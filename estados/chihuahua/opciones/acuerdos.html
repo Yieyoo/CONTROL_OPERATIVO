@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACUERDOS</title>
+    <title>Acuerdos</title>
     <link rel="stylesheet" href="../../diseños/estiloo.css">
 </head>
 <body>
@@ -36,7 +36,6 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                        <!-- Lista de estados -->
                         <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
                         <li><a href="estado-baja-california.html">Baja California</a></li>
                         <li><a href="estado-baja-california-sur.html">Baja California Sur</a></li>
@@ -68,7 +67,6 @@
                         <li><a href="estado-veracruz.html">Veracruz</a></li>
                         <li><a href="estado-yucatan.html">Yucatán</a></li>
                         <li><a href="estado-zacatecas.html">Zacatecas</a></li>
-                        <!-- ... (otros estados) ... -->
                     </ul>
                 </li>
             </ul>
@@ -85,20 +83,12 @@
 
     <!-- Cargar y ver el PDF -->
     <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-        <!-- Formulario para seleccionar y subir el PDF -->
-        <form id="uploadForm" style="display: flex; gap: 10px; align-items: center;">
-            <input type="file" id="pdfInput" accept="application/pdf" required>
-            <button type="submit">Subir PDF</button>
-        </form>
-
+        
         <!-- Visor del PDF -->
-        <iframe id="pdfViewer" width="90%" height="600px" style="border: 1px solid #000; margin-top: 20px;"></iframe>
-
-        <!-- Botón para eliminar el PDF -->
-        <button id="deleteButton" style="margin-top: 10px;">Eliminar PDF</button>
+        <div class="pdf-viewer">
+            <iframe id="pdfViewer" src="../../../documentacion/Acuerdos/ACUERDOS DE REUNIÓN DE SUPERVISIÓN OR CHIHUAHUA 2024_Con Firmas.pdf" style="border: 1px solid #000; width: 100%; height: 600px;"></iframe>
+        </div>
     </div>
-
-    <!-- Botón de regresar -->
     <button class="regresar-btn">Regresar</button>
 
     <!-- Vincular el archivo JavaScript -->
@@ -130,6 +120,11 @@
         // Función para mostrar/ocultar el submenú
         function toggleSubmenu(event) {
             event.preventDefault(); // Evita que el enlace recargue la página
+
+            // Cerrar todos los submenús antes de abrir uno nuevo
+            closeAllSubmenus();
+
+            // Abrir el submenú actual
             const submenu = event.target.closest('.submenu');
             submenu.classList.toggle('active');
         }
@@ -141,52 +136,12 @@
             }
         });
 
-        // Cargar el PDF almacenado al iniciar la página
-        document.addEventListener('DOMContentLoaded', () => {
-            const pdfInput = document.getElementById('pdfInput');
-            const uploadForm = document.getElementById('uploadForm');
-            const deleteButton = document.getElementById('deleteButton');
-            const pdfViewer = document.getElementById('pdfViewer');
-
-            // Cargar el PDF almacenado al iniciar la página
-            cargarPDF();
-
-            // Manejar la subida del archivo
-            uploadForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const file = pdfInput.files[0];
-                if (file && file.type === 'application/pdf') {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        // Guardar el PDF en localStorage con la clave 'ACUERDOS_pdf'
-                        localStorage.setItem('ACUERDOS_pdf', event.target.result);
-                        alert('PDF subido correctamente.');
-                        cargarPDF();
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    alert('Por favor, selecciona un archivo PDF válido.');
-                }
+        // Cerrar el submenú al hacer clic en una opción
+        const submenuLinks = document.querySelectorAll('.submenu-list a');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeAllSubmenus();
             });
-
-            // Manejar la eliminación del archivo
-            deleteButton.addEventListener('click', () => {
-                localStorage.removeItem('ACUERDOS_pdf'); // Eliminar el PDF usando la clave correcta
-                alert('PDF eliminado correctamente.');
-                cargarPDF();
-            });
-
-            // Cargar y mostrar el PDF almacenado
-            function cargarPDF() {
-                const pdfData = localStorage.getItem('ACUERDOS_pdf');
-                if (pdfData) {
-                    // Mostrar el PDF en el iframe
-                    pdfViewer.setAttribute('src', pdfData);
-                } else {
-                    // Limpiar el iframe si no hay PDF
-                    pdfViewer.removeAttribute('src');
-                }
-            }
         });
 
         // Regresar al historial
