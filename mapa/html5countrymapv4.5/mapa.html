@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Interactivo de México</title>
+    <link rel="stylesheet" href="../diseñom.css"> <!-- Nombre corregido -->
+</head>
+<body>
+
+    <header>Mapa Interactivo de México</header>
+
+    <!-- Contenedor del mapa -->
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+
+    <footer>
+        <p>Mapa generado con <a href="http://simplemaps.com" target="_blank">SimpleMaps</a></p>
+        <span id="fechaActual"></span>
+    </footer>
+
+    <!-- Fondo oscuro para el menú -->
+    <div class="menu-overlay"></div>
+    
+    <!-- Menú lateral -->
+    <nav class="menu">
+        <img src="../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
+        <ul>
+            <li><a href="../../index.html">Inicio</a></li>
+            <li><a href="mapa.html">Mapa</a></li>
+            <li class="submenu">
+                <a href="#" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                <ul class="submenu-list">
+                    <li><a href="datos-nacionales.html">Datos Nacionales</a></li>
+                    <li><a href="plantilla-personal.html">Plantilla de Personal</a></li>
+                    <li><a href="unidades-caninas.html">Unidades Caninas</a></li>
+                    <li><a href="inmuebles.html">Inmuebles</a></li>
+                </ul>
+            </li>
+            <li class="submenu">
+                <a href="#" onclick="toggleSubmenu(event)">Información de ORs</a>
+                <ul class="submenu-list">
+                  <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
+                  <li><a href="estado-baja-california.html">Baja California</a></li>
+                  <li><a href="estado-baja-california-sur.html">Baja California Sur</a></li>
+                  <li><a href="estado-campeche.html">Campeche</a></li>
+                  <li><a href="estado-chiapas.html">Chiapas</a></li>
+                  <li><a href="estados/chihuahua/chihuahua.html">Chihuahua</a></li>
+                  <li><a href="estado-coahuila.html">Coahuila</a></li>
+                  <li><a href="estado-colima.html">Colima</a></li>
+                  <li><a href="estado-durango.html">Durango</a></li>
+                  <li><a href="estado-guanajuato.html">Guanajuato</a></li>
+                  <li><a href="estado-guerrero.html">Guerrero</a></li>
+                  <li><a href="estado-hidalgo.html">Hidalgo</a></li>
+                  <li><a href="estado-jalisco.html">Jalisco</a></li>
+                  <li><a href="estado-mexico.html">Estado de México</a></li>
+                  <li><a href="estado-michoacan.html">Michoacán</a></li>
+                  <li><a href="estado-morelos.html">Morelos</a></li>
+                  <li><a href="estado-nayarit.html">Nayarit</a></li>
+                  <li><a href="estado-nuevo-leon.html">Nuevo León</a></li>
+                  <li><a href="estado-oaxaca.html">Oaxaca</a></li>
+                  <li><a href="estado-puebla.html">Puebla</a></li>
+                  <li><a href="estado-queretaro.html">Querétaro</a></li>
+                  <li><a href="estado-quintana-roo.html">Quintana Roo</a></li>
+                  <li><a href="estado-san-luis-potosi.html">San Luis Potosí</a></li>
+                  <li><a href="estado-sinaloa.html">Sinaloa</a></li>
+                  <li><a href="estado-sonora.html">Sonora</a></li>
+                  <li><a href="estado-tabasco.html">Tabasco</a></li>
+                  <li><a href="estado-tamaulipas.html">Tamaulipas</a></li>
+                  <li><a href="estado-tlaxcala.html">Tlaxcala</a></li>
+                  <li><a href="estado-veracruz.html">Veracruz</a></li>
+                  <li><a href="estado-yucatan.html">Yucatán</a></li>
+                  <li><a href="estado-zacatecas.html">Zacatecas</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Botón para abrir el menú -->
+    <button class="menu-toggle" onclick="toggleMenu()">☰ Menú</button>
+
+    <!-- Botón de regresar -->
+    <button class="regresar-btn">Regresar</button>
+
+    <script>
+        function toggleMenu() {
+            document.querySelector('.menu').classList.toggle('active');
+            document.querySelector('.menu-overlay').classList.toggle('active');
+        }
+
+        document.querySelector('.menu-overlay').addEventListener('click', () => {
+            document.querySelector('.menu').classList.remove('active');
+            document.querySelector('.menu-overlay').classList.remove('active');
+        });
+
+        function toggleSubmenu(event) {
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+
+        // Mostrar la fecha actual
+        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
+
+        document.querySelector('.regresar-btn').addEventListener('click', () => {
+            if (document.referrer) {
+                window.history.back();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+    </script>
+    
+    <script src="mapdata.js"></script>
+    <script src="countrymap.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultima Visita de Supervision y Evaluacion</title>
+    <link rel="stylesheet" href="../../diseños/estiloo.css">
+</head>
+<body>
+    <!-- Fondo oscuro para el menú -->
+    <div class="menu-overlay"></div>
+
+    <header>
+        <!-- Botón para abrir el menú en móviles -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰ Menú</button>
+
+        <!-- Menú principal -->
+        <nav class="menu">
+            <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
+            <ul>
+                <li><a href="../../../index.html">Inicio</a></li>
+                <li><a href="../../../mapa/html5countrymapv4.5/mapa.html">Mapa</a></li>
+                <!-- Submenú Datos Nacionales -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                        <li><a href="datos-nacionales.html">Datos Nacionales</a></li>
+                        <li><a href="plantilla-personal.html">Plantilla de Personal</a></li>
+                        <li><a href="unidades-caninas.html">Unidades Caninas</a></li>
+                        <li><a href="inmuebles.html">Inmuebles</a></li>
+                    </ul>
+                </li>
+                <!-- Submenú Información de ORs -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <!-- Enlaces de ORs (ejemplo para Aguascalientes) -->
+                        <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
+                        <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
+                        <li><a href="estado-baja-california.html">Baja California</a></li>
+                        <li><a href="estado-baja-california-sur.html">Baja California Sur</a></li>
+                        <li><a href="estado-campeche.html">Campeche</a></li>
+                        <li><a href="estado-chiapas.html">Chiapas</a></li>
+                        <li><a href="estado-chihuahua.html">Chihuahua</a></li>
+                        <li><a href="estado-coahuila.html">Coahuila</a></li>
+                        <li><a href="estado-colima.html">Colima</a></li>
+                        <li><a href="estado-durango.html">Durango</a></li>
+                        <li><a href="estado-guanajuato.html">Guanajuato</a></li>
+                        <li><a href="estado-guerrero.html">Guerrero</a></li>
+                        <li><a href="estado-hidalgo.html">Hidalgo</a></li>
+                        <li><a href="estado-jalisco.html">Jalisco</a></li>
+                        <li><a href="estado-mexico.html">Estado de México</a></li>
+                        <li><a href="estado-michoacan.html">Michoacán</a></li>
+                        <li><a href="estado-morelos.html">Morelos</a></li>
+                        <li><a href="estado-nayarit.html">Nayarit</a></li>
+                        <li><a href="estado-nuevo-leon.html">Nuevo León</a></li>
+                        <li><a href="estado-oaxaca.html">Oaxaca</a></li>
+                        <li><a href="estado-puebla.html">Puebla</a></li>
+                        <li><a href="estado-queretaro.html">Querétaro</a></li>
+                        <li><a href="estado-quintana-roo.html">Quintana Roo</a></li>
+                        <li><a href="estado-san-luis-potosi.html">San Luis Potosí</a></li>
+                        <li><a href="estado-sinaloa.html">Sinaloa</a></li>
+                        <li><a href="estado-sonora.html">Sonora</a></li>
+                        <li><a href="estado-tabasco.html">Tabasco</a></li>
+                        <li><a href="estado-tamaulipas.html">Tamaulipas</a></li>
+                        <li><a href="estado-tlaxcala.html">Tlaxcala</a></li>
+                        <li><a href="estado-veracruz.html">Veracruz</a></li>
+                        <li><a href="estado-yucatan.html">Yucatán</a></li>
+                        <li><a href="estado-zacatecas.html">Zacatecas</a></li>
+                        <!-- más estados... -->
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenedor de logos -->
+    <div class="logo-container">
+        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
+    </div>
+
+    <!-- Título visible en la página -->
+    <h1>Ultima Visita de Supervision y Evaluacion</h1>
+
+    <!-- Cargar y ver el PDF -->
+    <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <!-- Formulario para seleccionar y subir el PDF -->
+        <form id="uploadForm" style="display: flex; gap: 10px; align-items: center;">
+            <input type="file" id="pdfInput" accept="application/pdf" required>
+            <button type="submit">Subir PDF</button>
+        </form>
+
+        <!-- Visor del PDF -->
+        <iframe id="pdfViewer" width="100%" height="500px" style="border: 1px solid #000;"></iframe>
+
+        <!-- Botón para eliminar el PDF -->
+        <button id="deleteButton" style="margin-top: 10px;">Eliminar PDF</button>
+    </div>
+
+    <button class="regresar-btn">Regresar</button>
+
+    <script>
+        // Función para abrir y cerrar el menú lateral
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        }
+
+        // Función para cerrar todos los submenús
+        function closeAllSubmenus() {
+            const submenus = document.querySelectorAll('.submenu.active');
+            submenus.forEach(submenu => {
+                submenu.classList.remove('active');
+            });
+        }
+
+        // Función para mostrar/ocultar el submenú
+        function toggleSubmenu(event) {
+            event.preventDefault(); // Evita que el enlace recargue la página
+            closeAllSubmenus();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+
+        // Cerrar el submenú al hacer clic fuera de él
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.submenu')) {
+                closeAllSubmenus();
+            }
+        });
+
+        // Cerrar el submenú al hacer clic en una opción
+        const submenuLinks = document.querySelectorAll('.submenu-list a');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeAllSubmenus();
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pdfInput = document.getElementById('pdfInput');
+            const uploadForm = document.getElementById('uploadForm');
+            const deleteButton = document.getElementById('deleteButton');
+            const pdfViewer = document.getElementById('pdfViewer');
+
+            // Cargar el PDF almacenado al iniciar la página
+            cargarPDF();
+
+            // Manejar la subida del archivo
+            uploadForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const file = pdfInput.files[0];
+                if (file && file.type === 'application/pdf') {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        // Obtener un identificador único para esta pestaña
+                        const tabId = window.location.pathname.split('/').pop().split('.')[0];
+                        localStorage.setItem(`Ultima_Visita_pdf_${tabId}`, event.target.result);
+                        alert('PDF subido correctamente.');
+                        cargarPDF();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Por favor, selecciona un archivo PDF válido.');
+                }
+            });
+
+            // Manejar la eliminación del archivo
+            deleteButton.addEventListener('click', () => {
+                const tabId = window.location.pathname.split('/').pop().split('.')[0];
+                localStorage.removeItem(`Ultima_Visita_pdf_${tabId}`);
+                alert('PDF eliminado correctamente.');
+                cargarPDF();
+            });
+
+            // Cargar y mostrar el PDF almacenado
+            function cargarPDF() {
+                const tabId = window.location.pathname.split('/').pop().split('.')[0];
+                const pdfData = localStorage.getItem(`Ultima_Visita_pdf_${tabId}`);
+                if (pdfData) {
+                    pdfViewer.setAttribute('src', pdfData);
+                } else {
+                    pdfViewer.removeAttribute('src');
+                }
+            }
+        });
+
+        // Regresar al historial
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>
