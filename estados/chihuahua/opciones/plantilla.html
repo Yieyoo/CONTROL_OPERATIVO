@@ -92,10 +92,9 @@
         </form>
 
         <!-- Visor del PDF -->
-<!-- Visor del PDF -->
-<div class="pdf-viewer">
-    <iframe id="pdfViewer" src="" style="border: 1px solid #000;"></iframe>
-</div>
+        <div class="pdf-viewer">
+            <iframe id="pdfViewer" src="" style="border: 1px solid #000;"></iframe>
+        </div>
 
         <!-- Botón para eliminar el PDF -->
         <button id="deleteButton" style="margin-top: 10px;">Eliminar PDF</button>
@@ -201,6 +200,7 @@
                 }
             }
         });
+        
         // Regresar al historial
         document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
