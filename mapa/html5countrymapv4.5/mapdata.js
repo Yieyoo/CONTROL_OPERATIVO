@@ -82,7 +82,7 @@ var simplemaps_countrymap_mapdata = {
     MXBCN: {
       name: "Baja California",
       description: " ",
-      url: "https://es.wikipedia.org/wiki/Baja_California" // URL de redirección
+      url: "../../estados/baja california/baja california.html" // URL de redirección
     },
     MXBCS: {
       name: "Baja California Sur",
