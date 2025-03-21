@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chihuahua</title>
+    <link rel="icon" type="image/png" href="../../imagenes/pasaporte.png">
+    <link rel="stylesheet" href="diseñoch.css">
+</head>
+<body>
+    <!-- Fondo oscuro para el menú -->
+    <div class="menu-overlay"></div>
+
+    <header>
+        <!-- Botón para abrir el menú en móviles -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰ Menú</button>
+
+        <!-- Menú principal -->
+        <nav class="menu">
+            <img src="../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
+            <ul>
+                <li><a href="../../index.html">Inicio</a></li>
+                <li><a href="../../mapa/html5countrymapv4.5/mapa.html">Mapa</a></li>
+
+                <!-- Submenú Datos Nacionales -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                        <li><a href="datos-nacionales.html">Datos Nacionales</a></li>
+                        <li><a href="plantilla-personal.html">Plantilla de Personal</a></li>
+                        <li><a href="unidades-caninas.html">Unidades Caninas</a></li>
+                        <li><a href="inmuebles.html">Inmuebles</a></li>
+                    </ul>
+                </li>
+
+                <!-- Submenú Información de ORs -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
+                        <li><a href="estado-baja-california.html">Baja California</a></li>
+                        <li><a href="estado-baja-california-sur.html">Baja California Sur</a></li>
+                        <li><a href="estado-campeche.html">Campeche</a></li>
+                        <li><a href="estado-chiapas.html">Chiapas</a></li>
+                        <li><a href="estado-chihuahua.html">Chihuahua</a></li>
+                        <li><a href="estado-coahuila.html">Coahuila</a></li>
+                        <li><a href="estado-colima.html">Colima</a></li>
+                        <li><a href="estado-durango.html">Durango</a></li>
+                        <li><a href="estado-guanajuato.html">Guanajuato</a></li>
+                        <li><a href="estado-guerrero.html">Guerrero</a></li>
+                        <li><a href="estado-hidalgo.html">Hidalgo</a></li>
+                        <li><a href="estado-jalisco.html">Jalisco</a></li>
+                        <li><a href="estado-mexico.html">Estado de México</a></li>
+                        <li><a href="estado-michoacan.html">Michoacán</a></li>
+                        <li><a href="estado-morelos.html">Morelos</a></li>
+                        <li><a href="estado-nayarit.html">Nayarit</a></li>
+                        <li><a href="estado-nuevo-leon.html">Nuevo León</a></li>
+                        <li><a href="estado-oaxaca.html">Oaxaca</a></li>
+                        <li><a href="estado-puebla.html">Puebla</a></li>
+                        <li><a href="estado-queretaro.html">Querétaro</a></li>
+                        <li><a href="estado-quintana-roo.html">Quintana Roo</a></li>
+                        <li><a href="estado-san-luis-potosi.html">San Luis Potosí</a></li>
+                        <li><a href="estado-sinaloa.html">Sinaloa</a></li>
+                        <li><a href="estado-sonora.html">Sonora</a></li>
+                        <li><a href="estado-tabasco.html">Tabasco</a></li>
+                        <li><a href="estado-tamaulipas.html">Tamaulipas</a></li>
+                        <li><a href="estado-tlaxcala.html">Tlaxcala</a></li>
+                        <li><a href="estado-veracruz.html">Veracruz</a></li>
+                        <li><a href="estado-yucatan.html">Yucatán</a></li>
+                        <li><a href="estado-zacatecas.html">Zacatecas</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Información del instituto -->
+    <section class="instituto-info">
+        <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
+        <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
+        <h3>Dirección de Control Operativo</h3>
+        <div class="fecha-actual" id="fechaActual"></div>
+        <button class="regresar-btn">Regresar</button>
+    </section>
+
+    <!-- Agregamos el nombre del estado aquí -->
+    <div class="estado-info">
+        <h4>Chihuahua</h4> <!-- Aquí puedes cambiar el nombre del estado según sea necesario -->
+    </div>
+
+    <!-- Contenedor solo para las opciones -->
+    <div class="contenedor-principal">
+        <div class="opciones-container">
+            <div class="opciones-grid">
+                <div class="fila">
+                    <button class="btn-1" onclick="location.href='OPCIONES/FICHA.HTML'">Ficha Curricular</button>
+                </div>
+                <div class="fila">
+                    <button class="btn-2" onclick="location.href='OPCIONES/ORGANIGRAMA.HTML'">Organigrama</button>
+                    <button class="btn-3" onclick="location.href='OPCIONES/PLANTILLA.HTML'">Plantilla de Personal</button>
+                </div>
+                <div class="fila">
+                    <button class="btn-4" onclick="location.href='OPCIONES/VISITA.HTML'">Última Visita de Supervisión y Evaluación</button>
+                    <button class="btn-5" onclick="location.href='OPCIONES/ACUERDOS.HTML'">Acuerdos de Visita de Supervisión y Evaluación</button>
+                </div>
+                <div class="fila">
+                    <button class="btn-6" onclick="location.href='OPCIONES/VEHICULOS.HTML'">Vehículos</button>
+                    <button class="btn-7" onclick="location.href='OPCIONES/INMUEBLES.HTML'">Inmuebles</button>
+                    <button class="btn-8" onclick="location.href='OPCIONES/PERROS.HTML'">Unidad Canina</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor de logos -->
+    <div class="logo-container">
+        <img src="../../imagenes/inm logo.png" alt="Logo 1">
+    </div>
+
+    <script>
+        // Función para abrir y cerrar el menú lateral
+function toggleMenu() {
+    const menu = document.querySelector('.menu');
+    const menuOverlay = document.querySelector('.menu-overlay');
+    menu.classList.toggle('active');
+    menuOverlay.classList.toggle('active');
+}
+
+// Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+const menuOverlay = document.querySelector('.menu-overlay');
+menuOverlay.addEventListener('click', () => {
+    const menu = document.querySelector('.menu');
+    menu.classList.remove('active');
+    menuOverlay.classList.remove('active');
+});
+
+// Función para cerrar todos los submenús
+function closeAllSubmenus() {
+    const submenus = document.querySelectorAll('.submenu.active');
+    submenus.forEach(submenu => {
+        submenu.classList.remove('active');
+    });
+}
+
+// Función para mostrar/ocultar el submenú
+function toggleSubmenu(event) {
+    event.preventDefault(); // Evita que el enlace recargue la página
+
+    // Cerrar todos los submenús antes de abrir uno nuevo, si es necesario
+    const submenu = event.target.closest('.submenu');
+    
+    // Si el submenú ya está abierto, lo cerramos
+    if (submenu.classList.contains('active')) {
+        submenu.classList.remove('active');
+    } else {
+        // Si no está abierto, cerramos todos los submenús y luego abrimos este
+        closeAllSubmenus();
+        submenu.classList.add('active');
+    }
+}
+
+// Cerrar el submenú al hacer clic fuera de él
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.submenu') && !e.target.closest('.menu-toggle')) {
+        closeAllSubmenus();
+    }
+});
+
+// Cerrar el submenú al hacer clic en una opción
+const submenuLinks = document.querySelectorAll('.submenu-list a');
+submenuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        closeAllSubmenus();
+    });
+});
+
+// Mostrar la fecha actual
+document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
+
+// Regresar al historial
+document.querySelector('.regresar-btn').addEventListener('click', function() {
+    window.history.back();
+});
+
+    </script>
+</body>
+</html>
+    
