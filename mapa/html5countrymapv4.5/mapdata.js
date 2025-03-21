@@ -97,7 +97,7 @@ var simplemaps_countrymap_mapdata = {
     MXCHH: {
       name: "Chihuahua",
       description: " ",
-      url: "../../estados/chihuahua/chihuahua" // URL de redirección
+      url: "../../estados/chihuahua/chihuahua.html" // URL de redirección
     },
     MXCHP: {
       name: "Chiapas",
