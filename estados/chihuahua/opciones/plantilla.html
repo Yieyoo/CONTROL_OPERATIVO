@@ -82,22 +82,12 @@
     <h1>Plantilla de Personal Chihuahua</h1>
 
     <!-- Cargar y ver el PDF -->
-    <!-- Contenedor para subir, ver y eliminar PDF -->
     <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
         
-        <!-- Formulario para seleccionar y subir el PDF -->
-        <form id="uploadForm" style="display: flex; gap: 10px; align-items: center;">
-            <input type="file" id="pdfInput" accept="application/pdf" required>
-            <button type="submit">Subir PDF</button>
-        </form>
-
         <!-- Visor del PDF -->
         <div class="pdf-viewer">
-            <iframe id="pdfViewer" src="" style="border: 1px solid #000;"></iframe>
+            <iframe id="pdfViewer" src="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf" style="border: 1px solid #000; width: 100%; height: 600px;"></iframe>
         </div>
-
-        <!-- Botón para eliminar el PDF -->
-        <button id="deleteButton" style="margin-top: 10px;">Eliminar PDF</button>
     </div>
     <button class="regresar-btn">Regresar</button>
 
@@ -154,53 +144,6 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const pdfInput = document.getElementById('pdfInput');
-            const uploadForm = document.getElementById('uploadForm');
-            const deleteButton = document.getElementById('deleteButton');
-            const pdfViewer = document.getElementById('pdfViewer');
-
-            // Cargar el PDF almacenado al iniciar la página
-            cargarPDF();
-
-            // Manejar la subida del archivo
-            uploadForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const file = pdfInput.files[0];
-                if (file && file.type === 'application/pdf') {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        // Guardar el PDF en localStorage con una clave única
-                        localStorage.setItem('plantilla_personal_pdf', event.target.result);
-                        alert('PDF subido correctamente.');
-                        cargarPDF();
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    alert('Por favor, selecciona un archivo PDF válido.');
-                }
-            });
-
-            // Manejar la eliminación del archivo
-            deleteButton.addEventListener('click', () => {
-                localStorage.removeItem('plantilla_personal_pdf');
-                alert('PDF eliminado correctamente.');
-                cargarPDF();
-            });
-
-            // Cargar y mostrar el PDF almacenado
-            function cargarPDF() {
-                const pdfData = localStorage.getItem('plantilla_personal_pdf');
-                if (pdfData) {
-                    // Aplicar zoom al cargar el PDF
-                    pdfViewer.setAttribute('src', pdfData + '#zoom=150'); // Ajusta el zoom aquí
-                } else {
-                    // Limpiar el iframe si no hay PDF
-                    pdfViewer.removeAttribute('src');
-                }
-            }
-        });
-        
         // Regresar al historial
         document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
