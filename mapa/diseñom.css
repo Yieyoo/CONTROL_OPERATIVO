@@ -7,8 +7,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden; /* Elimina cualquier desplazamiento horizontal no deseado */
     font-family: Arial, sans-serif;
-    
-  
+
 }
 
 header {
@@ -29,20 +28,49 @@ header {
 }
 
 /* --- Contenedor del mapa --- */
+/* --- Contenedor del mapa --- */
 .map-container {
     padding: 2vw;
     text-align: center;
     margin-top: 2vw;
     margin-left: 18vw; /* Espacio para el menú en escritorio */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh; /* Ajusta la altura para que el mapa ocupe más espacio */
 }
 
 /* --- Imagen del mapa --- */
 img {
     max-width: 100%;
     height: auto;
+    max-height: 80vh; /* Limita la altura máxima de la imagen */
 }
 
-/* --- Menú lateral --- */
+/* --- Estilos Responsivos --- */
+@media (max-width: 1024px) {
+    .map-container {
+        margin-left: 0;
+        padding: 2vw;
+        height: 70vh; /* Ajusta la altura para tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .map-container {
+        height: 60vh; /* Ajusta la altura para dispositivos móviles más grandes */
+    }
+}
+
+@media (max-width: 480px) {
+    .map-container {
+        height: 50vh; /* Ajusta la altura para dispositivos móviles más pequeños */
+    }
+
+    img {
+        max-height: 50vh; /* Ajusta la altura máxima de la imagen en móviles */
+    }
+}
 nav.menu {
     position: fixed;
     top: 0;
