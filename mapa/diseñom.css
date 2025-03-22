@@ -229,13 +229,28 @@ nav.menu ul li a:hover {
 }
 
 /* --- Fecha actual --- */
-.fecha-actual {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    transform: translateX(100%);
-    font-size: 1.2vw;
-    color: #333;
+
+#fechaActual {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: rgba(105, 25, 50, 0.9);
+    padding: 10px 20px;
+    border-radius: 25px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    font-family: 'Arial', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#fechaActual:hover {
+    background-color: rgba(142, 92, 113, 0.9);
+    transform: translateY(-2px);
 }
 
 /* --- Botón de regreso --- */
