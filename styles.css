@@ -31,7 +31,7 @@ body {
     transform: translateX(-50%);
     max-width: 250px;
     height: auto;
-    z-index: 1000;
+    z-index: 500;
 }
 
 /* --- Contenedor principal --- */
