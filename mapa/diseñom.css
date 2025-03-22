@@ -1,19 +1,24 @@
 /* --- Estilo general para el cuerpo --- */
 body {
-    background-image: url('../IMAGENES/FONDO.jpg'); /* Fondo de la página */
+    background-image: url('../imagenes/fondo.jpg'); /* Fondo de la página */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     min-height: 100vh;
     overflow-x: hidden; /* Elimina cualquier desplazamiento horizontal no deseado */
     font-family: Arial, sans-serif;
-
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* --- Título --- */
 header {
     text-align: center;
     font-size: 2em;
     margin-top: 20px;
+    width: 100%; /* Asegura que el título ocupe todo el ancho */
+    z-index: 1000; /* Asegura que el título esté por encima de otros elementos */
 }
 
 /* --- Logo superior --- */
@@ -27,7 +32,7 @@ header {
     z-index: 1000;
 }
 
-/* --- Contenedor del mapa --- */
+
 /* --- Contenedor del mapa --- */
 .map-container {
     padding: 2vw;
@@ -37,14 +42,15 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80vh; /* Ajusta la altura para que el mapa ocupe más espacio */
+    height: 70vh; /* Ajusta la altura para que el mapa ocupe más espacio */
+    width: 80%; /* Limita el ancho del contenedor del mapa */
 }
 
 /* --- Imagen del mapa --- */
 img {
     max-width: 100%;
     height: auto;
-    max-height: 80vh; /* Limita la altura máxima de la imagen */
+    max-height: 70vh; /* Limita la altura máxima de la imagen */
 }
 
 /* --- Estilos Responsivos --- */
@@ -52,23 +58,26 @@ img {
     .map-container {
         margin-left: 0;
         padding: 2vw;
-        height: 70vh; /* Ajusta la altura para tablets */
+        height: 60vh; /* Ajusta la altura para tablets */
+        width: 90%; /* Aumenta el ancho en tablets */
     }
 }
 
 @media (max-width: 768px) {
     .map-container {
-        height: 60vh; /* Ajusta la altura para dispositivos móviles más grandes */
+        height: 50vh; /* Ajusta la altura para dispositivos móviles más grandes */
+        width: 95%; /* Aumenta el ancho en móviles */
     }
 }
 
 @media (max-width: 480px) {
     .map-container {
-        height: 50vh; /* Ajusta la altura para dispositivos móviles más pequeños */
+        height: 40vh; /* Ajusta la altura para dispositivos móviles más pequeños */
+        width: 100%; /* Ocupa todo el ancho en móviles pequeños */
     }
 
     img {
-        max-height: 50vh; /* Ajusta la altura máxima de la imagen en móviles */
+        max-height: 40vh; /* Ajusta la altura máxima de la imagen en móviles */
     }
 }
 nav.menu {
