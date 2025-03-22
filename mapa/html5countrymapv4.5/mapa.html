@@ -16,9 +16,8 @@
     </div>
 
     <footer>
-        <span id="fechaActual"></span>
+        <span class="fecha-actual"></span>
     </footer>
-
     <!-- Fondo oscuro para el menú -->
     <div class="menu-overlay"></div>
     
@@ -99,7 +98,7 @@
         }
 
         // Mostrar la fecha actual
-        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
+        document.querySelector(".fecha-actual").innerHTML = new Date().toLocaleDateString();
 
         document.querySelector('.regresar-btn').addEventListener('click', () => {
             if (document.referrer) {
