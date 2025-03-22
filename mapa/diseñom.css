@@ -84,23 +84,6 @@ nav.menu ul li a:hover {
     transform: translateX(1vw);
 }
 
-/* --- Fondo oscuro del menú --- */
-.menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-}
-
-.menu-overlay.active {
-    display: block;
-    opacity: 1;
-}
-
 /* --- Botón de menú --- */
 .menu-toggle {
     background-color: #691932;
@@ -116,6 +99,61 @@ nav.menu ul li a:hover {
     z-index: 1000;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s, transform 0.2s;
+}
+
+.menu-toggle:hover {
+    background-color: #8e5c71;
+    transform: scale(1.05);
+}
+
+/* --- Estilos Responsivos --- */
+@media (max-width: 1024px) {
+    nav.menu {
+        width: 20vw; /* Menú más estrecho en tablets */
+        left: -20vw;
+    }
+
+    nav.menu ul li a {
+        font-size: 1.8vw; /* Fuente un poco más grande en tablets */
+    }
+
+    .menu-toggle {
+        font-size: 2vw; /* Botón un poco más grande en tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    nav.menu {
+        width: 30vw; /* Menú más estrecho en móviles */
+        left: -30vw;
+    }
+
+    nav.menu ul li a {
+        font-size: 2.5vw; /* Fuente más grande pero no demasiado */
+        padding: 1.2vw; /* Espaciado cómodo para tocar */
+    }
+
+    .menu-toggle {
+        font-size: 3vw; /* Botón más grande pero no demasiado */
+        padding: 1.2vw 2.5vw;
+    }
+}
+
+@media (max-width: 480px) {
+    nav.menu {
+        width: 40vw; /* Menú un poco más ancho en móviles pequeños */
+        left: -40vw;
+    }
+
+    nav.menu ul li a {
+        font-size: 3vw; /* Fuente más grande pero compacta */
+        padding: 1.5vw; /* Espaciado cómodo para tocar */
+    }
+
+    .menu-toggle {
+        font-size: 3.5vw; /* Botón más grande pero compacto */
+        padding: 1.5vw 3vw;
+    }
 }
 
 .menu-toggle:hover {
@@ -190,7 +228,6 @@ nav.menu ul li a:hover {
     }
 }
 
-/* --- Fecha actual --- */
 /* --- Fecha actual --- */
 #fechaActual {
     position: fixed;
