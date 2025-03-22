@@ -1,6 +1,6 @@
 /* --- Estilo general para el cuerpo --- */
 body {
-    background-image: url('../IMAGENES/FONDO.jpg'); /* Fondo de la página */
+    background-image: url('../imagenes/fondo.jpg'); /* Fondo de la página */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
