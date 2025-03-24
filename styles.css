@@ -319,7 +319,7 @@ h1, h2, p {
 @media (max-width: 768px) {
     .fecha-actual {
         font-size: 4vw;  /* Aumentamos el tamaño del texto en pantallas pequeñas */
-        top: 60vw;        /* Bajamos un poco la posición */
+        top: 70vw;        /* Bajamos un poco la posición */
         right: 40vw;      /* Ajustamos la distancia desde la derecha */
         padding: 2vw 3vw; /* Más espacio interno para facilitar la lectura */
     }
