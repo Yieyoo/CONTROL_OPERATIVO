@@ -81,18 +81,24 @@ h<!DOCTYPE html>
         <h1>Plantilla de Personal Chihuahua</h1>
     </div>
     <div class="pdf-container">
-        <!-- Usar object en lugar de embed/iframe -->
+        <!-- Usaremos object con tamaños responsivos -->
         <object 
             data="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf#toolbar=0&navpanes=0&scrollbar=1" 
             type="application/pdf"
-            width="100%"
-            height="500px"
-            style="display: block; overflow: auto !important; -webkit-overflow-scrolling: touch !important;"
+            style="
+                width: 100%;
+                height: 80vh;
+                min-height: 600px;
+                display: block;
+                border: 1px solid #691932;
+                border-radius: 8px;
+                overflow: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            "
         >
             <p>Tu navegador no soporta PDFs. <a href="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf">Descárgalo aquí</a>.</p>
         </object>
     </div>
-
 
        <!-- Contenedor con márgenes y estilo 
 <div class="container">
@@ -112,11 +118,24 @@ h<!DOCTYPE html>
 
     <!-- Vincular el archivo JavaScript -->
     <script>
-         <!-- Script para iOS (añade JUSTO AQUÍ) -->
-
-         if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            document.querySelector('object').style.height = 'calc(100vh - 100px)';
+         // Ajuste automático para dispositivos
+    document.addEventListener('DOMContentLoaded', function() {
+        const pdfViewer = document.querySelector('object');
+        
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            // Para móviles iOS
+            pdfViewer.style.height = 'calc(100vh - 150px)';
+            pdfViewer.style.minHeight = '300px';
+        } else if (window.innerWidth < 768) {
+            // Para otros móviles
+            pdfViewer.style.height = '70vh';
+            pdfViewer.style.minHeight = '400px';
+        } else {
+            // Para escritorio
+            pdfViewer.style.height = '80vh';
+            pdfViewer.style.minHeight = '600px';
         }
+    });
 
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
