@@ -331,10 +331,28 @@ html, body {
 
 
 /* --- Contenedor principal del PDF (con márgenes) --- */
-.container {
+.pdf-container {
+    width: 90%;
+    margin: 20px auto;
+    border: 1px solid #691932;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+object {
     width: 100%;
-    padding: 0 20px; /* Márgenes laterales */
-    box-sizing: border-box; /* Incluye el padding en el ancho */
+    height: 70vh;
+    min-height: 500px;
+    display: block;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+@media screen and (max-width: 768px) {
+    object {
+        height: 60vh;
+        min-height: 300px;
+    }
 }
 
 /* --- Visor del PDF (estético y responsive) --- */
