@@ -1,10 +1,37 @@
-h<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PLANTILLA DE PERSONAL</title>
     <link rel="stylesheet" href="../../diseños/estiloo.css">
+    <style>
+        /* Estilos específicos para el visor PDF */
+        .pdf-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        
+        .pdf-embed {
+            width: 100%;
+            height: 80vh;
+            min-height: 600px;
+            border: 1px solid #691932;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        @media screen and (max-width: 768px) {
+            .pdf-embed {
+                height: 70vh;
+                min-height: 400px;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Fondo oscuro para el menú -->
@@ -77,65 +104,48 @@ h<!DOCTYPE html>
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo 1">
     </div>
+    
     <div class="header-container">
         <h1>Plantilla de Personal Chihuahua</h1>
     </div>
+
+    <!-- Contenedor del PDF - Versión optimizada -->
     <div class="pdf-container">
-        <!-- Usaremos object con tamaños responsivos -->
-        <object 
-            data="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf#toolbar=0&navpanes=0&scrollbar=1" 
-            type="application/pdf"
-            style="
-                width: 100%;
-                height: 80vh;
-                min-height: 600px;
-                display: block;
-                border: 1px solid #691932;
-                border-radius: 8px;
-                overflow: auto !important;
-                -webkit-overflow-scrolling: touch !important;
-            "
-        >
-            <p>Tu navegador no soporta PDFs. <a href="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf">Descárgalo aquí</a>.</p>
-        </object>
+        <iframe 
+            src="../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf"
+            class="pdf-embed"
+            frameborder="0"
+        ></iframe>
     </div>
 
-       <!-- Contenedor con márgenes y estilo 
-<div class="container">
-    <div class="pdf-viewer">
-        <embed 
-            src="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf" 
-            type="application/pdf" 
-            width="100%" 
-            height="100%"
-            style="-webkit-overflow-scrolling: touch; overflow: auto;"
-
-        >
-    </div>
-</div>
--->
     <button class="regresar-btn">Regresar</button>
 
-    <!-- Vincular el archivo JavaScript -->
+    <!-- Scripts -->
     <script>
-         // Ajuste automático para dispositivos
-    document.addEventListener('DOMContentLoaded', function() {
-        const pdfViewer = document.querySelector('object');
-        
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-            // Para móviles iOS
-            pdfViewer.style.height = 'calc(100vh - 150px)';
-            pdfViewer.style.minHeight = '300px';
-        } else if (window.innerWidth < 768) {
-            // Para otros móviles
-            pdfViewer.style.height = '70vh';
-            pdfViewer.style.minHeight = '400px';
-        } else {
-            // Para escritorio
-            pdfViewer.style.height = '80vh';
-            pdfViewer.style.minHeight = '600px';
+        // Ajuste responsivo del visor PDF
+        function adjustPDFViewer() {
+            const pdfViewer = document.querySelector('.pdf-embed');
+            
+            if (!pdfViewer) return;
+            
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                // Para iOS
+                pdfViewer.style.height = 'calc(100vh - 200px)';
+                pdfViewer.style.minHeight = '300px';
+            } else if (window.innerWidth < 768) {
+                // Para móviles en general
+                pdfViewer.style.height = '65vh';
+                pdfViewer.style.minHeight = '350px';
+            } else {
+                // Para escritorio
+                pdfViewer.style.height = '75vh';
+                pdfViewer.style.minHeight = '600px';
+            }
         }
-    });
+
+        // Ejecutar al cargar y al cambiar tamaño
+        window.addEventListener('load', adjustPDFViewer);
+        window.addEventListener('resize', adjustPDFViewer);
 
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
@@ -145,7 +155,7 @@ h<!DOCTYPE html>
             menuOverlay.classList.toggle('active');
         }
 
-        // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+        // Cerrar el menú al hacer clic fuera de él
         const menuOverlay = document.querySelector('.menu-overlay');
         menuOverlay.addEventListener('click', () => {
             const menu = document.querySelector('.menu');
@@ -163,12 +173,8 @@ h<!DOCTYPE html>
 
         // Función para mostrar/ocultar el submenú
         function toggleSubmenu(event) {
-            event.preventDefault(); // Evita que el enlace recargue la página
-
-            // Cerrar todos los submenús antes de abrir uno nuevo
+            event.preventDefault();
             closeAllSubmenus();
-
-            // Abrir el submenú actual
             const submenu = event.target.closest('.submenu');
             submenu.classList.toggle('active');
         }
