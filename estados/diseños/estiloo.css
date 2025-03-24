@@ -339,14 +339,21 @@ html, body {
 /* --- Visor del PDF (estético y responsive) --- */
 .pdf-viewer {
     width: 100%;
-    max-width: 900px; /* Ancho máximo para pantallas grandes */
-    height: 80vh;
-    margin: 20px auto; /* Centrado y margen vertical */
+    height: 70vh;
+    margin: 20px auto;
+    border: 1px solid #691932; /* Color que coincide con tu diseño */
+    border-radius: 12px;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    background: #f5f5f5; /* Fondo de respaldo */
+}
+.pdf-scroll-container {
+    width: 90%;
+    height: 70vh;
+    margin: 0 auto;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
     border: 1px solid #ddd;
-    border-radius: 12px; /* Esquinas redondeadas */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
-    overflow: hidden; /* Oculta el scroll del contenedor */
-    background: #f9f9f9; /* Fondo por si falla el PDF */
 }
 
 /* Iframe del PDF (ajuste perfecto) */
