@@ -22,7 +22,7 @@ body {
 /* --- Menú lateral --- */
 nav.menu {
     position: fixed;
-    top: 0;
+    top: 0x;
     left: -250px;
     width: 250px;
     height: 100%;
@@ -134,7 +134,7 @@ nav.menu ul li a:hover {
     font-size: 14px;
     cursor: pointer;
     position: fixed;
-    top: 50px;
+    top: 10px;
     left: 20px;
     border-radius: 5px;
     z-index: 1000;
@@ -154,7 +154,7 @@ nav.menu ul li a:hover {
     right: 20px;
     display: flex;
     gap: 20px;
-    z-index: 9999;
+    z-index: 100;
 }
 
 .logo-container img {
@@ -384,4 +384,18 @@ html, body {
 
 .regresar-btn:hover {
     background-color: #8e5c71;
+}
+.header-container {
+    text-align: center;  /* Centra los elementos dentro del contenedor */
+    margin-top: 20px;    /* Agrega espacio arriba si es necesario */
+}
+
+h1 {
+    font-size: 24px;  /* Tamaño del título */
+    margin-bottom: 10px;  /* Espacio debajo del título */
+}
+
+.logo-arriba-img {
+    width: 150px;    /* Ajusta el tamaño de la imagen */
+    height: auto;    /* Mantiene la proporción de la imagen */
 }
