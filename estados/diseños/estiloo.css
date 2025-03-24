@@ -22,7 +22,7 @@ body {
 /* --- Menú lateral --- */
 nav.menu {
     position: fixed;
-    top: 0x;
+    top: 0;
     left: -250px;
     width: 250px;
     height: 100%;
@@ -250,27 +250,33 @@ nav.menu ul li a:hover {
         padding: 12px 15px;
     }
 
-
-
     .logo-arriba-img {
         width: 100px;
     }
-}
 
-
-/* Mobile */
-@media screen and (max-width: 768px) {
+    /* Ajuste específico para PDF en móviles */
     .pdf-viewer {
-        height: 65vh;
+        height: 60vh;
         min-height: 300px;
         -webkit-overflow-scrolling: touch;
     }
-    
-    /* Ajuste específico para iOS */
+
     @supports (-webkit-touch-callout: none) {
         .pdf-viewer {
             height: calc(100vh - 150px);
         }
+    }
+
+    /* Ajuste contenedor PDF en dispositivos pequeños */
+    .pdf-container {
+        width: 95%;
+        max-width: 100%;
+        margin: 10px auto;
+    }
+
+    .pdf-viewer iframe {
+        height: 100%;
+        width: 100%;
     }
 }
 
@@ -336,8 +342,6 @@ html, body {
     overflow-x: hidden;
 }
 
-
-
 /* --- Contenedor principal del PDF (con márgenes) --- */
 .pdf-container {
     width: 95%;
@@ -356,8 +360,6 @@ html, body {
     border: none;
     display: block;
 }
-
-
 
 /* Iframe del PDF (ajuste perfecto) */
 .pdf-viewer iframe {
@@ -401,17 +403,19 @@ html, body {
 .regresar-btn:hover {
     background-color: #8e5c71;
 }
+
+/* --- Header con título --- */
 .header-container {
-    text-align: center;  /* Centra los elementos dentro del contenedor */
-    margin-top: 20px;    /* Agrega espacio arriba si es necesario */
+    text-align: center;
+    margin-top: 20px;
 }
 
 h1 {
-    font-size: 24px;  /* Tamaño del título */
-    margin-bottom: 10px;  /* Espacio debajo del título */
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 .logo-arriba-img {
-    width: 150px;    /* Ajusta el tamaño de la imagen */
-    height: auto;    /* Mantiene la proporción de la imagen */
+    width: 150px;
+    height: auto;
 }
