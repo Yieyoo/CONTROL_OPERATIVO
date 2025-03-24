@@ -249,16 +249,21 @@ nav.menu ul li a:hover {
         font-size: 16px;
         padding: 12px 15px;
     }
-
-    .pdf-viewer {
-        width: 100vw;
-        height: 80vh;
+    .container {
+        padding: 0 15px; /* Márgenes más pequeños en móviles */
     }
+    
+    .pdf-viewer {
+        height: 70vh;
+        border-radius: 8px; /* Esquinas menos redondeadas */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra más ligera */
+    }
+}
 
     .logo-arriba-img {
         width: 100px;
     }
-}
+
 
 /* --- Logo en la parte superior --- */
 .logo-arriba-img {
@@ -322,33 +327,34 @@ html, body {
     overflow-x: hidden;
 }
 
-/* --- Contenedor principal --- */
+
+
+/* --- Contenedor principal del PDF (con márgenes) --- */
 .container {
     width: 100%;
-    max-width: none;
-    padding: 0;
-    margin: 0;
+    padding: 0 20px; /* Márgenes laterales */
+    box-sizing: border-box; /* Incluye el padding en el ancho */
 }
 
-/* --- Visor del PDF --- */
+/* --- Visor del PDF (estético y responsive) --- */
 .pdf-viewer {
-    width: 80%;
-    max-width: 1200px;
-    height: 90vh;
+    width: 100%;
+    max-width: 900px; /* Ancho máximo para pantallas grandes */
+    height: 80vh;
+    margin: 20px auto; /* Centrado y margen vertical */
     border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: transparent;
-    overflow: hidden;
-    margin: 0 auto;
+    border-radius: 12px; /* Esquinas redondeadas */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    overflow: hidden; /* Oculta el scroll del contenedor */
+    background: #f9f9f9; /* Fondo por si falla el PDF */
 }
 
-/* --- Iframe del PDF --- */
+/* Iframe del PDF (ajuste perfecto) */
 .pdf-viewer iframe {
     width: 100%;
     height: 100%;
     border: none;
-    background-color: transparent;
+    display: block;
 }
 
 /* --- Estilo del botón de eliminar --- */
