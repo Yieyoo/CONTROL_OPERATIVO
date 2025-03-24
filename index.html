@@ -84,6 +84,8 @@
         <div class="title-container">
             <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
         </div>
+        <!-- Fecha Actual -->
+        <div class="fecha-actual" id="fechaActual"></div>
     </header>
 
     <!-- Contenido de prueba -->
@@ -152,6 +154,8 @@
             closeAllSubmenus();
         });
     });
+    // Mostrar la fecha actual
+document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
     </script>
 
 </body>

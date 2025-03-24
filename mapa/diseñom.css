@@ -93,7 +93,7 @@ nav.menu ul li a:hover {
     font-size: 1.2vw;
     cursor: pointer;
     position: fixed;
-    top: 2vw;
+    top: 1vw;
     left: 2vw;
     border-radius: 0.5vw;
     z-index: 1000;
