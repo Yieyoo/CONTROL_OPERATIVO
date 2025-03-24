@@ -13,6 +13,7 @@
             margin: 20px auto;
             padding: 10px;
             box-sizing: border-box;
+            overflow: auto; /* Para habilitar la barra de desplazamiento */
         }
         
         .pdf-embed {
@@ -23,12 +24,12 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        
+
         @media screen and (max-width: 768px) {
             .pdf-embed {
                 height: 70vh;
                 min-height: 400px;
-                -webkit-overflow-scrolling: touch;
+                -webkit-overflow-scrolling: touch; /* Suaviza el desplazamiento en iOS */
             }
         }
     </style>
@@ -47,21 +48,9 @@
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
                 <li><a href="../../../mapa/html5countrymapv4.5/mapa.html">Mapa</a></li>
-
                 <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                        <li><a href="datos-nacionales.html">Datos Nacionales</a></li>
-                        <li><a href="plantilla-personal.html">Plantilla de Personal</a></li>
-                        <li><a href="unidades-caninas.html">Unidades Caninas</a></li>
-                        <li><a href="inmuebles.html">Inmuebles</a></li>
-                    </ul>
-                </li>
-
-                <!-- Submenú Información de ORs -->
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
                         <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
                         <li><a href="estado-baja-california.html">Baja California</a></li>
@@ -96,6 +85,17 @@
                         <li><a href="estado-zacatecas.html">Zacatecas</a></li>
                     </ul>
                 </li>
+
+                <!-- Submenú Información de ORs -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <!-- Lista de enlaces a los estados -->
+                        <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
+                        <li><a href="estado-baja-california.html">Baja California</a></li>
+                        <!-- Aquí van el resto de los estados -->
+                    </ul>
+                </li>
             </ul>
         </nav>
     </header>
@@ -109,24 +109,16 @@
         <h1>Plantilla de Personal Chihuahua</h1>
     </div>
 
-    <!-- Contenedor del PDF - Versión optimizada -->
-<div class="pdf-container">
-    <!-- Opción 1: Usar PDF.js (recomendado) -->
-    <iframe 
-    src=../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf 
-        class="pdf-embed"
-        frameborder="0"
-    ></iframe>
-    
-    <!-- Opción 2: Alternativa con embed (si PDF.js falla) -->
-    <!-- 
-    <embed
-        src="../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf#toolbar=0&navpanes=0&scrollbar=1"
-        class="pdf-embed"
-        type="application/pdf"
-    >
-    -->
-</div>
+    <!-- Contenedor del PDF -->
+    <div class="pdf-container">
+        <!-- Opción 1: Usar PDF.js (recomendado) -->
+        <iframe 
+            src="../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf" 
+            class="pdf-embed"
+            frameborder="0"
+        ></iframe>
+    </div>
+
     <button class="regresar-btn">Regresar</button>
 
     <!-- Scripts -->
