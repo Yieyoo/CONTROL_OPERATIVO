@@ -80,17 +80,20 @@ h<!DOCTYPE html>
     <div class="header-container">
         <h1>Plantilla de Personal Chihuahua</h1>
     </div>
-
-
-    <div class="pdf-viewer">
-        <!-- Usa ESTE código para GitHub Pages -->
-        <iframe
-            src="https://yieyoo.github.io/prueba/documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf"
+    <div class="pdf-container">
+        <!-- Usar object en lugar de embed/iframe -->
+        <object 
+            data="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf#toolbar=0&navpanes=0&scrollbar=1" 
+            type="application/pdf"
             width="100%"
-            height="600px"
-            style="border:none;"
-        ></iframe>
-    </div> 
+            height="500px"
+            style="display: block; overflow: auto !important; -webkit-overflow-scrolling: touch !important;"
+        >
+            <p>Tu navegador no soporta PDFs. <a href="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf">Descárgalo aquí</a>.</p>
+        </object>
+    </div>
+
+
        <!-- Contenedor con márgenes y estilo 
 <div class="container">
     <div class="pdf-viewer">
@@ -109,6 +112,12 @@ h<!DOCTYPE html>
 
     <!-- Vincular el archivo JavaScript -->
     <script>
+         <!-- Script para iOS (añade JUSTO AQUÍ) -->
+
+         if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            document.querySelector('object').style.height = 'calc(100vh - 100px)';
+        }
+
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
             const menu = document.querySelector('.menu');
