@@ -300,3 +300,28 @@ h1, h2, p {
     width: 150px; /* Ancho deseado */
     height: auto; /* Mantiene la proporción de la imagen */
 }
+.fecha-actual {
+    font-size: 1.5vw; /* Tamaño del texto para pantallas grandes */
+    font-weight: bold;
+    color: #691932;
+    background-color: #f4f4f4;
+    padding: 0.5vw 1vw;
+    border-radius: 0.5vw;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    
+    position: fixed;
+    top: 5vw;
+    right: 2vw;
+    z-index: 900;
+}
+
+/* Ajustes para pantallas pequeñas (celulares) */
+@media (max-width: 768px) {
+    .fecha-actual {
+        font-size: 4vw;  /* Aumentamos el tamaño del texto en pantallas pequeñas */
+        top: 60vw;        /* Bajamos un poco la posición */
+        right: 40vw;      /* Ajustamos la distancia desde la derecha */
+        padding: 2vw 3vw; /* Más espacio interno para facilitar la lectura */
+    }
+}
+
