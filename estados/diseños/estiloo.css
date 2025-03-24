@@ -259,10 +259,18 @@ nav.menu ul li a:hover {
 
 
 /* Mobile */
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     .pdf-viewer {
-        height: 60vh;
-        width: 95%;
+        height: 65vh;
+        min-height: 300px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ajuste específico para iOS */
+    @supports (-webkit-touch-callout: none) {
+        .pdf-viewer {
+            height: calc(100vh - 150px);
+        }
     }
 }
 
@@ -332,37 +340,21 @@ html, body {
 
 /* --- Contenedor principal del PDF (con márgenes) --- */
 .pdf-container {
-    width: 90%;
+    width: 95%;
+    max-width: 1200px;
     margin: 20px auto;
-    border: 1px solid #691932;
     border-radius: 12px;
     overflow: hidden;
-}
-
-object {
-    width: 100%;
-    height: 70vh;
-    min-height: 500px;
-    display: block;
-    overflow: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
-@media screen and (max-width: 768px) {
-    object {
-        height: 60vh;
-        min-height: 300px;
-    }
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 /* --- Visor del PDF (estético y responsive) --- */
 .pdf-viewer {
-    width: 90%;
-    max-width: 900px;
-    height: 70vh;
-    margin: 20px auto;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 100%;
+    height: 75vh;
+    min-height: 500px;
+    border: none;
+    display: block;
 }
 
 
