@@ -110,14 +110,23 @@
     </div>
 
     <!-- Contenedor del PDF - Versión optimizada -->
-    <div class="pdf-container">
-        <iframe 
-            src="../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf"
-            class="pdf-embed"
-            frameborder="0"
-        ></iframe>
-    </div>
-
+<div class="pdf-container">
+    <!-- Opción 1: Usar PDF.js (recomendado) -->
+    <iframe 
+    src=../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf 
+        class="pdf-embed"
+        frameborder="0"
+    ></iframe>
+    
+    <!-- Opción 2: Alternativa con embed (si PDF.js falla) -->
+    <!-- 
+    <embed
+        src="../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf#toolbar=0&navpanes=0&scrollbar=1"
+        class="pdf-embed"
+        type="application/pdf"
+    >
+    -->
+</div>
     <button class="regresar-btn">Regresar</button>
 
     <!-- Scripts -->
