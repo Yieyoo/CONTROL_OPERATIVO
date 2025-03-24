@@ -180,7 +180,7 @@ nav.menu ul li a {
     margin-bottom: 5px;
 }
 nav.menu li a {
-    padding: 10px; /* Ajusta el espacio dentro de cada enlace */
+    padding: 12px; /* Ajusta el espacio dentro de cada enlace */
     display: block;
     color: white;
     text-decoration: none;
