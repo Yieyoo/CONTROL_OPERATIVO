@@ -34,7 +34,27 @@ header {
     margin-top: 2vw;
     margin-left: 18vw; /* Espacio para el menú en escritorio */
 }
+/* Ajustes para pantallas medianas (tablets) */
+@media (max-width: 1024px) {
+    .map-container {
+        margin-left: 0; /* Elimina el margen lateral */
+        padding: 2vw;
+    }
+}
 
+/* Ajustes para celulares */
+@media (max-width: 768px) {
+    .map-container {
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 90vw; /* Ajusta el ancho para que no ocupe toda la pantalla */
+        padding: 2vw;
+    }
+}
 /* --- Imagen del mapa --- */
 img {
     max-width: 100%;
