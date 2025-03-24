@@ -152,10 +152,12 @@ nav.menu {
     padding-left: 20px;
 }
 
+/* Estado cuando el menú está activo */
 nav.menu.active {
     left: 0;
 }
 
+/* --- Estilos para los enlaces del menú --- */
 nav.menu ul {
     list-style-type: none;
     padding: 0;
@@ -175,61 +177,17 @@ nav.menu ul li a {
     margin-bottom: 5px;
 }
 
+/* Efecto hover en los enlaces del menú */
 nav.menu ul li a:hover {
     background-color: #8e5c71;
-    transform: translateX(10px);
-}
-
-/* --- Submenú --- */
-.submenu-list {
-    display: none;
-    padding-left: 20px;
-    background-color: #5a1a2b;
-    border-radius: 5px;
-    margin-top: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    animation: fadeIn 0.3s ease;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.submenu.active .submenu-list {
-    display: block;
-}
-
-.submenu-list li a {
-    padding: 6px 10px;
-    font-size: 12px;
-    background-color: #7d5a6e;
-    border-bottom: 1px solid #444;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    border-radius: 5px;
-    display: block;
-    line-height: 1.2;
-}
-
-.submenu-list li a:hover {
-    background-color: #8e5c71;
-    transform: translateX(5px);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    transform: translateX(10px); /* Desplazamiento al hacer hover */
 }
 
 /* --- Fondo oscuro para el menú --- */
 .menu-overlay {
     display: none;
     position: fixed;
-    top: 0;
+    top: -20;
     left: 0;
     width: 100%;
     height: 100%;
@@ -260,19 +218,79 @@ nav.menu ul li a:hover {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+/* Efecto hover en el botón de menú */
 .menu-toggle:hover {
     background-color: #8e5c71;
-    transform: scale(1.05);
+    transform: scale(1.05); /* Efecto de escala al hacer hover */
 }
 
-/* --- Estilos Responsivos (Móviles) --- */
-@media screen and (max-width: 768px) {
-    .menu-toggle {
-        padding: 8px 12px;  /* Reduce el padding */
-        font-size: 12px;     /* Reduce el tamaño de la fuente */
+/* --- Estilos para el submenú --- */
+.submenu-list {
+    display: none; /* Oculta el submenú por defecto */
+    padding-left: 20px; /* Indentación para el submenú */
+    background-color: #5a1a2b; /* Color de fondo del submenú */
+    border-radius: 5px;
+    margin-top: 0; /* Eliminamos el margen superior */
+    padding-top: 0; /* Eliminamos el padding superior */
+    padding-bottom: 0; /* Eliminamos el padding inferior */
+    animation: fadeIn 0.3s ease; /* Animación de aparición */
+    max-height: 200px; /* Altura máxima del submenú */
+    overflow-y: auto; /* Agrega scroll vertical si el contenido es muy largo */
+}
+
+.submenu.active .submenu-list {
+    display: block; /* Muestra el submenú cuando está activo */
+}
+
+.submenu-list li a {
+    padding: 6px 10px; /* Reducimos el padding para botones más pequeños */
+    font-size: 12px; /* Reducimos el tamaño de la fuente */
+    background-color: #7d5a6e; /* Color de fondo de los enlaces del submenú */
+    border-bottom: 1px solid #444; /* Borde inferior para separar los enlaces */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border-radius: 5px;
+    display: block; /* Asegura que los enlaces ocupen todo el ancho */
+    line-height: 1.2; /* Reducimos el line-height para evitar espacio adicional */
+}
+
+/* Efecto hover en los enlaces del submenú */
+.submenu-list li a:hover {
+    background-color: #8e5c71; /* Color de fondo al pasar el mouse */
+    transform: translateX(5px); /* Efecto de desplazamiento al hacer hover */
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
+/* --- Estilos Responsivos --- */
+@media screen and (max-width: 768px) {
+    /* Menú lateral */
+    nav.menu {
+        width: 100%; /* Ocupa toda la pantalla en móviles */
+        left: -100%; /* Oculta el menú fuera de la pantalla */
+    }
+
+    nav.menu.active {
+        left: 0; /* Muestra el menú al activarse */
+    }
+
+    /* Botón de menú */
+    .menu-toggle {
+        font-size: 16px;
+        padding: 8px 16px;
+        top: 10px;
+        left: 10px;
+    }
+}
 
 /* --- Botón de regresar --- */
 .regresar-btn {
@@ -368,7 +386,11 @@ nav.menu ul li a:hover {
     }
 
     nav.menu {
-        width: 200px;
+        width: 100%; /* Ocupa toda la pantalla en móviles */
+        left: -100%; /* Oculta el menú fuera de la pantalla */
+    }
+    nav.menu.active {
+        left: 0; /* Muestra el menú al activarse */
     }
 
     nav.menu ul li a {
@@ -388,9 +410,12 @@ nav.menu ul li a:hover {
         font-size: 1rem;
     }
 
-    .menu-toggle {
-        padding: 14px 18px;
-        font-size: 20px;
+     /* Botón de menú */
+     .menu-toggle {
+        font-size: 16px;
+        padding: 8px 16px;
+        top: 10px;
+        left: 10px;
     }
 
     .regresar-btn {
@@ -421,5 +446,11 @@ h1, h2, p {
 .logo-arriba-img {
     width: 145px;  /* Cambia este valor según lo que necesites */
     height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
+}
+/* Ocultar la imagen en dispositivos móviles */
+@media screen and (max-width: 768px) {
+    .logo-arriba-img {
+        display: none;
+    }
 }
 
