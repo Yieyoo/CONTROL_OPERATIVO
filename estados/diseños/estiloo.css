@@ -332,8 +332,7 @@ html, body {
 
 /* --- Visor del PDF --- */
 .pdf-viewer {
-    width: 80%;
-    max-width: 1200px;
+    width: 100%;
     height: 90vh;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -341,7 +340,9 @@ html, body {
     background-color: transparent;
     overflow: hidden;
     margin: 0 auto;
+    position: relative;
 }
+
 
 /* --- Iframe del PDF --- */
 .pdf-viewer iframe {
@@ -350,7 +351,6 @@ html, body {
     border: none;
     background-color: transparent;
 }
-
 /* --- Estilo del botón de eliminar --- */
 #deleteButton {
     width: 200px;
