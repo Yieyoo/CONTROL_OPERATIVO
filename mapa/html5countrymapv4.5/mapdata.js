@@ -5,6 +5,8 @@ var simplemaps_countrymap_mapdata = {
     background_color: "#FFFFFF",
     background_transparent: "yes",
     border_color: "#ffffff",
+    popups: "no",  // Desactiva los popups completamente
+
     
     //State defaults
     state_description: "State description",
@@ -53,13 +55,16 @@ var simplemaps_countrymap_mapdata = {
     zoom_percentage: 0.99,
     zoom_time: 0.5,
     
-    //Popup settings
-    popup_color: "white",
-    popup_opacity: 0.9,
-    popup_shadow: 1,
-    popup_corners: 5,
-    popup_font: "12px/1.5 Verdana, Arial, Helvetica, sans-serif",
-    popup_nocss: "no",
+    // Popup settings
+/*
+popup_color: "white",
+popup_opacity: 0.9,
+popup_shadow: 1,
+popup_corners: 5,
+popup_font: "12px/1.5 Verdana, Arial, Helvetica, sans-serif",
+popup_nocss: "no",
+*/
+
     
     //Advanced settings
     div: "map",
