@@ -86,15 +86,18 @@
     <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
         
        <!-- Contenedor con márgenes y estilo -->
-       <div class="pdf-scroll-container">
-        <object 
-            data="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf" 
-            type="application/pdf"
-            style="width: 100%; height: 100%;"
+<div class="container">
+    <div class="pdf-viewer">
+        <embed 
+            src="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf" 
+            type="application/pdf" 
+            width="100%" 
+            height="100%"
+            style="-webkit-overflow-scrolling: touch; overflow: auto;"
+
         >
-            <p>Tu navegador no soporta PDFs. <a href="../../../documentacion/Plantas de Personal/PlantillaCHHH.pdf">Descárgalo aquí</a>.</p>
-        </object>
     </div>
+</div>
     <button class="regresar-btn">Regresar</button>
 
     <!-- Vincular el archivo JavaScript -->
