@@ -89,7 +89,7 @@ h1, h2, p {
     /* Otros ajustes para el contenedor en móviles */
     .instituto-info {
         padding: 1px; /* Reducimos el padding */
-        margin-top: -120px; /* Subimos el contenedor */
+        margin-top: -50px; /* Subimos el contenedor */
         display: flex;
         flex-direction: column;
         justify-content: flex-start; /* Hace que el texto suba */
