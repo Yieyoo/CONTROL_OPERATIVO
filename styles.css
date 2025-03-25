@@ -182,7 +182,7 @@ nav.menu ul li a:hover {
 @media screen and (max-width: 768px) {
     /* Menú lateral */
     nav.menu {
-        width: 70%; /* Ajusta el ancho del menú para que no ocupe toda la pantalla */
+        width: -100%; /* Ajusta el ancho del menú para que no ocupe toda la pantalla */
         left: -100%; /* Oculta el menú fuera de la pantalla */
     }
 
