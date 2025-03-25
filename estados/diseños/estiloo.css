@@ -473,8 +473,12 @@ h1 {
 }
 
 /* Ajuste para pantallas aún más pequeñas */
+/* Ajuste para pantallas aún más pequeñas */
 @media screen and (max-width: 480px) {
     .mobile-images img {
+        width: 300px;  /* Reduce el tamaño */
+        height: auto; /* Mantiene la proporción */
         margin-bottom: 15px;
     }
 }
+

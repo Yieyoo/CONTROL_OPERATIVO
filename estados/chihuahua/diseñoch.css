@@ -256,7 +256,7 @@ nav.menu ul li a:hover {
     color: #fff;
     border: none;
     width: 60px;   /* Ancho fijo */
-    height: 40px;  /* Alto fijo */
+    height: 40px;  /* Alto fijo */ 
     font-size: 14px;
     cursor: pointer;
     position: fixed;
