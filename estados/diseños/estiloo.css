@@ -415,8 +415,16 @@ html, body {
 
 /* --- Header con título --- */
 .header-container {
-    text-align: center;
-    margin-top: 20px;
+    text-align: center; /* Centra el título */
+    padding-top: 50px; /* Agrega espacio arriba del encabezado */
+    padding-bottom: 20px; /* Espacio debajo del encabezado */
+}
+
+/* Estilos específicos para dispositivos móviles */
+@media screen and (max-width: 768px) {
+    .header-container {
+        padding-top: 80px; /* Aumenta el espacio superior en móviles */
+    }
 }
 
 h1 {
