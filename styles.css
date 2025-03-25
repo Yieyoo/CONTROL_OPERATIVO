@@ -134,7 +134,6 @@ nav.menu ul li a:hover {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
-
 /* Efecto hover en el botón de menú */
 .menu-toggle:hover {
     background-color: #8e5c71;
@@ -154,11 +153,9 @@ nav.menu ul li a:hover {
     max-height: 200px; /* Altura máxima del submenú */
     overflow-y: auto; /* Agrega scroll vertical si el contenido es muy largo */
 }
-
 .submenu.active .submenu-list {
     display: block; /* Muestra el submenú cuando está activo */
 }
-
 .submenu-list li a {
     padding: 6px 10px; /* Reducimos el padding para botones más pequeños */
     font-size: 12px; /* Reducimos el tamaño de la fuente */
@@ -169,6 +166,8 @@ nav.menu ul li a:hover {
     display: block; /* Asegura que los enlaces ocupen todo el ancho */
     line-height: 1.2; /* Reducimos el line-height para evitar espacio adicional */
 }
+
+
 
 /* Efecto hover en los enlaces del submenú */
 .submenu-list li a:hover {
@@ -189,25 +188,77 @@ nav.menu ul li a:hover {
 }
 
 /* --- Estilos Responsivos --- */
+
 @media screen and (max-width: 768px) {
-    /* Menú lateral */
+    /* Menú lateral parcialmente visible en dispositivos pequeños */
     nav.menu {
-        width: -100%; /* Ajusta el ancho del menú para que no ocupe toda la pantalla */
-        left: -100%; /* Oculta el menú fuera de la pantalla */
+        left: -200px;  /* Muestra solo un poco del menú (ajusta este valor según lo que necesites) */
     }
 
-    nav.menu.active {
-        left: 0; /* Muestra el menú al activarse */
-    }
-
-    /* Botón de menú */
+    /* El botón de menú se mostrará para permitir abrir el menú completamente */
     .menu-toggle {
-        font-size: 16px;
-        padding: 8px 16px;
-        top: 10px;
-        left: 10px;
+        display: block; /* Asegura que el botón sea visible en pantallas pequeñas */
+    }
+
+    /* Estilo para el menú cuando está completamente activado */
+    nav.menu.active {
+        left: 0;  /* Muestra el menú completamente cuando está activo */
+    }
+    
+    /* Evita el desplazamiento horizontal */
+    body {
+        overflow-x: hidden;  /* Esto elimina cualquier barra de desplazamiento horizontal */
     }
 }
+/* --- Botón de menú --- */
+.menu-toggle {
+    background-color: #691932;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    position: fixed;
+    top: 25px;
+    left: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+menu-toggle:hover {
+    background-color: #8e5c71;
+    transform: scale(1.05);
+}
+
+/* --- Estilos Responsivos (Móviles) --- */
+@media screen and (max-width: 768px) {
+   .menu-toggle {
+    font-size: 10px;
+    padding: 5px 5px;
+    top: 10px;
+    left: 10px;
+}
+}
+
+/* --- Estilos Responsivos (Móviles) --- */
+@media screen and (max-width: 768px) {
+
+
+    nav.menu {
+        width: 200px;
+    }
+
+    nav.menu ul li a {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .menu-toggle {
+        padding: 14px 18px;
+        font-size: 20px;
+
+        }}
 
 /* --- Títulos y textos --- */
 h1, h2, p {
@@ -258,25 +309,6 @@ h1, h2, p {
         max-width: 500px; /* Reducimos el tamaño de la imagen */
         bottom: 5px;
     }
-
-    /* Menú lateral */
-    nav.menu {
-        width: 100%; /* Ocupa toda la pantalla en móviles */
-        left: -100%; /* Oculta el menú fuera de la pantalla */
-    }
-
-    nav.menu.active {
-        left: 0; /* Muestra el menú al activarse */
-    }
-
-    /* Botón de menú */
-    .menu-toggle {
-        font-size: 16px;
-        padding: 8px 16px;
-        top: 36px;
-        left: 10px;
-    }
-
     /* Títulos y textos */
     h1 {
         font-size: 20px; /* Reducimos el tamaño de la fuente */
@@ -334,4 +366,3 @@ h1, h2, p {
         padding: 2vw 3vw; /* Más espacio interno para facilitar la lectura */
     }
 }
-
