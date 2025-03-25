@@ -11,10 +11,17 @@ body {
 }
 
 header {
+    background-color: #691932;
+    color: white;
     text-align: center;
-    font-size: 2em;
-    margin-top: 20px;
+    font-size: 24px;
+    padding: 15px;
+    font-weight: bold;
+    border-bottom: 4px solid #285c4d;
+    margin-top: 52px; /* Lo baja 20px */
 }
+
+
 
 /* --- Logo superior --- */
 .logo-arriba-img {
@@ -135,8 +142,8 @@ nav.menu ul li a:hover {
     font-size: 14px;
     cursor: pointer;
     position: fixed;
-    top: 20px;
-    left: 20px;
+    top: 25px;
+    left: 15px;
     border-radius: 5px;
     z-index: 1000;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
@@ -272,5 +279,22 @@ nav.menu ul li a:hover {
     padding: 8px 12px;
     border-radius: 5px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    z-index: 500;
+}
+@media (max-width: 768px) { /* Para pantallas pequeñas (tablets y móviles) */
+    .fecha-actual {
+        top: 20px; /* Baja la fecha para no chocar con otros elementos */
+        right: 10px; /* Ajusta el margen derecho */
+        font-size: 14px; /* Reduce el tamaño del texto */
+        padding: 6px 10px; /* Reduce el espacio alrededor */
+    }
+}
+
+@media (max-width: 480px) { /* Para pantallas muy pequeñas (celulares) */
+    .fecha-actual {
+        top: 20px; /* Baja aún más si es necesario */
+        right: 5px; /* Ajusta el margen derecho */
+        font-size: 12px; /* Reduce el tamaño del texto para que no se vea grande */
+        padding: 5px 8px;
+    }
 }
