@@ -31,6 +31,14 @@ body {
 /* --- Información del instituto --- */
 .instituto-info {
     text-align: center;
+    padding: 5px 5px; /* Espaciado interno */
+    min-height: 100px; /* Altura mínima para evitar que se vea muy pequeño */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra el contenido verticalmente */
+}
+.instituto-info {
+    text-align: center;
     color: #691932;
     margin-bottom: 20px;
 }
@@ -159,9 +167,9 @@ nav.menu.active {
 
 /* --- Estilos para los enlaces del menú --- */
 nav.menu ul {
-    margin-top: 1000; /* Asegura que las opciones empiecen más cerca del borde superior */
+    list-style-type: none;
     padding: 0;
-    list-style: none;
+    margin-top: 40px; /* Aumenta este valor para bajar las opciones */
 }
 nav.menu li {
     margin: 5px 0;
@@ -423,7 +431,7 @@ nav.menu ul li a:hover {
         font-size: 16px;
         padding: 8px 16px;
         top: 10px;
-        left: 10px;
+        left: 30px;
     }
 
     .regresar-btn {
