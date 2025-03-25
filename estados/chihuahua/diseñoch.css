@@ -31,14 +31,11 @@ body {
 /* --- Información del instituto --- */
 .instituto-info {
     text-align: center;
-    padding: 5px 5px; /* Espaciado interno */
-    min-height: 100px; /* Altura mínima para evitar que se vea muy pequeño */
+    padding: 5px; /* Espaciado interno */
+    min-height: 100px; /* Altura mínima */
     display: flex;
     flex-direction: column;
     justify-content: center; /* Centra el contenido verticalmente */
-}
-.instituto-info {
-    text-align: center;
     color: #691932;
     margin-bottom: 20px;
 }
@@ -50,18 +47,53 @@ body {
 }
 
 .instituto-info h1 {
-    font-size: 2rem;
+    font-size: 1.3rem; /* Tamaño ajustado */
     margin-bottom: 10px;
+    font-weight: bold; /* Hace que h1 sea más negrita */
 }
 
 .instituto-info h2 {
-    font-size: 1.5rem;
+    font-size: 1rem; /* Tamaño ajustado */
     margin-bottom: 5px;
 }
 
 .instituto-info h3 {
-    font-size: 1.2rem;
-    color: #285c4d;
+    font-size: 1rem;
+    color: #691932;
+}
+
+/* --- Títulos y textos --- */
+h1, h2, p {
+    text-align: center;
+    margin-left: 10px;
+}
+
+/* --- Estilos Responsivos para Móviles --- */
+@media screen and (max-width: 768px) {
+    /* Ajustes en el tamaño de los títulos en móviles */
+    .instituto-info h1 {
+        font-size: 1.4rem; /* Título h1 más pequeño en móviles */
+        font-weight: bold; /* Mantener la negrita en h1 */
+    }
+
+    .instituto-info h2 {
+        font-size: 1.2rem; /* Título h2 más pequeño en móviles */
+        font-weight: 600; /* Mantener un peso intermedio para h2 */
+    }
+
+    .instituto-info h3 {
+        font-size: 0.9rem; /* Título h3 más pequeño en móviles */
+        font-weight: normal; /* Mantener sin negrita */
+    }
+
+    /* Otros ajustes para el contenedor en móviles */
+    .instituto-info {
+        padding: 1px; /* Reducimos el padding */
+        margin-top: -120px; /* Subimos el contenedor */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; /* Hace que el texto suba */
+    }
 }
 
 /* --- Contenedor de las opciones --- */
@@ -414,18 +446,6 @@ nav.menu ul li a:hover {
         padding: 10px;
     }
 
-    .instituto-info h1 {
-        font-size: 1.8rem;
-    }
-
-    .instituto-info h2 {
-        font-size: 1.4rem;
-    }
-
-    .instituto-info h3 {
-        font-size: 1rem;
-    }
-
      /* Botón de menú */
      .menu-toggle {
         font-size: 16px;
@@ -445,11 +465,6 @@ nav.menu ul li a:hover {
     }
 }
 
-/* --- Títulos y textos --- */
-h1, h2, p {
-    text-align: center;
-    margin-left: 10px;
-}
 
 /* --- Estilos para el texto de estado --- */
 .estado-info {
