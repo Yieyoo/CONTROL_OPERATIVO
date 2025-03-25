@@ -81,17 +81,17 @@ h1, h2, p {
 @media screen and (max-width: 768px) {
     /* Ajustes en el tamaño de los títulos en móviles */
     .instituto-info h1 {
-        font-size: 1.4rem; /* Título h1 más pequeño en móviles */
+        font-size: 1rem; /* Título h1 más pequeño en móviles */
         font-weight: bold; /* Mantener la negrita en h1 */
     }
 
     .instituto-info h2 {
-        font-size: 1.2rem; /* Título h2 más pequeño en móviles */
+        font-size: .9rem; /* Título h2 más pequeño en móviles */
         font-weight: 600; /* Mantener un peso intermedio para h2 */
     }
 
     .instituto-info h3 {
-        font-size: 0.9rem; /* Título h3 más pequeño en móviles */
+        font-size: .9rem; /* Título h3 más pequeño en móviles */
         font-weight: normal; /* Mantener sin negrita */
     }
 
