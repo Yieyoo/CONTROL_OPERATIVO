@@ -148,7 +148,7 @@
 
     <!-- Contenedor del PDF -->
     <div class="pdf-container">
-        <!-- Opción 1: Usar PDF.js (recomendado) -->
+        <!-- Usando solo el iframe para mostrar el PDF -->
         <iframe 
             src="../../../documentacion/Plantas%20de%20Personal/PlantillaCHHH.pdf" 
             class="pdf-embed"
@@ -160,31 +160,6 @@
 
     <!-- Scripts -->
     <script>
-        // Ajuste responsivo del visor PDF
-        function adjustPDFViewer() {
-            const pdfViewer = document.querySelector('.pdf-embed');
-            
-            if (!pdfViewer) return;
-            
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                // Para iOS
-                pdfViewer.style.height = 'calc(100vh - 200px)';
-                pdfViewer.style.minHeight = '300px';
-            } else if (window.innerWidth < 768) {
-                // Para móviles en general
-                pdfViewer.style.height = '65vh';
-                pdfViewer.style.minHeight = '350px';
-            } else {
-                // Para escritorio
-                pdfViewer.style.height = '75vh';
-                pdfViewer.style.minHeight = '600px';
-            }
-        }
-
-        // Ejecutar al cargar y al cambiar tamaño
-        window.addEventListener('load', adjustPDFViewer);
-        window.addEventListener('resize', adjustPDFViewer);
-
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
             const menu = document.querySelector('.menu');
