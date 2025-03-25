@@ -123,8 +123,9 @@ nav.menu ul li a:hover {
     background-color: #691932;
     color: #fff;
     border: none;
-    padding: 12px 20px;
-    font-size: 14px;
+    width: 60px;   /* Ancho fijo */
+    height: 40px;  /* Alto fijo */
+    font-size: 18px;
     cursor: pointer;
     position: fixed;
     top: 25px;

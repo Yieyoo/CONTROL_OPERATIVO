@@ -232,7 +232,8 @@ nav.menu ul li a:hover {
     background-color: #691932; /* Fondo oscuro */
     color: #fff; /* Texto blanco */
     border: none; /* Sin borde */
-    padding: 6px 12px; /* Tamaño más pequeño */
+    width: 60px;   /* Ancho fijo */
+    height: 40px;  /* Alto fijo */ 
     font-size: 12px; /* Fuente más pequeña */
     cursor: pointer; /* Apunta el cursor sobre el botón */
     position: fixed;
