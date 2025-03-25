@@ -428,3 +428,35 @@ h1 {
     width: 150px;
     height: auto;
 }
+/* Estilos para las imágenes dentro del contenedor */
+.mobile-images img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos específicos para dispositivos móviles */
+@media screen and (max-width: 768px) {
+    /* Mostrar el contenedor de imágenes solo en pantallas pequeñas */
+    .mobile-images {
+        display: block;
+    }
+
+    /* Ajuste del tamaño y margen de las imágenes para que se acomoden bien en pantallas pequeñas */
+    .mobile-images img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+}
+
+/* Ajuste para pantallas aún más pequeñas */
+@media screen and (max-width: 480px) {
+    .mobile-images img {
+        margin-bottom: 15px;
+    }
+}
