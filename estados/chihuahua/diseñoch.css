@@ -344,34 +344,37 @@ nav.menu ul li a:hover {
     }
 }
 
-
 /* --- Botón de menú --- */
 .menu-toggle {
-    background-color: #691932;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    font-size: 14px;
-    cursor: pointer;
+    background-color: #691932; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    border: none; /* Sin borde */
+    padding: 6px 12px; /* Tamaño más pequeño */
+    font-size: 12px; /* Fuente más pequeña */
+    cursor: pointer; /* Apunta el cursor sobre el botón */
     position: fixed;
-    top: 50px;
-    left: 20px;
-    border-radius: 5px;
+    top: 15px; /* Ajusta la posición */
+    left: 15px;
+    border-radius: 20px; /* Bordes redondeados más sutiles */
     z-index: 1000;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más suave */
+    transition: all 0.2s ease; /* Transición suave */
 }
 
+/* Efecto hover en el botón de menú */
 .menu-toggle:hover {
-    background-color: #8e5c71;
-    transform: scale(1.05);
+    background-color: #8e5c71; /* Fondo más claro cuando se pasa el mouse */
+    transform: scale(1.05); /* Efecto de escala para el hover */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más grande al pasar el mouse */
 }
 
 /* --- Estilos Responsivos (Móviles) --- */
 @media screen and (max-width: 768px) {
     .menu-toggle {
-        padding: 8px 12px;  /* Reduce el padding */
-        font-size: 12px;     /* Reduce el tamaño de la fuente */
+        font-size: 10px; /* Fuente aún más pequeña en móviles */
+        padding: 5px 10px; /* Ajustar el tamaño del botón en móviles */
+        top: 10px; /* Ajustar la posición */
+        left: 10px;
     }
 }
 

@@ -70,6 +70,8 @@ img {
 
 
 /* --- Menú lateral --- */
+
+/* --- Menú lateral --- */
 nav.menu {
     position: fixed;
     top: 0;
@@ -93,7 +95,7 @@ nav.menu.active {
 nav.menu ul {
     list-style-type: none;
     padding: 0;
-    margin-top: 60px;
+    margin-top: 55px;
 }
 
 nav.menu ul li a {
@@ -149,7 +151,6 @@ nav.menu ul li a:hover {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
-
 /* Efecto hover en el botón de menú */
 .menu-toggle:hover {
     background-color: #8e5c71;
@@ -169,11 +170,9 @@ nav.menu ul li a:hover {
     max-height: 200px; /* Altura máxima del submenú */
     overflow-y: auto; /* Agrega scroll vertical si el contenido es muy largo */
 }
-
 .submenu.active .submenu-list {
     display: block; /* Muestra el submenú cuando está activo */
 }
-
 .submenu-list li a {
     padding: 6px 10px; /* Reducimos el padding para botones más pequeños */
     font-size: 12px; /* Reducimos el tamaño de la fuente */
@@ -184,6 +183,8 @@ nav.menu ul li a:hover {
     display: block; /* Asegura que los enlaces ocupen todo el ancho */
     line-height: 1.2; /* Reducimos el line-height para evitar espacio adicional */
 }
+
+
 
 /* Efecto hover en los enlaces del submenú */
 .submenu-list li a:hover {
@@ -204,24 +205,84 @@ nav.menu ul li a:hover {
 }
 
 /* --- Estilos Responsivos --- */
+
 @media screen and (max-width: 768px) {
-    /* Menú lateral */
+    /* Menú lateral parcialmente visible en dispositivos pequeños */
     nav.menu {
-        width: 100%; /* Ocupa toda la pantalla en móviles */
-        left: -100%; /* Oculta el menú fuera de la pantalla */
+        left: -200px;  /* Muestra solo un poco del menú (ajusta este valor según lo que necesites) */
     }
 
-    nav.menu.active {
-        left: 0; /* Muestra el menú al activarse */
-    }
-
-    /* Botón de menú */
+    /* El botón de menú se mostrará para permitir abrir el menú completamente */
     .menu-toggle {
-        font-size: 16px;
-        padding: 8px 16px;
-        top: 10px;
+        display: block; /* Asegura que el botón sea visible en pantallas pequeñas */
+    }
+
+    /* Estilo para el menú cuando está completamente activado */
+    nav.menu.active {
+        left: 0;  /* Muestra el menú completamente cuando está activo */
+    }
+    
+    /* Evita el desplazamiento horizontal */
+    body {
+        overflow-x: hidden;  /* Esto elimina cualquier barra de desplazamiento horizontal */
+    }
+}
+/* --- Botón de menú --- */
+.menu-toggle {
+    background-color: #691932; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    border: none; /* Sin borde */
+    padding: 6px 12px; /* Tamaño más pequeño */
+    font-size: 12px; /* Fuente más pequeña */
+    cursor: pointer; /* Apunta el cursor sobre el botón */
+    position: fixed;
+    top: 15px; /* Ajusta la posición */
+    left: 15px;
+    border-radius: 20px; /* Bordes redondeados más sutiles */
+    z-index: 1000;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más suave */
+    transition: all 0.2s ease; /* Transición suave */
+}
+
+/* Efecto hover en el botón de menú */
+.menu-toggle:hover {
+    background-color: #8e5c71; /* Fondo más claro cuando se pasa el mouse */
+    transform: scale(1.05); /* Efecto de escala para el hover */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más grande al pasar el mouse */
+}
+
+/* --- Estilos Responsivos (Móviles) --- */
+@media screen and (max-width: 768px) {
+    .menu-toggle {
+        font-size: 10px; /* Fuente aún más pequeña en móviles */
+        padding: 5px 10px; /* Ajustar el tamaño del botón en móviles */
+        top: 10px; /* Ajustar la posición */
         left: 10px;
     }
+}
+/* --- Estilos Responsivos (Móviles) --- */
+@media screen and (max-width: 768px) {
+
+
+    nav.menu {
+        width: 200px;
+    }
+
+    nav.menu ul li a {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .menu-toggle {
+        padding: 14px 18px;
+        font-size: 20px;
+
+        }}
+
+/* --- Títulos y textos --- */
+h1, h2, p {
+    text-align: center;
+    margin-left: 10px;
 }
 
 /* --- Fecha actual --- */
