@@ -34,6 +34,16 @@ body {
     z-index: 500;
 }
 
+/* --- Imagen Gobernacion --- */
+.logo-gobernacion {
+    width: 100px; /* Ajusta el tamaño */
+    height: auto; /* Mantiene la proporción */
+    position: absolute; /* Para moverlo libremente */
+    top: 10px;
+    left: 90px;
+}
+
+
 /* --- Contenedor principal --- */
 .container {
     display: flex;
@@ -117,8 +127,8 @@ nav.menu ul li a:hover {
     font-size: 14px;
     cursor: pointer;
     position: fixed;
-    top: 20px;
-    left: 20px;
+    top: 25px;
+    left: 15px;
     border-radius: 5px;
     z-index: 1000;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
@@ -263,7 +273,7 @@ h1, h2, p {
     .menu-toggle {
         font-size: 16px;
         padding: 8px 16px;
-        top: 10px;
+        top: 36px;
         left: 10px;
     }
 
@@ -319,7 +329,7 @@ h1, h2, p {
 @media (max-width: 768px) {
     .fecha-actual {
         font-size: 4vw;  /* Aumentamos el tamaño del texto en pantallas pequeñas */
-        top: vw;        /* Bajamos un poco la posición */
+        top: 70vw;        /* Bajamos un poco la posición */
         right: 40vw;      /* Ajustamos la distancia desde la derecha */
         padding: 2vw 3vw; /* Más espacio interno para facilitar la lectura */
     }
