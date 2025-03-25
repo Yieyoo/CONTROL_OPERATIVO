@@ -47,7 +47,7 @@ body {
 /* --- Menú lateral --- */
 nav.menu {
     position: fixed;
-    top: -10;
+    top: 0;
     left: -250px;
     width: 250px;
     height: 100%;
@@ -182,7 +182,7 @@ nav.menu ul li a:hover {
 @media screen and (max-width: 768px) {
     /* Menú lateral */
     nav.menu {
-        width: 100%; /* Ocupa toda la pantalla en móviles */
+        width: 70%; /* Ajusta el ancho del menú para que no ocupe toda la pantalla */
         left: -100%; /* Oculta el menú fuera de la pantalla */
     }
 
@@ -319,7 +319,7 @@ h1, h2, p {
 @media (max-width: 768px) {
     .fecha-actual {
         font-size: 4vw;  /* Aumentamos el tamaño del texto en pantallas pequeñas */
-        top: 70vw;        /* Bajamos un poco la posición */
+        top: vw;        /* Bajamos un poco la posición */
         right: 40vw;      /* Ajustamos la distancia desde la derecha */
         padding: 2vw 3vw; /* Más espacio interno para facilitar la lectura */
     }
