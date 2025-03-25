@@ -321,7 +321,7 @@ nav.menu ul li a:hover {
 }
 
 /* --- Estilos Responsivos --- */
-/* --- Para dispositivos pequeños (Pantallas < 768px) --- */
+
 @media screen and (max-width: 768px) {
     /* Menú lateral parcialmente visible en dispositivos pequeños */
     nav.menu {
