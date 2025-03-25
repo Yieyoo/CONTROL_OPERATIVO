@@ -414,18 +414,28 @@ html, body {
 }
 
 /* --- Header con título --- */
-.header-container {
+/* Estilo general para el título */
+.header-container h1 {
     text-align: center; /* Centra el título */
     padding-top: 50px; /* Agrega espacio arriba del encabezado */
     padding-bottom: 20px; /* Espacio debajo del encabezado */
+    font-size: 2rem; /* Tamaño de fuente normal para pantallas grandes */
 }
 
 /* Estilos específicos para dispositivos móviles */
 @media screen and (max-width: 768px) {
-    .header-container {
+    .header-container h1 {
         padding-top: 80px; /* Aumenta el espacio superior en móviles */
+        font-size: 1rem; /* Tamaño de fuente más pequeño en móviles */
     }
 }
+
+@media screen and (max-width: 480px) {
+    .header-container h1 {
+        font-size: 1rem; /* Tamaño de fuente aún más pequeño en pantallas muy pequeñas */
+    }
+}
+
 
 h1 {
     font-size: 24px;
