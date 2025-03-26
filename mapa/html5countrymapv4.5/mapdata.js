@@ -87,7 +87,7 @@ popup_nocss: "no",
     MXBCN: {
       name: "Baja California",
       description: " ",
-      url: "../../estados/baja california/baja california.html" // URL de redirección
+      url: "../../estados/baja_california/baja_californiaindex.html" // URL de redirección
     },
     MXBCS: {
       name: "Baja California Sur",
