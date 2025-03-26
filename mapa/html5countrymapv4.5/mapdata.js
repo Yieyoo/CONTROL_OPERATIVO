@@ -82,7 +82,7 @@ popup_nocss: "no",
     MXAGU: {
       name: "Aguascalientes",
       description: " ",
-      url: "https://es.wikipedia.org/wiki/Aguascalientes" // URL de redirección
+      url: "../../estados/aguascalientes/aguascalientesindex.html" // URL de redirección
     },
     MXBCN: {
       name: "Baja California",
