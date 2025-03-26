@@ -28,9 +28,23 @@ body {
     box-sizing: border-box;
 }
 
+/* --- Contenedor principal --- */
+.contenedor-principal {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
 /* --- Información del instituto --- */
 .instituto-info {
     text-align: center;
+    padding: 5px; /* Espaciado interno */
+    min-height: 100px; /* Altura mínima */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra el contenido verticalmente */
     color: #691932;
     margin-bottom: 20px;
 }
@@ -42,18 +56,53 @@ body {
 }
 
 .instituto-info h1 {
-    font-size: 2rem;
+    font-size: 1.3rem; /* Tamaño ajustado */
     margin-bottom: 10px;
+    font-weight: bold; /* Hace que h1 sea más negrita */
 }
 
 .instituto-info h2 {
-    font-size: 1.5rem;
+    font-size: 1rem; /* Tamaño ajustado */
     margin-bottom: 5px;
 }
 
 .instituto-info h3 {
-    font-size: 1.2rem;
-    color: #285c4d;
+    font-size: 1rem;
+    color: #691932;
+}
+
+/* --- Títulos y textos --- */
+h1, h2, p {
+    text-align: center;
+    margin-left: 10px;
+}
+
+/* --- Estilos Responsivos para Móviles --- */
+@media screen and (max-width: 768px) {
+    /* Ajustes en el tamaño de los títulos en móviles */
+    .instituto-info h1 {
+        font-size: 1rem; /* Título h1 más pequeño en móviles */
+        font-weight: bold; /* Mantener la negrita en h1 */
+    }
+
+    .instituto-info h2 {
+        font-size: .9rem; /* Título h2 más pequeño en móviles */
+        font-weight: 600; /* Mantener un peso intermedio para h2 */
+    }
+
+    .instituto-info h3 {
+        font-size: .9rem; /* Título h3 más pequeño en móviles */
+        font-weight: normal; /* Mantener sin negrita */
+    }
+
+    /* Otros ajustes para el contenedor en móviles */
+    .instituto-info {
+        padding: 1px; /* Reducimos el padding */
+        margin-top: 60px; /* Subimos el contenedor */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; /* Hace que el texto suba */
+    }
 }
 
 /* --- Contenedor de las opciones --- */
@@ -152,14 +201,16 @@ nav.menu {
     padding-left: 20px;
 }
 
+/* Estado cuando el menú está activo */
 nav.menu.active {
     left: 0;
 }
 
+/* --- Estilos para los enlaces del menú --- */
 nav.menu ul {
     list-style-type: none;
     padding: 0;
-    margin-top: 60px;
+    margin-top: 55px;
 }
 
 nav.menu ul li a {
@@ -175,54 +226,10 @@ nav.menu ul li a {
     margin-bottom: 5px;
 }
 
+/* Efecto hover en los enlaces del menú */
 nav.menu ul li a:hover {
     background-color: #8e5c71;
-    transform: translateX(10px);
-}
-
-/* --- Submenú --- */
-.submenu-list {
-    display: none;
-    padding-left: 20px;
-    background-color: #5a1a2b;
-    border-radius: 5px;
-    margin-top: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    animation: fadeIn 0.3s ease;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.submenu.active .submenu-list {
-    display: block;
-}
-
-.submenu-list li a {
-    padding: 6px 10px;
-    font-size: 12px;
-    background-color: #7d5a6e;
-    border-bottom: 1px solid #444;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    border-radius: 5px;
-    display: block;
-    line-height: 1.2;
-}
-
-.submenu-list li a:hover {
-    background-color: #8e5c71;
-    transform: translateX(5px);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    transform: translateX(10px); /* Desplazamiento al hacer hover */
 }
 
 /* --- Fondo oscuro para el menú --- */
@@ -248,28 +255,127 @@ nav.menu ul li a:hover {
     background-color: #691932;
     color: #fff;
     border: none;
-    padding: 12px 20px;
+    width: 60px;   /* Ancho fijo */
+    height: 40px;  /* Alto fijo */ 
     font-size: 14px;
     cursor: pointer;
     position: fixed;
-    top: 50px;
-    left: 20px;
+    top: 25px;
+    left: 15px;
     border-radius: 5px;
     z-index: 1000;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+/* Efecto hover en el botón de menú */
 .menu-toggle:hover {
     background-color: #8e5c71;
-    transform: scale(1.05);
+    transform: scale(1.05); /* Efecto de escala al hacer hover */
+}
+
+/* --- Estilos para el submenú --- */
+.submenu-list {
+    display: none; /* Oculta el submenú por defecto */
+    padding-left: 20px; /* Indentación para el submenú */
+    background-color: #5a1a2b; /* Color de fondo del submenú */
+    border-radius: 5px;
+    margin-top: 0; /* Eliminamos el margen superior */
+    padding-top: 0; /* Eliminamos el padding superior */
+    padding-bottom: 0; /* Eliminamos el padding inferior */
+    animation: fadeIn 0.3s ease; /* Animación de aparición */
+    max-height: 200px; /* Altura máxima del submenú */
+    overflow-y: auto; /* Agrega scroll vertical si el contenido es muy largo */
+}
+
+.submenu.active .submenu-list {
+    display: block; /* Muestra el submenú cuando está activo */
+}
+
+.submenu-list li a {
+    padding: 6px 10px; /* Reducimos el padding para botones más pequeños */
+    font-size: 12px; /* Reducimos el tamaño de la fuente */
+    background-color: #7d5a6e; /* Color de fondo de los enlaces del submenú */
+    border-bottom: 1px solid #444; /* Borde inferior para separar los enlaces */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border-radius: 5px;
+    display: block; /* Asegura que los enlaces ocupen todo el ancho */
+    line-height: 1.2; /* Reducimos el line-height para evitar espacio adicional */
+}
+
+/* Efecto hover en los enlaces del submenú */
+.submenu-list li a:hover {
+    background-color: #8e5c71; /* Color de fondo al pasar el mouse */
+    transform: translateX(5px); /* Efecto de desplazamiento al hacer hover */
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Estilos Responsivos --- */
+
+@media screen and (max-width: 768px) {
+    /* Menú lateral parcialmente visible en dispositivos pequeños */
+    nav.menu {
+        left: -200px;  /* Muestra solo un poco del menú (ajusta este valor según lo que necesites) */
+    }
+
+    /* El botón de menú se mostrará para permitir abrir el menú completamente */
+    .menu-toggle {
+        display: block; /* Asegura que el botón sea visible en pantallas pequeñas */
+    }
+
+    /* Estilo para el menú cuando está completamente activado */
+    nav.menu.active {
+        left: 0;  /* Muestra el menú completamente cuando está activo */
+    }
+    
+    /* Evita el desplazamiento horizontal */
+    body {
+        overflow-x: hidden;  /* Esto elimina cualquier barra de desplazamiento horizontal */
+    }
+}
+
+/* --- Botón de menú --- */
+.menu-toggle {
+    background-color: #691932; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    border: none; /* Sin borde */
+    padding: 6px 12px; /* Tamaño más pequeño */
+    font-size: 12px; /* Fuente más pequeña */
+    cursor: pointer; /* Apunta el cursor sobre el botón */
+    position: fixed;
+    top: 15px; /* Ajusta la posición */
+    left: 15px;
+    border-radius: 20px; /* Bordes redondeados más sutiles */
+    z-index: 1000;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más suave */
+    transition: all 0.2s ease; /* Transición suave */
+}
+
+/* Efecto hover en el botón de menú */
+.menu-toggle:hover {
+    background-color: #8e5c71; /* Fondo más claro cuando se pasa el mouse */
+    transform: scale(1.05); /* Efecto de escala para el hover */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más grande al pasar el mouse */
 }
 
 /* --- Estilos Responsivos (Móviles) --- */
 @media screen and (max-width: 768px) {
     .menu-toggle {
-        padding: 8px 12px;  /* Reduce el padding */
-        font-size: 12px;     /* Reduce el tamaño de la fuente */
+        font-size: 10px; /* Fuente aún más pequeña en móviles */
+        padding: 5px 10px; /* Ajustar el tamaño del botón en móviles */
+        top: 10px; /* Ajustar la posición */
+        left: 10px;
     }
 }
 
@@ -376,18 +482,6 @@ nav.menu ul li a:hover {
         padding: 10px;
     }
 
-    .instituto-info h1 {
-        font-size: 1.8rem;
-    }
-
-    .instituto-info h2 {
-        font-size: 1.4rem;
-    }
-
-    .instituto-info h3 {
-        font-size: 1rem;
-    }
-
     .menu-toggle {
         padding: 14px 18px;
         font-size: 20px;
@@ -404,11 +498,6 @@ nav.menu ul li a:hover {
     }
 }
 
-/* --- Títulos y textos --- */
-h1, h2, p {
-    text-align: center;
-    margin-left: 10px;
-}
 
 /* --- Estilos para el texto de estado --- */
 .estado-info {
