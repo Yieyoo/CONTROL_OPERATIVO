@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vehiculos</title>
     <link rel="stylesheet" href="../../diseños/estiloo.css">
 </head>
@@ -12,7 +12,7 @@
 
     <header>
         <!-- Botón para abrir el menú en móviles -->
-        <button class="menu-toggle" onclick="toggleMenu()">☰ Menú</button>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
         <!-- Menú principal -->
         <nav class="menu">
@@ -20,15 +20,41 @@
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
                 <li><a href="../../../mapa/html5countrymapv4.5/mapa.html">Mapa</a></li>
-
                 <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
-                        <li><a href="datos-nacionales.html">Datos Nacionales</a></li>
-                        <li><a href="plantilla-personal.html">Plantilla de Personal</a></li>
-                        <li><a href="unidades-caninas.html">Unidades Caninas</a></li>
-                        <li><a href="inmuebles.html">Inmuebles</a></li>
+                        <li><a href="estado-aguascalientes.html">Aguascalientes</a></li>
+                        <li><a href="estado-baja-california.html">Baja California</a></li>
+                        <li><a href="estado-baja-california-sur.html">Baja California Sur</a></li>
+                        <li><a href="estado-campeche.html">Campeche</a></li>
+                        <li><a href="estado-chiapas.html">Chiapas</a></li>
+                        <li><a href="../chihuahua.html">Chihuahua</a></li>
+                        <li><a href="estado-coahuila.html">Coahuila</a></li>
+                        <li><a href="estado-colima.html">Colima</a></li>
+                        <li><a href="estado-durango.html">Durango</a></li>
+                        <li><a href="estado-guanajuato.html">Guanajuato</a></li>
+                        <li><a href="estado-guerrero.html">Guerrero</a></li>
+                        <li><a href="estado-hidalgo.html">Hidalgo</a></li>
+                        <li><a href="estado-jalisco.html">Jalisco</a></li>
+                        <li><a href="estado-mexico.html">Estado de México</a></li>
+                        <li><a href="estado-michoacan.html">Michoacán</a></li>
+                        <li><a href="estado-morelos.html">Morelos</a></li>
+                        <li><a href="estado-nayarit.html">Nayarit</a></li>
+                        <li><a href="estado-nuevo-leon.html">Nuevo León</a></li>
+                        <li><a href="estado-oaxaca.html">Oaxaca</a></li>
+                        <li><a href="estado-puebla.html">Puebla</a></li>
+                        <li><a href="estado-queretaro.html">Querétaro</a></li>
+                        <li><a href="estado-quintana-roo.html">Quintana Roo</a></li>
+                        <li><a href="estado-san-luis-potosi.html">San Luis Potosí</a></li>
+                        <li><a href="estado-sinaloa.html">Sinaloa</a></li>
+                        <li><a href="estado-sonora.html">Sonora</a></li>
+                        <li><a href="estado-tabasco.html">Tabasco</a></li>
+                        <li><a href="estado-tamaulipas.html">Tamaulipas</a></li>
+                        <li><a href="estado-tlaxcala.html">Tlaxcala</a></li>
+                        <li><a href="estado-veracruz.html">Veracruz</a></li>
+                        <li><a href="estado-yucatan.html">Yucatán</a></li>
+                        <li><a href="estado-zacatecas.html">Zacatecas</a></li>
                     </ul>
                 </li>
 
@@ -77,21 +103,30 @@
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo 1">
     </div>
-
-    <!-- Título visible en la página -->
-    <h1>Vehiculos</h1>
-
-    <!-- Cargar y ver el PDF -->
-    <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-        
-        <!-- Visor del PDF -->
-        <div class="pdf-viewer">
-            <iframe id="pdfViewer" src="../../../documentacion/Vehiculos/Vehiculos_CHH.pdf" style="border: 1px solid #000; width: 100%; height: 600px;"></iframe>
-        </div>
+    
+    <div class="header-container">
+        <h1>Vehiculos</h1>
     </div>
+
+    <!-- Contenedor del PDF -->
+    <div class="pdf-container">
+        <!-- Usando solo el iframe para mostrar el PDF -->
+        <iframe 
+    src="../../../documentacion/vehiculos/chihuahuav/Vehiculos_CHH.pdf" 
+    class="pdf-embed"
+    frameborder="0"
+></iframe>
+
+    </div>
+
+    <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
+    <div class="mobile-images">
+        <img src="../../../documentacion/vehiculos/chihuahuav/fotoveiculos1.jpg" alt="Imagen 1">
+    </div>
+
     <button class="regresar-btn">Regresar</button>
 
-    <!-- Vincular el archivo JavaScript -->
+    <!-- Scripts -->
     <script>
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
@@ -101,7 +136,7 @@
             menuOverlay.classList.toggle('active');
         }
 
-        // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+        // Cerrar el menú al hacer clic fuera de él
         const menuOverlay = document.querySelector('.menu-overlay');
         menuOverlay.addEventListener('click', () => {
             const menu = document.querySelector('.menu');
@@ -119,12 +154,8 @@
 
         // Función para mostrar/ocultar el submenú
         function toggleSubmenu(event) {
-            event.preventDefault(); // Evita que el enlace recargue la página
-
-            // Cerrar todos los submenús antes de abrir uno nuevo
+            event.preventDefault();
             closeAllSubmenus();
-
-            // Abrir el submenú actual
             const submenu = event.target.closest('.submenu');
             submenu.classList.toggle('active');
         }
