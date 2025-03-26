@@ -80,34 +80,60 @@
 
     <!-- Botón de regresar -->
     <button class="regresar-btn">Regresar</button>
-
     <script>
+        // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
-            document.querySelector('.menu').classList.toggle('active');
-            document.querySelector('.menu-overlay').classList.toggle('active');
+            const menu = document.querySelector('.menu');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
         }
-
-        document.querySelector('.menu-overlay').addEventListener('click', () => {
-            document.querySelector('.menu').classList.remove('active');
-            document.querySelector('.menu-overlay').classList.remove('active');
+    
+        // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+        const menuOverlay = document.querySelector('.menu-overlay');
+        menuOverlay.addEventListener('click', () => {
+            const menu = document.querySelector('.menu');
+            menu.classList.remove('active');
+            menuOverlay.classList.remove('active');
         });
-
+    
+        // Función para cerrar todos los submenús
+        function closeAllSubmenus() {
+            const submenus = document.querySelectorAll('.submenu.active');
+            submenus.forEach(submenu => {
+                submenu.classList.remove('active');
+            });
+        }
+    
+        // Función para mostrar/ocultar el submenú
         function toggleSubmenu(event) {
+            event.preventDefault(); // Evita que el enlace recargue la página
+    
+            // Cerrar todos los submenús antes de abrir uno nuevo
+            closeAllSubmenus();
+    
+            // Abrir el submenú actual
             const submenu = event.target.closest('.submenu');
             submenu.classList.toggle('active');
         }
-
-        // Mostrar la fecha actual
-        document.querySelector(".fecha-actual").innerHTML = new Date().toLocaleDateString();
-
-        document.querySelector('.regresar-btn').addEventListener('click', () => {
-            if (document.referrer) {
-                window.history.back();
-            } else {
-                window.location.href = "index.html";
+    
+        // Cerrar el submenú al hacer clic fuera de él
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.submenu')) {
+                closeAllSubmenus();
             }
         });
-    </script>
+    
+        // Cerrar el submenú al hacer clic en una opción
+        const submenuLinks = document.querySelectorAll('.submenu-list a');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeAllSubmenus();
+            });
+        });
+        // Mostrar la fecha actual
+    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
+        </script>
     
     <script src="mapdata.js"></script>
     <script src="countrymap.js"></script>
