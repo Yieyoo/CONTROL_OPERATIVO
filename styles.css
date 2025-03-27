@@ -21,6 +21,7 @@ body {
 
 /* Estilo para los títulos dentro de estas secciones */
 #seccion1 h2{
+    
     font-size: 1.2em;
     margin-bottom: 10px;
     font-weight: bold;
@@ -42,10 +43,10 @@ body {
 
 
 .nueva-imagen {
-    position: absolute;
+    position: fixed;
     bottom: 345px;  /* Mantiene la imagen 348px arriba del borde inferior */
     left: 0;
-    width: 300px;   /* Establece un tamaño fijo para la imagen */
+    width: 260px;   /* Establece un tamaño fijo para la imagen */
     height: auto;   
     object-fit: block;
     z-index: 10;    /* Asegura que esté por encima de otros elementos */
