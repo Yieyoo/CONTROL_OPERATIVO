@@ -40,7 +40,7 @@ body {
 }
 
 /* Línea separadora con más diseño */
-/* Línea separadora con más diseño */
+
 
 .nueva-imagen {
     position: absolute;
@@ -52,8 +52,6 @@ body {
     z-index: 10;    /* Asegura que esté por encima de otros elementos */
 }
 /* Estilo para dispositivos con pantallas más pequeñas (por ejemplo, móviles) */
-/* Medias query para dispositivos móviles */
-/* Medias query para dispositivos móviles */
 @media (max-width: 767px) {
     .nueva-imagen {
         width: 200px;       /* Ajusta el tamaño de la imagen para dispositivos pequeños */
