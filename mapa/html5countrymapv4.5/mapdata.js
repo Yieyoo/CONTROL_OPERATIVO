@@ -84,7 +84,7 @@ var simplemaps_countrymap_mapdata={
     },
     MXBCS: {
       name: "Baja California Sur",
-      url: "estados/baja_california_S/baja_california_surindex.html"
+      url: "estados/baja_california_s/baja_california_surindex.html"
     },
     MXCHH: {
       name: "Chihuahua",
