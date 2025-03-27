@@ -1,58 +1,154 @@
-/* --- Estilos generales --- */
+/* --- Estilo general para el cuerpo --- */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    color: #691932;
-    background-image: url('imagenes/fondo.jpg'); /* Fondo de la página */
+    background-image: url('imagenes/fondo.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     min-height: 100vh;
-    overflow-x: hidden; /* Elimina cualquier desplazamiento horizontal no deseado */
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    margin: 0; /* Evita desplazamientos no deseados */
+    padding: 0;
 }
+/* Fondo y estilo de las secciones de información */
+#seccion1 {
+    background-color: #c09404; /* Color amarillo */
+    padding: 1px; /* Espaciado interno */
+    border-radius: 10px; /* Bordes redondeados */
+    text-align: center; /* Centra el texto */
+    color: white; /* Texto en blanco para contraste */
+}
+
+/* Estilo para los títulos dentro de estas secciones */
+#seccion1 h2{
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+@media screen and (max-width: 768px) {
+    #seccion1 {
+        padding: .1px; /* Reducir padding para pantallas pequeñas */
+        font-size: 0.8em; /* Reducir el tamaño del título */
+        
+    }
+
+    #seccion1 h2 {
+        font-size: 0.8em; /* Reducir el tamaño del título */
+        margin-bottom: 5px; /* Reducir el espacio debajo del título */
+    }
+}
+
+/* Línea separadora con más diseño */
+
+
+.nueva-imagen {
+    position: fixed;
+    bottom: -50px; 
+    left: 0;
+    width: 400px; /* Ahora sí tomará este tamaño */
+    height: auto;
+    object-fit: cover;
+    z-index: 10;
+}
+
+
+header {
+    background-color: #691932;
+    color: white;
+    text-align: center;
+    font-size: 10px;
+    padding: 5px;
+    font-weight: bold;
+    border-bottom: 4px solid #c09404;
+    margin-top: 52px; /* Lo baja 20px */
+}
+
+
 
 /* --- Logo superior --- */
 .logo-arriba-img {
-    max-width: 120px; /* Ajusta el tamaño en móviles */
+    max-width: 100px;
     height: auto;
     display: block;
     position: fixed;
-    right: 10px;
-    top: 10px;
+    right: 1vw;
+    top: 1vw;
     z-index: 1000;
 }
 
-/* --- Imagen Señora (Fija en la parte inferior) --- */
-.nueva-imagen {
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    max-width: 500px;
+/* --- Contenedor del mapa --- */
+.map-container {
+    width: 80vw;  /* Ajusta el ancho al 80% del viewport */
+    height: 60vh; /* Ajusta la altura al 60% del viewport */
+    padding: 3vw; /* Aumenta el padding para mayor separación interna */
+    text-align: center;
+    margin-top: 2vw;
+    margin-left: 18vw; /* Espacio para el menú en escritorio */
+    background-color: lightgray; /* Solo para visualizar el contenedor */
+}
+
+/* Ajustes para pantallas medianas (tablets) */
+@media (max-width: 1024px) {
+    .map-container {
+        margin-left: 0; /* Elimina el margen lateral */
+        padding: 2vw;
+    }
+}
+
+/* Ajustes para celulares */
+@media (max-width: 768px) {
+    .map-container {
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 10vw; /* Ajusta el ancho para que no ocupe toda la pantalla */
+        max-height: 10vh; /* Limita la altura al 50% del viewport */
+        padding: 2vw;
+        overflow: auto; /* Agrega scroll si el contenido es demasiado grande */
+    }
+}
+
+/* --- Imagen del mapa --- */
+img {
+    max-width: 100%;
     height: auto;
-    z-index: 500;
 }
-
-/* --- Imagen Gobernacion --- */
-.logo-gobernacion {
-    width: 100px; /* Ajusta el tamaño */
-    height: auto; /* Mantiene la proporción */
-    position: absolute; /* Para moverlo libremente */
+/* --- Logo de Gobernación --- */
+#logo-gobernacion {
+    position: fixed;
     top: 10px;
-    left: 90px;
+    left: 80px;
+    max-width: 250px;
+    height: auto;
+    z-index: 1001;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease;
 }
 
-
-/* --- Contenedor principal --- */
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    min-height: 100vh; /* Asegura que el contenedor ocupe todo el alto de la pantalla */
-    padding: 0;
+#logo-gobernacion:hover {
+    transform: scale(1.05);
 }
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    #logo-gobernacion {
+        max-width: 80px;
+        top: 5px;
+        left: 20px;}
+    }
+@media (max-width: 480px) {
+    #logo-gobernacion {
+        max-width: 60px;
+    }
+    
+    .menu-toggle {
+        left: 70px;
+    }
+}
+
 
 /* --- Menú lateral --- */
 nav.menu {
@@ -123,9 +219,8 @@ nav.menu ul li a:hover {
     background-color: #691932;
     color: #fff;
     border: none;
-    width: 60px;   /* Ancho fijo */
-    height: 40px;  /* Alto fijo */
-    font-size: 18px;
+    padding: 12px 20px;
+    font-size: 14px;
     cursor: pointer;
     position: fixed;
     top: 25px;
@@ -216,7 +311,8 @@ nav.menu ul li a:hover {
     background-color: #691932; /* Fondo oscuro */
     color: #fff; /* Texto blanco */
     border: none; /* Sin borde */
-    padding: 6px 12px; /* Tamaño más pequeño */
+    width: 60px;   /* Ancho fijo */
+    height: 40px;  /* Alto fijo */ 
     font-size: 12px; /* Fuente más pequeña */
     cursor: pointer; /* Apunta el cursor sobre el botón */
     position: fixed;
@@ -239,12 +335,11 @@ nav.menu ul li a:hover {
 @media screen and (max-width: 768px) {
     .menu-toggle {
         font-size: 10px; /* Fuente aún más pequeña en móviles */
-        padding: 5px 10px; /* Ajustar el tamaño del botón en móviles */
+        padding: 60px 10px; /* Ajustar el tamaño del botón en móviles */
         top: 10px; /* Ajustar la posición */
         left: 10px;
     }
 }
-
 /* --- Estilos Responsivos (Móviles) --- */
 @media screen and (max-width: 768px) {
 
@@ -259,7 +354,7 @@ nav.menu ul li a:hover {
     }
 
     .menu-toggle {
-        padding: 18px 18px;
+        padding: 14px 18px;
         font-size: 20px;
 
         }}
@@ -270,103 +365,243 @@ h1, h2, p {
     margin-left: 10px;
 }
 
-/* --- Sección de información fija al fondo --- */
-#informacion {
-    position: absolute;
-    bottom: 50px;
-    width: 100%; /* Ajusta el porcentaje según el tamaño que desees */
-    max-width: 500px; /* Si quieres un máximo de ancho para pantallas grandes */
-    left: 50%; /* Para centrarlo horizontalmente */
-    transform: translateX(-50%); /* Centra el contenedor exacto */
-    text-align: center;
-    background-color: rgba(254, 251, 251, 0.9);
-    padding: 10px;
-    z-index: 1001;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.info-container h2 {
+/* --- Fecha actual --- */
+#fechaActual {
+    position: fixed;
+    top: 100px;
+    right: 20px;
     font-size: 16px;
-    color: #691932;
-    font-weight: bold;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: rgba(105, 25, 50, 0.9);
+    padding: 10px 20px;
+    border-radius: 25px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 500;
+    font-family: 'Arial', sans-serif;
     text-transform: uppercase;
-    margin: 0;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-/* --- Estilos Responsivos --- */
-@media screen and (max-width: 768px) {
-    /* Ajustes generales */
-    body {
-        padding: 10px;
-    }
-
-    /* Logo superior */
-    .logo-arriba-img {
-        max-width: 80px; /* Reducimos el tamaño del logo */
-        top: 5px;
-        right: 5px;
-    }
-
-    /* Imagen Señora (Fija en la parte inferior) */
-    .nueva-imagen { 
-        max-width: 500px; /* Reducimos el tamaño de la imagen */
-        bottom: 5px;
-    }
-    /* Títulos y textos */
-    h1 {
-        font-size: 20px; /* Reducimos el tamaño de la fuente */
-    }
-
-    .info-container h2 {
-        font-size: 14px; /* Reducimos el tamaño de la fuente */
-    }
-
-    /* Ajustes específicos para la sección de información */
-    #informacion {
-        position: absolute;
-        bottom: 80px; /* Ajustamos la posición */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%; /* Ocupa el 90% del ancho en móviles */
-        background-color: rgba(245, 242, 242, 0.9);
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-        z-index: 1001;
-    }
-
-    .info-container h2 {
-        font-size: 14px; /* Reducimos el tamaño de la fuente */
-    }
+#fechaActual:hover {
+    background-color: rgba(142, 92, 113, 0.9);
+    transform: translateY(-2px);
 }
 
-/* --- Estilos para el logo --- */
-.logo {
-    width: 150px; /* Ancho deseado */
-    height: auto; /* Mantiene la proporción de la imagen */
+/* --- Botón de regreso --- */
+.regresar-btn {
+    background-color: #691932;
+    color: white;
+    border: none;
+    padding: 1vw 2vw;
+    font-size: 1.2vw;
+    cursor: pointer;
+    position: fixed;
+    bottom: 2vw;
+    left: 2vw;
+    border-radius: 0.5vw;
+    z-index: 1000;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
+}
+
+.regresar-btn:hover {
+    background-color: #8e5c71;
 }
 .fecha-actual {
-    font-size: 1.5vw; /* Tamaño del texto para pantallas grandes */
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    font-size: 16px;
     font-weight: bold;
     color: #691932;
-    background-color: #f4f4f4;
-    padding: 0.5vw 1vw;
-    border-radius: 0.5vw;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    
-    position: fixed;
-    top: 5vw;
-    right: 2vw;
-    z-index: 900;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 500;
 }
-
-/* Ajustes para pantallas pequeñas (celulares) */
-@media (max-width: 768px) {
-    .fecha-actual {
-        font-size: 4vw;  /* Aumentamos el tamaño del texto en pantallas pequeñas */
-        top: 70vw;        /* Bajamos un poco la posición */
-        right: 40vw;      /* Ajustamos la distancia desde la derecha */
-        padding: 2vw 3vw; /* Más espacio interno para facilitar la lectura */
+/* --- Ajustes específicos para pantallas pequeñas --- */
+@media screen and (max-width: 768px) {
+    #fechaActual {
+        font-size: 20px; /* Reduce el tamaño de la fuente en móviles */
+        top: 5px; /* Ajusta un poco la posición hacia arriba */
+        padding: 6px 12px; /* Reduce el padding */
+        left: 50%; /* Posiciona el elemento en el centro horizontal */
+        transform: translateX(-50%); /* Mueve el elemento hacia la izquierda en un 50% de su ancho */
     }
 }
+
+/* --- Ajustes para pantallas muy pequeñas (menos de 480px) --- */
+@media screen and (max-width: 480px) {
+    #fechaActual {
+        font-size: 11px; /* Reduce más el tamaño de la fuente */
+        top: 5px; /* Ajusta la posición */
+        padding: 4px 10px; /* Menos padding */
+    }
+}
+/* --- Contenedor del Mapa Rediseñado --- */
+.mapa-container {
+    width: 85%;
+    max-width: 950px;
+    margin: 30px auto;
+    padding: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(105, 25, 50, 0.2);
+    overflow: hidden;
+    position: relative;
+    border: none;
+}
+
+.titulo-mapa {
+    text-align: center;
+    color: #691932;
+    margin: 0;
+    padding: 20px;
+    font-size: 1.5em;
+    font-weight: 600;
+    background: linear-gradient(to right, #f8f8f8, #ffffff, #f8f8f8);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+#map {
+    width: 100%;
+    height: 600px;
+    background-color: #f9f9f9;
+    display: block;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+/* Efecto hover para el contenedor */
+.mapa-container:hover {
+    box-shadow: 0 8px 30px rgba(105, 25, 50, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Estilo para los estados del mapa (si es SVG) */
+#map path {
+    stroke: #fff;
+    stroke-width: 1.2px;
+    transition: fill 0.3s ease;
+}
+
+#map path:hover {
+    fill: #8e5c71;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+/* Diseño responsivo */
+@media (max-width: 1024px) {
+    .mapa-container {
+        width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .mapa-container {
+        width: 95%;
+        margin: 20px auto;
+    }
+    
+    .titulo-mapa {
+        font-size: 1.3em;
+        padding: 15px;
+    }
+    
+    #map {
+        height: 500px;
+    }
+}
+
+@media (max-width: 480px) {
+    #map {
+        height: 400px;
+    }
+}
+#informacion {
+    position: fixed; /* Lo hace un elemento fijo en la pantalla */
+    bottom: 0; /* Lo coloca en la parte inferior */
+    left: 50%; /* Lo centra horizontalmente */
+    transform: translateX(-50%); /* Asegura que esté completamente centrado */
+    width: 100%; /* Ancho completo */
+    max-width: 500px; /* Limita el ancho máximo a 500px */
+    text-align: center;
+    background-color: rgba(254, 251, 251, 0.9); /* Fondo semitransparente */
+    padding: 8px 15px; /* Ajusta el padding para hacerlo más fino */
+    z-index: 1001;
+    border-radius: 15px; /* Bordes más redondeados */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
+    font-size: 14px; /* Fuente más pequeña */
+    font-family: Arial, sans-serif; /* Fuente más limpia */
+    font-weight: 400; /* Peso de fuente más ligero */
+}
+
+/* Estilo para pantallas grandes (PC) */
+@media screen and (min-width: 769px) {
+    #informacion {
+        display: none; /* Oculta en pantallas grandes (PC) */
+    }
+}
+
+/* Estilo para pantallas pequeñas (móviles) */
+@media screen and (max-width: 768px) {
+    #informacion {
+        display: block;
+        width: 90%;
+        max-width: 500px;
+        padding: 12px 20px;
+        font-size: 12px;
+        margin-top: -30px; /* Lo sube 20px */
+    }
+}
+
+/* Estilo general para el contenedor del título */
+.title-container {
+    text-align: center; /* Centra el texto */
+    margin: 10px 0; /* Espaciado superior e inferior */
+}
+
+/* Estilo para el título h1 */
+.title-container h1 {
+    font-size: 2.5em; /* Tamaño de fuente grande para pantallas grandes */
+    font-weight: bold; /* Negrita */
+    color: #f1ecec; /* Color de texto */
+    margin: 0; /* Eliminar márgenes */
+}
+
+/* Estilo para pantallas pequeñas (móviles) */
+@media screen and (max-width: 768px) {
+    .title-container {
+        margin: 10px 0; /* Reducir el margen para pantallas más pequeñas */
+    }
+
+    .title-container h1 {
+        font-size: 2em; /* Reducir el tamaño del título */
+        padding: 0 10px; /* Añadir algo de padding a los lados */
+        line-height: 1.2; /* Reducir el espacio entre líneas si es necesario */
+    }
+}
+
+/* Para pantallas muy pequeñas (menos de 480px) */
+@media screen and (max-width: 480px) {
+    .title-container h1 {
+        font-size: 1em; /* Más pequeño en pantallas muy pequeñas */
+        padding: 0 5px; /* Menos padding en pantallas muy pequeñas */
+    }
+}
+.decoracion-derecha {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 150px; /* Ajusta el ancho según lo necesites */
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
+    background-image: url('imagenes/fondo_decorar.png');
+    background-size: cover; /* Ajusta la imagen al div */
+    background-repeat: no-repeat;
+    z-index: -1; /* Para que no interfiera con el contenido */
+}
+
+
