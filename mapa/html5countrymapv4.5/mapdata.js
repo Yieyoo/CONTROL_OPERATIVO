@@ -126,6 +126,10 @@ var simplemaps_countrymap_mapdata={
       name: "Jalisco",
       url: "estados/jalisco/jaliscoindex.html"
     },
+    MXCMX: {
+      name: "Ciudad de México",
+      url: "estados/cdmx/cdmxindex.html"
+    },
     MXMEX: {
       name: "México",
       url: "estados/estado_de_mexico/estado_de_mexicoindex.html"
