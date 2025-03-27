@@ -35,7 +35,7 @@ var simplemaps_countrymap_mapdata={
     background_color: "#FFFFFF",  // Fondo blanco
     label_size: 16,
     label_font: "Arial",
-    label_display: "auto",
+    label_display: "always",
     label_scale: "yes",
     hide_labels: "no",
     hide_eastern_labels: "no",
@@ -86,12 +86,113 @@ var simplemaps_countrymap_mapdata={
       name: "Baja California Sur",
       url: "estados/baja_california_S/baja_california_surindex.html"
     },
-    // ... (todos los demás estados con rutas consistentes)
     MXCHH: {
       name: "Chihuahua",
       url: "estados/chihuahua/chihuahuaindex.html"
+    },
+    MXCAM: {
+      name: "Campeche",
+      url: "estados/campeche/campecheindex.html"
+    },
+    MXCOA: {
+      name: "Coahuila",
+      url: "estados/coahuila/coahuilaindex.html"
+    },
+    MXCOL: {
+      name: "Colima",
+      url: "estados/colima/colimaindex.html"
+    },
+    MXCHP: {
+      name: "Chiapas",
+      url: "estados/chiapas/chiapasindex.html"
+    },
+    MXDUR: {
+      name: "Durango",
+      url: "estados/durango/durangoindex.html"
+    },
+    MXGTO: {
+      name: "Guanajuato",
+      url: "estados/guanajuato/guanajuatoindex.html"
+    },
+    MXGRO: {
+      name: "Guerrero",
+      url: "estados/guerrero/guerreroindex.html"
+    },
+    MXHGO: {
+      name: "Hidalgo",
+      url: "estados/hidalgo/hidalgoindex.html"
+    },
+    MXJAL: {
+      name: "Jalisco",
+      url: "estados/jalisco/jaliscoindex.html"
+    },
+    MXMEX: {
+      name: "México",
+      url: "estados/estado_de_mexico/estado_de_mexicoindex.html"
+    },
+    MXMOR: {
+      name: "Morelos",
+      url: "estados/morelos/morelosindex.html"
+    },
+    MXNAY: {
+      name: "Nayarit",
+      url: "estados/nayarit/nayaritindex.html"
+    },
+    MXNLU: {
+      name: "Nuevo León",
+      url: "estados/nuevo_leon/nuevo_leonindex.html"
+    },
+    MXOAX: {
+      name: "Oaxaca",
+      url: "estados/oaxaca/oaxacaindex.html"
+    },
+    MXPUE: {
+      name: "Puebla",
+      url: "estados/puebla/pueblaindex.html"
+    },
+    MXQUE: {
+      name: "Querétaro",
+      url: "estados/queretaro/queretaroindex.html"
+    },
+    MXROO: {
+      name: "Quintana Roo",
+      url: "estados/quintana_roo/quintana_rooindex.html"
+    },
+    MXSLP: {
+      name: "San Luis Potosí",
+      url: "estados/san_luis_potosi/san_luis_potosiindex.html"
+    },
+    MXSIN: {
+      name: "Sinaloa",
+      url: "estados/sinaloa/sinaloaindex.html"
+    },
+    MXSON: {
+      name: "Sonora",
+      url: "estados/sonora/sonoraindex.html"
+    },
+    MXTAB: {
+      name: "Tabasco",
+      url: "estados/tabasco/tabascoindex.html"
+    },
+    MXTAM: {
+      name: "Tamaulipas",
+      url: "estados/tamaulipas/tamaulipasindex.html"
+    },
+    MXTLX: {
+      name: "Tlaxcala",
+      url: "estados/tlaxcala/tlaxcalaindex.html"
+    },
+    MXVER: {
+      name: "Veracruz",
+      url: "estados/veracruz/veracruzindex.html"
+    },
+    MXYUC: {
+      name: "Yucatán",
+      url: "estados/yucatan/yucatanindex.html"
+    },
+    MXZAC: {
+      name: "Zacatecas",
+      url: "estados/zacatecas/zacatecasindex.html"
     }
-    // ... continuar con los demás estados
-  },
-  // ... (el resto de tu configuración actual)
-};
+
+    }}
