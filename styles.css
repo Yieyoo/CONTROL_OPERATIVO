@@ -54,20 +54,14 @@ body {
 /* Estilo para dispositivos con pantallas más pequeñas (por ejemplo, móviles) */
 @media (max-width: 767px) {
     .nueva-imagen {
-        width: 200px;       /* Ajusta el tamaño de la imagen para dispositivos pequeños */
-        left: 50%;          /* Centra horizontalmente */
-        bottom: 0;          /* Sigue estando pegada al fondo */
-        transform: translateX(-50%);  /* Asegura el centrado horizontal */
+        display: none; 
     }
 }
 
 /* Medias query para pantallas muy pequeñas (como teléfonos en modo vertical) */
 @media (max-width: 480px) {
     .nueva-imagen {
-        width: 150px;       /* Ajusta el tamaño de la imagen para pantallas más pequeñas */
-        left: 50%;          /* Centra horizontalmente */
-        bottom: 0;          /* Sigue estando pegada al fondo */
-        transform: translateX(-50%);  /* Asegura el centrado horizontal */
+        display: none; 
     }
 }
 
@@ -140,7 +134,7 @@ img {
 #logo-gobernacion {
     position: absolute;
     top: 8px;
-    left: 500px;
+    left: 550px;
     max-width: 250px;
     height: auto;
     z-index: 1001;
