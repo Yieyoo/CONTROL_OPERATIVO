@@ -43,8 +43,8 @@ body {
 
 
 .nueva-imagen {
-    position: fixed;
-    bottom: 345px;  /* Mantiene la imagen 348px arriba del borde inferior */
+    position: absolute;
+    bottom: 360px;  /* Mantiene la imagen 348px arriba del borde inferior */
     left: 0;
     width: 260px;   /* Establece un tamaño fijo para la imagen */
     height: auto;   
