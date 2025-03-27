@@ -7,7 +7,7 @@ var simplemaps_countrymap_mapdata={
     border_color: "#ffffff",
     
     //State defaults
-    state_description: "State description",
+    state_description: "",
     state_color: "#691932",
     state_hover_color: "#3B729F",
     state_url: "",
@@ -76,15 +76,15 @@ var simplemaps_countrymap_mapdata={
   state_specific: {
     MXAGU: {
       name: "Aguascalientes",
-      url: "estado-aguascalientes.html" // Ruta relativa desde index.html
+      url: "estados/aguascalientes/aguascalientesindex.html" // Ruta relativa desde index.html
     },
     MXBCN: {
       name: "Baja California",
-      url: "estado-baja-california.html"
+      url: "estados/baja_california/baja_californiaindex.html"
     },
     MXBCS: {
       name: "Baja California Sur",
-      url: "estados/baja_california/baja_californiaindex.html"
+      url: ""
     },
     // ... (todos los demás estados con rutas consistentes)
     MXCHH: {
