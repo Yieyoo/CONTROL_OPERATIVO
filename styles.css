@@ -42,13 +42,34 @@ body {
 
 
 .nueva-imagen {
-    position: fixed;
-    bottom: -50px; 
+    position: absolute;
+    bottom: 345px;  /* Mantiene la imagen 348px arriba del borde inferior */
     left: 0;
-    width: 400px; /* Ahora sí tomará este tamaño */
-    height: auto;
-    object-fit: cover;
-    z-index: 10;
+    width: 300px;   /* Establece un tamaño fijo para la imagen */
+    height: auto;   
+    object-fit: block;
+    z-index: 10;    /* Asegura que esté por encima de otros elementos */
+}
+/* Estilo para dispositivos con pantallas más pequeñas (por ejemplo, móviles) */
+/* Medias query para dispositivos móviles */
+/* Medias query para dispositivos móviles */
+@media (max-width: 767px) {
+    .nueva-imagen {
+        width: 200px;       /* Ajusta el tamaño de la imagen para dispositivos pequeños */
+        left: 50%;          /* Centra horizontalmente */
+        bottom: 0;          /* Sigue estando pegada al fondo */
+        transform: translateX(-50%);  /* Asegura el centrado horizontal */
+    }
+}
+
+/* Medias query para pantallas muy pequeñas (como teléfonos en modo vertical) */
+@media (max-width: 480px) {
+    .nueva-imagen {
+        width: 150px;       /* Ajusta el tamaño de la imagen para pantallas más pequeñas */
+        left: 50%;          /* Centra horizontalmente */
+        bottom: 0;          /* Sigue estando pegada al fondo */
+        transform: translateX(-50%);  /* Asegura el centrado horizontal */
+    }
 }
 
 
@@ -118,9 +139,9 @@ img {
 }
 /* --- Logo de Gobernación --- */
 #logo-gobernacion {
-    position: fixed;
-    top: 10px;
-    left: 80px;
+    position: absolute;
+    top: 8px;
+    left: 500px;
     max-width: 250px;
     height: auto;
     z-index: 1001;
