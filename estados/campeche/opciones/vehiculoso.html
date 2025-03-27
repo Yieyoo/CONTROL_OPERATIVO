@@ -2,23 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Operativo</title>
-    <link rel="icon" type="image/png" href="imagenes/pasaporte.png">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vehiculos</title>
+    <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
 </head>
 <body>
-
+    <!-- Fondo oscuro para el menú -->
     <div class="menu-overlay"></div>
 
     <header>
+        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
+        <!-- Menú principal -->
         <nav class="menu">
-            <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
+            <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
-                <li><a href="index.html">Inicio</a></li>
-
+                <li><a href="../../../index.html">Inicio</a></li>
+                <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -29,6 +30,7 @@
                     </ul>
                 </li>
 
+                <!-- Submenú Información de ORs -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
@@ -37,7 +39,7 @@
                         <li><a href="estado-baja-california-sur.html">Baja California Sur</a></li>
                         <li><a href="estado-campeche.html">Campeche</a></li>
                         <li><a href="estado-chiapas.html">Chiapas</a></li>
-                        <li><a href="estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../chihuahuaindex.html">Chihuahua</a></li>
                         <li><a href="estado-coahuila.html">Coahuila</a></li>
                         <li><a href="estado-colima.html">Colima</a></li>
                         <li><a href="estado-durango.html">Durango</a></li>
@@ -67,45 +69,38 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
-        <img src="imagenes/MujerBandera.png" alt="Nueva imagen" class="nueva-imagen">
-        
-        <div class="title-container">
-            <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
-        </div>
-
-        <div class="fecha-actual" id="fechaActual"></div>
     </header>
-    <section id="seccion1">
-        <div class="intro">
-            <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
-            <p>Dirección de Control Operativo</p>
-        </div>
-    </section>
-    
-    <div class="linea"></div> <!-- Línea separadora -->
-    
-    <section id="informacion">
-        <div class="info-container">
-            <h2>Información de Control Operativo</h2>
-        </div>
-    </section>
 
-    <div class="decoracion-derecha"></div>
+    <!-- Contenedor de logos -->
+    <div class="logo-container">
+        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
+    </div>
+    
+    <div class="header-container">
+        <h1>Vehiculos</h1>
+    </div>
 
-    <section class="mapa-container">
-        <h2 class="titulo-mapa">Mapa Interactivo de México</h2>
-        <div id="map" style="background: #e9e9e9; width: 100%; height: 600px;"></div>
-        <p id="mapa-error" style="color: red; display: none;"></p>
-    </section>
+    <!-- Contenedor del PDF -->
+    <div class="pdf-container">
+        <!-- Usando solo el iframe para mostrar el PDF -->
+        <iframe 
+    src="../../../documentacion/vehiculos/bajacsv/Vehiculos_BCS.pdf" 
+    class="pdf-embed"
+    frameborder="0"
+></iframe>
+
+    </div>
+
+    <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
+    <div class="mobile-images">
+        <img src="../../../documentacion/vehiculos/bajacsv/Vehiculos_BCS_page-0001.jpg" alt="Imagen 1">
+    </div>
+
+    <button class="regresar-btn">Regresar</button>
 
     <!-- Scripts -->
-    <script src="mapa/html5countrymapv4.5/mapdata.js"></script>
-    <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
-
     <script>
+        // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
             const menu = document.querySelector('.menu');
             const menuOverlay = document.querySelector('.menu-overlay');
@@ -113,7 +108,7 @@
             menuOverlay.classList.toggle('active');
         }
 
-        // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+        // Cerrar el menú al hacer clic fuera de él
         const menuOverlay = document.querySelector('.menu-overlay');
         menuOverlay.addEventListener('click', () => {
             const menu = document.querySelector('.menu');
@@ -132,11 +127,7 @@
         // Función para mostrar/ocultar el submenú
         function toggleSubmenu(event) {
             event.preventDefault();
-
-            // Cerrar todos los submenús antes de abrir uno nuevo
             closeAllSubmenus();
-
-            // Abrir el submenú actual
             const submenu = event.target.closest('.submenu');
             submenu.classList.toggle('active');
         }
@@ -156,23 +147,9 @@
             });
         });
 
-        // Mostrar fecha actual
-        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        // Verificación de carga del mapa (opcional)
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (typeof simplemaps_countrymap === 'undefined') {
-                    document.getElementById('mapa-error').textContent = 
-                        'Error: No se cargó countrymap.js. Verifica la ruta.';
-                    document.getElementById('mapa-error').style.display = 'block';
-                    console.error("SimpleMaps no está definido");
-                }
-            }, 1000);
+        // Regresar al historial
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
+            window.history.back();
         });
     </script>
 </body>

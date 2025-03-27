@@ -91,37 +91,55 @@ header {
 }
 
 /* --- Contenedor del mapa --- */
+/* --- Contenedor del mapa --- */
 .map-container {
-    width: 80vw;  /* Ajusta el ancho al 80% del viewport */
-    height: 60vh; /* Ajusta la altura al 60% del viewport */
-    padding: 3vw; /* Aumenta el padding para mayor separación interna */
-    text-align: center;
-    margin-top: 2vw;
-    margin-left: 18vw; /* Espacio para el menú en escritorio */
-    background-color: lightgray; /* Solo para visualizar el contenedor */
+    width: 80vw;
+    height: 60vh;
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Ajustes para pantallas medianas (tablets) */
+/* Contenedor interno del mapa (SVG) */
+#map {
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+}
+
+/* Asegurar que el SVG ocupe todo el espacio */
+#map svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Ajustes para tablets */
 @media (max-width: 1024px) {
     .map-container {
-        margin-left: 0; /* Elimina el margen lateral */
-        padding: 2vw;
+        width: 90vw;
+        height: 50vh;
+        margin-left: 0;
+        padding: 15px;
     }
 }
 
-/* Ajustes para celulares */
+/* Ajustes para móviles */
 @media (max-width: 768px) {
     .map-container {
-        margin-left: auto;
-        margin-right: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        width: 10vw; /* Ajusta el ancho para que no ocupe toda la pantalla */
-        max-height: 10vh; /* Limita la altura al 50% del viewport */
-        padding: 2vw;
-        overflow: auto; /* Agrega scroll si el contenido es demasiado grande */
+        width: 95vw;
+        height: 40vh;
+        padding: 10px;
+        margin: 10px auto;
+    }
+    
+    /* Ajustar labels para móviles */
+    #map svg text {
+        font-size: 10px !important;
     }
 }
 
