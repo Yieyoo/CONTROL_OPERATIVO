@@ -84,7 +84,7 @@ var simplemaps_countrymap_mapdata={
     },
     MXBCS: {
       name: "Baja California Sur",
-      url: ""
+      url: "estados/baja_california_S/baja_california_surindex.html"
     },
     // ... (todos los demás estados con rutas consistentes)
     MXCHH: {
