@@ -45,7 +45,7 @@ body {
 .nueva-imagen {
     position: absolute;
     bottom: 425px;  /* Mantiene la imagen 348px arriba del borde inferior */
-    left: 100px;
+    left: 65px;
     width: 200px;   /* Establece un tamaño fijo para la imagen */
     height: auto;   
     object-fit: block;
