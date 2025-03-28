@@ -127,19 +127,20 @@ nav.menu ul li a:hover {
 
 /* --- Botón de menú --- */
 .menu-toggle {
-    background-color: #691932;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    font-size: 14px;
-    cursor: pointer;
+    background-color: #691932; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    border: none; /* Sin borde */
+    width: 60px;   /* Ancho fijo */
+    height: 40px;  /* Alto fijo */ 
+    font-size: 12px; /* Fuente más pequeña */
+    cursor: pointer; /* Apunta el cursor sobre el botón */
     position: fixed;
-    top: 10px;
-    left: 20px;
-    border-radius: 5px;
+    top: 15px; /* Ajusta la posición */
+    left: 15px;
+    border-radius: 20px; /* Bordes redondeados más sutiles */
     z-index: 1000;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más suave */
+    transition: all 0.2s ease; /* Transición suave */
 }
 
 .menu-toggle:hover {
