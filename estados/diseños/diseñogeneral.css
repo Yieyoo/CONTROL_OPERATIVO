@@ -68,7 +68,6 @@ body {
 
 .instituto-info h3 {
     font-size: 1rem;
-    color: #691932;
 }
 
 /* --- Títulos y textos --- */
@@ -512,10 +511,34 @@ nav.menu ul li a:hover {
     margin-left: 20px;
     height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
 }
-.nueva-imagen {
-    width: 200px; /* Ajusta el ancho según necesites */
-    margin-top: 60px;
-    height: auto; /* Mantiene la proporción de la imagen */
+.instituto-info {
+    background: linear-gradient(to right, #6b1e3f, #320d1c); /* Fondo degradado */
+    color: white; /* Texto blanco */
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+    margin: 20px auto;
+    width: 80%; /* Ancho adaptable */
+}
+
+/* Estilos para los títulos */
+.instituto-info h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.instituto-info h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.instituto-info h3 {
+    font-size: 16px;
+    font-weight: 400;
 }
 
 
