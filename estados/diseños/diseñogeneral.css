@@ -283,7 +283,7 @@ nav.menu ul li a:hover {
     padding-top: 0; /* Eliminamos el padding superior */
     padding-bottom: 0; /* Eliminamos el padding inferior */
     animation: fadeIn 0.3s ease; /* Animación de aparición */
-    max-height: 200px; /* Altura máxima del submenú */
+    max-height: 500px; /* Altura máxima del submenú */
     overflow-y: auto; /* Agrega scroll vertical si el contenido es muy largo */
 }
 
