@@ -160,11 +160,11 @@ var simplemaps_countrymap_mapdata={
     },
     MXROO: {
       name: "Quintana Roo",
-      url: "estados/quintana_roo/quintana_rooindex.html"
+      url: "estados/quintanaroo/quintanarooindex.html"
     },
     MXSLP: {
       name: "San Luis Potosí",
-      url: "estados/san_luis_potosi/san_luis_potosiindex.html"
+      url: "estados/san_luis/san_luisindex.html"
     },
     MXSIN: {
       name: "Sinaloa",
