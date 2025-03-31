@@ -131,8 +131,8 @@ var simplemaps_countrymap_mapdata={
       url: "estados/cdmx/cdmxindex.html"
     },
     MXMEX: {
-      name: "México",
-      url: "estados/estado_de_mexico/estado_de_mexicoindex.html"
+      name: "Estado de México",
+      url: "estados/edomex/edomexindex.html"
     },
     MXMOR: {
       name: "Morelos",
