@@ -502,7 +502,8 @@ h1, h2, p {
     #map {
         height: 400px;
     }
-}
+} 
+
 #informacion {
     position: fixed; /* Lo hace un elemento fijo en la pantalla */
     bottom: 0; /* Lo coloca en la parte inferior */
@@ -585,5 +586,4 @@ h1, h2, p {
     background-repeat: no-repeat;
     z-index: -1; /* Para que no interfiera con el contenido */
 }
-
 
