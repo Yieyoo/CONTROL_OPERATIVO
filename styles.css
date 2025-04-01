@@ -450,8 +450,8 @@ h1, h2, p {
 
 #map {
     width: 100%;
-    height: 600px;
-    background-color: #f9f9f9;
+    height: 570px;
+    background-color: #f6f6f6;
     display: block;
     border: none;
     transition: all 0.3s ease;
@@ -473,13 +473,14 @@ h1, h2, p {
 #map path:hover {
     fill: #8e5c71;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-}
-
-/* Diseño responsivo */
-@media (max-width: 1024px) {
-    .mapa-container {
-        width: 90%;
-    }
+}/* Ajustes generales para que el fondo del mapa no se extienda demasiado */
+.mapa-container {
+    width: 100%;
+    margin: 20px auto;
+    padding: 0;
+    background: #ffffff;  /* Fondo gris del mapa */
+    overflow: hidden;  /* Evita el desbordamiento si hay algún contenido extra */
+    height: auto;  /* Se ajusta al contenido */
 }
 
 @media (max-width: 768px) {
@@ -488,21 +489,17 @@ h1, h2, p {
         margin: 20px auto;
     }
     
-    .titulo-mapa {
-        font-size: 1.3em;
-        padding: 15px;
-    }
-    
     #map {
-        height: 500px;
+        height: 500px;  /* Ajusta la altura del mapa para pantallas más pequeñas */
     }
 }
 
 @media (max-width: 480px) {
     #map {
-        height: 400px;
+        height: 190px;  /* Ajusta la altura aún más para pantallas muy pequeñas */
     }
-} 
+}
+
 
 #informacion {
     position: fixed; /* Lo hace un elemento fijo en la pantalla */

@@ -33,7 +33,7 @@ var simplemaps_countrymap_mapdata={
     //Label defaults
     label_color: "#ffffff",
     label_hover_color: "#ffffff",
-    label_size: 16,
+    label_size: 20,
     label_font: "Arial",
     label_display: "auto",
     label_scale: "yes",
