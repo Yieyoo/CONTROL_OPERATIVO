@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chihuahua</title>
+    <title>Datos Nacionales</title>
     <link rel="icon" type="image/png" href="../../imagenes/pasaporte.png">
-    <link rel="stylesheet" href="../diseños/diseñogeneral.css">
+    <link rel="stylesheet" href="estilodatos.css">
 </head>
 <body>
     <!-- Fondo oscuro para el menú -->
@@ -17,16 +17,14 @@
 
         <!-- Menú principal -->
         <nav class="menu">
-            <img src="../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
-
+            <img src="../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
-                <li><a href="../../index.html">Inicio</a></li>
-
+                <li><a href="../index.html">Inicio</a></li>
                 <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
-                        <li><a href="../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="datos-nacionales.html">Datos Nacionales</a></li>
                         <li><a href="plantilla-personal.html">Plantilla de Personal</a></li>
                         <li><a href="unidades-caninas.html">Unidades Caninas</a></li>
                         <li><a href="inmuebles.html">Inmuebles</a></li>
@@ -37,12 +35,12 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                        <li><a href="../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="aguascalientesindex.html">Aguascalientes</a></li>
                         <li><a href="../baja_california/baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../campeche/campecheindex.html">Campeche</a></li>
                         <li><a href="../chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
                         <li><a href="../coahuila/coahuilaindex.html">Coahuila</a></li>
                         <li><a href="../colima/colimaindex.html">Colima</a></li>
                         <li><a href="../durango/durangoindex.html">Durango</a></li>
@@ -68,7 +66,7 @@
                         <li><a href="../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
                         <li><a href="../veracruz/veracruzindex.html">Veracruz</a></li>
                         <li><a href="../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                        <li><a href="../yucatan/yucatanindex.html">Zacatecas</a></li>
                     </ul>
                 </li>
             </ul>
@@ -86,7 +84,7 @@
 
     <!-- Agregamos el nombre del estado aquí -->
     <div class="estado-info">
-        <h4>Chihuahua</h4> <!-- Aquí puedes cambiar el nombre del estado según sea necesario -->
+        <h4>Datos Nacionales</h4> <!-- Aquí puedes cambiar el nombre del estado según sea necesario -->
     </div>
 
     <!-- Contenedor solo para las opciones -->
@@ -94,28 +92,21 @@
         <div class="opciones-container">
             <div class="opciones-grid">
                 <div class="fila">
-                    <button class="btn-1" onclick="location.href='opciones/fichao.html'">Ficha Curricular</button>
+                    <button class="btn-1" onclick="location.href='opciones/vehiculoso.html'">Padron Vehicular</button>
+                    <button class="btn-2" onclick="location.href='opciones/inmuebleso.html'">Plantilla de Personal</button>
+                    <button class="btn-3" onclick="location.href='opciones/perroso.html'">Unidades Caninas</button>
+                    <button class="btn-4" onclick="location.href='opciones/visitao.html'">Inmuebles</button>
                 </div>
                 <div class="fila">
-                    <button class="btn-2" onclick="location.href='opciones/organigramao.html'">Organigrama</button>
-                    <button class="btn-3" onclick="location.href='opciones/plantillao.html'">Plantilla de Personal</button>
-                </div>
-                <div class="fila">
-                    <button class="btn-4" onclick="location.href='opciones/visitao.html'">Última Visita de Supervisión y Evaluación</button>
-                    <button class="btn-5" onclick="location.href='opciones/acuerdoso.html'">Acuerdos de Visita de Supervisión y Evaluación</button>
-                </div>
-                <div class="fila">
-                    <button class="btn-6" onclick="location.href='opciones/vehiculoso.html'">Vehículos</button>
-                    <button class="btn-7" onclick="location.href='opciones/inmuebleso.html'">Inmuebles</button>
-                    <button class="btn-8" onclick="location.href='opciones/perroso.html'">Unidad Canina</button>
-                </div>
+                    <button class="btn-5" onclick="location.href='opciones/visitao.html'">Personal Comisionado</button>
+                    <button class="btn-6" onclick="location.href='opciones/acuerdoso.html'">Analítico de Estado de fuerza</button>
             </div>
         </div>
     </div>
 
     <!-- Contenedor de logos -->
     <div class="logo-container">
-        <img src="../../imagenes/inm logo.png" alt="Logo 1">
+        <img src="../imagenes/inm logo.png" alt="Logo 1">
     </div>
 
     <script>

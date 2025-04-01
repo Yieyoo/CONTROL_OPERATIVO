@@ -270,7 +270,7 @@ labels: {
     parent_id: "MXJAL"
   },
   MXMEX: {
-    name: "México",
+    name: "Estado de México",
     parent_id: "MXMEX"
   },
   MXMIC: {
