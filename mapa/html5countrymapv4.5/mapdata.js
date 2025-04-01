@@ -31,11 +31,11 @@ var simplemaps_countrymap_mapdata={
     all_locations_hidden: "no",
     
     //Label defaults
-    label_color: "#FF0000",  // Negro (o un color visible sobre tu fondo)
-    background_color: "#FFFFFF",  // Fondo blanco
+    label_color: "#ffffff",
+    label_hover_color: "#ffffff",
     label_size: 16,
     label_font: "Arial",
-    label_display: "always",
+    label_display: "auto",
     label_scale: "yes",
     hide_labels: "no",
     hide_eastern_labels: "no",
@@ -72,39 +72,47 @@ var simplemaps_countrymap_mapdata={
     state_image_url: "",
     state_image_position: "",
     location_image_url: ""
-    },
+  },
   state_specific: {
     MXAGU: {
       name: "Aguascalientes",
-      url: "estados/aguascalientes/aguascalientesindex.html" // Ruta relativa desde index.html
+      url: "estados/aguascalientes/aguascalientesindex.html",
+      hover_label: "Aguascalientes" // Nombre que aparecerá en el hover
     },
     MXBCN: {
       name: "Baja California",
-      url: "estados/baja_california/baja_californiaindex.html"
+      url: "estados/baja_california/baja_californiaindex.html",
+      hover_label: "Baja California"
     },
     MXBCS: {
       name: "Baja California Sur",
-      url: "estados/baja_california_s/baja_california_surindex.html"
+      url: "estados/baja_california_s/baja_california_surindex.html",
+      hover_label: "Baja California Sur"
     },
     MXCHH: {
       name: "Chihuahua",
-      url: "estados/chihuahua/chihuahuaindex.html"
+      url: "estados/chihuahua/chihuahuaindex.html",
+      hover_label: "Chihuahua"
     },
     MXCAM: {
       name: "Campeche",
-      url: "estados/campeche/campecheindex.html"
+      url: "estados/campeche/campecheindex.html",
+      hover_label: "Campeche"
     },
     MXCOA: {
       name: "Coahuila",
-      url: "estados/coahuila/coahuilaindex.html"
+      url: "estados/coahuila/coahuilaindex.html",
+      hover_label: "Coahuila"
     },
     MXCOL: {
       name: "Colima",
-      url: "estados/colima/colimaindex.html"
+      url: "estados/colima/colimaindex.html",
+      hover_label: "Colima"
     },
     MXCHP: {
       name: "Chiapas",
-      url: "estados/chiapas/chiapasindex.html"
+      url: "estados/chiapas/chiapasindex.html",
+      hover_label: "Chiapas"
     },
     MXDUR: {
       name: "Durango",
@@ -202,5 +210,140 @@ var simplemaps_countrymap_mapdata={
       name: "Michoacán",
       url: "estados/michoacan/michoacanindex.html"
   }
-}
-}
+},
+locations: {},
+labels: {
+  MXAGU: {
+    name: "Aguascalientes",
+    parent_id: "MXAGU"
+  },
+  MXBCN: {
+    name: "Baja California",
+    parent_id: "MXBCN"
+  },
+  MXBCS: {
+    name: "Baja California Sur",
+    parent_id: "MXBCS"
+  },
+  MXCAM: {
+    name: "Campeche",
+    parent_id: "MXCAM"
+  },
+  MXCHH: {
+    name: "Chihuahua",
+    parent_id: "MXCHH"
+  },
+  MXCHP: {
+    name: "Chiapas",
+    parent_id: "MXCHP"
+  },
+  MXCMX: {
+    name: "Ciudad de México",
+    parent_id: "MXCMX"
+  },
+  MXCOA: {
+    name: "Coahuila",
+    parent_id: "MXCOA"
+  },
+  MXCOL: {
+    name: "Colima",
+    parent_id: "MXCOL"
+  },
+  MXDUR: {
+    name: "Durango",
+    parent_id: "MXDUR"
+  },
+  MXGRO: {
+    name: "Guerrero",
+    parent_id: "MXGRO"
+  },
+  MXGUA: {
+    name: "Guanajuato",
+    parent_id: "MXGUA"
+  },
+  MXHID: {
+    name: "Hidalgo",
+    parent_id: "MXHID"
+  },
+  MXJAL: {
+    name: "Jalisco",
+    parent_id: "MXJAL"
+  },
+  MXMEX: {
+    name: "México",
+    parent_id: "MXMEX"
+  },
+  MXMIC: {
+    name: "Michoacán",
+    parent_id: "MXMIC"
+  },
+  MXMOR: {
+    name: "Morelos",
+    parent_id: "MXMOR"
+  },
+  MXNAY: {
+    name: "Nayarit",
+    parent_id: "MXNAY"
+  },
+  MXNLE: {
+    name: "Nuevo León",
+    parent_id: "MXNLE"
+  },
+  MXOAX: {
+    name: "Oaxaca",
+    parent_id: "MXOAX"
+  },
+  MXPUE: {
+    name: "Puebla",
+    parent_id: "MXPUE"
+  },
+  MXQUE: {
+    name: "Querétaro",
+    parent_id: "MXQUE"
+  },
+  MXROO: {
+    name: "Quintana Roo",
+    parent_id: "MXROO"
+  },
+  MXSIN: {
+    name: "Sinaloa",
+    parent_id: "MXSIN"
+  },
+  MXSLP: {
+    name: "San Luis Potosí",
+    parent_id: "MXSLP"
+  },
+  MXSON: {
+    name: "Sonora",
+    parent_id: "MXSON"
+  },
+  MXTAB: {
+    name: "Tabasco",
+    parent_id: "MXTAB"
+  },
+  MXTAM: {
+    name: "Tamaulipas",
+    parent_id: "MXTAM"
+  },
+  MXTLA: {
+    name: "Tlaxcala",
+    parent_id: "MXTLA"
+  },
+  MXVER: {
+    name: "Veracruz",
+    parent_id: "MXVER"
+  },
+  MXYUC: {
+    name: "Yucatán",
+    parent_id: "MXYUC"
+  },
+  MXZAC: {
+    name: "Zacatecas",
+    parent_id: "MXZAC"
+  }
+},
+legend: {
+  entries: []
+},
+regions: {}
+};
