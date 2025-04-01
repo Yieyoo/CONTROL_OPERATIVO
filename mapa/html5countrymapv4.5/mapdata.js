@@ -110,7 +110,7 @@ var simplemaps_countrymap_mapdata={
       name: "Durango",
       url: "estados/durango/durangoindex.html"
     },
-    MXGTO: {
+    MXGUA: {
       name: "Guanajuato",
       url: "estados/guanajuato/guanajuatoindex.html"
     },
@@ -118,7 +118,7 @@ var simplemaps_countrymap_mapdata={
       name: "Guerrero",
       url: "estados/guerrero/guerreroindex.html"
     },
-    MXHGO: {
+    MXHID: {
       name: "Hidalgo",
       url: "estados/hidalgo/hidalgoindex.html"
     },
@@ -142,9 +142,9 @@ var simplemaps_countrymap_mapdata={
       name: "Nayarit",
       url: "estados/nayarit/nayaritindex.html"
     },
-    MXNLU: {
+    MXNLE: {
       name: "Nuevo León",
-      url: "estados/nuevo_leon/nuevo_leonindex.html"
+      url: "estados/nuevo_leon/nuevolindex.html"
     },
     MXOAX: {
       name: "Oaxaca",
@@ -182,7 +182,7 @@ var simplemaps_countrymap_mapdata={
       name: "Tamaulipas",
       url: "estados/tamaulipas/tamaulipasindex.html"
     },
-    MXTLX: {
+    MXTLA: {
       name: "Tlaxcala",
       url: "estados/tlaxcala/tlaxcalaindex.html"
     },
@@ -197,6 +197,10 @@ var simplemaps_countrymap_mapdata={
     MXZAC: {
       name: "Zacatecas",
       url: "estados/zacatecas/zacatecasindex.html"
-    }
-
-    }}
+    },
+    MXMIC: {
+      name: "Michoacán",
+      url: "estados/michoacan/michoacanindex.html"
+  }
+}
+}
