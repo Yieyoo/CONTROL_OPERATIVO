@@ -230,11 +230,21 @@ nav.menu ul li a:hover {
     background-color: rgba(142, 92, 113, 0.9);
     transform: translateY(-2px);
 }
+/* Ajustes para móviles (pantallas menores a 768px) */
+@media (max-width: 768px) {
+    .fecha-actual {
+        top: 70px; /* Mover más cerca del borde superior */
+        right: 10px; /* Menor margen derecho */
+        font-size: 12px; /* Texto más pequeño */
+        padding: 6px 12px; /* Padding reducido */
+    }
+}
 
 /* --- Mapa interactivo mejorado --- */
 .mapa-container {
-    width: 90%;
-    max-width: 950px;
+    height: 90%; /* o un valor fijo como 500px */
+    max-height: 262px; /* límite máximo de altura */
+    width: auto; /* o un valor específico si lo prefieres */
     margin: 30px auto;
     padding: 0;
     background: white;
@@ -307,6 +317,7 @@ nav.menu ul li a:hover {
     }
     
     .menu-toggle {
+        margin-top: -3%;
         width: 38px;
         height: 38px;
         font-size: 16px;
@@ -318,10 +329,11 @@ nav.menu ul li a:hover {
     
     #logo-gobernacion {
         max-width: 100px;
+        left: 50%;
     }
     
     .nueva-imagen {
-        width: 100px;
+        width: 40px;
     }
     
     #map {
@@ -332,7 +344,7 @@ nav.menu ul li a:hover {
 /* --- Ajustes para pantallas en orientación horizontal --- */
 @media screen and (max-width: 768px) and (orientation: landscape) {
     #map {
-        height: 1%;
+        height: 100px;
 
     }
     
@@ -366,7 +378,7 @@ nav.menu ul li a:hover {
         bottom: 0; /* Coloca la imagen en la parte inferior */
         left: 50%; /* Centra la imagen horizontalmente */
         transform: translateX(-50%); /* Ajusta la posición para centrarla */
-        width: 80%; /* Ajusta el tamaño */
+        width: 20%; /* Ajusta el tamaño */
         max-width: 200px; /* Limita el tamaño máximo */
     }
 }
