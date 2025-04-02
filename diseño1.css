@@ -292,7 +292,7 @@ nav.menu ul li a:hover {
 @media (max-width: 768px) {
     .mapa-container {
         width: 95%; /* Ocupa más ancho en pantallas pequeñas */
-        height: 260px; /* Altura más pequeña en móvil */
+        height: 290px; /* Altura más pequeña en móvil */
         max-width: 100%; /* Elimina el límite máximo */
         margin: 15px auto; /* Reduce el margen superior/inferior */
         border-radius: 8px; /* Bordes menos pronunciados */
@@ -339,6 +339,11 @@ nav.menu ul li a:hover {
     background-repeat: no-repeat;
     z-index: -1;
     opacity: 0.8;
+}
+@media (max-width: 768px) {  /* Ajusta el breakpoint según tus necesidades (ej: 768px para tablets/móviles) */
+    .decoracion-derecha {
+        display: none !important; /* Asegura que se oculte incluso si hay otras reglas CSS */
+    }
 }
 
 /* --- Animaciones --- */
