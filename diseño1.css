@@ -263,7 +263,7 @@ nav.menu ul li a:hover {
 
 #map {
     width: 100%;
-    height: 570px;
+    height: 560px;
     background-color: #f6f6f6;
     border: none;
 }
@@ -294,89 +294,50 @@ nav.menu ul li a:hover {
     }
 }
 
-/* --- Responsive Design --- */
-@media screen and (max-width: 768px) {
-    header {
-        padding: 10px 0;
-    }
-    
+
+/* --- Ajustes para pantallas muy pequeñas --- */
+@media screen and (max-width: 480px) {
     .title-container h1 {
-        font-size: 1.4rem;
-        padding-top: 40px;
-    }
-    
-    #seccion1 {
-        margin-top: 80px;
-        padding: 10px 0;
+        font-size: 1rem;
+        padding-top: 35px;
     }
     
     #seccion1 h2 {
-        font-size: 1.1em;
+        font-size: 0.9rem;
     }
     
     .menu-toggle {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-        top: 10px;
-        left: 10px;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
     }
     
     .logo-arriba-img {
-        max-width: 80px;
-        top: 10px;
-        right: 10px;
+        max-width: 60px;
     }
     
     #logo-gobernacion {
-        max-width: 180px;
-        top: 8px;
+        max-width: 100px;
     }
     
     .nueva-imagen {
-        display: none;
+        width: 100px;
     }
-    
-    .fecha-actual {
-        top: 70px;
-        right: 10px;
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-    
-    .mapa-container {
-        width: 100%;
-        height: 260px; /* Ajusta la altura según necesites */
-    }
-    
     
     #map {
-        height: 400px;
+        height: 250px;
     }
 }
 
-@media screen and (max-width: 480px) {
-    .title-container h1 {
-        font-size: 1.1rem;
-    }
-    
-    #seccion1 h2 {
-        font-size: 0.9em;
-    }
-    
-    #logo-gobernacion {
-        max-width: 120px;
-        display: block;
-        margin: 0 auto; /* Centra horizontalmente */
-    }
-    
-    
+/* --- Ajustes para pantallas en orientación horizontal --- */
+@media screen and (max-width: 768px) and (orientation: landscape) {
     #map {
-        height: 300px;
+        height: 1%;
+
     }
     
-    .decoracion-derecha {
-        width: 80px;
+    .title-container h1 {
+        font-size: 1rem;
     }
 }
 .submenu {
@@ -406,7 +367,7 @@ nav.menu ul li a:hover {
         left: 50%; /* Centra la imagen horizontalmente */
         transform: translateX(-50%); /* Ajusta la posición para centrarla */
         width: 80%; /* Ajusta el tamaño */
-        max-width: 300px; /* Limita el tamaño máximo */
+        max-width: 200px; /* Limita el tamaño máximo */
     }
 }
 
