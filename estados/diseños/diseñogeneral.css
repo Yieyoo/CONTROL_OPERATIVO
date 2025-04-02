@@ -493,7 +493,7 @@ nav.menu ul li a:hover {
     /* Ajustes generales para compactar el contenedor */
     .instituto-info {
         padding: 5px 1px; /* Reduce el padding interno */
-        margin-top: -200px; /* Mantiene el ajuste de altura */
+        margin-top: 0px; /* Mantiene el ajuste de altura */
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
