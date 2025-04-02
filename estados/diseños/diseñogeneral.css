@@ -441,6 +441,7 @@ nav.menu ul li a:hover {
     padding: 0px 0px; /* Aumenté el padding para mejor legibilidad */
     border-radius: 0; /* Eliminé bordes redondeados para full-width */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+    margin-top: 10%;
     margin: 0; /* Eliminé margen auto */
     width: 100vw; /* 100% del viewport width */
     position: relative; /* Necesario para el ancho completo */
@@ -478,31 +479,28 @@ nav.menu ul li a:hover {
 }
 /* --- Estilos Responsivos para Móviles --- */
 @media screen and (max-width: 768px) {
-    /* Ajustes en el tamaño de los títulos en móviles */
     .instituto-info h1 {
-        font-size: 1rem; /* Título h1 más pequeño en móviles */
-        font-weight: bold; /* Mantener la negrita en h1 */
+        font-size: 1rem; /* Ajusta el tamaño de h1 en móviles */
+        font-weight: bold; /* Mantiene la negrita */
     }
-
-    .instituto-info h2 {
-        font-size: .9rem; /* Título h2 más pequeño en móviles */
-        font-weight: 600; /* Mantener un peso intermedio para h2 */
-    }
-
+    .instituto-info h1,
+    .instituto-info h2,
     .instituto-info h3 {
-        font-size: .9rem; /* Título h3 más pequeño en móviles */
-        font-weight: normal; /* Mantener sin negrita */
+        margin: 5px 0; /* Reduce el espacio vertical entre los textos */
+        padding: 0; /* Asegura que no haya padding extra */
     }
 
-    /* Otros ajustes para el contenedor en móviles */
+    /* Ajustes generales para compactar el contenedor */
     .instituto-info {
-        padding: 1px; /* Reducimos el padding */
-        margin-top: -100px; /* Subimos el contenedor */
+        padding: 5px 1px; /* Reduce el padding interno */
+        margin-top: -200px; /* Mantiene el ajuste de altura */
         display: flex;
         flex-direction: column;
-        justify-content: flex-start; /* Hace que el texto suba */
+        justify-content: flex-start;
     }
-}/* Estilo mejorado para integrar con tu diseño existente */
+}
+
+/* Estilo mejorado para integrar con tu diseño existente */
 .instituto-info {
     position: relative;
     margin-bottom: 0; /* Eliminamos el margen inferior original */
@@ -547,6 +545,6 @@ nav.menu ul li a:hover {
       padding: 0.6rem 0;
     }
     .estado-info h4 {
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
   }
