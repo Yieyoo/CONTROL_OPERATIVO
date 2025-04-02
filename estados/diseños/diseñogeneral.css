@@ -72,7 +72,7 @@ body {
 .opciones-grid button {
     /* Estilos de texto */
     font-size: 16px;           /* Tamaño base */
-    font-weight: 100;          /* Grosor (500-700 para botones) */
+    font-weight: 200;          /* Grosor (500-700 para botones) */
     letter-spacing: 0.5px;     /* Espaciado entre letras */
     text-align: center;        /* Alineación del texto */
     line-height: 1.4;          /* Espaciado entre líneas */
