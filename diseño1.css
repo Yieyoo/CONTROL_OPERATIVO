@@ -292,7 +292,7 @@ nav.menu ul li a:hover {
 @media (max-width: 768px) {
     .mapa-container {
         width: 95%; /* Ocupa más ancho en pantallas pequeñas */
-        height: 290px; /* Altura más pequeña en móvil */
+        height: 275px; /* Altura más pequeña en móvil */
         max-width: 100%; /* Elimina el límite máximo */
         margin: 15px auto; /* Reduce el margen superior/inferior */
         border-radius: 8px; /* Bordes menos pronunciados */
