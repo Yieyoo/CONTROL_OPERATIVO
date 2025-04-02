@@ -21,7 +21,7 @@ body {
 
 /* --- Contenedor principal --- */
 .contenedor-principal {
-    width: 100%;
+    width: 500%;
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
@@ -38,16 +38,7 @@ body {
 }
 
 /* --- Información del instituto --- */
-.instituto-info {
-    text-align: center;
-    padding: 5px; /* Espaciado interno */
-    min-height: 100px; /* Altura mínima */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Centra el contenido verticalmente */
-    color: #691932;
-    margin-bottom: 20px;
-}
+
 
 .instituto-info h1,
 .instituto-info h2,
@@ -108,11 +99,12 @@ h1, h2, p {
 .opciones-container {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 20px;
+    font-size: 20px; /* Puedes ajustar el tamaño según lo necesites */
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-top: 20px;
     width: 100%;
-    max-width: 800px;
+    max-width: 8000px;
     margin: 0 auto;
     box-sizing: border-box;
 }
@@ -503,8 +495,9 @@ nav.menu ul li a:hover {
     background: linear-gradient(to right, #A5852E, #A5852E); /* Fondo degradado */
     color: white; /* Texto blanco */
     text-align: center;
-    padding: 5px;
+    padding: 0px;
     border-radius: 10px; /* Bordes redondeados */
+
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
     margin: 20px auto;
     width: 80%; /* Ancho adaptable */
