@@ -33,7 +33,7 @@ var simplemaps_countrymap_mapdata={
     //Label defaults
     label_color: "#ffffff",
     label_hover_color: "#ffffff",
-    label_size: 15,
+    label_size: 12,
     label_font: "Arial",
     label_display: "auto",
     label_scale: "yes",
@@ -97,7 +97,7 @@ var simplemaps_countrymap_mapdata={
     MXCAM: {
       name: "Campeche",
       url: "estados/campeche/campecheindex.html",
-      hover_label: "Campeche"
+      hover_label: "Campeche" 
     },
     MXCOA: {
       name: "Coahuila",
