@@ -72,6 +72,7 @@ var simplemaps_countrymap_mapdata={
     state_image_url: "",
     state_image_position: "",
     location_image_url: ""
+    
   },
   state_specific: {
     MXAGU: {
