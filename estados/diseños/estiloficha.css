@@ -1,126 +1,134 @@
-/* Estilos generales */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
-    color: #333;
+    font-size: 12px;
 }
 
-/* Contenedor principal */
 .container {
-    display: flex;
-    justify-content: space-between;
-    margin: 40px auto;
-    width: 90%;
-    max-width: 1200px;
-    background-color: #fff;
-    padding: 20px;
+    max-width: 700px;
+    margin: 20px auto;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    border: 1px solid #ddd;
 }
 
-/* Estilo para la columna izquierda (imagen y detalles personales) */
 .profile-left {
     flex: 1;
-    margin-right: 20px;
+    min-width: 220px;
+    background-color: #691932; /* Fondo burdeos en el lado izquierdo */
+    padding: 15px;
+    box-sizing: border-box;
+    text-align: center;
+    color: #fff; /* Texto blanco */
 }
 
-.profile-left .foto-perfil {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
+.foto-perfil {
+    width: 100%;
+    max-width: 130px;
+    height: 130px;
     border-radius: 50%;
-    border: 3px solid #691932;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+    border: 2px solid #c09404;
 }
 
-.profile-left h1 {
-    font-size: 24px;
-    color: #691932;
+h1 {
+    font-size: 16px;
+    color: #fff; /* Título blanco */
+    margin-bottom: 6px;
+    font-weight: 600;
 }
 
 .profile-left p {
-    font-size: 16px;
-    color: #4a4a4a;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 500;
 }
 
-.profile-left h3 {
-    font-size: 20px;
-    color: #691932;
-    margin-top: 20px;
-    border-bottom: 2px solid #c09404;
+/* Formación Académica y Contacto */
+.formacion-academica,
+.contacto {
+    margin-top: 15px;
+}
+
+.formacion-academica h3,
+.contacto h3 {
+    color: #fff; /* Burdeos en los encabezados */
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #fff; /* Línea blanca */
     padding-bottom: 5px;
 }
 
-.profile-left ul {
+ul {
     list-style: none;
     padding-left: 0;
+    margin: 0;
 }
 
-.profile-left ul li {
-    margin: 8px 0;
+ul li {
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: #fff;
 }
 
-/* Estilo para la columna derecha (experiencia laboral) */
+/* Lado derecho con fondo blanco */
 .profile-right {
     flex: 2;
-    margin-left: 20px;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: #fff; /* Fondo blanco */
+    color: #333; /* Texto negro para contraste */
 }
 
-.profile-right h3 {
-    font-size: 20px;
-    color: #691932;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #c09404;
+.experiencia-laboral h3 {
+    color: #691932; /* Burdeos en los encabezados */
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #691932; /* Línea burdeos */
     padding-bottom: 5px;
 }
 
-.profile-right ul {
-    list-style: none;
-    padding-left: 0;
+.experiencia-laboral p {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
 }
 
-.profile-right ul li {
-    margin: 10px 0;
+.experiencia-laboral ul > li {
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #333; /* Texto negro en las listas */
 }
 
-/* Estilos para las sublistas */
-.profile-right ul ul {
-    margin-left: 20px;
+.experiencia-laboral ul ul {
+    padding-left: 12px;
 }
 
-.profile-right ul li, 
-.profile-left ul li {
-    font-size: 16px;
-    margin-bottom: 8px;
-    background: #f8f0f5;
-    padding: 10px;
-    border-radius: 6px;
-    border-left: 4px solid #c09404;
+.experiencia-laboral ul ul li {
+    font-size: 11px;
+    margin-bottom: 4px;
 }
 
-/* Responsividad */
-@media screen and (max-width: 768px) {
+/* Responsive */
+@media (max-width: 768px) {
     .container {
         flex-direction: column;
+        max-width: 90%;
     }
 
     .profile-left, .profile-right {
-        margin: 0;
-        margin-bottom: 20px;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
     }
 
-    .profile-left .foto-perfil {
-        width: 80px;
-        height: 80px;
-    }
-
-    .profile-left h1 {
-        font-size: 22px;
-    }
-
-    .profile-right h3 {
-        font-size: 18px;
+    .profile-left {
+        text-align: left;
     }
 }
