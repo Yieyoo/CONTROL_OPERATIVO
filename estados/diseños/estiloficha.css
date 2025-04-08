@@ -11,6 +11,7 @@ body {
     color: #333;
 }
 
+
 /* --- Logos mejorados --- */
 .logo-arriba-img {
     max-width: 100px;
@@ -22,7 +23,6 @@ body {
     z-index: 1000;
     transition: transform 0.3s ease;
 }
-
 
 /* --- Menú lateral mejorado --- */
 nav.menu {
@@ -129,7 +129,6 @@ nav.menu ul li a:hover {
     background-color: #c49d3a;
     transform: scale(1.05);
 }
-
 
 .submenu {
     max-height: 400px; /* Ajusta la altura máxima según necesites */
@@ -247,7 +246,6 @@ ul li {
 
 }
 
-
 /* Lado derecho con fondo blanco */
 .profile-right {
     flex: 2;
@@ -348,5 +346,26 @@ ul li {
         font-size: 12px; /* Texto más pequeño */
         padding: 6px 12px; /* Padding reducido */
     }
+}
+
+/* --- Botón de regresar --- */
+.regresar-btn {
+    background-color: #691932;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+.regresar-btn:hover {
+    background-color: #8e5c71;
 }
 
