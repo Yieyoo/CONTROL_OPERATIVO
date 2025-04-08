@@ -196,8 +196,18 @@
 document.querySelector('.regresar-btn').addEventListener('click', function() {
     window.history.back();
 });
+</script>
+<!-- Botón al final de tu documento HTML -->
+<button class="regresar-btn">Regresar</button>
 
-
+<script>
+    // Activar botón de regresar
+    const botonRegresar = document.querySelector('.regresar-btn');
+    if (botonRegresar) {
+        botonRegresar.addEventListener('click', function () {
+            window.history.back();
+        });
+    }
 </script>
 
 </body>
