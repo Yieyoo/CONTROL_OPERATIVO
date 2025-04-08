@@ -3,56 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Curricular</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
-    <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
+    <title>Ficha Profesional - Mtra. Paola López Rodas</title>
     <link rel="stylesheet" href="../../diseños/estiloficha.css">
-    <style>
-        /* Estilos adicionales para la presentación */
-        .presentacion-container {
-            width: 90%;
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .presentacion-iframe {
-            width: 100%;
-            height: 500px;
-            border: 2px solid #691932;
-            border-radius: 8px;
-        }
-        
-        @media (max-width: 768px) {
-            .presentacion-iframe {
-                height: 300px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- [Todo tu código HTML existente hasta el div ficha-container] -->
+ 
+    <header>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
-    <div class="ficha-container">
-        <!-- [Todo el contenido existente de ficha-left y ficha-right] -->
-    </div>
+        <nav class="menu">
+            <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
+            <ul>
+                <li><a href="../../../index.html">Inicio</a></li>
 
-    <!-- Contenedor para la presentación -->
-    <div class="presentacion-container">
-        <h2>Presentación Curricular</h2>
-        <iframe 
-            src="https://docs.google.com/presentation/d/e/2PACX-1vRz6TS8GCyN1T4VMIpwhxKnZh-JCylS9Yayp8fVqHWzPGA7nz-PrmsIEkn0ICzaWQ/pub?start=false&loop=false&delayms=3000"
-            class="presentacion-iframe"
-            frameborder="0"
-            allowfullscreen
-        ></iframe>
-    </div>
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="plantilla-personal.html">Plantilla de Personal</a></li>
+                        <li><a href="unidades-caninas.html">Unidades Caninas</a></li>
+                        <li><a href="inmuebles.html">Inmuebles</a></li>
+                    </ul>
+                </li>
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
+                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
+                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
+                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
+                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
+                        <li><a href="../../edomex/edomexindex.html">Estado de Mexico</a></li>
+                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
+                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
+                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
+                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
+                        <li><a href="../../cdmx/cdmxindex.html">Estado de México</a></li>
+                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
+                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
+                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
+                        <li><a href="../../nuevo-leon.html">Nuevo León</a></li>
+                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
+                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
+                        <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
+                        <li><a href="../../quintanaroo/quintanaroo.html">Quintana Roo</a></li>
+                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
+                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
+                        <li><a href="../../sonora/sonora.index.html">Sonora</a></li>
+                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
+                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
+                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
+                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
+                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
+                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div class="logo-container">
+            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
+        </div>
+    </header>
+    <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-    <button class="regresar-btn">Regresar</button>
+<div class="container">
+    <div class="profile-left">
+        <!-- Imagen, nombre y ocupación -->
+        <img src="../../../fotos/titulargua.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <h1>Mtra. Paola López Rodas</h1>
+        <p><strong>Titular de la Oficina de Representación del INM en Guanajuato</strong></p>
 
-    <!-- [Resto de tu código HTML y JavaScript] -->
+        <!-- Formación Académica -->
+        <div class="formacion-academica">
+            <h3>Formación Académica</h3>
+            <ul>
+                <li><strong>▴ Maestría en Criminalística.</strong></li>
+                <li><strong>▴ Licenciatura en Derecho.</strong></li>
+            </ul>
+        </div>
+
+        <!-- Información de Contacto -->
+        <div class="contacto">
+            <h3>Información de Contacto</h3>
+            <ul>
+                <li><strong>Teléfono Personal:</strong> 9511428341</li>
+                <li><strong>Teléfono de Trabajo:</strong> 4777169352 Ext. 61600</li>
+                <li><strong>Email Institucional:</strong> <a href="prodas@inami.gob.mx">prodas@inami.gob.mx</a></li>
+            </ul>
+        </div>
+    </div>  
+
+    <div class="profile-right">
+        <!-- Experiencia Laboral -->
+        <div class="experiencia-laboral">
+            <h3>Experiencia Laboral</h3>
+            <p><strong>Año de Ingreso al INM:</strong> 2012</p>
+            <ul>
+                <li><strong>▴Oficina de Representación en el Estado de Guanajuato</strong></li>
+                <ul>
+                    <li><strong>16/06/2023 - a la fecha:  </strong> Titular de la Oficina de  Representación.</li>
+                </ul>
+
+                <li><strong>▴ Oficina de Representación en el Estado de Oaxaca</strong></li>
+                <ul>
+                    <li><strong>16/01/2023 – 15/06/2023:  </strong>Titular de la Oficina de Representación.</li>
+                </ul>
+                <li><strong>▴ Oficina de Representación en el Estado de Chiapas</strong></li>
+
+                <ul>
+                    <li><strong>16/01/2022 – 15/01/2023:  </strong> Titular de la Oficina de Representación.</li>
+                    <li><strong>01/06/2019 -15/01/2022:  </strong> Sub Representante Federal Zona Sur.</li>
+                    <li><strong>16/03/2015 – 31/05/2019:  </strong> Delegada Local Cuauhtémoc. </li>
+                    <li><strong>16/04/2012 – 15/03/2015:  </strong> Sub Delegada Local Suchiate II.
+                    </li>
+
+                </ul>
+            </ul>
+        </div>
+        <!-- Carrera Profesional -->
+        <div class="carrera-profesional">
+            <h3>Carrera Profesional</h3>
+            <p>Cuenta con una trayectoria de más de 20 años de experiencia en la Administración Pública, ocupando los siguientes cargos, entre otros:</p>
+            <ul>
+                <li>▴<strong>Secretaria Técnica del Consejo Municipal de Suchiate en Proceso Electoral y Auxiliar Jurídico. </strong>Instituto Electoral de Chiapas.</li>
+                <li>▴<strong>Auxiliar Jurídico. Centro de Reinserción Social para Sentenciados N° 03.</strong></li>
+                <li>▴<strong>Analista “B”. Fiscalía General del Estado de Chiapas.</strong></li>
+          
+            </ul>
+        </div>
+        <div style="text-align:center; margin-top: 20px;">
+            <a href="../../../documentacion/fichas_curriculares/guanajuatof/FICHA CURRICULAR OR GUANAJUATO.pptx" download class="boton-descarga"> Descargar Ficha</a>
+        </div>
+        
+        
+
+<script>
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const menuOverlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+    }
+
+    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+    const menuOverlay = document.querySelector('.menu-overlay');
+    menuOverlay.addEventListener('click', () => {
+        const menu = document.querySelector('.menu');
+        menu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+
+    // Función para cerrar todos los submenús
+    function closeAllSubmenus() {
+        const submenus = document.querySelectorAll('.submenu.active');
+        submenus.forEach(submenu => {
+            submenu.classList.remove('active');
+        });
+    }
+
+    // Función para mostrar/ocultar el submenú
+    function toggleSubmenu(event) {
+        event.preventDefault();
+
+        // Cerrar todos los submenús antes de abrir uno nuevo
+        closeAllSubmenus();
+
+        // Abrir el submenú actual
+        const submenu = event.target.closest('.submenu');
+        submenu.classList.toggle('active');
+    }
+
+    // Cerrar el submenú al hacer clic fuera de él
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.submenu')) {
+            closeAllSubmenus();
+        }
+    });
+
+    // Cerrar el submenú al hacer clic en una opción
+    const submenuLinks = document.querySelectorAll('.submenu-list a');
+    submenuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            closeAllSubmenus();
+        });
+    });
+
+    // Mostrar fecha actual
+    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    // Regresar al historial
+document.querySelector('.regresar-btn').addEventListener('click', function() {
+    window.history.back();
+});
+</script>
+<!-- Botón al final de tu documento HTML -->
+<button class="regresar-btn">Regresar</button>
+
+<script>
+    // Activar botón de regresar
+    const botonRegresar = document.querySelector('.regresar-btn');
+    if (botonRegresar) {
+        botonRegresar.addEventListener('click', function () {
+            window.history.back();
+        });
+    }
+</script>
+
 </body>
 </html>
