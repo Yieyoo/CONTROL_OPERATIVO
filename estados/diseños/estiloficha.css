@@ -11,9 +11,25 @@ body {
     color: #333;
 }
 
+/* --- Header mejorado --- */
+header {
+    background-color: #691932;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-weight: bold;
+    border-bottom: 4px solid #A5852E;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
 
 /* --- Logos mejorados --- */
 .logo-arriba-img {
+    margin-top: 40px;
     max-width: 100px;
     height: auto;
     display: block;
@@ -169,16 +185,16 @@ nav.menu ul li a:hover {
 }
 
 .container {
-    display: flex;
     max-width: 1000px;
-    margin: 20px auto;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
+    margin: 60px auto 0 auto; /* top | right | bottom | left */
+    padding: 20px;
     display: flex;
-    flex-wrap: wrap;
-    overflow: hidden;
-    border: 1px solid #ddd;
+    gap: 30px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
 
 .profile-left {
     width: 250px; /* o min-width, como prefieras */
@@ -285,22 +301,77 @@ ul li {
     margin-bottom: 4px;
 }
 
-/* Responsive */
+/* Ficha Curricular - Responsive Mejorado */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
-        max-width: 90%;
-    }
-
-    .profile-left, .profile-right {
-        border-right: none;
-        border-bottom: 1px solid #ddd;
+        max-width: 95%;
+        margin: 100px auto 20px auto;
+        padding: 15px;
+        gap: 20px;
     }
 
     .profile-left {
-        text-align: left;
+        width: 100%;
+        padding: 15px;
+        text-align: center;
+        border: none;
+        border-bottom: 2px solid #c09404;
+        background-color: #691932;
+        border-radius: 10px;
+    }
+
+    .foto-perfil {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 10px auto;
+    }
+
+    .profile-left h1,
+    .profile-left p,
+    .formacion-academica h3,
+    .contacto h3,
+    .formacion-academica ul li,
+    .contacto ul li {
+        text-align: center;
+    }
+
+    .formacion-academica,
+    .contacto {
+        margin-top: 10px;
+    }
+
+    .profile-right {
+        width: 100%;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+    }
+
+    .experiencia-laboral h3 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .experiencia-laboral p {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .experiencia-laboral ul {
+        padding-left: 18px;
+    }
+
+    .experiencia-laboral ul li {
+        font-size: 14px;
+    }
+
+    .carrera-profesional ul li {
+        font-size: 14px;
+        text-align: center;
     }
 }
+
 
 /* --- Fecha actual mejorada --- */
 .fecha-actual {
@@ -368,4 +439,22 @@ ul li {
 .regresar-btn:hover {
     background-color: #8e5c71;
 }
+.boton-descarga {
+    display: inline-block;
+    background-color: #c09404;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
+}
+
+.boton-descarga:hover {
+    background-color: #a57903;
+}
+
+
 
