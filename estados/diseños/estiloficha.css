@@ -456,5 +456,26 @@ ul li {
     background-color: #a57903;
 }
 
+.carrera-profesional {
+    width: 100%;
+    padding: 0 10px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.carrera-profesional p,
+.carrera-profesional ul,
+.carrera-profesional li {
+    text-align: justify;
+    margin-bottom: 10px;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 600px) {
+    .carrera-profesional {
+        padding: 0 15px;
+        font-size: 16px;
+    }
+}
 
 
