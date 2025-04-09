@@ -291,7 +291,7 @@ nav.menu ul li a:hover {
 }
 
 .submenu {
-    max-height: 400px; /* Ajusta la altura máxima según necesites */
+    max-height: 360px; /* Ajusta la altura máxima según necesites */
     overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
     scrollbar-width: thin; /* Para navegadores como Firefox */
     scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
