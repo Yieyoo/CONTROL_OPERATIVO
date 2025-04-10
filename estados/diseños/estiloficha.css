@@ -1,141 +1,480 @@
-/* --- Estilo Moderno para Ficha Curricular --- */
 body {
-    background-color: #f5f5f5;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    background-image: url('../../imagenes/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
     color: #333;
 }
 
-/* --- Contenedor Principal --- */
-.curriculum-container {
-    max-width: 900px;
-    margin: 80px auto 30px;
-    display: flex;
-    background: white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-/* --- Columna Izquierda (Perfil) --- */
-.profile-column {
-    width: 30%;
-    background: linear-gradient(135deg, #691932 0%, #8e2b4a 100%);
-    padding: 30px 20px;
+/* --- Header mejorado --- */
+header {
+    background-color: #691932;
     color: white;
     text-align: center;
+    padding: 15px 0;
+    font-weight: bold;
+    border-bottom: 4px solid #A5852E;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.profile-picture {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid #c09404;
-    margin: 0 auto 20px;
-    object-fit: cover;
+
+/* --- Logos mejorados --- */
+.logo-arriba-img {
+    margin-top: 40px;
+    max-width: 100px;
+    height: auto;
+    display: block;
+    position: fixed;
+    right: 20px;
+    top: 15px;
+    z-index: 1000;
+    transition: transform 0.3s ease;
 }
 
-.profile-title {
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-    font-weight: 600;
+/* --- Menú lateral mejorado --- */
+nav.menu {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background-color: #691932;
+    padding-top: 70px;
+    transition: left 0.3s ease;
+    z-index: 999;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
 }
 
-.profile-subtitle {
-    font-size: 1rem;
-    opacity: 0.9;
-    margin-bottom: 30px;
+nav.menu.active {
+    left: 0;
 }
 
-.section-title {
-    font-size: 1.1rem;
-    color: #c09404;
-    border-bottom: 2px solid rgba(255,255,255,0.2);
-    padding-bottom: 8px;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    text-align: left;
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
 }
 
-.contact-info {
-    text-align: left;
-    font-size: 0.9rem;
-}
-
-.contact-info li {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-}
-
-.contact-info i {
-    margin-right: 10px;
-    color: #c09404;
-}
-
-/* --- Columna Derecha (Contenido) --- */
-.content-column {
-    width: 70%;
-    padding: 30px;
-}
-
-.main-title {
-    color: #691932;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #c09404;
-}
-
-.section-header {
-    color: #691932;
-    font-size: 1.3rem;
-    margin: 25px 0 15px;
-}
-
-.experience-item {
-    margin-bottom: 20px;
-}
-
-.job-title {
-    font-weight: 600;
-    color: #333;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-}
-
-.job-period {
-    color: #c09404;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
+.menu-overlay.active {
     display: block;
 }
 
-.job-description {
-    font-size: 0.95rem;
-    line-height: 1.5;
+nav.menu ul {
+    list-style-type: none;
+    padding: 0 15px;
 }
 
-/* --- Responsive Design --- */
+nav.menu ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    display: block;
+    padding: 12px 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+nav.menu ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+/* --- Submenú refinado --- */
+.submenu-list {
+    display: none;
+    padding-left: 10px;
+    border-radius: 4px;
+    animation: fadeIn 0.3s ease;
+}
+
+.submenu.active .submenu-list {
+    display: block;
+}
+
+.submenu-list li a {
+    padding: 8px 15px;
+    font-size: 13px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.submenu-list li a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Botón de menú mejorado --- */
+.menu-toggle {
+    background-color: #A5852E;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    border-radius: 50%;
+    z-index: 1001;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-toggle:hover {
+    background-color: #c49d3a;
+    transform: scale(1.05);
+}
+
+.submenu {
+    max-height: 350px; /* Ajusta la altura máxima según necesites */
+    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
+    scrollbar-width: thin; /* Para navegadores como Firefox */
+    scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
+}
+
+/* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
+.submenu::-webkit-scrollbar {
+    width: 6px; /* Ancho de la barra */
+}
+
+.submenu::-webkit-scrollbar-thumb {
+    background-color: #c09404; /* Color de la barra */
+    border-radius: 3px; /* Bordes redondeados */
+}
+
+.submenu::-webkit-scrollbar-track {
+    background: transparent; /* Fondo de la barra */
+}
+
+#logo-gobernacion {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 120px;
+    height: auto;
+    z-index: 100;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+#logo-gobernacion:hover {
+    transform: translateX(-50%) scale(1.03);
+}
+
+.container {
+    max-width: 1000px;
+    margin: 60px auto 0 auto; /* top | right | bottom | left */
+    padding: 20px;
+    display: flex;
+    gap: 30px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.profile-left {
+    width: 250px; /* o min-width, como prefieras */
+    background-color: #691932;
+    padding: 15px;
+    box-sizing: border-box;
+    text-align: center;
+    color: #fff;
+}
+.foto-perfil {
+    width: 40%;
+    max-width: 130px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 12px;
+    border: 2px solid #c09404;
+}
+
+h1 {
+    font-size: 20px;
+    color: #fff; /* Título blanco */
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.profile-left p {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Formación Académica y Contacto */
+.formacion-academica,
+.contacto {
+    margin-top: 20px;
+    text-align: left;
+
+}
+
+.formacion-academica h3,
+.contacto h3 {
+    color: #fff; /* Burdeos en los encabezados */
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #fff; /* Línea blanca */
+    padding-bottom: 5px;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+ul li {
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: #fff;
+}
+.carrera-profesional ul li {
+    color: #333; /* Color oscuro solo para los li dentro de carrera-profesional */
+    font-size: 15px;
+    color: #691932;
+
+}
+
+/* Lado derecho con fondo blanco */
+.profile-right {
+    flex: 2;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: #fff; /* Fondo blanco */
+    color: #691932; /* Texto negro para contraste */
+}
+
+.experiencia-laboral h3 {
+    color:  #A67C00; /* Burdeos en los encabezados */
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #691932; /* Línea burdeos */
+    padding-bottom: 5px;
+}
+
+.experiencia-laboral p {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.experiencia-laboral ul > li {
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: #691932; /* Texto negro en las listas */
+}
+
+.experiencia-laboral ul ul {
+    padding-left: 12px;
+}
+
+.experiencia-laboral ul ul li {
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+/* Ficha Curricular - Responsive Mejorado */
 @media (max-width: 768px) {
-    .curriculum-container {
+    .container {
         flex-direction: column;
-        margin: 60px auto 20px;
+        max-width: 95%;
+        margin: 100px auto 20px auto;
+        padding: 15px;
+        gap: 20px;
     }
-    
-    .profile-column, .content-column {
+
+    .profile-left {
         width: 100%;
+        padding: 15px;
+        text-align: center;
+        border: none;
+        border-bottom: 2px solid #c09404;
+        background-color: #691932;
+        border-radius: 10px;
     }
-    
-    .profile-column {
-        padding: 25px 15px;
+
+    .foto-perfil {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 10px auto;
     }
-    
-    .content-column {
-        padding: 25px;
+
+    .profile-left h1,
+    .profile-left p,
+    .formacion-academica h3,
+    .contacto h3,
+    .formacion-academica ul li,
+    .contacto ul li {
+        text-align: center;
+    }
+
+    .formacion-academica,
+    .contacto {
+        margin-top: 10px;
+    }
+
+    .profile-right {
+        width: 100%;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+    }
+
+    .experiencia-laboral h3 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .experiencia-laboral p {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .experiencia-laboral ul {
+        padding-left: 18px;
+    }
+
+    .experiencia-laboral ul li {
+        font-size: 14px;
+    }
+
+    .carrera-profesional ul li {
+        font-size: 14px;
+        text-align: center;
     }
 }
 
-/* --- Iconos (usar Font Awesome) --- */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
+/* --- Fecha actual mejorada --- */
+.fecha-actual {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background-color: rgba(105, 25, 50, 0.9);
+    padding: 8px 15px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    z-index: 500;
+    transition: all 0.3s ease;
+}
+
+.fecha-actual:hover {
+    background-color: rgba(142, 92, 113, 0.9);
+    transform: translateY(-2px);
+}
+/* Estilos base (escritorio) */
+.fecha-actual {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background-color: rgba(105, 25, 50, 0.9);
+    padding: 8px 15px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    z-index: 500;
+    transition: all 0.3s ease;
+}
+
+/* Ajustes para móviles (pantallas menores a 768px) */
+@media (max-width: 768px) {
+    .fecha-actual {
+        top: 70px; /* Mover más cerca del borde superior */
+        right: 10px; /* Menor margen derecho */
+        font-size: 12px; /* Texto más pequeño */
+        padding: 6px 12px; /* Padding reducido */
+    }
+}
+
+/* --- Botón de regresar --- */
+.regresar-btn {
+    background-color: #691932;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+.regresar-btn:hover {
+    background-color: #8e5c71;
+}
+.boton-descarga {
+    display: inline-block;
+    background-color: #c09404;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
+}
+
+.boton-descarga:hover {
+    background-color: #a57903;
+}
+
+.carrera-profesional {
+    width: 100%;
+    padding: 0 10px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.carrera-profesional p,
+.carrera-profesional ul,
+.carrera-profesional li {
+    text-align: justify;
+    margin-bottom: 10px;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 600px) {
+    .carrera-profesional {
+        padding: 0 15px;
+        font-size: 16px;
+    }
+}
+
+
