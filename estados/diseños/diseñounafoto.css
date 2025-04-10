@@ -141,6 +141,7 @@ nav.menu ul li a:hover {
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     animation: fadeIn 0.3s ease;
+    max-height: 250px; /* Altura máxima del submenú */
 }
 
 .submenu.active .submenu-list {
