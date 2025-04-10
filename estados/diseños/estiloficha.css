@@ -169,7 +169,7 @@ nav.menu ul li a:hover {
 #logo-gobernacion {
     position: absolute;
     top: 5px;
-    left: 10%;
+    left: 50%;
     transform: translateX(-50%);
     max-width: 120px;
     height: auto;
