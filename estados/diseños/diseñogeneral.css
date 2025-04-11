@@ -1,6 +1,5 @@
 /* --- Estilos generales --- */
 body {
-    transform: scale(1);
     margin: 0;
     font-family: 'Arial', sans-serif;
     color: #333;
@@ -19,10 +18,10 @@ body {
     font-size: 14px;
     overflow-x: hidden;
 }
-
 html {
     zoom: 1; /* puedes ajustar a 0.8, 1.2, etc */
   }
+  
 
 /* --- Contenedor principal --- */
 .contenedor-principal {
