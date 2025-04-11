@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página en Construcción</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fdf6e3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      color: #333;
+      position: relative;
+    }
+
+    .regresar-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #c09404;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .regresar-btn:hover {
+      background-color: #a57f02;
+    }
+
+    .container {
+      max-width: 800px;
+      padding: 2rem;
+    }
+
+    .logo {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #c09404;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .logo {
+        max-width: 300px;
+      }
+
+      .regresar-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Botón arriba a la izquierda -->
+  <button class="regresar-btn">Regresar</button>
+
+  <div class="container">
+    <img src="imagenes/MujerBandera.png" alt="Logo INM" class="logo">
+    <h1>Página en Construcción</h1>
+    <p>Estamos trabajando para traerte una mejor experiencia.</p>
+  </div>
+
+  <script>
+    document.querySelector('.regresar-btn').addEventListener('click', function() {
+      window.history.back();
+    });
+  </script>
+</body>
+</html>
