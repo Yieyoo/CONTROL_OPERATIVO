@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
+   
 <head>
     <meta charset="UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baja California</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../../imagenes/iconom.png">
@@ -177,7 +179,10 @@ document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString
 document.querySelector('.regresar-btn').addEventListener('click', function() {
     window.history.back();
 });
-
+const baseWidth = 1280; // o lo que mida tu laptop
+  const scale = window.innerWidth / baseWidth;
+  document.body.style.transform = `scale(${scale})`;
+  document.body.style.transformOrigin = 'top left';
     </script>
 </body>
 </html>
