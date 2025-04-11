@@ -1,5 +1,6 @@
 /* --- Estilos generales --- */
 body {
+    transform: scale(1);
     margin: 0;
     font-family: 'Arial', sans-serif;
     color: #333;
@@ -18,6 +19,10 @@ body {
     font-size: 14px;
     overflow-x: hidden;
 }
+
+html {
+    zoom: 1; /* puedes ajustar a 0.8, 1.2, etc */
+  }
 
 /* --- Contenedor principal --- */
 .contenedor-principal {
@@ -236,6 +241,7 @@ nav.menu ul li a:hover {
 .menu-toggle {
     background-color: #A5852E;
     color: white;
+    margin-top: 70px;
     border: none;
     width: 50px;
     height: 50px;
@@ -312,7 +318,6 @@ nav.menu ul li a:hover {
 }
 
 
-
 /* --- Botón de regresar --- */
 .regresar-btn {
     background-color: #691932;
@@ -322,8 +327,8 @@ nav.menu ul li a:hover {
     font-size: 16px;
     cursor: pointer;
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    top: 20px;         /* Posición desde la parte superior */
+    left: 20px;        /* Posición desde la parte izquierda */
     border-radius: 5px;
     z-index: 1000;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
