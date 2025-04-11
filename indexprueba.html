@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Operativo</title>
+    <link rel="icon" type="image/png" sizes="48x48" href="imagenes/iconom.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="menu-overlay"></div>
+
+    <header>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+        <nav class="menu">
+            <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                        <li><a href="datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="datos_nacionales/opcionesdatos/inmueblesd.html">Inmuebles</a></li>
+                    </ul>
+                </li>
+
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <li><a href="estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="estados/baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
+                        <li><a href="estados/campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="estados/chiapas/chiapasindex.html">Chiapas</a></li>
+                        <li><a href="estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="estados/cdmx/cdmxindex.html">Ciudad de México</a></li>
+                        <li><a href="estados/coahuila/coahuilaindex.html">Coahuila</a></li>
+                        <li><a href="estados/colima/colimaindex.html">Colima</a></li>
+                        <li><a href="estados/durango/durangoindex.html">Durango</a></li>
+                        <li><a href="estados/guanajuato/guanajuatoindex.html">Guanajuato</a></li>
+                        <li><a href="estados/guerrero/guerreroindex.html">Guerrero</a></li>
+                        <li><a href="estados/hidalgo/hidalgoindex.html">Hidalgo</a></li>
+                        <li><a href="estados/jalisco/jaliscoindex.html">Jalisco</a></li>
+                        <li><a href="estados/edomex/edomexindex.html">Estado de México</a></li>
+                        <li><a href="estados/michoacan/michoacanindex.html">Michoacán</a></li>
+                        <li><a href="estados/morelos/morelosindex.html">Morelos</a></li>
+                        <li><a href="estados/nayarit/nayaritindex.html">Nayarit</a></li>
+                        <li><a href="estados/nuevo_leon/nuevolindex.html">Nuevo León</a></li>
+                        <li><a href="estados/oaxaca/oaxacaindex.html">Oaxaca</a></li>
+                        <li><a href="estados/puebla/pueblaindex.html">Puebla</a></li>
+                        <li><a href="estados/queretaro/queretaroindex.html">Querétaro</a></li>
+                        <li><a href="estados/quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
+                        <li><a href="estados/san_luis/san_luisindex.html">San Luis Potosí</a></li>
+                        <li><a href="estados/sinaloa/sinaloaindex.html">Sinaloa</a></li>
+                        <li><a href="estados/sonora/sonoraindex.html">Sonora</a></li>
+                        <li><a href="estados/tabasco/tabascoindex.html">Tabasco</a></li>
+                        <li><a href="estados/tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
+                        <li><a href="estados/tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
+                        <li><a href="estados/veracruz/veracruzindex.html">Veracruz</a></li>
+                        <li><a href="estados/yucatan/yucatanindex.html">Yucatán</a></li>
+                        <li><a href="estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div class="logo-container">
+            <img src="imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
+        </div>
+        <img src="imagenes/MujerBandera.png" alt="Nueva imagen" class="nueva-imagen">
+        
+        <div class="title-container">
+            <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
+        </div>
+
+        <div class="fecha-actual" id="fechaActual"></div>
+    </header>
+    <section id="seccion1">
+        <div class="intro">
+            <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
+            <p>Dirección de Control Operativo</p>
+        </div>
+    </section>
+    
+    <div class="linea"></div> <!-- Línea separadora -->
+    
+    <section id="informacion">
+        <div class="info-container">
+            <h2>Información de Control Operativo</h2>
+        </div>
+    </section>
+
+    <div class="decoracion-derecha"></div>
+
+    <section class="mapa-container">
+        <h2 class="titulo-mapa">Mapa Interactivo de México</h2>
+        <div id="map"></div>
+        <p id="mapa-error" style="color: red; display: none;"></p>
+    </section>
+
+    <!-- Scripts -->
+    <script src="mapa/html5countrymapv4.5/mapdata.js"></script>
+    <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        }
+
+        // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+        const menuOverlay = document.querySelector('.menu-overlay');
+        menuOverlay.addEventListener('click', () => {
+            const menu = document.querySelector('.menu');
+            menu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        });
+
+        // Función para cerrar todos los submenús
+        function closeAllSubmenus() {
+            const submenus = document.querySelectorAll('.submenu.active');
+            submenus.forEach(submenu => {
+                submenu.classList.remove('active');
+            });
+        }
+
+        // Función para mostrar/ocultar el submenú
+        function toggleSubmenu(event) {
+            event.preventDefault();
+
+            // Cerrar todos los submenús antes de abrir uno nuevo
+            closeAllSubmenus();
+
+            // Abrir el submenú actual
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+
+        // Cerrar el submenú al hacer clic fuera de él
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.submenu')) {
+                closeAllSubmenus();
+            }
+        });
+
+        // Cerrar el submenú al hacer clic en una opción
+        const submenuLinks = document.querySelectorAll('.submenu-list a');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeAllSubmenus();
+            });
+        });
+
+        // Mostrar fecha actual
+        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Verificación de carga del mapa (opcional)
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof simplemaps_countrymap === 'undefined') {
+                    document.getElementById('mapa-error').textContent = 
+                        'Error: No se cargó countrymap.js. Verifica la ruta.';
+                    document.getElementById('mapa-error').style.display = 'block';
+                    console.error("SimpleMaps no está definido");
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
