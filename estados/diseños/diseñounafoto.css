@@ -39,12 +39,13 @@ header {
     height: auto;
     display: block;
     position: fixed;
-    margin-top: -.2%;
-    left: 140px;
-    top: 15px;
-    z-index: 1000;
+    margin-top: 0%;
+    left: 270px;
+    top: 50px;
+    z-index: 100;
     transition: transform 0.3s ease;
 }
+
 
 /* --- Logos en la esquina superior derecha --- */
 .logo-container {
@@ -86,7 +87,7 @@ nav.menu {
     width: 250px;
     height: 100%;
     background-color: #691932;
-    padding-top: 70px;
+    padding-top: 170px;
     transition: left 0.3s ease;
     z-index: 999;
     box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
@@ -162,6 +163,7 @@ nav.menu ul li a:hover {
 .menu-toggle {
     background-color: #A5852E;
     color: white;
+    margin-top: 100px;
     border: none;
     width: 50px;
     height: 50px;
@@ -178,6 +180,7 @@ nav.menu ul li a:hover {
     align-items: center;
     justify-content: center;
 }
+
 
 .menu-toggle:hover {
     background-color: #c49d3a;
@@ -214,7 +217,6 @@ nav.menu ul li a:hover {
         gap: 15px;
     }
     
-
     .fecha-actual {
         top: 10px;
         left: 50%;
@@ -374,10 +376,10 @@ html, body {
     font-size: 16px;
     cursor: pointer;
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    top: 40px;         /* Posición desde la parte superior */
+    left: 20px;        /* Posición desde la parte izquierda */
     border-radius: 5px;
-    z-index: 1000;
+    z-index: 10;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease;
 }
