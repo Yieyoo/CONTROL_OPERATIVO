@@ -1,586 +1,551 @@
-/* --- Estilo general para el cuerpo --- */
+/* ============ RESET Y VARIABLES ============ */
+:root {
+  --color-primario: #A5852E; /* Dorado principal */
+  --color-texto: #333; /* Texto oscuro */
+  --color-texto-claro: #691932; /* Texto blanco */
+  --color-fondo: #f4f4f4; /* Fondo gris claro */
+  --sombra: 0 4px 8px rgba(0, 0, 0, 0.1); /* Corrección: faltaba rgba */
+  --transicion: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============ ESTILOS GENERALES ============ */
 body {
-    background-image: url('imagenes/fondo.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    min-height: 100vh;
-    overflow-x: hidden;
-    font-family: Arial, sans-serif;
-    margin: 0; /* Evita desplazamientos no deseados */
-    padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: var(--color-fondo);
+  background-image: url('imagenes/fondo.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  color: var(--color-texto);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-/* Fondo y estilo de las secciones de información */
-#seccion1 {
-    background-color: #A5852E; /* Color amarillo */
-    padding: 1px; /* Espaciado interno */
-    border-radius: 10px; /* Bordes redondeados */
-    text-align: center; /* Centra el texto */
-    color: white; /* Texto en blanco para contraste */
-}
+/* Fondo derecho fijo con tu imagen */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 45%; /* Ajusta según el ancho de tu imagen */
+  height: 100vh;
+  background-image: url('imagenes/fondoderecha.jpg');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
 
-/* Estilo para los títulos dentro de estas secciones */
-#seccion1 h2{
-    
-    font-size: 1.2em;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-@media screen and (max-width: 768px) {
-    #seccion1 {
-        padding: .1px; /* Reducir padding para pantallas pequeñas */
-        font-size: 0.8em; /* Reducir el tamaño del título */
-        
-    }
-
-    #seccion1 h2 {
-        font-size: 0.8em; /* Reducir el tamaño del título */
-        margin-bottom: 5px; /* Reducir el espacio debajo del título */
-    }
 }
 
-/* Línea separadora con más diseño */
-
-
-.nueva-imagen {
-    position: absolute;
-    bottom: 425px;  /* Mantiene la imagen 348px arriba del borde inferior */
-    left: 65px;
-    width: 200px;   /* Establece un tamaño fijo para la imagen */
-    height: auto;   
-    object-fit: block;
-    z-index: 10;    /* Asegura que esté por encima de otros elementos */
-}
-/* Estilo para dispositivos con pantallas más pequeñas (por ejemplo, móviles) */
-@media (max-width: 767px) {
-    .nueva-imagen {
-        display: none; 
-    }
+/* Asegurar que el contenido esté por encima */
+body {
+  position: relative;
 }
 
-/* Medias query para pantallas muy pequeñas (como teléfonos en modo vertical) */
-@media (max-width: 480px) {
-    .nueva-imagen {
-        display: none; 
-    }
+header, main, footer {
+  position: relative;
+  z-index: 1;
 }
 
-
-header {
-    background-color: #691932;
-    color: white;
-    text-align: center;
-    font-size: 10px;
-    padding: 5px;
-    font-weight: bold;
-    border-bottom: 4px solid #A5852E;
-    margin-top: 52px; /* Lo baja 20px */
+/* ============ HEADER ============ */
+/* Línea superior vino */
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px; /* Altura del bloque vino */
+  background-color: #691932;
+  z-index: 2; /* Mayor que el ::after */
 }
 
-
-
-/* --- Logo superior --- */
-.logo-arriba-img {
-    max-width: 100px;
-    height: auto;
-    display: block;
-    position: fixed;
-    right: 1vw;
-    top: 1vw;
-    z-index: 1000;
+/* Línea divisoria amarilla (delgada) */
+header::after {
+  content: '';
+  position: absolute;
+  top: 40px; /* Justo debajo del ::before */
+  left: 0;
+  width: 100%;
+  height: 20px; /* Grosor de la línea */
+  background-color: #c09404;
+  z-index: 2;
+}
+.contra-header {
+height: 48px;
+background-color: #691932;
+width: 100%;
+margin-top: -50px;   /* 🔽 Más cerca del contenido de arriba */
+margin-bottom: 20px;
 }
 
-/* --- Contenedor del mapa --- */
-
-
-/* --- Imagen del mapa --- */
-img {
-    max-width: 100%;
-    height: auto;
-}
-/* --- Logo de Gobernación --- */
-#logo-gobernacion {
-    position: absolute;
-    top: 8px;
-    left: 550px;
-    max-width: 250px;
-    height: auto;
-    z-index: 1001;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    transition: transform 0.3s ease;
-}
-
-#logo-gobernacion:hover {
-    transform: scale(1.05);
-}
-
-/* Ajustes responsivos */
-@media (max-width: 768px) {
-    #logo-gobernacion {
-        max-width: 80px;
-        top: 5px;
-        left: 20px;}
-    }
-@media (max-width: 480px) {
-    #logo-gobernacion {
-        max-width: 60px;
-    }
-    
-    .menu-toggle {
-        left: 70px;
-    }
-}
-
-
-/* --- Menú lateral --- */
+/* --- Menú lateral mejorado --- */
 nav.menu {
-    position: fixed;
-    top: 0;
-    left: -250px;
-    width: 250px;
-    height: 100%;
-    background-color: #691932;
-    padding-top: 20px;
-    transition: left 0.3s ease;
-    z-index: 999;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-    padding-left: 20px;
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background-color: #691932;
+  padding-top: 150px; /* Ajusta la distancia desde la parte superior */
+  transition: left 0.3s ease;
+  z-index: 1000;
+  box-shadow: 2px 0 15px rgba(186, 28, 28, 0.3);
 }
 
-/* Estado cuando el menú está activo */
 nav.menu.active {
-    left: 0;
+  left: 0; /* Activa el menú cuando tiene la clase 'active' */
 }
 
-/* --- Estilos para los enlaces del menú --- */
-nav.menu ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 55px;
-}
-
-nav.menu ul li a {
-    text-decoration: none;
-    color: white;
-    font-size: 14px;
-    display: block;
-    padding: 10px;
-    background-color: #7d5a6e;
-    border-bottom: 1px solid #444;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-
-/* Efecto hover en los enlaces del menú */
-nav.menu ul li a:hover {
-    background-color: #8e5c71;
-    transform: translateX(10px); /* Desplazamiento al hacer hover */
-}
-
-/* --- Fondo oscuro para el menú --- */
 .menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-    transition: opacity 0.3s ease;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
 }
 
 .menu-overlay.active {
-    display: block;
-    opacity: 1;
+  display: block;
 }
 
-/* --- Botón de menú --- */
-.menu-toggle {
-    background-color: #691932;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    position: fixed;
-    top: 25px;
-    left: 15px;
-    border-radius: 5px;
-    z-index: 1000;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-/* Efecto hover en el botón de menú */
-.menu-toggle:hover {
-    background-color: #8e5c71;
-    transform: scale(1.05); /* Efecto de escala al hacer hover */
+nav.menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 70; /* Elimina el margen superior de las opciones principales */
 }
 
-/* --- Estilos para el submenú --- */
+nav.menu ul li {
+  position: relative; /* Necesario para submenús */
+}
+
+nav.menu ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+  display: block;
+  padding: 12px 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+nav.menu ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px);
+}
+
+/* --- Submenú refinado --- */
+/* Aseguramos que el submenú tenga un scroll fijo */
 .submenu-list {
-    display: none; /* Oculta el submenú por defecto */
-    padding-left: 20px; /* Indentación para el submenú */
-    background-color: #5a1a2b; /* Color de fondo del submenú */
-    border-radius: 5px;
-    margin-top: 0; /* Eliminamos el margen superior */
-    padding-top: 0; /* Eliminamos el padding superior */
-    padding-bottom: 0; /* Eliminamos el padding inferior */
-    animation: fadeIn 0.3s ease; /* Animación de aparición */
-    max-height: 100px; /* Altura máxima del submenú */
-    overflow-y: auto; /* Agrega scroll vertical si el contenido es muy largo */
+  display: none;
+  padding-left: 10px;
+  border-radius: 4px;
+  animation: fadeIn 0.3s ease;
+  max-height: 250px; /* Altura máxima del submenú */
+  overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
+  position: sticky; /* Hace que el submenú se quede fijo al hacer scroll */
+  top: 0; /* Se mantendrá en la parte superior de su contenedor */
 }
+
 .submenu.active .submenu-list {
-    display: block; /* Muestra el submenú cuando está activo */
+  display: block;
 }
+
+
 .submenu-list li a {
-    padding: 6px 10px; /* Reducimos el padding para botones más pequeños */
-    font-size: 12px; /* Reducimos el tamaño de la fuente */
-    background-color: #7d5a6e; /* Color de fondo de los enlaces del submenú */
-    border-bottom: 1px solid #444; /* Borde inferior para separar los enlaces */
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    border-radius: 5px;
-    display: block; /* Asegura que los enlaces ocupen todo el ancho */
-    line-height: 1.2; /* Reducimos el line-height para evitar espacio adicional */
+  padding: 8px 15px;
+  font-size: 13px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-
-
-/* Efecto hover en los enlaces del submenú */
 .submenu-list li a:hover {
-    background-color: #8e5c71; /* Color de fondo al pasar el mouse */
-    transform: translateX(5px); /* Efecto de desplazamiento al hacer hover */
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Animación de aparición */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* --- Estilos Responsivos --- */
-
-@media screen and (max-width: 768px) {
-    /* Menú lateral parcialmente visible en dispositivos pequeños */
-    nav.menu {
-        left: -200px;  /* Muestra solo un poco del menú (ajusta este valor según lo que necesites) */
-    }
-
-    /* El botón de menú se mostrará para permitir abrir el menú completamente */
-    .menu-toggle {
-        display: block; /* Asegura que el botón sea visible en pantallas pequeñas */
-    }
-
-    /* Estilo para el menú cuando está completamente activado */
-    nav.menu.active {
-        left: 0;  /* Muestra el menú completamente cuando está activo */
-    }
-    
-    /* Evita el desplazamiento horizontal */
-    body {
-        overflow-x: hidden;  /* Esto elimina cualquier barra de desplazamiento horizontal */
-    }
-}
-/* --- Botón de menú --- */
+/* --- Botón de menú mejorado --- */
 .menu-toggle {
-    background-color: #691932; /* Fondo oscuro */
-    color: #fff; /* Texto blanco */
-    border: none; /* Sin borde */
-    width: 60px;   /* Ancho fijo */
-    height: 40px;  /* Alto fijo */ 
-    font-size: 12px; /* Fuente más pequeña */
-    cursor: pointer; /* Apunta el cursor sobre el botón */
-    position: fixed;
-    top: 15px; /* Ajusta la posición */
-    left: 15px;
-    border-radius: 20px; /* Bordes redondeados más sutiles */
-    z-index: 1000;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más suave */
-    transition: all 0.2s ease; /* Transición suave */
+  background-color: #A5852E;
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  cursor: pointer;
+  position: fixed;
+  top: 75px;
+  left: 15px;
+  border-radius: 50%;
+  z-index: 100000;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Efecto hover en el botón de menú */
 .menu-toggle:hover {
-    background-color: #8e5c71; /* Fondo más claro cuando se pasa el mouse */
-    transform: scale(1.05); /* Efecto de escala para el hover */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más grande al pasar el mouse */
+  background-color: #c49d3a;
+  transform: scale(1.05);
 }
 
-/* --- Estilos Responsivos (Móviles) --- */
-@media screen and (max-width: 768px) {
-    .menu-toggle {
-        font-size: 10px; /* Fuente aún más pequeña en móviles */
-        padding: 60px 10px; /* Ajustar el tamaño del botón en móviles */
-        top: 10px; /* Ajustar la posición */
-        left: 10px;
-    }
-}
-/* --- Estilos Responsivos (Móviles) --- */
-@media screen and (max-width: 768px) {
-
-
-    nav.menu {
-        width: 200px;
-    }
-
-    nav.menu ul li a {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    .menu-toggle {
-        padding: 14px 18px;
-        font-size: 20px;
-
-        }}
-
-/* --- Títulos y textos --- */
-h1, h2, p {
-    text-align: center;
-    margin-left: 10px;
+/* --- Submenú con desplazamiento --- */
+.submenu {
+  max-height: 400px; /* Ajusta la altura máxima según necesites */
+  overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
+  scrollbar-width: thin; /* Para navegadores como Firefox */
+  scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
 }
 
-/* --- Fecha actual --- */
-#fechaActual {
-    position: fixed;
-    top: 100px;
-    right: 20px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    background-color: rgba(105, 25, 50, 0.9);
-    padding: 10px 20px;
-    border-radius: 25px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 500;
-    font-family: 'Arial', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+/* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
+.submenu::-webkit-scrollbar {
+  width: 6px; /* Ancho de la barra */
 }
 
-#fechaActual:hover {
-    background-color: rgba(142, 92, 113, 0.9);
-    transform: translateY(-2px);
+.submenu::-webkit-scrollbar-thumb {
+  background-color: #c09404; /* Color de la barra */
+  border-radius: 3px; /* Bordes redondeados */
 }
 
-/* --- Botón de regreso --- */
-.regresar-btn {
-    background-color: #691932;
-    color: white;
+.submenu::-webkit-scrollbar-track {
+  background: transparent; /* Fondo de la barra */
+}
+
+/* --- Animación de desvanecimiento para los submenús --- */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.logo-arriba-img {
+  height: 50px;
+  margin-right: 10px;
+  filter: brightness(0) invert(1);
+}
+
+.logo-container {
+  position: absolute; /* Posicionamiento absoluto respecto al header */
+  margin-top: 70px;
+  right: 20px; /* Distancia desde el borde derecho */
+  top: 10px; /* Distancia desde el borde superior */
+  z-index: 100; /* Asegura que esté por encima de otros elementos */
+}
+
+.logo-container img {
+  width: 300px; /* Ancho que especificaste */
+  height: auto; /* Mantiene la proporción */
+  transition: var(--transicion);
+}
+
+/* ============ PORTADA ============ */
+.portada {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem;
+  background: linear-gradient(135deg, var(--color-secundario) 0%, #4d1225 100%);
+  color: var(--color-texto-claro);
+  min-height: 50vh; /* Asegura que la portada ocupe toda la altura visible */
+  margin-bottom: 0; /* Evita márgenes adicionales */
+}
+
+
+.portada .imagen-container {
+  width: 45%;
+  animation: fadeInLeft 0.8s ease;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* Asegura que la imagen esté alineada al fondo */
+  margin-bottom: 0; /* Elimina margen inferior */
+}
+
+.portada .imagen-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  display: block;
+  margin-top: 10;
+  z-index: 1;
+  margin-left: 300px; /* Ajusta el valor según lo necesites */
+}
+
+
+.portada .texto-container {
+  width: 50%;
+  text-align: right;
+  animation: fadeInRight 0.8s ease;
+  padding: 2rem;
+}
+.portada .texto-container {
+  width: 50%;
+  text-align: right;
+  animation: fadeInRight 0.8s ease;
+  padding: 2rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin-bottom: 0; /* Elimina margen inferior */
+}
+
+
+.portada .texto-container h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--color-texto-claro);
+  margin-bottom: 0.8rem; /* Reducido de 1.5rem */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  line-height: 1.1; /* Ajustado de 1.2 */
+  letter-spacing: -0.5px; /* Reduce espacio entre letras */
+}
+
+.portada .texto-container h2,
+.portada .texto-container h3 {
+  font-size: 1.5rem;
+  color: var(--color-texto-claro);
+  margin-bottom: 0.6rem; /* Reducido de 1.5rem */
+  font-weight: normal;
+  line-height: 1.2; /* Añadido para consistencia */
+  letter-spacing: -0.3px; /* Reduce espacio entre letras */
+}
+
+
+.portada .texto-container .fecha-actual {
+  font-size: 1.1rem;
+  color: rgba(0, 0, 0, 0.8);
+  font-style: italic;
+}
+/* Contenedor principal */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem; /* Espacio entre secciones */
+    padding: 2rem 0;
+  }
+  
+  /* Estilo para la portada */
+  .portada {
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+    padding: 3rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Línea divisoria decorativa */
+  .separador {
+    height: 10px;
+    background: linear-gradient(to right, 
+                transparent, 
+                var(--color-primario), 
+                transparent);
+    margin: 2rem 0;
     border: none;
-    padding: 1vw 2vw;
-    font-size: 1.2vw;
-    cursor: pointer;
-    position: fixed;
-    bottom: 2vw;
-    left: 2vw;
-    border-radius: 0.5vw;
-    z-index: 1000;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s;
+  }
+  
+  /* ============ MAPA ============ */
+  .mapa-container {
+    background-color: #fff;
+    padding: 1rem; /* Reducir padding para ganar espacio */
+    border-radius: 10px;
+    width: 80%; /* Aumentar ancho */
+    max-width: 1300px; /* Aumentar tamaño máximo */
+    margin: 2rem auto;
+    box-shadow: var(--sombra);
+    overflow: hidden; /* Evitar que el mapa sobresalga */
 }
 
-.regresar-btn:hover {
-    background-color: #8e5c71;
-}
-.fecha-actual {
-    position: fixed;
-    top: 90px;
-    right: 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #691932;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 8px 12px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    z-index: 500;
-}
-/* --- Ajustes específicos para pantallas pequeñas --- */
-@media screen and (max-width: 768px) {
-    #fechaActual {
-        font-size: 20px; /* Reduce el tamaño de la fuente en móviles */
-        top: 5px; /* Ajusta un poco la posición hacia arriba */
-        padding: 6px 12px; /* Reduce el padding */
-        left: 50%; /* Posiciona el elemento en el centro horizontal */
-        transform: translateX(-50%); /* Mueve el elemento hacia la izquierda en un 50% de su ancho */
-    }
-}
-
-/* --- Ajustes para pantallas muy pequeñas (menos de 480px) --- */
-@media screen and (max-width: 480px) {
-    #fechaActual {
-        font-size: 11px; /* Reduce más el tamaño de la fuente */
-        top: 5px; /* Ajusta la posición */
-        padding: 4px 10px; /* Menos padding */
-    }
-}
-/* --- Contenedor del Mapa Rediseñado --- */
-.mapa-container {
-    width: 85%;
-    max-width: 950px;
-    margin: 30px auto;
-    padding: 0;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 25px rgba(105, 25, 50, 0.2);
-    overflow: hidden;
-    position: relative;
-    border: none;
-}
-
-.titulo-mapa {
-    text-align: center;
-    color: #691932;
-    margin: 0;
-    padding: 20px;
-    font-size: 1.5em;
-    font-weight: 600;
-    background: linear-gradient(to right, #f8f8f8, #ffffff, #f8f8f8);
-    border-bottom: 1px solid #e0e0e0;
-}
-
-#map {
+.mapa-container #map {
     width: 100%;
-    height: 570px;
-    background-color: #f6f6f6;
-    display: block;
-    border: none;
-    transition: all 0.3s ease;
+    height: 750px; /* Altura ajustada */
+    background-color: #e6e6e6;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transform: scale(1); /* Asegurar que no haya reducción */
+    box-sizing: border-box; /* Asegura que el padding y border se incluyan en el tamaño total */
 }
 
-/* Efecto hover para el contenedor */
-.mapa-container:hover {
-    box-shadow: 0 8px 30px rgba(105, 25, 50, 0.25);
-    transform: translateY(-2px);
+/* Ajustar el mapa para que ocupe todo el espacio disponible */
+#map svg {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%; /* Asegura que no se estire más allá de su contenedor */
 }
 
-/* Estilo para los estados del mapa (si es SVG) */
-#map path {
-    stroke: #fff;
-    stroke-width: 1.2px;
-    transition: fill 0.3s ease;
+  
+  .mapa-container .titulo-mapa {
+      font-size: 1.8rem;
+      color: var(--color-secundario);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      position: relative;
+      padding-bottom: 0.5rem;
+  }
+  
+  .mapa-container .titulo-mapa::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background-color: var(--color-secundario);
+  }
+  
+ 
+/* ============ LÍNEA SEPARADORA ============ */
+.linea {
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--color-secundario), transparent);
+  margin: 2rem 0;
+  border: none;
 }
 
-#map path:hover {
-    fill: #8e5c71;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-}/* Ajustes generales para que el fondo del mapa no se extienda demasiado */
-.mapa-container {
+/* ============ ANIMACIONES ============ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 992px) {
+  .portada {
+    flex-direction: column;
+    padding: 2rem;
+    min-height: auto;
+  }
+
+  .portada .imagen-container,
+  .portada .texto-container {
     width: 100%;
-    margin: 20px auto;
-    padding: 0;
-    background: #ffffff;  /* Fondo gris del mapa */
-    overflow: hidden;  /* Evita el desbordamiento si hay algún contenido extra */
-    height: auto;  /* Se ajusta al contenido */
+    text-align: center;
+  }
+
+  .portada .texto-container {
+    margin-top: 2rem;
+    padding: 1rem;
+  }
+
+  .mapa-container {
+    width: 95%;
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 768px) {
-    .mapa-container {
-        width: 95%;
-        margin: 20px auto;
-    }
-    
-    #map {
-        height: 500px;  /* Ajusta la altura del mapa para pantallas más pequeñas */
-    }
+  header {
+    padding: 15px 20px;
+    flex-direction: column;
+    height: auto;
+  }
+
+  .menu-toggle {
+    align-self: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  .portada {
+    padding: 1.5rem;
+  }
+
+  .portada .texto-container h1 {
+    font-size: 2rem;
+  }
+
+  .portada .texto-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .mapa-container #map {
+    height: 400px;
+  }
+
+  .logo-container {
+    margin-top: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
-    #map {
-        height: 190px;  /* Ajusta la altura aún más para pantallas muy pequeñas */
-    }
+  .portada .texto-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .portada .texto-container h2 {
+    font-size: 1.1rem;
+  }
+
+  .mapa-container {
+    padding: 1rem;
+  }
+
+  .mapa-container #map {
+    height: 300px;
+  }
 }
-
-
-#informacion {
-    position: fixed; /* Lo hace un elemento fijo en la pantalla */
-    bottom: 0; /* Lo coloca en la parte inferior */
-    left: 50%; /* Lo centra horizontalmente */
-    transform: translateX(-50%); /* Asegura que esté completamente centrado */
-    width: 100%; /* Ancho completo */
-    max-width: 500px; /* Limita el ancho máximo a 500px */
-    text-align: center;
-    background-color: rgba(254, 251, 251, 0.9); /* Fondo semitransparente */
-    padding: 8px 15px; /* Ajusta el padding para hacerlo más fino */
-    z-index: 1001;
-    border-radius: 15px; /* Bordes más redondeados */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
-    font-size: 14px; /* Fuente más pequeña */
-    font-family: Arial, sans-serif; /* Fuente más limpia */
-    font-weight: 400; /* Peso de fuente más ligero */
-}
-
-/* Estilo para pantallas grandes (PC) */
-@media screen and (min-width: 769px) {
-    #informacion {
-        display: none; /* Oculta en pantallas grandes (PC) */
-    }
-}
-
-/* Estilo para pantallas pequeñas (móviles) */
-@media screen and (max-width: 768px) {
-    #informacion {
-        display: block;
-        width: 90%;
-        max-width: 500px;
-        padding: 12px 20px;
-        font-size: 12px;
-        margin-top: -30px; /* Lo sube 20px */
-    }
-}
-
-/* Estilo general para el contenedor del título */
-.title-container {
-    text-align: center; /* Centra el texto */
-    margin: 10px 0; /* Espaciado superior e inferior */
-}
-
-/* Estilo para el título h1 */
-.title-container h1 {
-    font-size: 2.5em; /* Tamaño de fuente grande para pantallas grandes */
-    font-weight: bold; /* Negrita */
-    color: #f1ecec; /* Color de texto */
-    margin: 0; /* Eliminar márgenes */
-}
-
-/* Estilo para pantallas pequeñas (móviles) */
-@media screen and (max-width: 768px) {
-    .title-container {
-        margin: 10px 0; /* Reducir el margen para pantallas más pequeñas */
-    }
-
-    .title-container h1 {
-        font-size: 2em; /* Reducir el tamaño del título */
-        padding: 0 10px; /* Añadir algo de padding a los lados */
-        line-height: 1.2; /* Reducir el espacio entre líneas si es necesario */
-    }
-}
-
-/* Para pantallas muy pequeñas (menos de 480px) */
-@media screen and (max-width: 480px) {
-    .title-container h1 {
-        font-size: 1em; /* Más pequeño en pantallas muy pequeñas */
-        padding: 0 5px; /* Menos padding en pantallas muy pequeñas */
-    }
-}
-.decoracion-derecha {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 150px; /* Ajusta el ancho según lo necesites */
-    height: 100vh; /* Ocupa toda la altura de la pantalla */
-    background-image: url('imagenes/fondo_decorar.png');
-    background-size: cover; /* Ajusta la imagen al div */
-    background-repeat: no-repeat;
-    z-index: -1; /* Para que no interfiera con el contenido */
-}
-
+  
