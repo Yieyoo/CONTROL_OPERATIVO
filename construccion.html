@@ -5,10 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Página en Construcción</title>
   <style>
+    :root {
+      --color-primario: #A5852E; /* Dorado principal */
+      --color-texto: #333; /* Texto oscuro */
+      --color-texto-claro: #691932; /* Texto blanco */
+      --color-fondo: #f4f4f4; /* Fondo gris claro */
+      --sombra: 0 4px 8px rgba(0, 0, 0, 0.1); /* Corrección: faltaba rgba */
+      --transicion: all 0.3s ease;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #fdf6e3;
+      background-image: url('imagenes/fondo.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -18,27 +31,96 @@
       position: relative;
     }
 
+    /* Menú lateral */
+    nav.menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #691932;
+      padding-top: 150px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 15px rgba(186, 28, 28, 0.3);
+    }
+
+    nav.menu.active {
+      left: 0;
+    }
+
+    nav.menu ul {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 70px;
+    }
+
+    nav.menu ul li a {
+      text-decoration: none;
+      color: white;
+      font-size: 14px;
+      display: block;
+      padding: 12px 15px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    nav.menu ul li a:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .menu-toggle {
+      background-color: #A5852E;
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      position: fixed;
+      top: 75px;
+      left: 15px;
+      border-radius: 50%;
+      z-index: 100000;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-toggle:hover {
+      background-color: #c49d3a;
+      transform: scale(1.05);
+    }
+
+    /* Estilos de la página */
     .regresar-btn {
       position: absolute;
       top: 20px;
       left: 20px;
-      background-color: #c09404;
+      background-color: #6A1B2E; /* Color vino */
       color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
+      padding: 0.3rem 0.8rem; /* Botón más pequeño */
+      font-size: 0.9rem; /* Tamaño de texto más pequeño */
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
 
     .regresar-btn:hover {
-      background-color: #a57f02;
+      background-color: #8E2F4B; /* Vino más claro en hover */
     }
 
     .container {
       max-width: 800px;
       padding: 2rem;
+      z-index: 2;
     }
 
     .logo {
@@ -75,9 +157,19 @@
   </style>
 </head>
 <body>
-  <!-- Botón arriba a la izquierda -->
+  <!-- Botón de regresar -->
   <button class="regresar-btn">Regresar</button>
 
+  <!-- Menú lateral -->
+  <nav class="menu">
+    <ul>
+      <li><a href="#">Inicio</a></li>
+      <li><a href="#">Acerca de</a></li>
+      <li><a href="#">Contacto</a></li>
+    </ul>
+  </nav>
+
+  <!-- Contenedor principal -->
   <div class="container">
     <img src="imagenes/MujerBandera.png" alt="Logo INM" class="logo">
     <h1>Página en Construcción</h1>
@@ -87,6 +179,21 @@
   <script>
     document.querySelector('.regresar-btn').addEventListener('click', function() {
       window.history.back();
+    });
+
+    // Toggle para el menú lateral
+    const menuToggle = document.querySelector('.menu-toggle');
+    const menu = document.querySelector('.menu');
+    const overlay = document.querySelector('.menu-overlay');
+
+    menuToggle.addEventListener('click', () => {
+      menu.classList.toggle('active');
+      overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', () => {
+      menu.classList.remove('active');
+      overlay.classList.remove('active');
     });
   </script>
 </body>
