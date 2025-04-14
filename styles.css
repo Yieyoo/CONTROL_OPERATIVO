@@ -513,15 +513,31 @@ nav.menu ul li a:hover {
   .portada {
     padding: 1.5rem;
   }
-
-  .portada .texto-container h1 {
-    font-size: 2rem;
+  @media (max-width: 767px) {
+    .texto-container {
+      padding: 0.3rem;
+    }
+    
+    .texto-container h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.2rem;
+    }
+    
+    .texto-container h2,
+    .texto-container h3 {
+      font-size: 1rem;
+      margin-bottom: 0.1rem;
+    }
+    
+    .linea {
+      margin: 0.3rem 0;
+    }
+    
+    .fecha-actual {
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+    }
   }
-
-  .portada .texto-container h2 {
-    font-size: 1.5rem;
-  }
-
   .mapa-container #map {
     height: 400px;
   }
@@ -548,4 +564,111 @@ nav.menu ul li a:hover {
     height: 300px;
   }
 }
+@media (max-width: 480px) {
+
+
+  .menu-toggle {
+    top: 15px;
+    left: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+
+  .contra-header {
+    margin-top: -40px;
+    height: 30px;
+  }
+
+    /* ...lo demás igual... */
   
+    .portada {
+      padding: 1rem;
+      flex-direction: column-reverse; /* <-- Cambiado aquí */
+      text-align: center;
+    }
+  
+
+  .portada .imagen-container {
+    margin-left: 0;
+    margin-bottom: 1rem;
+  }
+
+  .portada .imagen-container img {
+    margin-left: 0;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .portada .texto-container {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .portada .texto-container h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .portada .texto-container h2,
+  .portada .texto-container h3 {
+    font-size: 1rem;
+  }
+
+  .portada .texto-container .fecha-actual {
+    font-size: 0.9rem;
+  }
+
+  .mapa-container {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .mapa-container #map {
+    height: 250px;
+  }
+
+  .logo-container {
+    position: absolute;
+    top: 60px;
+    right: 10px; /* ⬅️ Ahora en el lado izquierdo */
+    z-index: 100;
+    margin: 0; /* Elimina márgenes innecesarios */
+  }
+  
+  .logo-container img {
+    width: 120px; /* ⬇️ Más pequeño */
+    height: auto;
+    margin: 0;
+  }
+  
+
+  nav.menu {
+    width: 200px;
+    padding-top: 100px;
+  }
+
+  nav.menu ul li a {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .submenu-list li a {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+/* Por defecto en PC: oculta el h2 móvil */
+.titulo-movil {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .titulo-movil {
+    display: block;
+    font-size: 1.1rem;
+    color: #000;
+    text-align: center;
+    margin: 0;
+  }
+}
