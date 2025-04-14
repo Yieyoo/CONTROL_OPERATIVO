@@ -1,83 +1,111 @@
-/* --- Estilo general refinado --- */
-body {
-    background-image: url('imagenes/fondo.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    min-height: 100vh;
-    overflow-x: hidden;
-    font-family: 'Arial', sans-serif;
+/* ============ RESET Y VARIABLES ============ */
+:root {
+    --color-primario: #A5852E; /* Dorado principal */
+    --color-texto: #333; /* Texto oscuro */
+    --color-texto-claro: #691932; /* Texto blanco */
+    --color-fondo: #f4f4f4; /* Fondo gris claro */
+    --sombra: 0 4px 8px rgba(0, 0, 0, 0.1); /* Corrección: faltaba rgba */
+    --transicion: all 0.3s ease;
+  }
+  
+  * {
     margin: 0;
     padding: 0;
-    color: #333;
-}
-
-
-/* --- Header mejorado --- */
-header {
-    background-color: #691932;
-    color: white;
-    text-align: center;
-    padding: 15px 0;
-    font-weight: bold;
-    border-bottom: 4px solid #A5852E;
+    box-sizing: border-box;
+  }
+  
+  /* ============ ESTILOS GENERALES ============ */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--color-fondo);
+    background-image: url('imagenes/fondo.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    color: var(--color-texto);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Fondo derecho fijo con tu imagen */
+  body::before {
+    content: '';
     position: fixed;
     top: 0;
+    right: 0;
+    width: 45%; /* Ajusta según el ancho de tu imagen */
+    height: 100vh;
+    background-image: url('imagenes/fondoderecha.jpg');
+    background-size: cover;
+    background-position: left center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    pointer-events: none;
+  
+  }
+  
+  /* Asegurar que el contenido esté por encima */
+  body {
+    position: relative;
+  }
+  
+  header, main, footer {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* ============ HEADER ============ */
+  /* Línea superior vino */
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.title-container h1 {
-    font-size: 1.8rem;
-    margin: 0;
-    padding: 10px 0;
-    color: #f1ecec;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-}
-
-/* --- Sección 1 refinada --- */
-#seccion1 {
-    background-color: #A5852E;
-    padding: 15px 0;
-    border-radius: 8px;
-    text-align: center;
-    color: white;
-    margin: 100px auto 20px;
-    max-width: 90%;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-#seccion1 h2 {
-    font-size: 1.4em;
-    margin-bottom: 5px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-}
-.info-container {
-    text-align: center;
-}
-
-/* --- Menú lateral mejorado --- */
-nav.menu {
+    height: 40px; /* Altura del bloque vino */
+    background-color: #691932;
+    z-index: 2; /* Mayor que el ::after */
+  }
+  
+  /* Línea divisoria amarilla (delgada) */
+  header::after {
+    content: '';
+    position: absolute;
+    top: 40px; /* Justo debajo del ::before */
+    left: 0;
+    width: 100%;
+    height: 20px; /* Grosor de la línea */
+    background-color: #c09404;
+    z-index: 2;
+  }
+  .contra-header {
+  height: 48px;
+  background-color: #691932;
+  width: 100%;
+  margin-top: -50px;   /* 🔽 Más cerca del contenido de arriba */
+  margin-bottom: 20px;
+  }
+  
+  /* --- Menú lateral mejorado --- */
+  nav.menu {
     position: fixed;
     top: 0;
     left: -250px;
     width: 250px;
     height: 100%;
     background-color: #691932;
-    padding-top: 70px;
+    padding-top: 150px; /* Ajusta la distancia desde la parte superior */
     transition: left 0.3s ease;
-    z-index: 999;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
-}
-
-nav.menu.active {
-    left: 0;
-}
-
-.menu-overlay {
+    z-index: 1000;
+    box-shadow: 2px 0 15px rgba(186, 28, 28, 0.3);
+  }
+  
+  nav.menu.active {
+    left: 0; /* Activa el menú cuando tiene la clase 'active' */
+  }
+  
+  .menu-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -85,19 +113,24 @@ nav.menu.active {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-}
-
-.menu-overlay.active {
+    z-index: 9999;
+  }
+  
+  .menu-overlay.active {
     display: block;
-}
-
-nav.menu ul {
+  }
+  
+  nav.menu ul {
     list-style-type: none;
-    padding: 0 15px;
-}
-
-nav.menu ul li a {
+    padding: 0;
+    margin-top: 70; /* Elimina el margen superior de las opciones principales */
+  }
+  
+  nav.menu ul li {
+    position: relative; /* Necesario para submenús */
+  }
+  
+  nav.menu ul li a {
     text-decoration: none;
     color: white;
     font-size: 14px;
@@ -108,39 +141,44 @@ nav.menu ul li a {
     transition: all 0.3s ease;
     border-radius: 4px;
     margin-bottom: 8px;
-}
-
-nav.menu ul li a:hover {
+  }
+  
+  nav.menu ul li a:hover {
     background-color: rgba(255, 255, 255, 0.2);
     transform: translateX(5px);
-}
-
-/* --- Submenú refinado --- */
-.submenu-list {
+  }
+  
+  /* --- Submenú refinado --- */
+  /* Aseguramos que el submenú tenga un scroll fijo */
+  .submenu-list {
     display: none;
     padding-left: 10px;
     border-radius: 4px;
     animation: fadeIn 0.3s ease;
     max-height: 250px; /* Altura máxima del submenú */
-}
-
-.submenu.active .submenu-list {
+    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
+    position: sticky; /* Hace que el submenú se quede fijo al hacer scroll */
+    top: 0; /* Se mantendrá en la parte superior de su contenedor */
+  }
+  
+  .submenu.active .submenu-list {
     display: block;
-}
-
-.submenu-list li a {
+  }
+  
+  
+  .submenu-list li a {
     padding: 8px 15px;
     font-size: 13px;
     background-color: rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.submenu-list li a:hover {
+  }
+  
+  .submenu-list li a:hover {
     background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* --- Botón de menú mejorado --- */
-.menu-toggle {
+  }
+  
+  /* --- Botón de menú mejorado --- */
+  .menu-toggle {
     background-color: #A5852E;
     color: white;
     border: none;
@@ -149,293 +187,365 @@ nav.menu ul li a:hover {
     font-size: 20px;
     cursor: pointer;
     position: fixed;
-    top: 15px;
+    top: 75px;
     left: 15px;
     border-radius: 50%;
-    z-index: 1001;
+    z-index: 100000;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.menu-toggle:hover {
+  }
+  
+  .menu-toggle:hover {
     background-color: #c49d3a;
     transform: scale(1.05);
-}
-
-/* --- Logos mejorados --- */
-.logo-arriba-img {
-    max-width: 100px;
-    height: auto;
-    display: block;
-    position: fixed;
-    right: 20px;
-    top: 15px;
-    z-index: 1000;
-    transition: transform 0.3s ease;
-}
-
-.logo-arriba-img:hover {
-    transform: scale(1.05);
-}
-
-#logo-gobernacion {
-    position: absolute;
-    top: 20px;
-    left: 15%;
-    transform: translateX(-50%);
-    max-width: 200px;
-    height: auto;
-    z-index: 100;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    transition: transform 0.3s ease;
-}
-
-#logo-gobernacion:hover {
-    transform: translateX(-50%) scale(1.03);
-}
-
-.nueva-imagen {
-    position: absolute;
-    bottom: 425px;
-    left: 65px;
-    width: 200px;
-    height: auto;
-    z-index: 10;
-    transition: transform 0.3s ease;
-}
-
-.nueva-imagen:hover {
-    transform: scale(1.03);
-}
-
-/* --- Fecha actual mejorada --- */
-.fecha-actual {
-    position: fixed;
-    top: 90px;
-    right: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    background-color: rgba(105, 25, 50, 0.9);
-    padding: 8px 15px;
-    border-radius: 20px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    z-index: 500;
-    transition: all 0.3s ease;
-}
-
-.fecha-actual:hover {
-    background-color: rgba(142, 92, 113, 0.9);
-    transform: translateY(-2px);
-}
-/* Estilos base (escritorio) */
-.fecha-actual {
-    position: fixed;
-    top: 90px;
-    right: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    background-color: rgba(105, 25, 50, 0.9);
-    padding: 8px 15px;
-    border-radius: 20px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    z-index: 500;
-    transition: all 0.3s ease;
-}
-
-/* Ajustes para móviles (pantallas menores a 768px) */
-@media (max-width: 768px) {
-    .fecha-actual {
-        top: 70px; /* Mover más cerca del borde superior */
-        right: 10px; /* Menor margen derecho */
-        font-size: 12px; /* Texto más pequeño */
-        padding: 6px 12px; /* Padding reducido */
-    }
-}
-
-/* --- Mapa interactivo mejorado --- */
-.mapa-container {
-    width: 90%;
-    max-width: 950px;
-    margin: 30px auto;
-    padding: 0;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.mapa-container:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    transform: translateY(-3px);
-}
-/* Estilos base (para escritorio) */
-.mapa-container {
-    width: 90%;
-    max-width: 950px;
-    margin: 30px auto;
-    padding: 0;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-/* Ajustes para móviles (pantallas ≤ 768px) */
-@media (max-width: 768px) {
-    .mapa-container {
-        width: 95%; /* Ocupa más ancho en pantallas pequeñas */
-        height: 275px; /* Altura más pequeña en móvil */
-        max-width: 100%; /* Elimina el límite máximo */
-        margin: 15px auto; /* Reduce el margen superior/inferior */
-        border-radius: 8px; /* Bordes menos pronunciados */
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* Sombra más suave */
-    }
-}
-
-/* Ajustes adicionales para pantallas muy pequeñas (ej: iPhone SE) */
-@media (max-width: 480px) {
-    .mapa-container {
-        width: 98%;
-        margin: 10px auto;
-        border-radius: 6px;
-    }
-}
-
-.titulo-mapa {
-    text-align: center;
-    color: #691932;
-    margin: 0;
-    padding: 15px;
-    font-size: 1.4em;
-    font-weight: 600;
-    background: linear-gradient(to right, #f8f8f8, #ffffff, #f8f8f8);
-    border-bottom: 1px solid #e0e0e0;
-}
-
-#map {
-    width: 100%;
-    height: 560px;
-    background-color: #f6f6f6;
-    border: none;
-}
-
-/* --- Decoración derecha refinada --- */
-.decoracion-derecha {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 150px;
-    height: 100vh;
-    background-image: url('imagenes/fondo_decorar.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    z-index: -1;
-    opacity: 0.8;
-}
-@media (max-width: 768px) {  /* Ajusta el breakpoint según tus necesidades (ej: 768px para tablets/móviles) */
-    .decoracion-derecha {
-        display: none !important; /* Asegura que se oculte incluso si hay otras reglas CSS */
-    }
-}
-
-/* --- Animaciones --- */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-/* --- Ajustes para pantallas muy pequeñas --- */
-@media screen and (max-width: 480px) {
-    .title-container h1 {
-        font-size: 1rem;
-        padding-top: 35px;
-    }
-    
-    #seccion1 h2 {
-        font-size: 0.9rem;
-    }
-    
-    .menu-toggle {
-        width: 38px;
-        height: 38px;
-        font-size: 16px;
-    }
-    
-    .logo-arriba-img {
-        max-width: 60px;
-    }
-    
-    #logo-gobernacion {
-        max-width: 100px;
-        left: 50%;
-        
-    }
-    
-    .nueva-imagen {
-        width: 100px;
-    }
-    
-    #map {
-        height: 250px;
-    }
-}
-
-/* --- Ajustes para pantallas en orientación horizontal --- */
-@media screen and (max-width: 768px) and (orientation: landscape) {
-    #map {
-        height: 100px;
-
-    }
-    
-    .title-container h1 {
-        font-size: 1rem;
-    }
-}
-.submenu {
+  }
+  
+  /* --- Submenú con desplazamiento --- */
+  .submenu {
     max-height: 400px; /* Ajusta la altura máxima según necesites */
     overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
     scrollbar-width: thin; /* Para navegadores como Firefox */
     scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
-}
-
-/* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
-.submenu::-webkit-scrollbar {
+  }
+  
+  /* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
+  .submenu::-webkit-scrollbar {
     width: 6px; /* Ancho de la barra */
-}
-
-.submenu::-webkit-scrollbar-thumb {
+  }
+  
+  .submenu::-webkit-scrollbar-thumb {
     background-color: #c09404; /* Color de la barra */
     border-radius: 3px; /* Bordes redondeados */
-}
-
-.submenu::-webkit-scrollbar-track {
+  }
+  
+  .submenu::-webkit-scrollbar-track {
     background: transparent; /* Fondo de la barra */
-}
-@media screen and (max-width: 768px) {
-    .nueva-imagen {
-        position: fixed; /* Fija la imagen */
-        bottom: 0; /* Coloca la imagen en la parte inferior */
-        left: 50%; /* Centra la imagen horizontalmente */
-        transform: translateX(-50%); /* Ajusta la posición para centrarla */
-        width:20%; /* Ajusta el tamaño */
-        max-width: 200px; /* Limita el tamaño máximo */
+  }
+  
+  /* --- Animación de desvanecimiento para los submenús --- */
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
     }
-}
-
-
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  .logo-arriba-img {
+    height: 50px;
+    margin-right: 10px;
+    filter: brightness(0) invert(1);
+  }
+  
+  .logo-container {
+    position: absolute; /* Posicionamiento absoluto respecto al header */
+    margin-top: 70px;
+    right: 20px; /* Distancia desde el borde derecho */
+    top: 10px; /* Distancia desde el borde superior */
+    z-index: 100; /* Asegura que esté por encima de otros elementos */
+  }
+  
+  .logo-container img {
+    width: 300px; /* Ancho que especificaste */
+    height: auto; /* Mantiene la proporción */
+    transition: var(--transicion);
+  }
+  
+  /* ============ PORTADA ============ */
+  .portada {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem;
+    background: linear-gradient(135deg, var(--color-secundario) 0%, #4d1225 100%);
+    color: var(--color-texto-claro);
+    min-height: 50vh; /* Asegura que la portada ocupe toda la altura visible */
+    margin-bottom: 0; /* Evita márgenes adicionales */
+  }
+  
+  
+  .portada .imagen-container {
+    width: 45%;
+    animation: fadeInLeft 0.8s ease;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Asegura que la imagen esté alineada al fondo */
+    margin-bottom: 0; /* Elimina margen inferior */
+  }
+  
+  .portada .imagen-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    transition: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: block;
+    margin-top: 10;
+    z-index: 1;
+    margin-left: 300px; /* Ajusta el valor según lo necesites */
+  }
+  
+  
+  .portada .texto-container {
+    width: 50%;
+    text-align: right;
+    animation: fadeInRight 0.8s ease;
+    padding: 2rem;
+  }
+  .portada .texto-container {
+    width: 50%;
+    text-align: right;
+    animation: fadeInRight 0.8s ease;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin-bottom: 0; /* Elimina margen inferior */
+  }
+  
+  
+  .portada .texto-container h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-texto-claro);
+    margin-bottom: 0.8rem; /* Reducido de 1.5rem */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1.1; /* Ajustado de 1.2 */
+    letter-spacing: -0.5px; /* Reduce espacio entre letras */
+  }
+  
+  .portada .texto-container h2,
+  .portada .texto-container h3 {
+    font-size: 1.5rem;
+    color: var(--color-texto-claro);
+    margin-bottom: 0.6rem; /* Reducido de 1.5rem */
+    font-weight: normal;
+    line-height: 1.2; /* Añadido para consistencia */
+    letter-spacing: -0.3px; /* Reduce espacio entre letras */
+  }
+  
+  
+  .portada .texto-container .fecha-actual {
+    font-size: 1.1rem;
+    color: rgba(0, 0, 0, 0.8);
+    font-style: italic;
+  }
+  /* Contenedor principal */
+  .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem; /* Espacio entre secciones */
+      padding: 2rem 0;
+    }
+    
+    /* Estilo para la portada */
+    .portada {
+      background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+      padding: 3rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Línea divisoria decorativa */
+    .separador {
+      height: 10px;
+      background: linear-gradient(to right, 
+                  transparent, 
+                  var(--color-primario), 
+                  transparent);
+      margin: 2rem 0;
+      border: none;
+    }
+    
+    /* ============ MAPA ============ */
+    .mapa-container {
+      background-color: #fff;
+      padding: 1rem; /* Reducir padding para ganar espacio */
+      border-radius: 10px;
+      width: 80%; /* Aumentar ancho */
+      max-width: 1300px; /* Aumentar tamaño máximo */
+      margin: 2rem auto;
+      box-shadow: var(--sombra);
+      overflow: hidden; /* Evitar que el mapa sobresalga */
+  }
+  
+  .mapa-container #map {
+      width: 100%;
+      height: 750px; /* Altura ajustada */
+      background-color: #e6e6e6;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      transform: scale(1); /* Asegurar que no haya reducción */
+      box-sizing: border-box; /* Asegura que el padding y border se incluyan en el tamaño total */
+  }
+  
+  /* Ajustar el mapa para que ocupe todo el espacio disponible */
+  #map svg {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100%; /* Asegura que no se estire más allá de su contenedor */
+  }
+  
+    
+    .mapa-container .titulo-mapa {
+        font-size: 1.8rem;
+        color: var(--color-secundario);
+        margin-bottom: 1.5rem;
+        text-align: center;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .mapa-container .titulo-mapa::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background-color: var(--color-secundario);
+    }
+    
+   
+  /* ============ LÍNEA SEPARADORA ============ */
+  .linea {
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--color-secundario), transparent);
+    margin: 2rem 0;
+    border: none;
+  }
+  
+  /* ============ ANIMACIONES ============ */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 992px) {
+    .portada {
+      flex-direction: column;
+      padding: 2rem;
+      min-height: auto;
+    }
+  
+    .portada .imagen-container,
+    .portada .texto-container {
+      width: 100%;
+      text-align: center;
+    }
+  
+    .portada .texto-container {
+      margin-top: 2rem;
+      padding: 1rem;
+    }
+  
+    .mapa-container {
+      width: 95%;
+      padding: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    header {
+      padding: 15px 20px;
+      flex-direction: column;
+      height: auto;
+    }
+  
+    .menu-toggle {
+      align-self: flex-end;
+      margin-bottom: 1rem;
+    }
+  
+    .portada {
+      padding: 1.5rem;
+    }
+  
+    .portada .texto-container h1 {
+      font-size: 2rem;
+    }
+  
+    .portada .texto-container h2 {
+      font-size: 1.5rem;
+    }
+  
+    .mapa-container #map {
+      height: 400px;
+    }
+  
+    .logo-container {
+      margin-top: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .portada .texto-container h1 {
+      font-size: 1.8rem;
+    }
+  
+    .portada .texto-container h2 {
+      font-size: 1.1rem;
+    }
+  
+    .mapa-container {
+      padding: 1rem;
+    }
+  
+    .mapa-container #map {
+      height: 300px;
+    }
+  }
+    
