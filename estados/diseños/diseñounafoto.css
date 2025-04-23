@@ -35,15 +35,9 @@ header {
 }
 /* --- Logos mejorados --- */
 .logo-arriba-img {
-    max-width: 100px;
-    height: auto;
-    display: block;
-    position: fixed;
-    margin-top: 0%;
-    left: 270px;
-    top: 50px;
-    z-index: 100;
-    transition: transform 0.3s ease;
+    position: static; /* O relative/absolute según necesidad */
+    width: 120px; /* Ajusta el tamaño */
+    margin: 10px auto; /* Centrado */
 }
 
 
@@ -89,7 +83,7 @@ nav.menu {
     background-color: #691932;
     padding-top: 170px;
     transition: left 0.3s ease;
-    z-index: 999;
+    z-index: 1001;
     box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
 }
 
@@ -257,10 +251,6 @@ nav.menu ul li a:hover {
 }
 
 /* --- Logo en la parte superior --- */
-.logo-arriba-img {
-    width: 145px;
-    height: auto;
-}
 
 /* --- Estilo para los botones --- */
 form button, #deleteButton, .file-button, .upload-button {
@@ -417,10 +407,6 @@ h1 {
     margin-bottom: 10px;
 }
 
-.logo-arriba-img {
-    width: 150px;
-    height: auto;
-}
 /* Estilos para las imágenes dentro del contenedor */
 .mobile-images img {
     width: 100%;
