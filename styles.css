@@ -155,7 +155,7 @@ nav.menu ul li a:hover {
   padding-left: 10px;
   border-radius: 4px;
   animation: fadeIn 0.3s ease;
-  max-height: 250px; /* Altura máxima del submenú */
+  max-height: 350px; /* Altura máxima del submenú */
   overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
   position: sticky; /* Hace que el submenú se quede fijo al hacer scroll */
   top: 0; /* Se mantendrá en la parte superior de su contenedor */
