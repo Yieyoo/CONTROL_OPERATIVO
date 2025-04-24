@@ -329,7 +329,7 @@ nav.menu ul li a:hover {
     top: 20px;         /* Posición desde la parte superior */
     left: 20px;        /* Posición desde la parte izquierda */
     border-radius: 5px;
-    z-index: 1000;
+    z-index: 900;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease;
 }
@@ -433,7 +433,10 @@ nav.menu ul li a:hover {
 .logo-arriba-img {
     width: 145px;  /* Cambia este valor según lo que necesites */
     margin-left: 20px;
+
     height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
+    position: relative; /* Asegura que el logo se pueda posicionar */
+    top: -30px; /* Ajusta este valor para subir el logo */
 }
 .instituto-info {
     background: linear-gradient(to right, #6b1e3f, #320d1c); /* Fondo degradado */
