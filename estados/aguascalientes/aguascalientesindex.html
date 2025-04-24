@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+   
 <head>
     <meta charset="UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aguascalientes</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../../imagenes/iconom.png">
     <link rel="stylesheet" href="../diseños/diseñogeneral.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">      
 </head>
 <body>
     <!-- Fondo oscuro para el menú -->
@@ -13,14 +16,14 @@
 
     <header>
         <!-- Botón para abrir el menú en móviles -->
-        <img src="../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
-        
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        
+
         <!-- Menú principal -->
         <nav class="menu">
+            <img src="../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../index.html">Inicio</a></li>
+
                 <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
@@ -67,11 +70,12 @@
                         <li><a href="../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
                         <li><a href="../veracruz/veracruzindex.html">Veracruz</a></li>
                         <li><a href="../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../yucatan/yucatanindex.html">Zacatecas</a></li>
+                        <li><a href="../zacatecas/zacatecasindex.html">Zacatecas</a></li>
                     </ul>
                 </li>
             </ul>
         </nav>
+        
     </header>
 
     <!-- Información del instituto -->
@@ -85,7 +89,7 @@
 
     <!-- Agregamos el nombre del estado aquí -->
     <div class="estado-info">
-        <h4>Aguascalientes</h4> <!-- Aquí puedes cambiar el nombre del estado según sea necesario -->
+        <h4>Baja California</h4> <!-- Aquí puedes cambiar el nombre del estado según sea necesario -->
     </div>
 
     <!-- Contenedor solo para las opciones -->
@@ -175,7 +179,6 @@ document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString
 document.querySelector('.regresar-btn').addEventListener('click', function() {
     window.history.back();
 });
-
     </script>
 </body>
 </html>
