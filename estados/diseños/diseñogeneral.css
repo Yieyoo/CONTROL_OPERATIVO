@@ -205,7 +205,7 @@ nav.menu ul li a {
     transition: all 0.3s ease;
     border-radius: 4px;
     margin-bottom: 8px;
-}
+  }
 
 nav.menu ul li a:hover {
     background-color: rgba(255, 255, 255, 0.2);
@@ -218,7 +218,10 @@ nav.menu ul li a:hover {
     padding-left: 10px;
     border-radius: 4px;
     animation: fadeIn 0.3s ease;
-    max-height: 200px;
+    max-height: 350px; /* Altura máxima del submenú */
+    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
+    position: sticky; /* Hace que el submenú se quede fijo al hacer scroll */
+    top: 0; /* Se mantendrá en la parte superior de su contenedor */
 }
 
 .submenu.active .submenu-list {
