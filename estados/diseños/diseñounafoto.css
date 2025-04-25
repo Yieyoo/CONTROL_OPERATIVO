@@ -35,9 +35,12 @@ header {
 }
 /* --- Logos mejorados --- */
 .logo-arriba-img {
-    position: static; /* O relative/absolute según necesidad */
-    width: 120px; /* Ajusta el tamaño */
-    margin: 10px auto; /* Centrado */
+    width: 145px;  /* Cambia este valor según lo que necesites */
+    margin-left: 18px;
+
+    height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
+    position: relative; /* Asegura que el logo se pueda posicionar */
+    top: -195px; /* Ajusta este valor para subir el logo */
 }
 
 
@@ -81,11 +84,12 @@ nav.menu {
     width: 250px;
     height: 100%;
     background-color: #691932;
-    padding-top: 170px;
+    padding-top: 150px; /* Ajusta la distancia desde la parte superior */
     transition: left 0.3s ease;
-    z-index: 1001;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
-}
+    z-index: 1000;
+    box-shadow: 2px 0 15px rgba(186, 28, 28, 0.3);
+    border-top: 50px solid #E5E5E5; /* Línea dorada arriba del menú */
+  }
 
 nav.menu.active {
     left: 0;
@@ -167,7 +171,7 @@ nav.menu ul li a:hover {
     top: 15px;
     left: 15px;
     border-radius: 50%;
-    z-index: 1001;
+    z-index: 12000;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     display: flex;
