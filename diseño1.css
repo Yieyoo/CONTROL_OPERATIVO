@@ -1,551 +1,672 @@
 /* ============ RESET Y VARIABLES ============ */
 :root {
-    --color-primario: #A5852E; /* Dorado principal */
-    --color-texto: #333; /* Texto oscuro */
-    --color-texto-claro: #691932; /* Texto blanco */
-    --color-fondo: #f4f4f4; /* Fondo gris claro */
-    --sombra: 0 4px 8px rgba(0, 0, 0, 0.1); /* Corrección: faltaba rgba */
-    --transicion: all 0.3s ease;
+  --color-primario: #A5852E; /* Dorado principal */
+  --color-texto: #333; /* Texto oscuro */
+  --color-texto-claro: #691932; /* Texto blanco */
+  --color-fondo: #f4f4f4; /* Fondo gris claro */
+  --sombra: 0 4px 8px rgba(0, 0, 0, 0.1); /* Corrección: faltaba rgba */
+  --transicion: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============ ESTILOS GENERALES ============ */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--color-fondo);
+  background-image: url('imagenes/fondo.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  color: var(--color-texto);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+/* Fondo derecho fijo con tu imagen */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 45%; /* Ajusta según el ancho de tu imagen */
+  height: 100vh;
+  background-image: url('imagenes/fondoderecha.jpg');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
+
+}
+
+/* Asegurar que el contenido esté por encima */
+body {
+  position: relative;
+}
+
+header, main, footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============ HEADER ============ */
+/* Línea superior vino */
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px; /* Altura del bloque vino */
+  background-color: #691932;
+  z-index: 2; /* Mayor que el ::after */
+}
+
+/* Línea divisoria amarilla (delgada) */
+header::after {
+  content: '';
+  position: absolute;
+  top: 40px; /* Justo debajo del ::before */
+  left: 0;
+  width: 100%;
+  height: 20px; /* Grosor de la línea */
+  background-color: #c09404;
+  z-index: 2;
+}
+.contra-header {
+height: 48px;
+background-color: #691932;
+width: 100%;
+margin-top: -50px;   /* 🔽 Más cerca del contenido de arriba */
+margin-bottom: 20px;
+}
+nav.menu {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background-color: #691932; /* Mantén el color morado original */
+  padding-top: 150px;
+  transition: left 0.3s ease;
+  z-index: 1000;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3); /* Sombra más sutil */
+  border-top: 50px solid #c09404; /* Línea dorada arriba del menú */
+}
+
+nav.menu.active {
+  left: 0;
+}
+
+.menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.menu-overlay.active {
+  display: block;
+}
+
+nav.menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin-top: -50px;
+}
+
+nav.menu ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+  display: block;
+  padding: 12px 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Línea suave */
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+nav.menu ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px);
+}
+
+.submenu-list {
+  display: none;
+  padding-left: 10px;
+  border-radius: 8px;
+  animation: slideIn 0.3s ease-out;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.submenu.active .submenu-list {
+  display: block;
+}
+
+.submenu-list li a {
+  padding: 8px 15px;
+  font-size: 13px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.submenu-list li a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.menu-toggle {
+  background-color: #A5852E; /* Mantén el color dorado original */
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  cursor: pointer;
+  position: fixed;
+  top: 75px;
+  left: 15px;
+  border-radius: 50%;
+  z-index: 100000;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-toggle:hover {
+  background-color: #c49d3a; /* Color dorado más intenso en hover */
+  transform: scale(1.05);
+}
+
+.submenu {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c09404 transparent; /* Utiliza el dorado para la barra */
+}
+
+.submenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+  background-color: #c09404; /* Dorado en la barra */
+}
+
+.submenu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
   }
-  
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
-  
-  /* ============ ESTILOS GENERALES ============ */
-  body {
-    font-family: 'Arial', sans-serif;
-    background-color: var(--color-fondo);
-    background-image: url('imagenes/fondo.jpg');
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center;
-    color: var(--color-texto);
-    line-height: 1.6;
-    min-height: 100vh;
+}
+
+
+/* --- Animación de desvanecimiento para los submenús --- */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.logo-arriba-img {
+  height: 50px;
+  margin-right: 10px;
+  filter: brightness(0) invert(1);
+}
+
+.logo-container {
+  position: absolute; /* Posicionamiento absoluto respecto al header */
+  margin-top: 70px;
+  right: 20px; /* Distancia desde el borde derecho */
+  top: 10px; /* Distancia desde el borde superior */
+  z-index: 100; /* Asegura que esté por encima de otros elementos */
+}
+
+.logo-container img {
+  width: 300px; /* Ancho que especificaste */
+  height: auto; /* Mantiene la proporción */
+  transition: var(--transicion);
+}
+
+/* ============ PORTADA ============ */
+.portada {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem;
+  background: linear-gradient(135deg, var(--color-secundario) 0%, #4d1225 100%);
+  color: var(--color-texto-claro);
+  min-height: 50vh; /* Asegura que la portada ocupe toda la altura visible */
+  margin-bottom: 0; /* Evita márgenes adicionales */
+}
+
+
+.portada .imagen-container {
+  width: 45%;
+  animation: fadeInLeft 0.8s ease;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* Asegura que la imagen esté alineada al fondo */
+  margin-bottom: 0; /* Elimina margen inferior */
+}
+
+.portada .imagen-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  display: block;
+  margin-top: 10;
+  z-index: 1;
+  margin-left: 300px; /* Ajusta el valor según lo necesites */
+}
+
+
+.portada .texto-container {
+  width: 50%;
+  text-align: right;
+  animation: fadeInRight 0.8s ease;
+  padding: 2rem;
+}
+.portada .texto-container {
+  width: 50%;
+  text-align: right;
+  animation: fadeInRight 0.8s ease;
+  padding: 2rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin-bottom: 0; /* Elimina margen inferior */
+}
+
+
+.portada .texto-container h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--color-texto-claro);
+  margin-bottom: 0.8rem; /* Reducido de 1.5rem */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  line-height: 1.1; /* Ajustado de 1.2 */
+  letter-spacing: -0.5px; /* Reduce espacio entre letras */
+}
+
+.portada .texto-container h2,
+.portada .texto-container h3 {
+  font-size: 1.5rem;
+  color: var(--color-texto-claro);
+  margin-bottom: 0.6rem; /* Reducido de 1.5rem */
+  font-weight: normal;
+  line-height: 1.2; /* Añadido para consistencia */
+  letter-spacing: -0.3px; /* Reduce espacio entre letras */
+}
+
+
+.portada .texto-container .fecha-actual {
+  font-size: 1.1rem;
+  color: rgba(0, 0, 0, 0.8);
+  font-style: italic;
+}
+/* Contenedor principal */
+.main-content {
     display: flex;
     flex-direction: column;
-  }
-  /* Fondo derecho fijo con tu imagen */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 45%; /* Ajusta según el ancho de tu imagen */
-    height: 100vh;
-    background-image: url('imagenes/fondoderecha.jpg');
-    background-size: cover;
-    background-position: left center;
-    background-repeat: no-repeat;
-    z-index: -1;
-    pointer-events: none;
-  
+    gap: 3rem; /* Espacio entre secciones */
+    padding: 2rem 0;
   }
   
-  /* Asegurar que el contenido esté por encima */
-  body {
-    position: relative;
-  }
-  
-  header, main, footer {
-    position: relative;
-    z-index: 1;
-  }
-  
-  /* ============ HEADER ============ */
-  /* Línea superior vino */
-  header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 40px; /* Altura del bloque vino */
-    background-color: #691932;
-    z-index: 2; /* Mayor que el ::after */
-  }
-  
-  /* Línea divisoria amarilla (delgada) */
-  header::after {
-    content: '';
-    position: absolute;
-    top: 40px; /* Justo debajo del ::before */
-    left: 0;
-    width: 100%;
-    height: 20px; /* Grosor de la línea */
-    background-color: #c09404;
-    z-index: 2;
-  }
-  .contra-header {
-  height: 48px;
-  background-color: #691932;
-  width: 100%;
-  margin-top: -50px;   /* 🔽 Más cerca del contenido de arriba */
-  margin-bottom: 20px;
-  }
-  
-  /* --- Menú lateral mejorado --- */
-  nav.menu {
-    position: fixed;
-    top: 0;
-    left: -250px;
-    width: 250px;
-    height: 100%;
-    background-color: #691932;
-    padding-top: 150px; /* Ajusta la distancia desde la parte superior */
-    transition: left 0.3s ease;
-    z-index: 1000;
-    box-shadow: 2px 0 15px rgba(186, 28, 28, 0.3);
-  }
-  
-  nav.menu.active {
-    left: 0; /* Activa el menú cuando tiene la clase 'active' */
-  }
-  
-  .menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-  }
-  
-  .menu-overlay.active {
-    display: block;
-  }
-  
-  nav.menu ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 70; /* Elimina el margen superior de las opciones principales */
-  }
-  
-  nav.menu ul li {
-    position: relative; /* Necesario para submenús */
-  }
-  
-  nav.menu ul li a {
-    text-decoration: none;
-    color: white;
-    font-size: 14px;
-    display: block;
-    padding: 12px 15px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-    border-radius: 4px;
-    margin-bottom: 8px;
-  }
-  
-  nav.menu ul li a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
-  }
-  
-  /* --- Submenú refinado --- */
-  /* Aseguramos que el submenú tenga un scroll fijo */
-  .submenu-list {
-    display: none;
-    padding-left: 10px;
-    border-radius: 4px;
-    animation: fadeIn 0.3s ease;
-    max-height: 250px; /* Altura máxima del submenú */
-    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
-    position: sticky; /* Hace que el submenú se quede fijo al hacer scroll */
-    top: 0; /* Se mantendrá en la parte superior de su contenedor */
-  }
-  
-  .submenu.active .submenu-list {
-    display: block;
-  }
-  
-  
-  .submenu-list li a {
-    padding: 8px 15px;
-    font-size: 13px;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  
-  .submenu-list li a:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-  
-  /* --- Botón de menú mejorado --- */
-  .menu-toggle {
-    background-color: #A5852E;
-    color: white;
-    border: none;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-    cursor: pointer;
-    position: fixed;
-    top: 75px;
-    left: 15px;
-    border-radius: 50%;
-    z-index: 100000;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .menu-toggle:hover {
-    background-color: #c49d3a;
-    transform: scale(1.05);
-  }
-  
-  /* --- Submenú con desplazamiento --- */
-  .submenu {
-    max-height: 400px; /* Ajusta la altura máxima según necesites */
-    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
-    scrollbar-width: thin; /* Para navegadores como Firefox */
-    scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
-  }
-  
-  /* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
-  .submenu::-webkit-scrollbar {
-    width: 6px; /* Ancho de la barra */
-  }
-  
-  .submenu::-webkit-scrollbar-thumb {
-    background-color: #c09404; /* Color de la barra */
-    border-radius: 3px; /* Bordes redondeados */
-  }
-  
-  .submenu::-webkit-scrollbar-track {
-    background: transparent; /* Fondo de la barra */
-  }
-  
-  /* --- Animación de desvanecimiento para los submenús --- */
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  
-  .logo-arriba-img {
-    height: 50px;
-    margin-right: 10px;
-    filter: brightness(0) invert(1);
-  }
-  
-  .logo-container {
-    position: absolute; /* Posicionamiento absoluto respecto al header */
-    margin-top: 70px;
-    right: 20px; /* Distancia desde el borde derecho */
-    top: 10px; /* Distancia desde el borde superior */
-    z-index: 100; /* Asegura que esté por encima de otros elementos */
-  }
-  
-  .logo-container img {
-    width: 300px; /* Ancho que especificaste */
-    height: auto; /* Mantiene la proporción */
-    transition: var(--transicion);
-  }
-  
-  /* ============ PORTADA ============ */
+  /* Estilo para la portada */
   .portada {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
     padding: 3rem;
-    background: linear-gradient(135deg, var(--color-secundario) 0%, #4d1225 100%);
-    color: var(--color-texto-claro);
-    min-height: 50vh; /* Asegura que la portada ocupe toda la altura visible */
-    margin-bottom: 0; /* Evita márgenes adicionales */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   
-  
-  .portada .imagen-container {
-    width: 45%;
-    animation: fadeInLeft 0.8s ease;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end; /* Asegura que la imagen esté alineada al fondo */
-    margin-bottom: 0; /* Elimina margen inferior */
-  }
-  
-  .portada .imagen-container img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    transition: none;
-    margin-top: 0;
-    margin-bottom: 0;
-    display: block;
-    margin-top: 10;
-    z-index: 1;
-    margin-left: 300px; /* Ajusta el valor según lo necesites */
-  }
-  
-  
-  .portada .texto-container {
-    width: 50%;
-    text-align: right;
-    animation: fadeInRight 0.8s ease;
-    padding: 2rem;
-  }
-  .portada .texto-container {
-    width: 50%;
-    text-align: right;
-    animation: fadeInRight 0.8s ease;
-    padding: 2rem;
-    box-sizing: border-box;
-    overflow: hidden;
-    margin-bottom: 0; /* Elimina margen inferior */
-  }
-  
-  
-  .portada .texto-container h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--color-texto-claro);
-    margin-bottom: 0.8rem; /* Reducido de 1.5rem */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-    line-height: 1.1; /* Ajustado de 1.2 */
-    letter-spacing: -0.5px; /* Reduce espacio entre letras */
-  }
-  
-  .portada .texto-container h2,
-  .portada .texto-container h3 {
-    font-size: 1.5rem;
-    color: var(--color-texto-claro);
-    margin-bottom: 0.6rem; /* Reducido de 1.5rem */
-    font-weight: normal;
-    line-height: 1.2; /* Añadido para consistencia */
-    letter-spacing: -0.3px; /* Reduce espacio entre letras */
-  }
-  
-  
-  .portada .texto-container .fecha-actual {
-    font-size: 1.1rem;
-    color: rgba(0, 0, 0, 0.8);
-    font-style: italic;
-  }
-  /* Contenedor principal */
-  .main-content {
-      display: flex;
-      flex-direction: column;
-      gap: 3rem; /* Espacio entre secciones */
-      padding: 2rem 0;
-    }
-    
-    /* Estilo para la portada */
-    .portada {
-      background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
-      padding: 3rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-    
-    /* Línea divisoria decorativa */
-    .separador {
-      height: 10px;
-      background: linear-gradient(to right, 
-                  transparent, 
-                  var(--color-primario), 
-                  transparent);
-      margin: 2rem 0;
-      border: none;
-    }
-    
-    /* ============ MAPA ============ */
-    .mapa-container {
-      background-color: #fff;
-      padding: 1rem; /* Reducir padding para ganar espacio */
-      border-radius: 10px;
-      width: 80%; /* Aumentar ancho */
-      max-width: 1300px; /* Aumentar tamaño máximo */
-      margin: 2rem auto;
-      box-shadow: var(--sombra);
-      overflow: hidden; /* Evitar que el mapa sobresalga */
-  }
-  
-  .mapa-container #map {
-      width: 100%;
-      height: 750px; /* Altura ajustada */
-      background-color: #e6e6e6;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      transform: scale(1); /* Asegurar que no haya reducción */
-      box-sizing: border-box; /* Asegura que el padding y border se incluyan en el tamaño total */
-  }
-  
-  /* Ajustar el mapa para que ocupe todo el espacio disponible */
-  #map svg {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100%; /* Asegura que no se estire más allá de su contenedor */
-  }
-  
-    
-    .mapa-container .titulo-mapa {
-        font-size: 1.8rem;
-        color: var(--color-secundario);
-        margin-bottom: 1.5rem;
-        text-align: center;
-        position: relative;
-        padding-bottom: 0.5rem;
-    }
-    
-    .mapa-container .titulo-mapa::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 3px;
-        background-color: var(--color-secundario);
-    }
-    
-   
-  /* ============ LÍNEA SEPARADORA ============ */
-  .linea {
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--color-secundario), transparent);
+  /* Línea divisoria decorativa */
+  .separador {
+    height: 10px;
+    background: linear-gradient(to right, 
+                transparent, 
+                var(--color-primario), 
+                transparent);
     margin: 2rem 0;
     border: none;
   }
   
-  /* ============ ANIMACIONES ============ */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  /* ============ MAPA ============ */
+  .mapa-container {
+    background-color: #fff;
+    padding: 1rem; /* Reducir padding para ganar espacio */
+    border-radius: 10px;
+    width: 80%; /* Aumentar ancho */
+    max-width: 1300px; /* Aumentar tamaño máximo */
+    margin: 2rem auto;
+    box-shadow: var(--sombra);
+    overflow: hidden; /* Evitar que el mapa sobresalga */
+}
+
+.mapa-container #map {
+    width: 100%;
+    height: 750px; /* Altura ajustada */
+    background-color: #e6e6e6;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transform: scale(1); /* Asegurar que no haya reducción */
+    box-sizing: border-box; /* Asegura que el padding y border se incluyan en el tamaño total */
+}
+
+/* Ajustar el mapa para que ocupe todo el espacio disponible */
+#map svg {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%; /* Asegura que no se estire más allá de su contenedor */
+}
+
+  
+  .mapa-container .titulo-mapa {
+      font-size: 1.8rem;
+      color: var(--color-secundario);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      position: relative;
+      padding-bottom: 0.5rem;
   }
   
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .mapa-container .titulo-mapa::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background-color: var(--color-secundario);
   }
   
-  @keyframes fadeInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
+ 
+/* ============ LÍNEA SEPARADORA ============ */
+.linea {
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--color-secundario), transparent);
+  margin: 2rem 0;
+  border: none;
+}
+
+/* ============ ANIMACIONES ============ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 992px) {
+  .portada {
+    flex-direction: column;
+    padding: 2rem;
+    min-height: auto;
+  }
+
+  .portada .imagen-container,
+  .portada .texto-container {
+    width: 100%;
+    text-align: center;
+  }
+
+  .portada .texto-container {
+    margin-top: 2rem;
+    padding: 1rem;
+  }
+
+  .mapa-container {
+    width: 95%;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 15px 20px;
+    flex-direction: column;
+    height: auto;
+  }
+
+  .menu-toggle {
+    align-self: flex-end;
+    margin-bottom: 1rem;
+  }
+
+  .portada {
+    padding: 1.5rem;
+  }
+  @media (max-width: 767px) {
+    .texto-container {
+      padding: 0.3rem;
     }
-    to {
-      opacity: 1;
-      transform: translateX(0);
+    
+    .texto-container h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.2rem;
+    }
+    
+    .texto-container h2,
+    .texto-container h3 {
+      font-size: 1rem;
+      margin-bottom: 0.1rem;
+    }
+    
+    .linea {
+      margin: 0.3rem 0;
+    }
+    
+    .fecha-actual {
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
     }
   }
-  
-  @keyframes fadeInRight {
-    from {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+  .mapa-container #map {
+    height: 400px;
   }
-  
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+
+  .logo-container {
+    margin-top: 1rem;
   }
+}
+
+@media (max-width: 480px) {
+  .portada .texto-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .portada .texto-container h2 {
+    font-size: 1.1rem;
+  }
+
+  .mapa-container {
+    padding: 1rem;
+  }
+
+  .mapa-container #map {
+    height: 300px;
+  }
+}
+@media (max-width: 480px) {
+
+
+  .menu-toggle {
+    top: 15px;
+    left: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+
+  .contra-header {
+    margin-top: -40px;
+    height: 30px;
+  }
+
+    /* ...lo demás igual... */
   
-  /* ============ RESPONSIVE ============ */
-  @media (max-width: 992px) {
     .portada {
-      flex-direction: column;
-      padding: 2rem;
-      min-height: auto;
-    }
-  
-    .portada .imagen-container,
-    .portada .texto-container {
-      width: 100%;
+      padding: 1rem;
+      flex-direction: column-reverse; /* <-- Cambiado aquí */
       text-align: center;
     }
   
-    .portada .texto-container {
-      margin-top: 2rem;
-      padding: 1rem;
-    }
-  
-    .mapa-container {
-      width: 95%;
-      padding: 1.5rem;
-    }
+
+  .portada .imagen-container {
+    margin-left: 0;
+    margin-bottom: 1rem;
+  }
+
+  .portada .imagen-container img {
+    margin-left: 0;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .portada .texto-container {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .portada .texto-container h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .portada .texto-container h2,
+  .portada .texto-container h3 {
+    font-size: 1rem;
+  }
+
+  .portada .texto-container .fecha-actual {
+    font-size: 0.9rem;
+  }
+
+  .mapa-container {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .mapa-container #map {
+    height: 169px;
+  }
+
+  .logo-container {
+    position: absolute;
+    top: 60px;
+    right: 10px; /* ⬅️ Ahora en el lado izquierdo */
+    z-index: 100;
+    margin: 0; /* Elimina márgenes innecesarios */
   }
   
-  @media (max-width: 768px) {
-    header {
-      padding: 15px 20px;
-      flex-direction: column;
-      height: auto;
-    }
-  
-    .menu-toggle {
-      align-self: flex-end;
-      margin-bottom: 1rem;
-    }
-  
-    .portada {
-      padding: 1.5rem;
-    }
-  
-    .portada .texto-container h1 {
-      font-size: 2rem;
-    }
-  
-    .portada .texto-container h2 {
-      font-size: 1.5rem;
-    }
-  
-    .mapa-container #map {
-      height: 400px;
-    }
-  
-    .logo-container {
-      margin-top: 1rem;
-    }
+  .logo-container img {
+    width: 120px; /* ⬇️ Más pequeño */
+    height: auto;
+    margin: 0;
   }
   
-  @media (max-width: 480px) {
-    .portada .texto-container h1 {
-      font-size: 1.8rem;
-    }
-  
-    .portada .texto-container h2 {
-      font-size: 1.1rem;
-    }
-  
-    .mapa-container {
-      padding: 1rem;
-    }
-  
-    .mapa-container #map {
-      height: 300px;
-    }
+
+  nav.menu {
+    width: 200px;
+    padding-top: 100px;
   }
-    
+
+  nav.menu ul li a {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .submenu-list li a {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+/* Por defecto en PC: oculta el h2 móvil */
+.titulo-movil {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .titulo-movil {
+    display: block;
+    font-size: 1.1rem;
+    color: #000;
+    text-align: center;
+    margin: 0;
+  }
+}
