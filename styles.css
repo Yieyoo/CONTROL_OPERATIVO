@@ -42,7 +42,6 @@ body::before {
   background-repeat: no-repeat;
   z-index: -1;
   pointer-events: none;
-
 }
 
 /* Asegurar que el contenido esté por encima */
@@ -87,7 +86,7 @@ margin-top: -50px;   /* 🔽 Más cerca del contenido de arriba */
 margin-bottom: 20px;
 }
 
-/* --- Menú lateral mejorado --- */
+/* --- Menú lateral estilizado --- */
 nav.menu {
   position: fixed;
   top: 0;
@@ -95,16 +94,19 @@ nav.menu {
   width: 250px;
   height: 100%;
   background-color: #691932;
-  padding-top: 150px; /* Ajusta la distancia desde la parte superior */
-  transition: left 0.3s ease;
+  padding-top: 130px;
+  transition: left 0.4s ease;
   z-index: 1000;
-  box-shadow: 2px 0 15px rgba(186, 28, 28, 0.3);
+  box-shadow: 8px 0 20px rgba(0, 0, 0, 0.3);
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 nav.menu.active {
-  left: 0; /* Activa el menú cuando tiene la clase 'active' */
+  left: 0;
 }
 
+/* Fondo overlay */
 .menu-overlay {
   display: none;
   position: fixed;
@@ -113,85 +115,86 @@ nav.menu.active {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  z-index: 999;
 }
 
 .menu-overlay.active {
   display: block;
 }
 
+/* Lista del menú */
 nav.menu ul {
   list-style-type: none;
-  padding: 0;
-  margin-top: 70; /* Elimina el margen superior de las opciones principales */
+  padding: 0 15px;
+  margin-top: 20px;
 }
 
 nav.menu ul li {
-  position: relative; /* Necesario para submenús */
+  margin-bottom: 12px;
 }
 
 nav.menu ul li a {
   text-decoration: none;
   color: white;
-  font-size: 14px;
+  font-size: 15px;
   display: block;
-  padding: 12px 15px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 18px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
-  border-radius: 4px;
-  margin-bottom: 8px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
 }
 
 nav.menu ul li a:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: translateX(5px);
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(6px);
 }
 
-/* --- Submenú refinado --- */
-/* Aseguramos que el submenú tenga un scroll fijo */
+/* --- Submenú con diseño más suave --- */
 .submenu-list {
   display: none;
-  padding-left: 10px;
-  border-radius: 4px;
+  padding-left: 15px;
   animation: fadeIn 0.3s ease;
-  max-height: 350px; /* Altura máxima del submenú */
-  overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
-  position: sticky; /* Hace que el submenú se quede fijo al hacer scroll */
-  top: 0; /* Se mantendrá en la parte superior de su contenedor */
+  max-height: 350px;
+  overflow-y: auto;
+  margin-top: 8px;
 }
 
 .submenu.active .submenu-list {
   display: block;
 }
 
-
 .submenu-list li a {
-  padding: 8px 15px;
-  font-size: 13px;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 10px 16px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  transition: all 0.3s ease;
 }
 
 .submenu-list li a:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
 }
 
-/* --- Botón de menú mejorado --- */
+/* --- Botón de menú flotante y redondeado --- */
 .menu-toggle {
   background-color: #A5852E;
   color: white;
   border: none;
-  width: 50px;
-  height: 50px;
-  font-size: 20px;
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
   cursor: pointer;
   position: fixed;
   top: 75px;
   left: 15px;
   border-radius: 50%;
   z-index: 100000;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -200,41 +203,36 @@ nav.menu ul li a:hover {
 
 .menu-toggle:hover {
   background-color: #c49d3a;
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
-/* --- Submenú con desplazamiento --- */
+/* Scroll del submenú */
 .submenu {
-  max-height: 400px; /* Ajusta la altura máxima según necesites */
-  overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
-  scrollbar-width: thin; /* Para navegadores como Firefox */
-  scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c09404 transparent;
+  padding-right: 5px;
 }
 
-/* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
 .submenu::-webkit-scrollbar {
-  width: 6px; /* Ancho de la barra */
+  width: 6px;
 }
 
 .submenu::-webkit-scrollbar-thumb {
-  background-color: #c09404; /* Color de la barra */
-  border-radius: 3px; /* Bordes redondeados */
+  background-color: #c09404;
+  border-radius: 4px;
 }
 
 .submenu::-webkit-scrollbar-track {
-  background: transparent; /* Fondo de la barra */
+  background: transparent;
 }
 
-/* --- Animación de desvanecimiento para los submenús --- */
+/* Animaciones suaves */
 @keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-
 .logo-arriba-img {
   height: 50px;
   margin-right: 10px;
