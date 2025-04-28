@@ -174,7 +174,7 @@ nav.menu ul li a:hover {
     font-size: 20px;
     cursor: pointer;
     position: fixed;
-    top: 100px;
+    top: 15px;
     left: 15px;
     border-radius: 50%;
     z-index: 1001;
@@ -201,22 +201,32 @@ nav.menu ul li a:hover {
     gap: 40px;
     background-color: #fff;
     border-radius: 20px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    position: relative; /* Esto es necesario para posicionar elementos dentro del contenedor */
+    box-shadow: 0 6px 15px rgba(210, 195, 195, 0.15);
+    position: relative;
+    min-height: 500px; /* Altura mínima */
 }
 
 .logo-img {
     position: absolute;
-    top: 20px; /* Ajusta la distancia desde la parte superior */
-    right: 20px; /* Ajusta la distancia desde la parte derecha */
-    width: 100px; /* Ajusta el tamaño del logo */
-    height: auto; /* Mantiene la relación de aspecto */
+    top: 20px;
+    right: 20px;
+    width: 100px;
+    height: auto;
+    z-index: 10;
 }
 
+/* Contenedor flexible para contenido */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
 
 /* Lado izquierdo - Perfil */
 .profile-left {
     width: 250px;
+    min-height: 100%;
     background-image: url('../../imagenes/decoficha.png');
     background-size: cover;
     background-position: center;
@@ -224,6 +234,15 @@ nav.menu ul li a:hover {
     box-sizing: border-box;
     text-align: center;
     color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenido ajustable */
+.scrollable-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .foto-perfil {
@@ -231,8 +250,9 @@ nav.menu ul li a:hover {
     max-width: 140px;
     height: 140px;
     border-radius: 50%;
-    margin-bottom: 20px;
+    margin: 0 auto 20px auto;
     border: 2px solid #c09404;
+    object-fit: cover;
 }
 
 .profile-left h1 {
@@ -240,6 +260,7 @@ nav.menu ul li a:hover {
     color: #fff;
     margin-bottom: 12px;
     font-weight: 600;
+    line-height: 1.3;
 }
 
 .profile-left p {
@@ -247,40 +268,14 @@ nav.menu ul li a:hover {
     font-weight: 500;
     margin-bottom: 15px;
 }
-.formacion-academica {
+
+.formacion-academica,
+.contacto {
     margin-top: 18px;
     text-align: left;
-    padding-left: 10px; /* Le damos un pequeño margen interno a la izquierda */
 }
 
-.formacion-academica h3 {
-    color: #fff;
-    font-size: 17px; /* Puedes aumentar un poco el tamaño si quieres más presencia */
-    font-weight: 600;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #fff;
-    padding-bottom: 5px;
-    text-align: left; /* Muy importante para que el título también esté a la izquierda */
-}
-
-.formacion-academica ul {
-    list-style: none; /* Quitamos viñetas normales para usar las tuyas (▴) */
-    padding-left: 0;
-    margin: 0;
-}
-
-.formacion-academica ul li {
-    font-size: 15px;
-    margin-bottom: 10px;
-    color: #fff;
-    text-align: left; /* Muy importante para que cada línea esté a la izquierda */
-}
-.contacto {
-    margin-top: 19px;
-    padding-left: 10px; /* Pequeño espacio a la izquierda */
-    text-align: left;
-}
-
+.formacion-academica h3,
 .contacto h3 {
     color: #fff;
     font-size: 17px;
@@ -288,76 +283,71 @@ nav.menu ul li a:hover {
     margin-bottom: 12px;
     border-bottom: 1px solid #fff;
     padding-bottom: 5px;
-    text-align: left;
 }
 
-.contacto ul {
-    list-style: none; /* Quitamos viñetas para control visual */
-    padding-left: 0;
-    margin: 0;
-}
-
+.formacion-academica ul li,
 .contacto ul li {
     font-size: 15px;
     margin-bottom: 10px;
     color: #fff;
-    text-align: left;
+    line-height: 1.4;
 }
 
 .contacto ul li a {
-    color: #c09404; /* Color dorado para resaltar el correo */
-    text-decoration: none; /* Quitamos el subrayado si quieres que se vea más limpio */
+    color: #c09404;
+    text-decoration: none;
+    word-break: break-all;
 }
 
 .contacto ul li a:hover {
-    text-decoration: underline; /* Opcional: subrayar al pasar el mouse */
+    text-decoration: underline;
 }
-
 
 /* Lado derecho */
 .profile-right {
     flex: 2;
-    padding: 15px;
-    box-sizing: border-box;
-    background-color: #fff;
-    color: #691932;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
 }
 
-/* ===============================
-    6. Secciones Específicas
-================================== */
-/* Formación Académica y Contacto */
-/* Experiencia Laboral */
+.experiencia-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .experiencia-laboral {
-    margin-top: 100px; /* Agrega un margen superior para que la información se genere más abajo */
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .experiencia-laboral h3 {
     color: #A67C00;
     font-size: 25px;
     font-weight: 700;
-    margin-bottom: 15px; /* Más espacio debajo del título */
-    border-bottom: 2px solid #691932; /* Línea más visible */
-    padding-bottom: 8px; /* Separación más cómoda */
+    margin-bottom: 15px;
+    border-bottom: 2px solid #691932;
+    padding-bottom: 8px;
 }
 
 .experiencia-laboral p {
     font-size: 20px;
     font-weight: 600;
-    margin-bottom: 10px; /* Más separación entre párrafos */
-    line-height: 1.5; /* Mejora de interlineado */
+    margin-bottom: 10px;
+    line-height: 1.5;
 }
 
 .experiencia-laboral ul > li {
-    font-size: 20px; /* Un poquito más grande */
-    margin-bottom: 10px; /* Más espacio entre puntos */
+    font-size: 20px;
+    margin-bottom: 10px;
     color: #691932;
-    line-height: 1.6; /* Mejor interlineado */
-    text-align: justify; /* Justificar el texto si quieres que quede parejo a los lados */
+    line-height: 1.6;
 }
 
 .experiencia-laboral ul ul {
-    padding-left: 20px; /* Más sangría para sub-listas */
+    padding-left: 20px;
 }
 
 .experiencia-laboral ul ul li {
@@ -366,29 +356,9 @@ nav.menu ul li a:hover {
     line-height: 1.5;
 }
 
-
 /* ===============================
-    7. Botones (Regresar, Descargar)
+    6. Botones
 ================================== */
-.regresar-btn {
-    background-color: #691932;
-    color: white;
-    border: none;
-    padding: 12px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    position: fixed;
-    top: 40px;
-    left: 20px;
-    border-radius: 5px;
-    z-index: 1000;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease;
-}
-
-.regresar-btn:hover {
-    background-color: #8e5c71;
-}
 .boton-descarga {
     display: inline-block;
     background-color: #c09404;
@@ -400,15 +370,36 @@ nav.menu ul li a:hover {
     font-size: 16px;
     box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
     transition: background-color 0.3s ease;
-    margin-top: 110px; /* Agrega un margen superior para que se genere más abajo */
+    margin-top: 20px;
+    align-self: center;
 }
 
 .boton-descarga:hover {
     background-color: #a57903;
 }
 
+.regresar-btn {
+    background-color: #691932;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+.regresar-btn:hover {
+    background-color: #8e5c71;
+}
+
 /* ===============================
-    8. Fecha Actual
+    7. Fecha Actual
 ================================== */
 .fecha-actual {
     position: fixed;
@@ -431,7 +422,7 @@ nav.menu ul li a:hover {
 }
 
 /* ===============================
-    9. Responsive (Pantallas pequeñas)
+    8. Responsive (Pantallas pequeñas)
 ================================== */
 @media (max-width: 768px) {
     .container {
@@ -440,46 +431,37 @@ nav.menu ul li a:hover {
         margin: 100px auto 20px auto;
         padding: 15px;
         gap: 20px;
+        min-height: auto;
     }
 
     .profile-left {
         width: 100%;
-        padding: 15px;
-        background-color: #691932;
-        border-bottom: 2px solid #c09404;
-        border-radius: 10px;
+        min-height: auto;
+    }
+
+    .profile-right {
+        width: 100%;
     }
 
     .foto-perfil {
         width: 100px;
         height: 100px;
-        margin: 0 auto 10px auto;
     }
 
-    .profile-left h1,
-    .profile-left p,
     .formacion-academica h3,
     .contacto h3,
-    .formacion-academica ul li,
-    .contacto ul li {
-        text-align: center;
-    }
-
-    .profile-right {
-        width: 100%;
-        padding: 15px;
-        border-radius: 10px;
-    }
-
     .experiencia-laboral h3 {
-        font-size: 20px;
-        text-align: center;
+        font-size: 18px;
     }
 
-    .experiencia-laboral p,
-    .carrera-profesional ul li {
+    .formacion-academica ul li,
+    .contacto ul li,
+    .experiencia-laboral ul > li {
         font-size: 14px;
-        text-align: center;
+    }
+
+    .experiencia-laboral ul ul li {
+        font-size: 13px;
     }
 
     .fecha-actual {
@@ -488,11 +470,34 @@ nav.menu ul li a:hover {
         font-size: 12px;
         padding: 6px 12px;
     }
+
+    .menu-toggle {
+        top: 15px;
+    }
 }
 
-@media (max-width: 600px) {
-    .carrera-profesional {
-        padding: 0 15px;
+@media (max-width: 480px) {
+    .profile-left h1 {
+        font-size: 17px;
+    }
+    
+    .profile-left p {
+        font-size: 14px;
+    }
+    
+    .experiencia-laboral h3 {
+        font-size: 20px;
+    }
+    
+    .experiencia-laboral p {
         font-size: 16px;
+    }
+    
+    .experiencia-laboral ul > li {
+        font-size: 15px;
+    }
+    
+    .experiencia-laboral ul ul li {
+        font-size: 14px;
     }
 }
