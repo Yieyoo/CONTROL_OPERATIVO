@@ -4,25 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Dra. Bertha Paola Sánchez Orozco </title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
  
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -64,13 +87,12 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
         </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
         <img src="../../../fotos/titulargrr.png" alt="Foto de Esther Martínez" class="foto-perfil">
@@ -123,22 +145,19 @@
                     <li><strong>01/08/2019 - 15/07/2021:  </strong> Coordinación de Unidad en Áreas de  Servicios Migratorios.</li>
                 </ul>
             </ul>
-        </div>
         <!-- Carrera Profesional -->
         <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <p>Cuenta con una trayectoria de más de 3 años de experiencia en la Administración Pública y en el sector privado, ocupando los siguientes cargos, entre otros:</p>
-            <ul>
-                <li>▴<strong>Psicóloga Infantil.</strong></li>
-                <li>▴<strong>Psicopedagoga.</strong></li>             
-            </ul>
-        </div>
+                    <h3>Carrera Profesional</h3>
+                    <ul>
+                        <li>Cuenta con más de 10 años de experiencia en la Administración Pública y en el sector privado, ocupando los siguientes cargos, entre otros:</li>
+                        <li><strong>▴ Contadora General:</strong> Audio Digital El Puma S.A. de C.V.</li>
+                        <li><strong>▴ Jefa de Departamento del Área de Asistencia al Contribuyente:</strong> Secretaría de Hacienda y Crédito Público.</li>
+                        <li><strong>▴ Asesor Fiscal:</strong> Secretaría de Hacienda y Crédito Público.</li>
+                    </ul>
+                        
         <div style="text-align:center; margin-top: 20px;">
             <a href="../../../documentacion/fichas_curriculares/guerrerof/FICHA CURRICULAR OR GUERRERO.pptx" download class="boton-descarga"> Descargar Ficha</a>
         </div>
-        
-        
-
 <script>
     function toggleMenu() {
         const menu = document.querySelector('.menu');
