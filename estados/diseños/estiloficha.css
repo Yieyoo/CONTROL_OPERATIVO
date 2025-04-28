@@ -182,15 +182,15 @@ nav.menu ul li a:hover {
     transform: translateX(-50%) scale(1.03);
 }
 
-.container {
-    max-width: 1000px;
-    margin: 60px auto 0 auto; /* top | right | bottom | left */
-    padding: 20px;
+.profile-left {
+    width: 250px;
+    min-height: 100%;
     display: flex;
-    gap: 30px;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    background: #691932;
+    color: white;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .profile-left {
@@ -260,11 +260,10 @@ ul li {
 
 /* Lado derecho con fondo blanco */
 .profile-right {
-    flex: 2;
-    padding: 15px;
-    box-sizing: border-box;
-    background-color: #fff; /* Fondo blanco */
-    color: #691932; /* Texto negro para contraste */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
 }
 
 .experiencia-laboral h3 {

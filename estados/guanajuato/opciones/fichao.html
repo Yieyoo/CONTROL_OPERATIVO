@@ -3,19 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional - Mtra. Paola López Rodas</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Marcela Rueda Luna</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
- 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -64,157 +86,102 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titulargua.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Mtra. Paola López Rodas</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Guanajuato</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+        <div class="container">
+            <!-- Logo posicionado dentro del contenedor -->
+            <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴ Maestría en Criminalística.</strong></li>
-                <li><strong>▴ Licenciatura en Derecho.</strong></li>
-            </ul>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titulargua.png" alt="Foto de zaria carrasco" class="foto-perfil">
+            <h1>Marcela Rueda Luna</h1>
+            <p><strong>Encargada de la Oficina de Representación del INM en Guanajuato</strong></p>
+
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
+                <ul>
+                    <li><strong>▴Licenciatura en Relaciones Internacionales. </strong></li>
+                    <li><strong>▴Diplomado en Seguridad Ciudadana y Prevención. </strong></li>
+                    <li><strong>▴Dipolomado en Relaciones  Internacionales.</strong></li>
+                </ul>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
+                <ul>
+                    <li><strong>Teléfono Personal:</strong> 8442185540</li>
+                    <li><strong>Teléfono de Trabajo:</strong>477 716 9352 ext. 61600</li>
+                    <li><strong>Email Institucional:</strong> <a href="mruedal@inami.gob.mx">mruedal@inami.gob.mx</a></li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
-            <ul>
-                <li><strong>Teléfono Personal:</strong> 9511428341</li>
-                <li><strong>Teléfono de Trabajo:</strong> 4777169352 Ext. 61600</li>
-                <li><strong>Email Institucional:</strong> <a href="prodas@inami.gob.mx">prodas@inami.gob.mx</a></li>
-            </ul>
-        </div>
-    </div>  
-
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2012</p>
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Guanajuato</strong></li>
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
+                
+                <h3>Experiencia Laboral</h3>
+                <p>Cuenta con una trayectoria de más de 12 años de experiencia en el Instituto Nacional de Migración, ocupando los siguientes cargos:</p>
                 <ul>
-                    <li><strong>16/06/2023 - a la fecha:  </strong> Titular de la Oficina de  Representación.</li>
-                </ul>
-
-                <li><strong>▴ Oficina de Representación en el Estado de Oaxaca</strong></li>
-                <ul>
-                    <li><strong>16/01/2023 – 15/06/2023:  </strong>Titular de la Oficina de Representación.</li>
-                </ul>
-                <li><strong>▴ Oficina de Representación en el Estado de Chiapas</strong></li>
-
-                <ul>
-                    <li><strong>16/01/2022 – 15/01/2023:  </strong> Titular de la Oficina de Representación.</li>
-                    <li><strong>01/06/2019 -15/01/2022:  </strong> Sub Representante Federal Zona Sur.</li>
-                    <li><strong>16/03/2015 – 31/05/2019:  </strong> Delegada Local Cuauhtémoc. </li>
-                    <li><strong>16/04/2012 – 15/03/2015:  </strong> Sub Delegada Local Suchiate II.
+                    <li><strong>Año de ingreso al INM:</strong> 2013.</li>
+                    <li><strong>▴Oficina de Representación en el Estado de Guanajuato:</strong>
+                        <ul>
+                            <li>01/03/2025 – Actual: Titular de la Oficina de Representación.</li>
+                        </ul>
                     </li>
-
+                    <li><strong>▴Instituto Nacional de Migración – Nuevo Laredo, Tamaulipas:</strong>
+                        <ul>
+                            <li>16/05/2023 – 28/02/2025: Subrepresentante Federal del INM.</li>
+                            <li>16/05/2021 – 15/05/2023: Subdirectora de Control y Supervisión Operativa.</li>
+                            <li>16/01/2021 – 15/05/2021: Jefa de Departamento.</li>
+                        </ul>
+                    </li>
+                    <li><strong>▴Oficina de Representación en el Estado de Coahuila:</strong>
+                        <ul>
+                            <li>16/04/2014 – 31/05/2018: Jefa de Control Migratorio del INM.</li>
+                            <li>16/04/2013 – 15/05/2014: Jefa de Trámite y Archivo Migratorio del INM.</li>
+                        </ul>
+                    </li>
                 </ul>
-            </ul>
+                <div class="carrera-profesional">
+                    <h3>Carrera Profesional</h3>
+                    <ul>
+                <p>Cuenta con una trayectoria profesional de más de 12 años en el servicio público y privado, desempeñando los siguientes cargos:</p>
+                <ul>
+                    <li><strong>▴Secretaría de Relaciones Exteriores – Ciudad de México:</strong> Participación en Proyecto Eventual de la SRE.</li>
+                    <li><strong>▴PEAU NEUVE – Saltillo, Coahuila:</strong> Gerente de Desarrollo de Proyectos.</li>
+                    <li><strong>▴Secretaría de Gobierno del Estado de Coahuila – Saltillo, Coahuila:</strong> Jefa de Seguimiento en el Despacho del Secretario de Gobierno del Estado.</li>
+                    <li><strong>▴Subsecretaría de Protección Civil del Estado de Coahuila – Saltillo, Coahuila:</strong> Secretaria Particular del Titular.</li>
+                    <li><strong>▴Luna Labs México – Saltillo, Coahuila:</strong> Asistente de Gerencia.</li>
+                </ul>
+                
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/chiapasf/CHIAPAS.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
-        <!-- Carrera Profesional -->
-        <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <p>Cuenta con una trayectoria de más de 20 años de experiencia en la Administración Pública, ocupando los siguientes cargos, entre otros:</p>
-            <ul>
-                <li>▴<strong>Secretaria Técnica del Consejo Municipal de Suchiate en Proceso Electoral y Auxiliar Jurídico. </strong>Instituto Electoral de Chiapas.</li>
-                <li>▴<strong>Auxiliar Jurídico. Centro de Reinserción Social para Sentenciados N° 03.</strong></li>
-                <li>▴<strong>Analista “B”. Fiscalía General del Estado de Chiapas.</strong></li>
-          
-            </ul>
-        </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/guanajuatof/FICHA CURRICULAR OR GUANAJUATO.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-        
-        
+    </div>
 
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
