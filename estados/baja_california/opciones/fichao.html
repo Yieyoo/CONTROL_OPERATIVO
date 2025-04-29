@@ -4,18 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Mtro. Jorge Alejandro Palau Hernández</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
- 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -64,166 +86,98 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularbcn.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Mtro. Jorge Alejandro Palau Hernández</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Baja California</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+    <div class="container">
+        <!-- Logo posicionado dentro del contenedor -->
+        <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴Maestría en Política Criminal.</strong></li>
-                <li><strong>▴Licenciatura en Derecho.</strong></li>
-            </ul>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titularbcn.png" alt="Foto de Farah Cerdio" class="foto-perfil">
+            <h1>Mtro. Ignacio Fraire Zúñiga</h1>
+            <p><strong>Encargada de la Oficina de Representación del INM en Chiapas</strong></p>
+
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
+                <ul>
+                    <li><strong>▴ Maestría </strong> en Política Criminal.</li>
+                    <li><strong>▴ Licenciatura </strong>en Derecho.</li>
+                </ul>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
+                <ul>
+                    <li><strong>Teléfono Personal:</strong>5551920362</li>
+                    <li><strong>Teléfono de Trabajo:</strong>6646366017  ext. 8210 218</li>
+                    <li><strong>Email Institucional:</strong> <a href="jpalau@inami.gob.mx">jpalau@inami.gob.mx</a></li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
-            <ul>
-                <li><strong>Teléfono Personal:</strong> 5551920362</li>
-                <li><strong>Teléfono de Trabajo:</strong> : 6646366017 Ext. 8210218</li>
-                <li><strong>Email Institucional:</strong> <a href="jpalau@inami.gob.mx">jpalau@inami.gob.mx</a></li>
-            </ul>
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
+                <h3>Experiencia Laboral</h3>
+                <p><strong>Año de ingreso al INM:</strong> 2019</p>
+                <p><strong>Oficina de Representación en el Estado de Baja California:</strong></p>
+                <ul>
+                    <li><strong>01/10/2024 - a la fecha:</strong> Titular de la Oficina de Representación.</li>
+                </ul>
+                <p><strong>Dirección General de Control y Verificación Migratoria:</strong></p>
+                <ul>
+                    <li><strong>16/02/2023 – 30/09/2024:</strong> Director de Estaciones Migratorias.</li>
+                </ul>
+                <p><strong>Oficina de Representación en el Estado de Veracruz:</strong></p>
+                <ul>
+                    <li><strong>16/03/2022 – 15/01/2023:</strong> Director de la Estación Migratoria.</li>
+                </ul>
+                <p><strong>Dirección General del Centro de Control y Confianza:</strong></p>
+                <ul>
+                    <li><strong>16/10/2021 – 15/03/2022:</strong> Director de Investigación Socioeconómica.</li>
+                </ul>
+                <p><strong>Oficina de Representación en el Estado de Chiapas:</strong></p>
+                <ul>
+                    <li><strong>16/02/2021 – 15/10/2021:</strong> Director de la Estación Migratoria.</li>
+                </ul>
+                <p><strong>Oficina de Representación en la Ciudad de México:</strong></p>
+                <ul>
+                    <li><strong>16/03/2020 – 15/02/2021:</strong> Director de la Estación Migratoria.</li>
+                    <li><strong>01/10/2019 – 15/03/2020:</strong> Subdirector de Servicios Operativos y Atención al Migrante y Subdirector de Enlace Administrativo en la Estación Migratoria.</li>
+                </ul>
+                <h3>Carrera Profesional</h3>
+                <ul>
+                    <li><strong>Secretaría de Seguridad y Protección Ciudadana:</strong> Órgano Administrativo Desconcentrado de Prevención y Readaptación Social - Subdirector de Enlace Administrativo.</li>
+                    <li><strong>Gobierno del Distrito Federal:</strong> Secretaría de Transporte y Vialidad - Dirección de Licencias y Control Vehicular.</li>
+                </ul>
+
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/baja_californiaf/BAJA CALIFORNIA.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
     </div>
 
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2019</p>
-            <ul>
-                <li><strong>▴ Oficina de Representación en el Estado de Baja California.</strong></li>
-                <ul>
-                    <li><strong>01/10/2024 - Actualidad:</strong> Titular de la Oficina de Representación (Baja California)</li>
-                </ul>
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-                <li><strong>▴ Dirección General de Control y Verificación Migratoria.</strong></li>
-                <ul>
-                    <li><strong>16/02/2023 – 30/09/2024:</strong> Director de Estaciones Migratorias.
-                    </li>
-                </ul>
-                
-                <li><strong>▴ Oficina de Representación en el Estado de Veracruz.</strong></li>
-                <ul>
-                    <li><strong>16/03/2022 - 15/01/2023 </strong> Director de la Estación Migratoria.</li>
-                </ul>
-
-                <li><strong>▴ Dirección General del Centro de Control y Confianza.</strong></li>
-                <ul>
-                    <li><strong>16/10/2021 - 15/03/2022:</strong> Director de Investigación Socioeconómica.</li>
-                </ul>
-                <li><strong>▴ Oficina de Representación en el Estado de Chiapas.</strong></li>
-                <ul>
-                    <li><strong>16/02/2021 - 15/10/21:</strong> Director de la Estación Migratoria.</li>
-                </ul>
-
-                <li><strong>▴ Oficina de Representación en la Ciudad de México.</strong></li>
-                <ul>
-                    <li><strong>16/03/2020 - 15/02/2021:</strong> Director de  la Estación Migratoria.</li>
-                    <li><strong>01/10/2019 - 15/03/2020:</strong>Subdirector de Servicios Operativos y    Atención al Migrante y Subdirector de Enlace Administrativo en la Estación Migratoria.</li>
-                </ul>
-            </ul>
-        </div>
-
-        <!-- Carrera Profesional -->
-        <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <ul>
-                <li><strong>▴Subdirector de Enlace Administrativo. Secretaría de Seguridad y Protección Ciudadana. Órgano Administrativo Desconcentrado de Prevención y Readaptación Social.</strong></li>
-                <li><strong>▴Dirección de Licencias y Control Vehicular. Gobierno del Distrito Federal. Secretaría de Transporte y Vialidad.</strong></li>
-            </ul>
-        </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/baja_californiaf/BAJA CALIFORNIA.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-        
-        
-
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
-
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
