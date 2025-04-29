@@ -3,19 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional - Vicealmirante Guillermo Mejía George</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Lic. Cinthya Dalel Huerta Ayala</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
- 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -64,146 +86,89 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularSNL.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Vicealmirante Guillermo Mejía George</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Sinaloa</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+        <div class="container">
+            <!-- Logo posicionado dentro del contenedor -->
+            <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴Maestría en Administración Naval y Administración Militar para la Seguridad y Defensa Nacionales.</strong></li>
-                <li><strong>▴Licenciatura en Ingeniería en Ciencias Navales.</strong></li>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titularSNL.png" alt="Foto de zaria carrasco" class="foto-perfil">
+            <h1>Lic. Cinthya Dalel Huerta Ayala</h1>
+            <p><strong>Encargada de la Oficina de Representación del INM en Sinaloa</strong></p>
+
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
+                <ul>
+                    <li><strong>▴Licenciatura en Psicología.</strong></li>
+                </ul>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
+                <ul>
+                    <li><strong>Teléfono Personal:</strong> 5543658842</li>
+                    <li><strong>Teléfono de Trabajo:</strong>669 981 3813 ext.8560201</li>
+                    <li><strong>Email Institucional:</strong> <a href="cdhuerta@inami.gob.mx">cdhuerta@inami.gob.mx</a></li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
+                
+                <h3>Experiencia Laboral</h3>
             <ul>
-                <li><strong>Teléfono Personal:</strong>4434916441</li>
-                <li><strong>Teléfono de Trabajo:</strong>6698813813 Ext. 8560201</li>
-                <li><strong>Email Institucional:</strong> <a href="gmejia@inami.gob.mx">gmejia@inami.gob.mx</a></li>
-            </ul>
+                <li><strong>Cuenta con una trayectoria de 22 años de experiencia en el Instituto Nacional de Migración, ocupando los siguientes cargos:</strong></li>
+                <li><strong>Año de ingreso al INM:</strong> 2003/2025</li>
+                <li><strong>▴ Oficina de Representación en el Estado de Sinaloa:</strong></li>
+                <ul>
+                    <li>01/04/2025 – a la fecha: Titular de la Oficina de Representación.</li>
+                    <li>16/09/2020 – 31/05/2024: Sub Representante Federal (Directora de Área).</li>
+                </ul>
+                <li><strong>▴ Dirección General de Coordinación de Oficinas de Representación:</strong></li>
+                <ul>
+                    <li>01/09/2017 – 15/09/2020: Subdirectora de Control Operativo Zona Centro.</li>
+                    <li>01/02/2012 – 31/08/2017: Jefa de Departamento de Enlace Operativo Zona Sur.</li>
+                    <li>01/10/2010 – 31/01/2012: Agente de Protección al Migrante.</li>
+                    <li>16/05/2010 – 30/09/2010: Agente Federal de Migración “C”.</li>
+                </ul>
+                <li><strong>▴ Oficina de Representación en Zacatecas:</strong></li>
+                <ul>
+                    <li>16/07/2006 – 15/05/2010: Agente Federal de Migración “B”.</li>
+                </ul>
+                <li><strong>▴ Oficina de Representación en Ciudad de México:</strong></li>
+                <ul>
+                    <li>01/06/2003 – 15/07/2006: Agente Federal de Migración “B”.</li>
+                    <li>16/05/2003 – 31/05/2003: Supervisor de Servicios Migratorios.</li>
+                </ul>
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/guanajuatof/FICHA CURRICULAR OR GUANAJUATO.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
     </div>
 
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2022</p>
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Sinaloa</strong></li>
-                <ul>
-                    <li><strong>16/01/2024 - a la fecha:</strong> Titular de la Oficina de  Representación.</li>   
-                </ul>
-                
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Michoacán</strong></li>
-                <ul>
-                    <li><strong>01/01/2022 – 15/01/2024: </strong> Titular de la Oficina de  Representación.</li>   
-                </ul>
-            </ul>
-        <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <ul>
-                <p>Cuenta con una trayectoria de más de 40 años de experiencia en la Marina de México, ocupando los siguientes cargos, entre otros:</p>
-                <li>▴Oficial de Cargo, Segundo Comandante y Comandante en Unidades de Superficie;</li>
-                <li>▴Jefe de Sección de Grupo de Comando en la Cuarta Flotilla de Unidades de Vigilancia Oceánica;</li>
-                <li>▴Jefe de Sección Segunda en Diferentes Regiones y Zonas Navales;</li>
-                <li>▴Subjefe de Ayudantes del Secretario de Marina;</li>
-                <li>▴Subinspector de Establecimientos Logísticos en la Inspección y Contraloría General de Marina;</li>
-                <li>▴Jefe de Ayudantes del Inspector y Contralor de Marina;</li>
-                <li>▴Director de Soporte Académico y Logístico en el Centro de Estudios Superiores Navales.</li>
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-            </ul>
-        </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/sinaloaf/FICHA CURRICULAR OR SINALOA.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
-
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
-</html>
