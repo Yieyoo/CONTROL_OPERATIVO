@@ -3,22 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional - Gral. Jesús Antonio Montaño  Juárez</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Lic. Dalia Ivette Pérez Aguilar</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
- 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">6
+                    <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
@@ -64,156 +86,93 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularqrt.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Gral. Jesús Antonio Montaño  Juárez</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Querétaro</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+        <div class="container">
+            <!-- Logo posicionado dentro del contenedor -->
+            <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴Maestría en Administración Militar.</strong></li>
-                <li><strong>▴Licenciatura en Administración Militar.</strong></li>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titularqrt.png" alt="Foto de zaria carrasco" class="foto-perfil">
+            <h1>Lic. Dalia Ivette Pérez Aguilar</h1>
+            <p><strong>Encargada de la Oficina de Representación del INM en Querétaro</strong></p>
+
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
+                <ul>
+                    <li>Licenciatura en Antropología Social.</li>
+                    <li>Diplomado en Cultura: Teoría, Metodología y Responsabilidad Social.</li>
+                    <li>Licenciatura en Derecho.</li>
+                    <li>Especialidad en Derecho Migratorio.</li>
+                    <li>Maestría en Juicios Orales.</li>
+                </ul>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
+                <ul>
+                    <li><strong>Teléfono de Trabajo:</strong>44 2680 5256 ext. 8520200</li>
+                    <li><strong>Email Institucional:</strong> <a href="diperez@inami.gob.mx">diperez@inami.gob.mx</a></li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
-            <ul>
-                <li><strong>Teléfono Personal:</strong> 5612594186</li>
-                <li><strong>Teléfono de Trabajo:</strong> : 4422141538 Ext. 8520200</li>
-                <li><strong>Email Institucional:</strong> <a href="jmontano@inami.gob.mx">jmontano@inami.gob.mx</a></li>
-            </ul>
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
+                
+                <h3>Experiencia Laboral</h3>
+                <ul>
+                    <li><strong>Año de ingreso al INM:</strong> 2020</li>
+                    <li><strong>Oficina de Representación en el Estado de Querétaro:</strong></li>
+                    <ul>
+                        <li>01/02/2025 - a la fecha: Titular de la Oficina de Representación.</li>
+                    </ul>
+                    <li><strong>Dirección General del Centro de Evaluación y Control de Confianza:</strong></li>
+                    <ul>
+                        <li>16/01/2023 – 31/01/2025: Directora de Sistemas Seguridad de la Información y Administración.</li>
+                    </ul>
+                    <li><strong>Dirección General de Control y Verificación Migratoria:</strong></li>
+                    <ul>
+                        <li>01/06/2021 – 15/01/2023: Subdirectora de Operación de Estaciones Migratorias en la Dirección de Estaciones Migratorias.</li>
+                    </ul>
+                <div class="carrera-profesional">
+                    <h3>Carrera Profesional</h3>
+                    <ul>
+                        <li><strong>Conferencia Nacional del Sistema Penitenciario en Prevención y Readaptación Social:</strong> Jefa de Departamento</li>
+                        <li><strong>Dirección General de Políticas Públicas y Vinculación Interinstitucional en el Órgano Administrativo Desconcentrado Prevención y Readaptación Social:</strong> Jefa de Departamento</li>
+                        <li><strong>Secretaría del Bienestar:</strong> Servidor de la Nación</li>
+                    </ul>
+                </div>
+
+                    </ul>
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/guanajuatof/FICHA CURRICULAR OR GUANAJUATO.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
     </div>
 
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2012/2020</p>
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Querétaro</strong></li>
-                <ul>
-                    <li><strong>16/03/2022 - a la fecha:  </strong> Titular de la Oficina de  Representación.</li>   
-                </ul>
-                
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Guanajuato</strong></li>
-                <ul>
-                    <li><strong> 01/10/2021 – 15/03/2022:  </strong> Titular de la Oficina de  Representación.</li>   
-                </ul>
-                
-                <li><strong>▴Oficina de Representación en el Estado de México</strong></li>
-                <ul>
-                    <li><strong> 01/07/2020 – 30/09/2021:  </strong> Titular de la Oficina de  Representación.</li>   
-                </ul>
-        <!-- Carrera Profesional -->
-        <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <ul>
-                <p>Cuenta con una trayectoria de 40 años de experiencia en el sector de la Fuerza Armada de México, ocupando los siguientes cargos, entre otros:</p>
-                <li>▴Comandante del Escuadrón Aéreo de Pelea 211;</li>
-                <li>▴Comandante del Escuadrón Avanzado de la Escuela Militar de Aviación;</li>
-                <li>▴Comandante del Primer Grupo Aéreo;</li>
-                <li>▴Comandante de la Estación Aérea Militar N° 6;</li>
-                <li>▴Comandante de la Base Aérea Militar N° 16;</li>
-                <li>▴Comandante de la Base Aérea Militar N°4;</li>
-                <li>▴Director de la Escuela Militar de Aplicación Aero táctica de la Fuerza Aérea;</li>
-                <li>▴Jefe de Sección Primera (R.H.) del Estado Mayor de la Fuerza Aérea.</li>
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-
-            </ul>
-        </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/queretarof/FICHA CURRICULAR OR QUERÉTARO.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-        
-        
-
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
-
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
