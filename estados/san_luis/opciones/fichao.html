@@ -4,25 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Gral. Pedro León Álvarez Alcacio</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
  
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -64,16 +87,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularslp.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titularslp.png" alt="Foto del General" class="foto-perfil">
         <h1>Gral. Pedro León Álvarez Alcacio</h1>
         <p><strong>Titular de la Oficina de Representación del INM en San Luis Potosí</strong></p>
 
@@ -81,9 +102,10 @@
         <div class="formacion-academica">
             <h3>Formación Académica</h3>
             <ul>
-                <li><strong>▴Maestría en Administración Militar.</strong></li>
-                <li><strong>▴Licenciatura en Administración Militar.</strong></li>
-                <li><strong>▴Licenciatura en Ingeniería en Construcción Militar.</strong></li>
+                <li><strong>▴ Maestría en Administración Militar</strong></li>
+                <li><strong>▴ Licenciatura en Administración Militar</strong></li>
+                <li><strong>▴ Licenciatura en Ingeniería en Construcción Militar</strong></li>
+            </ul>
         </div>
 
         <!-- Información de Contacto -->
@@ -91,11 +113,11 @@
             <h3>Información de Contacto</h3>
             <ul>
                 <li><strong>Teléfono Personal:</strong> 5563006305</li>
-                <li><strong>Teléfono de Trabajo:</strong>4448331959 Ext. 8550200</li>
-                <li><strong>Email Institucional:</strong> <a href="palvarez@inami.gob.mx">palvarez@inami.gob.mx</a></li>
+                <li><strong>Teléfono de Trabajo:</strong> 4448331959 Ext. 8550200</li>
+                <li><strong>Email Institucional:</strong> <a href="mailto:palvarez@inami.gob.mx">palvarez@inami.gob.mx</a></li>
             </ul>
         </div>
-    </div>
+    </div>  
 
     <div class="profile-right">
         <!-- Experiencia Laboral -->
@@ -103,38 +125,38 @@
             <h3>Experiencia Laboral</h3>
             <p><strong>Año de Ingreso al INM:</strong> 2020</p>
             <ul>
-                <li><strong>▴Oficina de Representación en el Estado de San Luis Potosí</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de San Luis Potosí</strong></li>
                 <ul>
-                    <li><strong>01/06/2022 - a la fecha </strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>01/06/2022 - a la fecha:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Durango</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Durango</strong></li>
                 <ul>
-                    <li><strong>16/10/2021 – 31/05/2022 </strong> Titular de la Oficina de Representación.</li>   
+                    <li><strong>16/10/2021 – 31/05/2022:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-            </ul>
-            <li><strong>▴Oficina de Representación en el Estado de Aguascalientes</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Aguascalientes</strong></li>
                 <ul>
-                    <li><strong>01/01/2020 – 15/10/2021</strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>01/01/2020 – 15/10/2021:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
             </ul>
+            
         <!-- Carrera Profesional -->
         <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
+            <p>Cuenta con una trayectoria de más de 40 años de experiencia en la Secretaría de la Defensa Nacional, ocupando los siguientes cargos, entre otros:</p>
             <ul>
-                <p>Cuenta con una trayectoria de más de 40 años de experiencia en la Secretaría de la Defensa Nacional, ocupando los siguientes cargos, entre otros:</p>
-                <li>Director de Obras del Instituto de Seguridad Social para las Fuerzas Armadas Mexicanas;</li>
-                <li>▴Comandante de la Primera Brigada de Ingenieros del Primer Cuerpo del Ejército;</li>
-                <li>▴Director de la Escuela Militar de Ingenieros;</li>
-                <li>▴Subdirector General de la Dirección General de Ingenieros;</li>
-                <li>▴Agregado Adjunto de Defensa en la Agregaduría Militar de México en Estados Unidos de América.</li>
-
+                <li><strong>▴ Director de Obras</strong> del Instituto de Seguridad Social para las Fuerzas Armadas Mexicanas</li>
+                <li><strong>▴ Comandante de la Primera Brigada de Ingenieros</strong> del Primer Cuerpo del Ejército</li>
+                <li><strong>▴ Director de la Escuela Militar de Ingenieros</strong></li>
+                <li><strong>▴ Subdirector General</strong> de la Dirección General de Ingenieros</li>
+                <li><strong>▴ Agregado Adjunto de Defensa</strong> en la Agregaduría Militar de México en Estados Unidos de América</li>
             </ul>
         </div>
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/san_luisf/SAN LUIS POTOSI.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/san_luisf/SAN LUIS POTOSI.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
+    </div>
+</div>
+
 <script>
     function toggleMenu() {
         const menu = document.querySelector('.menu');
