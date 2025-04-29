@@ -3,27 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional -General Pedro Enrique Fernández Ortiz
-    </title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - General Pedro Enrique Fernández Ortiz</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
  
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -65,16 +87,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/tituladur.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/tituladur.png" alt="Foto del General" class="foto-perfil">
         <h1>General Pedro Enrique Fernández Ortiz</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Durango</strong></p>
 
@@ -91,7 +111,7 @@
         <div class="contacto">
             <h3>Información de Contacto</h3>
             <ul>
-                <li><strong>Teléfono Personal:</strong> 5522467264 </li>
+                <li><strong>Teléfono Personal:</strong> 5522467264</li>
                 <li><strong>Teléfono de Trabajo:</strong> 6188250914 Ext. 8360201</li>
                 <li><strong>Email Institucional:</strong> <a href="pfernandez@inami.gob.mx">pfernandez@inami.gob.mx</a></li>
             </ul>
@@ -104,41 +124,38 @@
             <h3>Experiencia Laboral</h3>
             <p><strong>Año de Ingreso al INM:</strong> 2021</p>
             <ul>
-                <li><strong>▴Oficina de Representación en el Estado Durango</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado Durango</strong></li>
                 <ul>
-                    <li><strong>01/06/2022 - a la fecha: </strong> Titular de la Oficina de  Representación. </li>
+                    <li><strong>01/06/2022 - a la fecha:</strong> Titular de la Oficina de Representación.</li>
                 </ul>
-
                 <li><strong>▴ Oficina de Representación en San Luis Potosí</strong></li>
                 <ul>
-                    <li><strong>01/10/2021 – 31/05/2022: </strong> Titular de la Oficina de Representación.</li>
+                    <li><strong>01/10/2021 – 31/05/2022:</strong> Titular de la Oficina de Representación.</li>
                 </ul>
                 <li><strong>▴ Oficina de Representación en Coahuila</strong></li>
-
                 <ul>
-                    <li><strong>16/03/2021 – 30/09/2021:  </strong> Titular de la Oficina de Representación.</li>
+                    <li><strong>16/03/2021 – 30/09/2021:</strong> Titular de la Oficina de Representación.</li>
                 </ul>
             </ul>
-        </div>
-
         <!-- Carrera Profesional -->
         <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
             <p>Cuenta con una amplia experiencia de 45 años en las Fuerzas Armadas, ocupando los siguientes cargos, entre otros:</p>
             <ul>
-                <li>▴ Comandante de tropas;</li>
-                <li>▴ Subjefe Operativo del Centro Nacional de Adiestramiento en Santa Gertrudis, Chihuahua;</li>
-                <li>▴ Subjefe del Área de Doctrina de la Sección Sexta del Estado Mayor de la Defensa Nacional;</li>
-                <li>▴ Comandante de Unidades Tipo Corporación;</li>
-                <li>▴ Subdirector Operativo de la Dirección General de Armas de Fuego y Control de Explosivos;</li>
-                <li>▴ Subdirector General de la Dirección General de Infantería.<li>
+                <li><strong>▴</strong> Comandante de tropas;</li>
+                <li><strong>▴</strong> Subjefe Operativo del Centro Nacional de Adiestramiento en Santa Gertrudis, Chihuahua;</li>
+                <li><strong>▴</strong> Subjefe del Área de Doctrina de la Sección Sexta del Estado Mayor de la Defensa Nacional;</li>
+                <li><strong>▴</strong> Comandante de Unidades Tipo Corporación;</li>
+                <li><strong>▴</strong> Subdirector Operativo de la Dirección General de Armas de Fuego y Control de Explosivos;</li>
+                <li><strong>▴</strong> Subdirector General de la Dirección General de Infantería;</li>
             </ul>
         </div>
+        
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/durangof/DURANGO.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/durangof/DURANGO.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
-        
-        
+    </div>
+</div>
 
 <script>
     function toggleMenu() {
@@ -197,11 +214,8 @@
         month: 'long',
         day: 'numeric'
     });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
 </script>
+
 <!-- Botón al final de tu documento HTML -->
 <button class="regresar-btn">Regresar</button>
 
