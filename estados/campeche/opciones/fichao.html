@@ -4,18 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Gral. Pedro Alberto Alcalá López</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
- 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -64,158 +86,91 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularcam.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Gral. Pedro Alberto Alcalá López</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Campeche</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+    <div class="container">
+        <!-- Logo posicionado dentro del contenedor -->
+        <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴Licenciatura en Contaduría.</strong></li>
-                <li><strong>▴Licenciatura en Administración Militar.</strong></li>
-                <li><strong>▴Licenciatura en Derecho.</strong></li>
-            </ul>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titularcam.png" alt="Foto de Farah Cerdio" class="foto-perfil">
+            <h1>Gral. Pedro Alberto Alcalá López</h1>
+            <p><strong>Titular de la Oficina de Representación del INM en Campeche</strong></p>
+
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
+                <ul>
+                    <li><strong>▴ Licenciatura</strong> en Contaduría.</li>
+                    <li><strong>▴ Licenciatura </strong>en Administración Militar.</li>
+                    <li><strong>▴ Licenciatura </strong>en Derecho.</li>
+                </ul>
+                </ul>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
+                <ul>
+                    <li><strong>Teléfono Personal:</strong> 5540900332</li>
+                    <li><strong>Teléfono de Trabajo:</strong>9818160369  ext. 8250222</li>
+                    <li><strong>Email Institucional:</strong> <br><a href="palcala@inami.gob.mx">palcala@inami.gob.mx</a></li>
+                </ul>
+            </div>
         </div>
 
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
+                <h3>Experiencia Laboral</h3>
+           
             <ul>
-                <li><strong>Teléfono Personal:</strong> 5540900332</li>
-                <li><strong>Teléfono de Trabajo:</strong> : 9818160369 Ext. 8250222</li>
-                <li><strong>Email Institucional:</strong> <a href="palcala@inami.gob.mx">palcala@inami.gob.mx</a></li>
+                <li><strong>Año de ingreso al INM:</strong> 2019</li>
+                <li><strong>▴Oficina de Representación en el Estado de Campeche:</strong><br>
+                    16/01/2024 - a la fecha: Titular de la Oficina de Representación.</li>
+                <li><strong>▴Oficina de Representación en el Estado de Guerrero:</strong><br>
+                    01/10/2021 – 15/01/2024: Titular de la Oficina de Representación.</li>
+                <li><strong>▴Oficina de Representación en el Estado de Chihuahua:</strong><br>
+                    16/10/2019 – 30/09/2021: Titular de la Oficina de Representación.</li>
             </ul>
+            <p><strong>Carrera Profesional:</strong></p>
+            <p>Cuenta con una trayectoria de 40 años de experiencia en el sector de la Fuerza Aérea y Armada, ocupando los siguientes cargos, entre otros:</p>
+            <ul>
+                <li>▴Jefe de la Subsección Administrativa</li>
+                <li>▴Gerente de Pago a Pensionados</li>
+                <li>▴Subdirector de Fondos de Ahorro y de Trabajo</li>
+                <li>▴Director de Administración</li>
+                <li>▴Jefe de la Sección de Personal</li>
+                <li>▴Jefe Regional del Servicio de Abastecimiento</li>
+                <li>▴Jefe de la Subsección Logística del Centro de Mando y Control del Sistema de Vigilancia Aérea</li>
+                <li>▴Jefe de la Segunda Sección de Inteligencia</li>
+            </ul>
+
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/campechef/CAMPECHE.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
     </div>
 
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2019</p>
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Campeche </strong></li>
-                <ul>
-                    <li><strong> 16/01/2024 - a la fecha: </strong> Titular de la Oficina de  Representación.</li>
-                </ul>
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-                <li><strong>▴ Oficina de Representación en el Estado de Guerrero </strong></li>
-                <ul>
-                    <li><strong>01/10/21 – 15/01/2024: </strong> Titular de la Oficina de  Representación.</li>
-                </ul>
-                
-                <li><strong>▴Oficina de Representación en el Estado de Chihuahua</strong></li>
-                <ul>
-                    <li><strong>16/10/2019 – 30/09/2021:  </strong> Titular de la Oficina de Representación.</li>
-                </ul>
-            </ul>
-        </div>
-
-        <!-- Carrera Profesional -->
-        <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <ul><p>Cuenta con una trayectoria de 40 años de experiencia en el sector de la Fuerza Aérea y Armada, ocupando los siguientes cargos, entre otros:</p>
-                <li><strong>▴Jefe de la Subsección Administrativa;</strong></li>
-                <li><strong>▴Gerente de Pago a Pensionados;</strong></li>
-                <li><strong>▴JSubdirector de Fondos de Ahorro y de Trabajo;</strong></li>
-                <li><strong>▴Director de Administración;</strong></li>
-                <li><strong>▴Jefe de la Sección de Personal;</strong></li>
-                <li><strong>▴Jefe Regional del Servicio de Abastecimiento;</strong></li>
-                <li><strong>▴Jefe de la Subsección Logística del Centro de Mando y Control del Sistema de Vigilancia Aérea;</strong></li>
-                <li><strong>▴DirectorJefe de la Segunda Sección de Inteligencia.</strong></li>
-                
-            </ul>
-        </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/campechef/CAMPECHE.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-        
-        
-
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
-
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
