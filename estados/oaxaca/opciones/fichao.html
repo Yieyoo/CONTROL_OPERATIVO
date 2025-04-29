@@ -4,24 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Lcda. Selene Mandujano Figueroa</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">    
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -63,16 +86,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularoax.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titularoax.png" alt="Foto de la Licenciada" class="foto-perfil">
         <h1>Lcda. Selene Mandujano Figueroa</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Oaxaca</strong></p>
 
@@ -81,6 +102,7 @@
             <h3>Formación Académica</h3>
             <ul>
                 <li><strong>▴ Licenciatura en Derecho</strong></li>
+            </ul>
         </div>
 
         <!-- Información de Contacto -->
@@ -97,29 +119,29 @@
     <div class="profile-right">
         <!-- Experiencia Laboral -->
         <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            
-            <p><strong>Año de Ingreso al INM:</strong> 2011/2023</p>     
+            <h3>Trayectoria INM</h3>
+            <p><strong>Año de Ingreso al INM:</strong> 2011/2023</p>
+            <p>Cuenta con una trayectoria de 13 años de experiencia en el Instituto Nacional de Migración, ocupando los siguientes puestos:</p>
             <ul>
-                <p>Cuenta con una trayectoria de 13 años de experiencia en el Instituto Nacional de Migración, ocupando los siguientes puestos:</p></p>
-                <li><strong>Oficina de Representación  en el Estado de Oaxaca</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Oaxaca</strong></li>
                 <ul>
-                    <li><strong>16/06/2023 - a la fecha: </strong> Titular de la Oficina de  Representación.</li>
+                    <li><strong>16/06/2023 - a la fecha:</strong> Titular de la Oficina de Representación.</li>
                 </ul>
-                <li><strong>Oficina de Representación en el Estado de Chiapas</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Chiapas</strong></li>
                 <ul>
-                    <li><strong>16/04/2022 – 16/10/2022: </strong> Sub Representante Federal Zona Sur.</li>
-                    <li><strong>16/10/2021 – 15/04/2022: </strong> </strong> Subdirectora de Regulación Migratoria.</li>
-                    <li><strong>12/07/2018 – 15/10/2021:  </strong> </strong>Sub Representante Local en Boca Lacantún.</li>
-                    <li><strong>16/10/2011 – 11/07/2018:  </strong> </strong> Agente Federal de Migración “B”.</li>
+                    <li><strong>16/04/2022 – 16/10/2022:</strong> Sub Representante Federal Zona Sur.</li>
+                    <li><strong>16/10/2021 – 15/04/2022:</strong> Subdirectora de Regulación Migratoria.</li>
+                    <li><strong>12/07/2018 – 15/10/2021:</strong> Sub Representante Local en Boca Lacantún.</li>
+                    <li><strong>16/10/2011 – 11/07/2018:</strong> Agente Federal de Migración "B".</li>
                 </ul>
             </ul>
         </div>
+
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/oaxacaf/OAXACA.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/oaxacaf/OAXACA.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
-        
-        
+    </div>
+</div>
 
 <script>
     function toggleMenu() {
@@ -178,11 +200,8 @@
         month: 'long',
         day: 'numeric'
     });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
 </script>
+
 <!-- Botón al final de tu documento HTML -->
 <button class="regresar-btn">Regresar</button>
 
