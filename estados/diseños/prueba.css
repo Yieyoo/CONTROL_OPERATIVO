@@ -201,9 +201,10 @@ nav.menu ul li a:hover {
     gap: 40px;
     background-color: #fff;
     border-radius: 20px;
-    box-shadow: 0 6px 15px rgba(210, 195, 195, 0.15);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Agregué sombra para mayor visibilidad */
     position: relative;
     min-height: 500px; /* Altura mínima */
+    z-index: 1; /* Asegúrate de que esté por encima de otros elementos */
 }
 .experiencia-laboral p {
     color: #691932; /* Aquí defines el color que quieras */

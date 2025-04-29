@@ -3,18 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional - Contralmirante Felipe Morales Callejas</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Liliana Monroy Garduño</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -63,153 +86,88 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularmch.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Contralmirante Felipe Morales Callejas</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Michoacán</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+        <div class="container">
+            <!-- Logo posicionado dentro del contenedor -->
+            <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴ Maestría en Administración Naval.</strong></li>
-                <li><strong>▴ Licenciatura en Ingeniería en Ciencias Navales.</strong></li>
-        </div>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titularmch.png" alt="Foto de zaria carrasco" class="foto-perfil">
+            <h1>Liliana Monroy Garduño</h1>
+            <p><strong>Encargada de la Oficina de Representación del INM en michoacan</strong></p>
 
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
-            <ul>
-                <li><strong>Teléfono Personal:</strong> 8331010439</li>
-                <li><strong>Teléfono de Trabajo:</strong> 4433158496 Ext. 8440801</li>
-                <li><strong>Email Institucional:</strong> <a href="ivramirez@inami.gob.mx">ivramirez@inami.gob.mx</a></li>
-            </ul>
-        </div>
-    </div>  
-
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2022</p>     
-            <ul>
-                <li><strong>Oficina de Representación en el Estado de Michoacán</strong></li>
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
                 <ul>
-                    <li><strong>16/01/2024 - a la fecha: </strong> Titular de la Oficina de  Representación.</li>
+                    <li><strong>▴Licenciatura en Administración.</strong></li>4171082852
                 </ul>
+            </div>
 
-                <li><strong>▴ Oficina de Representación en el Estado de Sinaloa</strong></li>
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
                 <ul>
-                    <li><strong>01/06/2022 – 15/01/2024:  </strong>Titular de la Oficina de  Representación.</li>
+                    <li><strong>Teléfono Personal:</strong> 4171082852</li>
+                    <li><strong>Teléfono de Trabajo:</strong>443 315 8496Ext. 8440201</li>
+                    <li><strong>Email Institucional:</strong> <a href="lmonroyg@inami.gob.mx">lmonroyg@inami.gob.mx</a></li>
                 </ul>
-            </ul>
+            </div>
         </div>
-        <!-- Carrera Profesional -->
-        <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <p>Cuenta con una trayectoria de más de 17 años en la Administración Pública, ocupando los siguientes cargos, entre otros:</p></p>
-            <ul>
+
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
                 
-                <li>▴Jefe de Servicios de la Primera Zona Naval;</li>
-                <li>▴Coordinador de Servicios y Mantenimiento de la Primera Zona Naval; </li>
-                <li>▴Jefe de Sección y Subinspector de la Primera Zona Naval;</li>
-                <li>▴Jefe de Grupo de Comando de la Fuerza Naval del Golfo;</li>
-                <li>▴Jefe de Sección y Jefe de Subsección  de la Fuerza Naval del Pacífico;</li>
-                <li>▴Jefe de Servicios de la Primera Zona Naval;</li>
-                <li>▴Comandante de la Sexta Flota Naval;</li>
-                <li>▴Comandante del Buque Patrulla “Otomí P21”;</li>
-                <li>▴Comandante del Buque Patrulla “Arrecife SISAL AM-12”.</li>
-                
-            </ul>
+                <h3>Experiencia Laboral</h3>
+                <p><strong>Año de ingreso al INM:</strong> 2017</p>
+                <p><strong>▴ Oficina de Representación en el Estado de Michoacán:</strong></p>
+                <ul>
+                    <li><strong>01/04/2025 - Actual: </strong>Titular de la Oficina de Representación.</li>
+                    <li><strong>01/02/2022 – 31/03/2025: </strong>Subdirectora de Control y Verificación Migratoria.</li>
+                    <li><strong>31/10/2019 – 31/01/2022: </strong>Jefa de Departamento de Archivo Migratorio.</li>
+                </ul>
+                <div class="carrera-profesional">
+                    <h3>Carrera Profesional</h3>
+                    <ul>
+                        <li><strong>Cuenta con más de 16 años de experiencia en la Administración Pública, ocupando los siguientes cargos, entre otros:</strong></li>
+                        <ul>
+                            <li>▴Contratos y Cartas de Factibilidad. JUMAPAA;</li>
+                            <li>▴Cajera. JUMAPAA Acámbaro Guanajuato;</li>
+                            <li>▴Asistente Administrativo área de compras. Hospital General de Acámbaro;</li>
+                            <li>▴Jefa. Botica Anexa al Hospital General de Acámbaro Guanajuato. “DIMESA”;</li>
+                            <li>▴Jefa. Botica Anexa al Hospital General de Acámbaro Guanajuato. “ISSEG”;</li>
+                            <li>▴Auxiliar. Botica Anexa al Hospital General de Acámbaro “SURTIMEDICA”;</li>
+                            <li>▴Administradora. Zapatería “El gran Ofertón” sucursal Acámbaro Guanajuato;</li>
+                            <li>▴Empleada de Mostrador y Cajera. Creaciones La Estrella;</li>
+                            <li>▴Secretaria. Consultorio de Patología del Dr. Aarón Alcocer, Morelia Michoacán.</li>
+                        </ul>
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/guanajuatof/FICHA CURRICULAR OR GUANAJUATO.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/michoacanf/FICHA CURRICULAR OR MICHOACÁN.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-        
-        
+    </div>
 
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
