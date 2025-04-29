@@ -4,25 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Capitán Paulo César Lavín Aldama</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
  
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -64,16 +87,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularson.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titularson.png" alt="Foto del Capitán" class="foto-perfil">
         <h1>Capitán Paulo César Lavín Aldama</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Sonora</strong></p>
 
@@ -81,21 +102,22 @@
         <div class="formacion-academica">
             <h3>Formación Académica</h3>
             <ul>
-                <li><strong>▴Maestría en Administración Pública.</strong></li>
-                <li><strong>▴Especialidad en Administración Naval.</strong></li>
-                <li><strong>▴Licenciatura en ingeniería en Ciencias Navales.</strong></li>
+                <li><strong>▴ Maestría en Administración Pública</strong></li>
+                <li><strong>▴ Especialidad en Administración Naval</strong></li>
+                <li><strong>▴ Licenciatura en Ingeniería en Ciencias Navales</strong></li>
+            </ul>
         </div>
 
         <!-- Información de Contacto -->
         <div class="contacto">
             <h3>Información de Contacto</h3>
             <ul>
-                <li><strong>Teléfono Personal:</strong>6623387229</li>
-                <li><strong>Teléfono de Trabajo:</strong>6622360698 Ext. 8580247</li>
-                <li><strong>Email Institucional:</strong> <a href="plavin@inami.gob.mx">plavin@inami.gob.mx</a></li>
+                <li><strong>Teléfono Personal:</strong> 6623387229</li>
+                <li><strong>Teléfono de Trabajo:</strong> 6622360698 Ext. 8580247</li>
+                <li><strong>Email Institucional:</strong> <a href="mailto:plavin@inami.gob.mx">plavin@inami.gob.mx</a></li>
             </ul>
         </div>
-    </div>
+    </div>  
 
     <div class="profile-right">
         <!-- Experiencia Laboral -->
@@ -103,23 +125,28 @@
             <h3>Experiencia Laboral</h3>
             <p><strong>Año de Ingreso al INM:</strong> 2024</p>
             <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Sonora</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Sonora</strong></li>
                 <ul>
-                    <li><strong>06/01/2024 - a la fecha</strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>06/01/2024 - a la fecha:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-            <div class="carrera-profesional">
+            </ul>
+            
+        <!-- Carrera Profesional -->
+        <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
+            <p>Cuenta con más de 10 años de experiencia en la Administración Pública, ocupando los siguientes cargos, entre otros:</p>
             <ul>
-                <p>Cuenta con más de 10 años de experiencia en la Administración Pública, ocupando los siguientes cargos, entre otros:</p>
-                <li>▴Enlace Logístico Administrativo y Enlace Administrativo y Logístico de Campaña.<strong>Gobierno del Estado de Sonora.</strong></li>
-                <li>▴Subdirector de Estadística y Evaluación.<strong>Secretaría de Seguridad y Protección Ciudadana.</strong></li>
-                <li>▴Ayudante Naval del Secretario de Marina y Oficial Naval. <strong>Secretaría de Marina.</strong></li>
-
+                <li><strong>▴ Enlace Logístico Administrativo y Enlace Administrativo y Logístico de Campaña</strong> - Gobierno del Estado de Sonora</li>
+                <li><strong>▴ Subdirector de Estadística y Evaluación</strong> - Secretaría de Seguridad y Protección Ciudadana</li>
+                <li><strong>▴ Ayudante Naval del Secretario de Marina y Oficial Naval</strong> - Secretaría de Marina</li>
             </ul>
         </div>
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/sonoraf/SONORA.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/sonoraf/SONORA.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
+    </div>
+</div>
+
 <script>
     function toggleMenu() {
         const menu = document.querySelector('.menu');
