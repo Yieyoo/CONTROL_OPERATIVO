@@ -3,26 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional -Contralmirante Genaro García Wong</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Contralmirante Genaro García Wong</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
  
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -64,16 +87,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titulartxl.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titulartxl.png" alt="Foto del Contralmirante" class="foto-perfil">
         <h1>Contralmirante Genaro García Wong</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Tlaxcala</strong></p>
 
@@ -81,21 +102,22 @@
         <div class="formacion-academica">
             <h3>Formación Académica</h3>
             <ul>
-                <li><strong>▴Maestría en Seguridad Nacional.</strong></li>
-                <li><strong>▴Maestría en Administración Naval.</strong></li>
-                <li><strong>▴Licenciatura en ingeniería en Ciencias Navales.</strong></li>
+                <li><strong>▴ Maestría en Seguridad Nacional</strong></li>
+                <li><strong>▴ Maestría en Administración Naval</strong></li>
+                <li><strong>▴ Licenciatura en Ingeniería en Ciencias Navales</strong></li>
+            </ul>
         </div>
 
         <!-- Información de Contacto -->
         <div class="contacto">
             <h3>Información de Contacto</h3>
             <ul>
-                <li><strong>Teléfono Personal:</strong>9621552035</li>
-                <li><strong>Teléfono de Trabajo:</strong>2464640827 Ext. 8640260<li>
-                <li><strong>Email Institucional:</strong> <a href="ggwong@inami.gob.mx">ggwong@inami.gob.mx</a></li>
+                <li><strong>Teléfono Personal:</strong> 9621552035</li>
+                <li><strong>Teléfono de Trabajo:</strong> 2464640827 Ext. 8640260</li>
+                <li><strong>Email Institucional:</strong> <br><a href="mailto:ggwong@inami.gob.mx">ggwong@inami.gob.mx</a></li>
             </ul>
         </div>
-    </div>
+    </div>  
 
     <div class="profile-right">
         <!-- Experiencia Laboral -->
@@ -103,45 +125,48 @@
             <h3>Experiencia Laboral</h3>
             <p><strong>Año de Ingreso al INM:</strong> 2020</p>
             <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Tlaxcala</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Tlaxcala</strong></li>
                 <ul>
-                    <li><strong>16/01/2023 - a la fecha:  </strong> Titular de la Oficina de  Representación.<li>   
+                    <li><strong>16/01/2023 - a la fecha:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                <li><strong>▴Oficina de Representación en el Estado de Veracruz</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Veracruz</strong></li>
                 <ul>
-                    <li><strong>16/03/2022 – 15/01/2023 </strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>16/03/2022 - 15/01/2023:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                <li><strong>▴Oficina de Representación en el Estado de Coahuila</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Coahuila</strong></li>
                 <ul>
-                    <li><strong>16/10/2021 – 15/03/2022: </strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>16/10/2021 - 15/03/2022:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                
-                <li><strong>▴Oficina de Representación en el Estado de Tlaxcala</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Tlaxcala</strong></li>
                 <ul>
-                    <li><strong>16/01/2021 – 15/10/2021:  </strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>16/01/2021 - 15/10/2021:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                
-                <li><strong>▴Oficina de Representación en el Estado de Sinaloa</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Sinaloa</strong></li>
                 <ul>
-                    <li><strong>01/01/2020 – 15/01/2021: </strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>01/01/2020 - 15/01/2021:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
             </ul>
-            <div class="carrera-profesional">
+            
+        <!-- Carrera Profesional -->
+        <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
+            <p>Cuenta con una trayectoria de 40 años de experiencia en la Marina de México, ocupando los siguientes cargos, entre otros:</p>
             <ul>
-                <p>Cuenta con una trayectoria de 40 años de experiencia en la Marina de México, ocupando los siguientes cargos, entre otros:</p>
-                <li>▴Jefe de Grupo de Comando en Base Aeronaval;</li>
-                <li>▴Oficial de Enlace;</li>
-                <li>▴Jefe de Sección de Operaciones;</li>
-                <li>▴Jefe de Grupo de Comando;</li>
-                <li>▴Inspector de Mando Territorial;</li>
-                <li>▴Jefe de Sección de Inteligencia y Operaciones</li>
-                <li>▴Comandante de Operaciones y Vigilancia Aérea.</li>
-
+                <li><strong>▴ Jefe de Grupo de Comando en Base Aeronaval</strong></li>
+                <li><strong>▴ Oficial de Enlace</strong></li>
+                <li><strong>▴ Jefe de Sección de Operaciones</strong></li>
+                <li><strong>▴ Jefe de Grupo de Comando</strong></li>
+                <li><strong>▴ Inspector de Mando Territorial</strong></li>
+                <li><strong>▴ Jefe de Sección de Inteligencia y Operaciones</strong></li>
+                <li><strong>▴ Comandante de Operaciones y Vigilancia Aérea</strong></li>
+            </ul>
         </div>
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/tlaxcalaf/TLAXCALA.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/tlaxcalaf/TLAXCALA.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
+    </div>
+</div>
+
 <script>
     function toggleMenu() {
         const menu = document.querySelector('.menu');
