@@ -4,25 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Mtro. Fidel Gaona Urbina</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
- 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">6
+                    <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -64,16 +86,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularpbl.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titularpbl.png" alt="Foto del Maestro" class="foto-perfil">
         <h1>Mtro. Fidel Gaona Urbina</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Puebla</strong></p>
 
@@ -81,9 +101,10 @@
         <div class="formacion-academica">
             <h3>Formación Académica</h3>
             <ul>
-                <li><strong>▴Estudios de Doctorado en Administración Pública.</strong></li>
-                <li><strong>▴Maestría en Ciencias Penales.</strong></li>
-                <li><strong>▴Licenciatura en Derecho.</strong></li>
+                <li><strong>▴ Estudios de Doctorado en Administración Pública.</strong></li>
+                <li><strong>▴ Maestría en Ciencias Penales.</strong></li>
+                <li><strong>▴ Licenciatura en Derecho.</strong></li>
+            </ul>
         </div>
 
         <!-- Información de Contacto -->
@@ -91,7 +112,7 @@
             <h3>Información de Contacto</h3>
             <ul>
                 <li><strong>Teléfono Personal:</strong> 8261661241</li>
-                <li><strong>Teléfono de Trabajo:</strong> : 2222359041 Ext. 8510300</li>
+                <li><strong>Teléfono de Trabajo:</strong> 2222359041 Ext. 8510300</li>
                 <li><strong>Email Institucional:</strong> <a href="fgaona@inami.gob.mx">fgaona@inami.gob.mx</a></li>
             </ul>
         </div>
@@ -103,36 +124,36 @@
             <h3>Experiencia Laboral</h3>
             <p><strong>Año de Ingreso al INM:</strong> 2012/2019</p>
             <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Puebla</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Puebla</strong></li>
                 <ul>
-                    <li><strong> 01/01/2023 - a la fecha: </strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>01/01/2023 - a la fecha:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Tlaxcala</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Tlaxcala</strong></li>
                 <ul>
-                    <li><strong> 16/01/2022 – 31/12/2022:  </strong> Titular de la Oficina de  Representación.</li>   
+                    <li><strong>16/01/2022 – 31/12/2022:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                
-                <li><strong>▴Oficina de Representación en el Estado de Puebla</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Puebla</strong></li>
                 <ul>
-                    <li><strong> 16/06/2019 – 15/01/2022:  </strong> Representante Local Zona Norte.</li>   
+                    <li><strong>16/06/2019 – 15/01/2022:</strong> Representante Local Zona Norte.</li>   
                 </ul>
+            </ul>
+
         <!-- Carrera Profesional -->
         <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
+            <p>Cuenta con más de 15 años de experiencia en la Administración Pública, ocupando los siguientes puestos, entre otros:</p>
             <ul>
-                <p>Cuenta con más de 15 años de experiencia en la Administración Pública, ocupando los siguientes puestos, entre otros:</p>
-                <li><strong>▴Subdirector de Licencias de Funcionamiento/Subdirector de Movilidad/Director de Apoyo Técnico del Sistema Estatal de Seguridad Pública/Subdirector General de Seguridad Pública y Vialidad.</strong>Gobierno del Estado de México.</li>
-                <li><strong>▴Director General de Programación y Evaluación  de Apoyos Directos. </strong>Secretaría de Agricultura, Ganadería, Desarrollo Rural, Pesca y Alimentación. Apoyos y Servicios a la Comercialización Agropecuaria. </li>
-                <li><strong>▴Subdirector de la Policía Preventiva en Reynosa/Director de Seguridad Pública y Vialidad.  </strong>Gobierno del Estado de Tamaulipas.</li>
+                <li><strong>▴</strong> Subdirector de Licencias de Funcionamiento/Subdirector de Movilidad/Director de Apoyo Técnico del Sistema Estatal de Seguridad Pública/Subdirector General de Seguridad Pública y Vialidad. <strong>Gobierno del Estado de México.</strong></li>
+                <li><strong>▴</strong> Director General de Programación y Evaluación de Apoyos Directos. <strong>Secretaría de Agricultura, Ganadería, Desarrollo Rural, Pesca y Alimentación. Apoyos y Servicios a la Comercialización Agropecuaria.</strong></li>
+                <li><strong>▴</strong> Subdirector de la Policía Preventiva en Reynosa/Director de Seguridad Pública y Vialidad. <strong>Gobierno del Estado de Tamaulipas.</strong></li>
             </ul>
         </div>
+        
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/pueblaf/PUEBLA.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/pueblaf/PUEBLA.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
-        
-        
+    </div>
+</div>
 
 <script>
     function toggleMenu() {
@@ -191,11 +212,8 @@
         month: 'long',
         day: 'numeric'
     });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
 </script>
+
 <!-- Botón al final de tu documento HTML -->
 <button class="regresar-btn">Regresar</button>
 
