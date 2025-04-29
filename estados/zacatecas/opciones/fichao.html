@@ -3,19 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional -Gral. José de Jesús Barajas Santos</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Lic. Celeste Arteaga Ramos</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
- 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -64,150 +86,76 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularzac.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Gral. José de Jesús Barajas Santos</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Zacatecas</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+        <div class="container">
+            <!-- Logo posicionado dentro del contenedor -->
+            <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴Maestría en Seguridad Nacional.</strong></li>
-                <li><strong>▴Licenciatura de Piloto Aviador Militar.</strong></li></div>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titularzac.png" alt="Foto de zaria carrasco" class="foto-perfil">
+            <h1>Lic. Celeste Arteaga Ramos</h1>
+            <p><strong>Encargada de la Oficina de Representación del INM en Zacatecas</strong></p>
 
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
-            <ul>
-                <li><strong>Teléfono Personal:</strong>4921236764</li>
-                <li><strong>Teléfono de Trabajo:</strong>4929250058 Ext. 8680201<li>
-                <li><strong>Email Institucional:</strong> <a href="jbarajas@inami.gob.mx">jbarajas@inami.gob.mx</a></li>
-            </ul>
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
+                <ul>
+                    <li>Licenciatura en Derecho.</li>
+                </ul>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
+                <ul>
+                    <li><strong>Teléfono Personal:</strong>  492 117 61 98</li>
+                    <li><strong>Teléfono de Trabajo:</strong>492 925 00 58  ext. 8680201</li>
+                    <li><strong>Email Institucional:</strong> <a href="carteaga@inami.gob.mx">carteaga@inami.gob.mx</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
+                
+                <h3>Trayectoria INM</h3>
+                <ul>
+                    <li>Año de ingreso al INM: 2019</li>
+                    <li><strong> ▴Oficina de Representación del INM en Zacatecas:</strong></li>
+                    <ul>
+                        <li><strong> 01/03/2025 - a la fecha:</strong> Titular de la Oficina de Representación.</li>
+                        <li><strong> 01/03/2022 - 28/02/2025: </strong>Subdirectora de Control y Verificación Migratoria.</li>
+                        <li><strong> 15/03/2021 – 28/02/2022: </strong>Departamento de Regulación Migratoria y Estación Migratoria.</li>
+                        <li><strong> 15/05/2020 – 14/03/2021: </strong>Encargada del Departamento de Asuntos Jurídicos.</li>
+                        <li><strong> 01/11/2019 – 14/05/2020: </strong>Coordinadora de Unidad en Áreas de Servicios Migratorios.</li>
+                    </ul>
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/guanajuatof/FICHA CURRICULAR OR GUANAJUATO.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
     </div>
 
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2019</p>
-            <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Zacatecas</strong></li>
-                <ul>
-                    <li><strong>01/06/2022 - a la fecha</strong>Titular de Oficina de Representación.<li>   
-                </ul>
-                <li><strong>▴Oficina de Representación en el Estado de Aguascalientes</strong></li>
-                <ul>
-                    <li><strong>16/10/2021-31/05/2022</strong>Titular de la Oficina de Representación.</li> 
-                </ul>
-                <li><strong>▴Oficina de Representación en el Estado de Nuevo León</strong></li>
-                <ul>
-                    <li><strong>01/02/2021-15/10/2021: </strong>Titular de la Oficina de Representación.<li>   
-                </ul>
-                <li><strong>▴Oficina de Representación en el Estado de Coahuila</strong></li>
-                <ul>
-                    <li><strong>16/08/2019-31/01/2021:</strong>Titular de la Oficina de Representación.</li> 
-                </ul>
-            </ul>
-            <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <ul>
-                <p>Cuenta con una trayectoria de 45 años de experiencia en el sector de la Fuerza Aérea y Armada, ocupando los siguientes cargos, entre otros:</p>
-                <li>▴General de División;</li>
-                <li>▴General de A.L.A. P.A.D.E.M.A.  Jefe del Estado Mayor de la RANE en Chihuahua;</li>
-                <li>▴General de A.L.A. Agregado Militar en la República Popular de China;</li>
-                <li>▴Comandante de A.L.A. de Combate en BAM 1;</li>
-                <li>Comandante de la BAM 12;</li>
-                <li>▴Coronel  F.A. P.A.D.E.M.A. Sección Quinta del EMFA.</li>
-            </ul>
-        </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/zacatecasf/FICHA CURRICULAR OR ZACATECAS.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
-
