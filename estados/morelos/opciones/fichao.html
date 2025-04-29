@@ -3,18 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional - Dra. Ana Alday Chávez</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Lic. Nelly Campos Quiroz</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <style>
+        /* Estilos para el contenedor principal */
+        .container {
+            position: relative; /* Necesario para posicionar el logo internamente */
+            padding-top: 20px;
+        }
+        
+        /* Logo dentro del contenedor (arriba-derecha) */
+        .container-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px; /* Ajusta según necesidad */
+            z-index: 10;
+        }
+        
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .container-logo {
+                width: 70px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -63,147 +86,89 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
-<div class="container">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularmor.png" alt="Foto de Esther Martínez" class="foto-perfil">
-        <h1>Dra. Ana Alday Chávez</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Morelos</strong></p>
+    <!-- Contenedor principal con logo integrado -->
+        <div class="container">
+            <!-- Logo posicionado dentro del contenedor -->
+            <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
 
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴ Doctorado en Educación.</strong></li>
-                <li><strong>▴ Maestría Ingeniería Industrial.</strong></li>
-                <li><strong>▴ Licenciatura en Administración y Desarrollo Empresarial.</strong></li>
-                <li><strong>▴ Licenciatura en Ingeniería Mecánica.</strong></li>
+        <div class="profile-left">
+            <!-- Imagen, nombre y ocupación -->
+            <img src="../../../fotos/titularmor.png" alt="Foto de zaria carrasco" class="foto-perfil">
+            <h1>Nelly Campos Quiroz</h1>
+            <p><strong>Encargada de la Oficina de Representación del INM en Morelos</strong></p>
 
-        </div>
-
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
-            <ul>
-                <li><strong>Teléfono Personal:</strong> 7352069455</li>
-                <li><strong>Teléfono de Trabajo:</strong> 7773157464 Ext. 8460222</li>
-                <li><strong>Email Institucional:</strong> <a href="aalday@inami.gob.mx">aalday@inami.gob.mx</a></li>
-            </ul>
-        </div>
-    </div>  
-
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2019</p>     
-            <ul>
-                <li><strong>Oficina de Representación en el Estado de Morelos</strong></li>
+            <!-- Formación Académica -->
+            <div class="formacion-academica">
+                <h3>Formación Académica</h3>
                 <ul>
-                    <li><strong>16/08/2019 - a la fecha: </strong> Titular de Oficina de Representación.</li>
+                    <li><strong>▴Licenciatura en Derecho.</strong></li>
                 </ul>
-            </ul>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="contacto">
+                <h3>Información de Contacto</h3>
+                <ul>
+                    <li><strong>Teléfono Personal:</strong> 5569917376</li>
+                    <li><strong>Teléfono de Trabajo:</strong>777 315 7464 ext. 8460222</li>
+                    <li><strong>Email Institucional:</strong> <a href="ncampos@inami.gob.mx">ncampos@inami.gob.mx</a></li>
+                </ul>
+            </div>
         </div>
-        <!-- Carrera Profesional -->
-        <div class="carrera-profesional">
-            <h3>Carrera Profesional</h3>
-            <p>Cuenta con una trayectoria de más de 20 años en el sector público, ocupando los siguientes cargos, entre otros:</p></p>
-            <ul>
+
+        <div class="profile-right">
+            <!-- Experiencia Laboral -->
+            <div class="experiencia-laboral">
                 
-                <li>▴Directora de Área en la Coordinación General de Centros Federales. <strong>Órgano Administrativo Desconcentrado de Prevención y Readaptación Social. </strong></li>
-                <li>▴Directora de la Institución, Subdirectora de Planeación y Vinculación, Subdirectora Académica, Auditora Interna del Sistema de Gestión de Calidad, Jefa del Departamento de Planeación, Programación y Presupuestación, Jefa del Centro de Información, Jefa del Departamento de Ciencias Básicas. <strong>Instituto Tecnológico de Cuautla del Tecnológico Nacional de México.</strong></li>
-                <li>▴Directora de Planeación y Evaluación <strong>Tecnológico Nacional de México. </strong></li>
-                <li>▴Directora de Desarrollo del Sistema.  <strong>Dirección General de Educación Superior Tecnológica de la Secretaría de Educación Pública.</strong></li>
-                <li>▴Directora de la Institución.  <strong>Instituto Tecnológico  de Iguala.</strong></li>
-                
-            </ul>
+                <h3>Experiencia Laboral</h3>
+                <ul>
+                    <li><strong>Año de ingreso al INM:</strong> 2019.</li>
+                    <li><strong>▴ Oficina de Representación en el Estado de Morelos:</strong></li>
+                    <ul>
+                        <li>16/03/2025 - a la fecha: Titular de Oficina de Representación.</li>
+                    </ul>
+                    <li><strong>▴ Dirección General de Coordinación de Oficinas de Representación:</strong></li>
+                    <ul>
+                        <li>01/01/2024 - 28/02/2025: Directora de Supervisión y Evaluación Regional.</li>
+                        <li>01/11/2019 - 31/12/2023: Subdirectora de Supervisión.</li>
+                    </ul>
+                </ul>
+                <div class="carrera-profesional">
+                    <h3>Carrera Profesional</h3>
+                    <ul>
+                        <li><strong> Cuenta con una trayectoria de más de 18 años de experiencia en el sector público, ocupando entre otros cargos, los siguientes: </strong></li>
+                        <li>▴ Directora de Asistencia Técnica de la Secretaría General. Instituto Politécnico Nacional.</li>
+                        <li>▴ Directora de Gobierno y Subdirectora de Mercados y Comercio en Vía Pública. Alcaldía Miguel Hidalgo.</li>
+                        <li>▴ Jefa del Área de Concertación de Apoyos Económicos. Centro de Incubación de Empresas de Base Tecnológica.</li>
+                        <li>▴ Directora General Adjunta de Ordenamiento de la Propiedad Rural. Secretaría de la Reforma Agraria (SEDATU).</li>
+                        <li>▴ Directora de Expropiaciones. Secretaría de la Reforma Agraria (SEDATU).</li>
+                        <li>▴ Diputada Federal de Mayoría. H. Congreso de la Unión.</li>
+                    </ul>
+            <div style="text-align:center; margin-top: 20px;">
+                <a href="../../../documentacion/fichas_curriculares/guanajuatof/FICHA CURRICULAR OR GUANAJUATO.pptx" download class="boton-descarga">Descargar Ficha</a>
+            </div>
         </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/morelosf/FICHA CURRICULAR OR MORELOS.pptx" download class="boton-descarga"> Descargar Ficha</a>
-        </div>
-        
-        
+    </div>
 
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
+    <!-- Botón de Regresar -->
+    <button class="regresar-btn">Regresar</button>
 
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('active');
         }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
-</script>
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-    }
-</script>
-
+    </script>
 </body>
 </html>
