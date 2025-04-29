@@ -3,26 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional -Contralmirante Gil Manuel Larios Gutiérrez</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <title>Ficha Profesional - Contralmirante Gil Manuel Larios Gutiérrez</title>
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
  
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -64,16 +87,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularcol.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titularcol.png" alt="Foto del Contralmirante" class="foto-perfil">
         <h1>Contralmirante Gil Manuel Larios Gutiérrez</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Colima</strong></p>
 
@@ -96,7 +117,7 @@
                 <li><strong>Email Institucional:</strong> <a href="glarios@inami.gob.mx">glarios@inami.gob.mx</a></li>
             </ul>
         </div>
-    </div>
+    </div>  
 
     <div class="profile-right">
         <!-- Experiencia Laboral -->
@@ -104,36 +125,36 @@
             <h3>Experiencia Laboral</h3>
             <p><strong>Año de Ingreso al INM:</strong> 2021</p>
             <ul>
-                <li><strong>▴Oficina de Representación en el Estado Colima</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado Colima</strong></li>
                 <ul>
-                    <li><strong>16/01/2024 - a la fecha: </strong> Titular de la Oficina de  Representación.</li>
+                    <li><strong>16/01/2024 - a la fecha:</strong> Titular de la Oficina de Representación.</li>
                 </ul>
 
                 <li><strong>▴ Oficina de Representación en el Estado de Campeche</strong></li>
                 <ul>
-                    <li><strong>16/07/2021 – 15/01/2024: </strong> Titular de la Oficina de Representación.</li>
+                    <li><strong>16/07/2021 – 15/01/2024:</strong> Titular de la Oficina de Representación.</li>
                 </ul>
             </ul>
-        </div>
-
         <!-- Carrera Profesional -->
         <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
             <p>Cuenta con una amplia experiencia de 40 años en la Marina de México, ocupando los siguientes cargos, entre otros:</p>
             <ul>
-                <li>▴ Ayudante Naval  del Almirante Secretario de Marina  y del Comandante de la Novena Zonal Naval;</li>
-                <li>▴ Oficial de Cargo de  Navegación, Máquinas, Operaciones y Logística;</li>
-                <li>▴ Jefe de la Sección de Inteligencia y Operaciones;</li>
-                <li>▴ Titular de la Residencia del Dragado del Pacífico en Mazatlán, Sinaloa.</li>
-                <li>▴ Subdirector Operativo del CC2 del Estado Mayor General de la Armada;</li>
-                <li>▴ Agregado Naval de la Embajada de México en Panamá, Costa Rica y Nicaragua.<li>
+                <li><strong>▴</strong> Ayudante Naval del Almirante Secretario de Marina y del Comandante de la Novena Zonal Naval;</li>
+                <li><strong>▴</strong> Oficial de Cargo de Navegación, Máquinas, Operaciones y Logística;</li>
+                <li><strong>▴</strong> Jefe de la Sección de Inteligencia y Operaciones;</li>
+                <li><strong>▴</strong> Titular de la Residencia del Dragado del Pacífico en Mazatlán, Sinaloa.</li>
+                <li><strong>▴</strong> Subdirector Operativo del CC2 del Estado Mayor General de la Armada;</li>
+                <li><strong>▴</strong> Agregado Naval de la Embajada de México en Panamá, Costa Rica y Nicaragua.</li>
             </ul>
         </div>
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/colimaf/COLIMA.pptx" download class="boton-descarga"> Descargar Ficha</a>
         </div>
         
-        
+        <div style="text-align:center; margin-top: 20px;">
+            <a href="../../../documentacion/fichas_curriculares/colimaf/COLIMA.pptx" download class="boton-descarga">Descargar Ficha</a>
+        </div>
+    </div>
+</div>
 
 <script>
     function toggleMenu() {
@@ -192,11 +213,8 @@
         month: 'long',
         day: 'numeric'
     });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
 </script>
+
 <!-- Botón al final de tu documento HTML -->
 <button class="regresar-btn">Regresar</button>
 
