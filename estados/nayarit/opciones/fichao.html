@@ -4,24 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Lic. José Armando Salmón Muñoz</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">    
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -45,7 +68,7 @@
                         <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
                         <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
                         <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../nuevo-leon.html">Nuevo León</a></li>
+                        <li><a href="../../nuevo_leon/nuevolindex.html">Nuevo León</a></li>
                         <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
                         <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
                         <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
@@ -63,16 +86,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularnay.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titularnay.png" alt="Foto del Licenciado" class="foto-perfil">
         <h1>Lic. José Armando Salmón Muñoz</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Nayarit</strong></p>
 
@@ -81,6 +102,7 @@
             <h3>Formación Académica</h3>
             <ul>
                 <li><strong>▴ Licenciatura en Administración de Empresas.</strong></li>
+            </ul>
         </div>
 
         <!-- Información de Contacto -->
@@ -98,36 +120,33 @@
         <!-- Experiencia Laboral -->
         <div class="experiencia-laboral">
             <h3>Experiencia Laboral</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2023</p>     
+            <p><strong>Año de Ingreso al INM:</strong> 2023</p>
             <ul>
-                <li><strong>Oficina de Representación en el Estado de Nayarit</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Nayarit</strong></li>
                 <ul>
-                    <li><strong>16/11/2023 - a la fecha:  </strong> Titular de la Oficina de  Representación.</li>
+                    <li><strong>16/11/2023 - a la fecha:</strong> Titular de la Oficina de Representación.</li>
                 </ul>
             </ul>
-        </div>
         <!-- Carrera Profesional -->
         <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
-            <p>Cuenta con una amplia experiencia de más de 30 años en la Administración Pública, ocupando los siguientes cargos, entre otros:   </p></p>
+            <p>Cuenta con una amplia experiencia de más de 30 años en la Administración Pública, ocupando los siguientes cargos, entre otros:</p>
             <ul>
-            
-                <li>▴Director General del Consejo de Ciencia y Tecnologia.<strong>Gobierno del Estado de Nayarit.</strong></li>
-                <li>▴Coordinador General de Planeación.  <strong>Secretaría de Economía. Instituto Nacional del Emprendedor. </strong></li>
-                <li>▴Delegado Estatal en Jalisco.  <strong>Instituto de Seguridad y Servicios Sociales de los Trabajadores del Estado. </strong></li>
-                <li>▴Titular de la Jefatura de Servicios de Afiliación – Cobranza.  <strong>. Instituto Mexicano del Seguro Social.</strong></li>
-                <li>▴Administrador Titular.  <strong>Secretaría de Hacienda y Crédito Público. Servicio de Administración y Enajenación de Bienes.</strong></li>
-                <li>▴Director Estatal en Colima/Director Estatal en Jalisco/Director Regional Occidente.  <strong>. Banco Nacional de Comercio Exterior.</strong></li>
-                <li>▴Director de Programas Sectoriales de Fiscalización.  <strong>. Secretaría de Hacienda y Crédito Público. Subsecretaría de Ingresos.</strong></li>
-                
+                <li><strong>▴</strong> Director General del Consejo de Ciencia y Tecnología. <strong>Gobierno del Estado de Nayarit.</strong></li>
+                <li><strong>▴</strong> Coordinador General de Planeación. <strong>Secretaría de Economía. Instituto Nacional del Emprendedor.</strong></li>
+                <li><strong>▴</strong> Delegado Estatal en Jalisco. <strong>Instituto de Seguridad y Servicios Sociales de los Trabajadores del Estado.</strong></li>
+                <li><strong>▴</strong> Titular de la Jefatura de Servicios de Afiliación - Cobranza. <strong>Instituto Mexicano del Seguro Social.</strong></li>
+                <li><strong>▴</strong> Administrador Titular. <strong>Secretaría de Hacienda y Crédito Público. Servicio de Administración y Enajenación de Bienes.</strong></li>
+                <li><strong>▴</strong> Director Estatal en Colima/Director Estatal en Jalisco/Director Regional Occidente. <strong>Banco Nacional de Comercio Exterior.</strong></li>
+                <li><strong>▴</strong> Director de Programas Sectoriales de Fiscalización. <strong>Secretaría de Hacienda y Crédito Público. Subsecretaría de Ingresos.</strong></li>
             </ul>
         </div>
         
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/nayaritf/NAYARIT.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/nayaritf/NAYARIT.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
-        
-        
+    </div>
+</div>
 
 <script>
     function toggleMenu() {
@@ -186,11 +205,8 @@
         month: 'long',
         day: 'numeric'
     });
-    // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
 </script>
+
 <!-- Botón al final de tu documento HTML -->
 <button class="regresar-btn">Regresar</button>
 
