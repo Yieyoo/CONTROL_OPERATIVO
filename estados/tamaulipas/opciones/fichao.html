@@ -4,25 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha Profesional - Mtro. Seguismundo Doguín Martínez</title>
-    <link rel="stylesheet" href="../../diseños/estiloficha.css">
+    <link rel="stylesheet" href="../../diseños/prueba.css">
 </head>
+<style>
+    /* Estilos para el contenedor principal */
+    .container {
+        position: relative; /* Necesario para posicionar el logo internamente */
+        padding-top: 20px;
+    }
+    
+    /* Logo dentro del contenedor (arriba-derecha) */
+    .container-logo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 300px; /* Ajusta según necesidad */
+        z-index: 10;
+    }
+    
+    /* Ajuste para móviles */
+    @media (max-width: 768px) {
+        .container-logo {
+            width: 70px;
+            top: 10px;
+            right: 10px;
+        }
+    }
+</style>
 <body>
  
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../../construccion.html">Plantilla de Personal</a></li>
                         <li><a href="../../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -64,16 +87,14 @@
                 </li>
             </ul>
         </nav>
-        <div class="logo-container">
-            <img src="../../../imagenes/gobernacion.jpg" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
     </header>
     <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
 
 <div class="container">
+    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
     <div class="profile-left">
         <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titulartam.png" alt="Foto de Esther Martínez" class="foto-perfil">
+        <img src="../../../fotos/titulartam.png" alt="Foto del Mtro. Doguín" class="foto-perfil">
         <h1>Mtro. Seguismundo Doguín Martínez</h1>
         <p><strong>Titular de la Oficina de Representación del INM en Tamaulipas</strong></p>
 
@@ -81,21 +102,22 @@
         <div class="formacion-academica">
             <h3>Formación Académica</h3>
             <ul>
-                <li><strong>▴Maestría en Administración Pública.</strong></li>
-                <li><strong>▴Especialidad en Derecho, Política y Criminología.</strong></li>
-                <li><strong>▴Licenciatura en Criminología.</strong></li>
+                <li><strong>▴ Maestría en Administración Pública</strong></li>
+                <li><strong>▴ Especialidad en Derecho, Política y Criminología</strong></li>
+                <li><strong>▴ Licenciatura en Criminología</strong></li>
+            </ul>
         </div>
 
         <!-- Información de Contacto -->
         <div class="contacto">
             <h3>Información de Contacto</h3>
             <ul>
-                <li><strong>Teléfono Personal:</strong>8448924314</li>
-                <li><strong>Teléfono de Trabajo:</strong>8677125600 Ext. 8620201</li>
-                <li><strong>Email Institucional:</strong> <a href="sdoguin@inami.gob.mx">sdoguin@inami.gob.mx</a></li>
+                <li><strong>Teléfono Personal:</strong> 8448924314</li>
+                <li><strong>Teléfono de Trabajo:</strong> 8677125600 Ext. 8620201</li>
+                <li><strong>Email Institucional:</strong> <a href="mailto:sdoguin@inami.gob.mx">sdoguin@inami.gob.mx</a></li>
             </ul>
         </div>
-    </div>
+    </div>  
 
     <div class="profile-right">
         <!-- Experiencia Laboral -->
@@ -103,30 +125,35 @@
             <h3>Experiencia Laboral</h3>
             <p><strong>Año de Ingreso al INM:</strong> 2013/2019</p>
             <ul>
-                <li><strong>▴Oficina de Representación en el Estado de Tamaulipas</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Tamaulipas</strong></li>
                 <ul>
-                    <li><strong>01/07/2019 - a la fecha:</strong> Titular de la Oficina de  Representación.<li>   
-                        <li><strong>01/02/2013 – 28/02/2017: </strong> Titular de la Oficina de Representación.<li>   
+                    <li><strong>01/07/2019 - a la fecha:</strong> Titular de la Oficina de Representación.</li>   
+                    <li><strong>01/02/2013 - 28/02/2017:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
-                <li><strong>▴Oficina de Representación en el Estado de Coahuila</strong></li>
+                <li><strong>▴ Oficina de Representación en el Estado de Coahuila</strong></li>
                 <ul>
-                    <li><strong>01/02/2013 – 28/02/2017: </strong> Titular de la Oficina de Representación.</li>   
+                    <li><strong>01/02/2013 - 28/02/2017:</strong> Titular de la Oficina de Representación.</li>   
                 </ul>
             </ul>
-            <div class="carrera-profesional">
+            
+        <!-- Carrera Profesional -->
+        <div class="carrera-profesional">
             <h3>Carrera Profesional</h3>
+            <p>Cuenta con más de 20 años de experiencia en la Administración Pública, ocupando los siguientes cargos, entre otros:</p>
             <ul>
-                <p>Cuenta con más de 20 años de experiencia en la Administración Pública, ocupando los siguientes cargos, entre otros:</p>
-                <li>▴Secretario Ejecutivo y Director General.<strong>Comisión de Derechos Humanos del Estado de Coahuila.</strong></li>
-                <li>▴Comisario General de la Unidad Desconcentrada de Ejecución de Penas y Reinserción Social. <strong>Secretaría de Gobierno del Estado de Coahuila.</strong></li>
-                <li>▴Subsecretario de Gobierno de protección Civil.<strong> Secretaría de Gobierno del Estado de Coahuila.</strong></li>
-                <li>▴Director General de la Policía del Estado. <strong>Director General de la Policía del Estado. </strong></li>
-                <li>▴Director de Seguridad Pública Municipal.<strong> Director de Seguridad Pública Municipal.</strong></li>
+                <li><strong>▴ Secretario Ejecutivo y Director General</strong> - Comisión de Derechos Humanos del Estado de Coahuila</li>
+                <li><strong>▴ Comisario General de la Unidad Desconcentrada</strong> - Secretaría de Gobierno del Estado de Coahuila</li>
+                <li><strong>▴ Subsecretario de Gobierno de Protección Civil</strong> - Secretaría de Gobierno del Estado de Coahuila</li>
+                <li><strong>▴ Director General de la Policía del Estado</strong></li>
+                <li><strong>▴ Director de Seguridad Pública Municipal</strong></li>
             </ul>
         </div>
         <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/tamaulipasf/TAMAULIPAS.pptx" download class="boton-descarga"> Descargar Ficha</a>
+            <a href="../../../documentacion/fichas_curriculares/tamaulipasf/TAMAULIPAS.pptx" download class="boton-descarga">Descargar Ficha</a>
         </div>
+    </div>
+</div>
+
 <script>
     function toggleMenu() {
         const menu = document.querySelector('.menu');
