@@ -76,7 +76,6 @@ header {
     z-index: 1000;
 }
 
-/* --- Menú lateral mejorado --- */
 /* --- Menú lateral estilizado --- *//* Menú principal - Diseño mejorado */
 nav.menu {
     position: fixed;
@@ -138,11 +137,22 @@ nav.menu {
   }
   
   /* Lista del menú - Diseño premium */
-  nav.menu ul {
-    list-style-type: none;
-    padding: 0 20px;
-    margin-top: 20px;
-  }
+  
+/* Lista del menú - Diseño premium */
+nav.menu ul {
+  list-style-type: none;
+  padding: 0 20px;
+  margin-top: 70px;
+}
+
+nav.menu > ul {
+  margin-top: 70px; /* Solo afecta a las ideas principales */
+}
+
+nav.menu ul ul {
+  margin-top: 5%; /* Ajusta el margen para evitar que se baje demasiado */
+}
+
   
   nav.menu ul li {
     margin-bottom: 15px;
