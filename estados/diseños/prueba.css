@@ -120,14 +120,20 @@ nav.menu {
   .menu-overlay.active {
     display: block;
   }
-  
-
-  
+   
   /* Lista del menú - Diseño premium */
   nav.menu ul {
     list-style-type: none;
     padding: 0 20px;
-    margin-top: 20px;
+    margin-top: 70px;
+  }
+  
+  nav.menu > ul {
+    margin-top: 70px; /* Solo afecta a las ideas principales */
+  }
+  
+  nav.menu ul ul {
+    margin-top: 0; /* Ajusta el margen para evitar que se baje demasiado */
   }
   
   nav.menu ul li {
@@ -203,12 +209,12 @@ nav.menu {
     background: linear-gradient(135deg, #A5852E 0%, #c49d3a 100%);
     color: white;
     border: none;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     font-size: 24px;
     cursor: pointer;
     position: fixed;
-    top: 20px;
+    top: 80px;
     left: 20px;
     border-radius: 50%;
     z-index: 100000;
@@ -285,7 +291,6 @@ nav.menu {
       font-size: 20px;
     }
   }
-  
 /* ===============================
     5. Sección Principal (Container)
 ================================== */
@@ -487,7 +492,7 @@ nav.menu {
     font-size: 16px;
     cursor: pointer;
     position: fixed;
-    bottom: 20px;
+    top: 40px;
     left: 20px;
     border-radius: 5px;
     z-index: 1000;
