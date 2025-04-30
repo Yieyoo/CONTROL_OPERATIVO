@@ -1,8 +1,29 @@
-/* --- Estilos generales --- */
-body {
+/* ==================== */
+/* VARIABLES Y RESET */
+/* ==================== */
+:root {
+    --color-primario: #691932;
+    --color-secundario: #A5852E;
+    --color-terciario: #285c4d;
+    --color-texto: #333;
+    --color-blanco: #fff;
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* ==================== */
+  /* ESTILOS GENERALES */
+  /* ==================== */
+  body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    color: #333;
+    color: var(--color-texto);
     background-image: url('../../imagenes/fondo.jpg');
     background-repeat: no-repeat;
     background-size: cover;
@@ -17,13 +38,14 @@ body {
     padding: 20px;
     font-size: 14px;
     overflow-x: hidden;
-}
-body::before {
+  }
+  
+  body::before {
     content: '';
     position: fixed;
     top: 0;
     right: 0;
-    width: 45%; /* Ajusta según el ancho de tu imagen */
+    width: 45%;
     height: 100vh;
     background-image: url('imagenes/fondoderecha.jpg');
     background-size: cover;
@@ -33,28 +55,31 @@ body::before {
     pointer-events: none;
   }
   
-html {
-    zoom: 1; /* puedes ajustar a 0.8, 1.2, etc */
-  }  
-
-/* --- Contenedor principal --- */
-.contenedor-principal {
+  html {
+    zoom: 1;
+  }
+  
+  /* ==================== */
+  /* ESTRUCTURA PRINCIPAL */
+  /* ==================== */
+  .contenedor-principal {
     width: 100%;
-    max-width: 900px;  /* Aumenté de 800px a 1200px */
+    max-width: 900px;
     margin: 0 auto;
-    padding: 30px 5px;  /* Más padding horizontal y vertical */
-    box-sizing: border-box;
-    
-    /* Nuevas propiedades para mejor presentación */
-    background-color: #fff;  /* Fondo blanco */
-    border-radius: 8px;  /* Esquinas redondeadas */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Sombra sutil */
+    padding: 30px 5px;
+    background-color: var(--color-blanco);
+    border-radius: 8px;
+    box-shadow: var(--sombra);
     margin-top: 20px;
     margin-bottom: 40px;
-}
-
-/* --- Contenedor de las opciones --- */
-.opciones-container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* ==================== */
+  /* COMPONENTE DE OPCIONES */
+  /* ==================== */
+  .opciones-container {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 20px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
@@ -63,486 +88,378 @@ html {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    box-sizing: border-box;
-}
-
-/* --- Estilo para el grid de botones --- */
-.opciones-grid {
+  }
+  
+  .opciones-grid {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    /* Control general del texto en el grid */
-    font-family: 'Segoe UI', Roboto, sans-serif; /* Fuente profesional */
-}
-
-.fila {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  .fila {
     display: flex;
     justify-content: center;
     gap: 15px;
     width: 100%;
     flex-wrap: wrap;
-}
-
-/* Estilos para todos los botones del grid */
-.opciones-grid button {
-    /* Estilos de texto */
-    font-size: 16px;           /* Tamaño base */
-    font-weight: 200;          /* Grosor (500-700 para botones) */
-    letter-spacing: 0.5px;     /* Espaciado entre letras */
-    text-align: center;        /* Alineación del texto */
-    line-height: 1.4;          /* Espaciado entre líneas */
-    
-    /* Otros estilos visuales */
-    padding: 12px 20px;        /* Espacio interno */
-    border-radius: 8px;        /* Bordes redondeados */
-    border: none;              /* Sin borde */
-    cursor: pointer;           /* Cursor tipo pointer */
-    transition: all 0.3s ease; /* Transición suave */
-    
-    /* Sombra y efectos */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Efecto hover */
-.opciones-grid button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-/* Versión móvil */
-@media (max-width: 768px) {
-    .opciones-grid button {
-        font-size: 14px;
-        padding: 10px 15px;
-    }
-}
-
-.opciones-grid button {
-    color: white;
-    padding: 10px 14px;
-    border: none;
-    border-radius: 8px;
+  }
+  
+  /* ==================== */
+  /* BOTONES */
+  /* ==================== */
+  .opciones-grid button {
+    font-size: 16px;
+    font-weight: 200;
+    letter-spacing: 0.5px;
     text-align: center;
-    font-size: 14px;
+    line-height: 1.4;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transicion);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    color: var(--color-blanco);
     flex: 1;
     max-width: 100%;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-sizing: border-box;
-}
-
-.opciones-grid button:hover {
+  }
+  
+  .opciones-grid button:hover {
     transform: translateY(-2px);
-}
-
-/* --- Colores específicos para los botones --- */
-.btn-1 {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+  
+  /* Colores específicos para los botones */
+  .btn-1 {
     background-color: black;
-}
-
-.btn-1:hover {
+  }
+  
+  .btn-1:hover {
     background-color: grey;
-}
-
-.btn-2,
-.btn-3,
-.btn-6,
-.btn-7,
-.btn-8 {
-    background-color: #691932;
-}
-
-.btn-2:hover,
-.btn-3:hover,
-.btn-6:hover,
-.btn-7:hover,
-.btn-8:hover {
+  }
+  
+  .btn-2,
+  .btn-3,
+  .btn-6,
+  .btn-7,
+  .btn-8 {
+    background-color: var(--color-primario);
+  }
+  
+  .btn-2:hover,
+  .btn-3:hover,
+  .btn-6:hover,
+  .btn-7:hover,
+  .btn-8:hover {
     background-color: #8e5c71;
-}
-
-.btn-4,
-.btn-5 {
-    background-color: #285c4d;
-}
-
-.btn-4:hover,
-.btn-5:hover {
+  }
+  
+  .btn-4,
+  .btn-5 {
+    background-color: var(--color-terciario);
+  }
+  
+  .btn-4:hover,
+  .btn-5:hover {
     background-color: #3a7d60;
-}
-
-/* --- Menú lateral mejorado --- */
-nav.menu {
+  }
+  
+  /* ==================== */
+  /* MENÚ LATERAL MEJORADO */
+  /* ==================== */
+  nav.menu {
     position: fixed;
     top: 0;
-    left: -250px;
-    width: 250px;
+    left: -300px;
+    width: 300px;
     height: 100%;
-    background-color: #691932;
-    padding-top: 70px;
-    transition: left 0.3s ease;
-    z-index: 999;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
-}
-
-nav.menu.active {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #4d1224 100%);
+    padding-top: 100px;
+    transition: var(--transicion);
+    z-index: 1000;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    overflow: hidden;
+  }
+  
+  /* Efecto de borde sutil */
+  nav.menu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--color-secundario), #c49d3a);
+  }
+  
+  nav.menu.active {
     left: 0;
+  }
+  
+  /* Logo del menú */
+  .logo-arriba-img {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  
+/* Lista del menú */
+nav.menu ul {
+    list-style-type: none;
+    padding: 0 20px;
+    margin: 10; /* Remove margin-top here */
 }
 
-.menu-overlay {
+/* Ajustar solo las principales */
+nav.menu > ul {
+    margin-top: 90px; /* Apply margin-top only to the main menu */
+}
+  
+  nav.menu ul li {
+    margin-bottom: 15px;
+    position: relative;
+  }
+  
+  nav.menu ul li a {
+    text-decoration: none;
+    color: var(--color-blanco);
+    font-size: 16px;
+    font-weight: 500;
+    display: block;
+    padding: 14px 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid transparent;
+    transition: var(--transicion);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  nav.menu ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    transform: translateX(8px);
+    border-left: 3px solid var(--color-secundario);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Submenú */
+  .submenu-list {
+    display: none;
+    padding-left: 10px;
+    animation: slideDown 0.3s ease;
+    margin-top: 10px;
+    border-left: 2px dashed rgba(255, 255, 255, 0.1);
+  }
+  
+  .submenu.active .submenu-list {
+    display: block;
+  }
+  
+  .submenu-list li a {
+    padding: 12px 18px;
+    font-size: 14px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: var(--transicion);
+  }
+  
+  .submenu-list li a:hover {
+    background-color: rgba(165, 133, 46, 0.2);
+    transform: translateX(5px);
+  }
+  
+  /* Indicador de submenú */
+  .submenu > a::after {
+    content: '›';
+    position: absolute;
+    right: 20px;
+    transform: rotate(90deg);
+    transition: transform 0.3s ease;
+  }
+  
+  .submenu.active > a::after {
+    transform: rotate(270deg);
+  }
+  
+  /* Botón de menú */
+  .menu-toggle {
+    background: linear-gradient(135deg, var(--color-secundario) 0%, #c49d3a 100%);
+    color: var(--color-blanco);
+    border: none;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    position: fixed;
+    top: 90px;
+    left: 20px;
+    border-radius: 50%;
+    z-index: 100000;
+    box-shadow: 0 8px 25px rgba(165, 133, 46, 0.4);
+    transition: var(--transicion);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .menu-toggle:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
+  }
+  
+  /* Scroll del submenú */
+  .submenu {
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secundario) transparent;
+    padding-right: 5px;
+  }
+  
+  .submenu::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .submenu::-webkit-scrollbar-thumb {
+    background-color: var(--color-secundario);
+    border-radius: 4px;
+    background-clip: padding-box;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .submenu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* Overlay del menú */
+  .menu-overlay {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-}
-
-.menu-overlay.active {
-    display: block;
-}
-
-nav.menu ul {
-    list-style-type: none;
-    margin-top: 50px; 
-    padding: 0 15px;
-}
-
-nav.menu ul li a {
-    text-decoration: none;
-    color: white;
-    font-size: 14px;
-    display: block;
-    padding: 12px 15px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-    border-radius: 4px;
-    margin-bottom: 8px;
-  }
-
-nav.menu ul li a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
-}
-
-/* --- Submenú refinado --- */
-.submenu-list {
-    display: none;
-    padding-left: 10px;
-    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 999;
     animation: fadeIn 0.3s ease;
-    max-height: 350px; /* Altura máxima del submenú */
-    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
-    position: sticky; /* Hace que el submenú se quede fijo al hacer scroll */
-    top: 0; /* Se mantendrá en la parte superior de su contenedor */
-}
-
-.submenu.active .submenu-list {
+  }
+  
+  .menu-overlay.active {
     display: block;
-}
-
-.submenu-list li a {
-    padding: 8px 15px;
-    font-size: 13px;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.submenu-list li a:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* --- Botón de menú mejorado --- */
-.menu-toggle {
-    background-color: #A5852E;
-    color: white;
-    margin-top: 70px;
-    border: none;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-    cursor: pointer;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    border-radius: 50%;
-    z-index: 1001;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.menu-toggle:hover {
-    background-color: #c49d3a;
-    transform: scale(1.05);
-}
-/* Animación de aparición */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-#logo-gobernacion {
-    position: absolute;
-    top: 20px;
-    left: 15%;
-    transform: translateX(-50%);
-    max-width: 200px;
-    height: auto;
-    z-index: 100;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    transition: transform 0.3s ease;
-}
-/* --- Estilos Responsivos --- */
-
-@media screen and (max-width: 768px) {
-    
-    /* Evita el desplazamiento horizontal */
-    body {
-        overflow-x: hidden;  /* Esto elimina cualquier barra de desplazamiento horizontal */
-    }
-}
-
-.submenu {
-    max-height: 360px; /* Ajusta la altura máxima según necesites */
-    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
-    scrollbar-width: thin; /* Para navegadores como Firefox */
-    scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
-}
-
-/* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
-.submenu::-webkit-scrollbar {
-    width: 6px; /* Ancho de la barra */
-}
-
-.submenu::-webkit-scrollbar-thumb {
-    background-color: #c09404; /* Color de la barra */
-    border-radius: 3px; /* Bordes redondeados */
-}
-
-.submenu::-webkit-scrollbar-track {
-    background: transparent; /* Fondo de la barra */
-}
-
-
-/* --- Botón de regresar --- */
-.regresar-btn {
-    background-color: #691932;
-    color: white;
+  }
+  
+  /* ==================== */
+  /* COMPONENTES ADICIONALES */
+  /* ==================== */
+  /* Botón de regresar */
+  .regresar-btn {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
     border: none;
     padding: 12px 16px;
     font-size: 16px;
     cursor: pointer;
     position: fixed;
-    top: 20px;         /* Posición desde la parte superior */
-    left: 20px;        /* Posición desde la parte izquierda */
+    top: 20px;
+    left: 20px;
     border-radius: 5px;
     z-index: 900;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease;
-}
-
-.regresar-btn:hover {
+  }
+  
+  .regresar-btn:hover {
     background-color: #8e5c71;
-}
-
-/* --- Logos en la esquina superior derecha --- */
-.logo-container {
+  }
+  
+  /* Logos en esquina superior derecha */
+  .logo-container {
     position: fixed;
     top: 20px;
     right: 20px;
     display: flex;
     gap: 20px;
     z-index: 9999;
-}
-
-.logo-container img {
+  }
+  
+  .logo-container img {
     width: 120px;
     height: auto;
     object-fit: contain;
     cursor: pointer;
-}
-
-/* --- Fecha debajo del logo --- */
-.fecha-actual {
+  }
+  
+  /* Fecha actual */
+  .fecha-actual {
     position: fixed;
     top: 90px;
     right: 20px;
     font-size: 16px;
     font-weight: bold;
-    color: #691932;
+    color: var(--color-primario);
     background-color: rgba(255, 255, 255, 0.8);
     padding: 8px 12px;
     border-radius: 5px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-}
-
-/* --- Estilos Responsivos (Móviles) --- */
-@media screen and (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-
-    .contenedor-principal,
-    .opciones-container {
-        padding: 15px;
-        width: 100%;
-    }
-
-    .opciones-grid {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .opciones-grid button {
-        padding: 12px 16px;
-        font-size: 14px;
-        width: 100%;
-    }
-
-    .logo-container {
-        top: 10px;
-        right: 10px;
-        gap: 15px;
-    }
-
-    .fecha-actual {
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 15px;
-        padding: 4px 5px;
-        background-color: rgba(255, 255, 255, 0.8);
-        z-index: 1000;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    .regresar-btn {
-        font-size: 14px;
-        padding: 10px 14px;
-    }
-
-    .estado-info {
-        font-size: 20px;
-        margin-top: -30px;
-    }
-}
-
-
-/* --- Estilos para el texto de estado --- */
-.estado-info {
-    text-align: center;
-    margin-top: -40px;
-    font-size: 30px;
-    font-weight: bold;
-    color: #333;
-}
-.logo-arriba-img {
-    width: 145px;  /* Cambia este valor según lo que necesites */
-    margin-left: 20px;
-
-    height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
-    position: relative; /* Asegura que el logo se pueda posicionar */
-    top: -30px; /* Ajusta este valor para subir el logo */
-}
+  }
+  
+  /* Información del instituto */
 .instituto-info {
-    background: linear-gradient(to right, #6b1e3f, #320d1c); /* Fondo degradado */
-    color: white; /* Texto blanco */
+    background: linear-gradient(to right, #6b1e3f, #320d1c);
+    color: var(--color-blanco);
     text-align: center;
-    padding: 0px 0px; /* Aumenté el padding para mejor legibilidad */
-    border-radius: 0; /* Eliminé bordes redondeados para full-width */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+    padding: 20px 0; /* Further increased padding for an even thicker background */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     margin-top: 10%;
-    margin: 0; /* Eliminé margen auto */
-    width: 100vw; /* 100% del viewport width */
-    position: relative; /* Necesario para el ancho completo */
-    left: 0%; /* Centrado */
-    right: 0%; /* Centrado */
-    margin-left: -50vw; /* Compensación */
-    margin-right: -50vw; /* Compensación */
-    box-sizing: border-box; /* Incluye padding en el ancho */
+    margin: 0;
+    width: 100vw;
+    position: relative;
+    left: 0%;
+    right: 0%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    box-sizing: border-box;
 }
-
-/* Versión para móviles */
-@media (max-width: 768px) {
-    .instituto-info {
-        padding: 25px 15px;
-    }
-}
-
-/* Estilos para los títulos */
-.instituto-info h1 {
-    font-size: 20px;
+  .instituto-info h1 {
+    font-size: 30px;
     font-weight: bold;
     margin-bottom: 10px;
     text-transform: uppercase;
-}
-
-.instituto-info h2 {
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-
-.instituto-info h3 {
-    font-size: 10px;
-    font-weight: 400;
-}
-/* --- Estilos Responsivos para Móviles --- */
-@media screen and (max-width: 768px) {
-    .instituto-info h1 {
-        font-size: 1rem; /* Ajusta el tamaño de h1 en móviles */
-        font-weight: bold; /* Mantiene la negrita */
-    }
-    .instituto-info h1,
-    .instituto-info h2,
-    .instituto-info h3 {
-        margin: 5px 0; /* Reduce el espacio vertical entre los textos */
-        padding: 0; /* Asegura que no haya padding extra */
-    }
-
-    /* Ajustes generales para compactar el contenedor */
-    .instituto-info {
-        padding: 5px 1px; /* Reduce el padding interno */
-        margin-top: 0px; /* Mantiene el ajuste de altura */
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
-}
-
-/* Estilo mejorado para integrar con tu diseño existente */
-.instituto-info {
-    position: relative;
-    margin-bottom: 0; /* Eliminamos el margen inferior original */
-    padding-bottom: 1.5rem; /* Añadimos espacio en la parte inferior */
   }
   
+  .instituto-info h2 {
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  
+  .instituto-info h3 {
+    font-size: 17px;
+    font-weight: 400;
+  }
+  
+  /* Estado info */
   .estado-info {
-    background-color: #A5852E; /* Dorado institucional */
-    color: white;
+    background-color: var(--color-secundario);
+    color: var(--color-blanco);
     text-align: center;
     padding: 0.8rem 0;
     margin: 0;
-    width: 100vw; /* Asegura que ocupe todo el ancho de la pantalla */
+    width: 100vw;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: relative;
-    top: -1rem; /* Mantiene el desplazamiento hacia arriba */
-    left: 0; /* Asegura que comience desde el borde izquierdo */
-}
-
-
+    top: -1rem;
+    left: 0;
+  }
   
   .estado-info h4 {
     font-size: 1.3rem;
@@ -553,19 +470,124 @@ nav.menu ul li a:hover {
     position: relative;
   }
   
-  /* Efecto de transición suave */
-  .contenedor-principal {
-    position: relative;
-    z-index: 1;
-    margin-top: -0.5rem; /* Compensamos el solape */
+  /* ==================== */
+  /* ANIMACIONES */
+  /* ==================== */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   
-  /* Versión responsiva */
-  @media (max-width: 768px) {
+  @keyframes slideDown {
+    from { 
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* ==================== */
+  /* MEDIA QUERIES */
+  /* ==================== */
+  @media screen and (max-width: 768px) {
+    /* Estilos generales */
+    body {
+      padding: 10px;
+      overflow-x: hidden;
+    }
+    
+    /* Contenedores */
+    .contenedor-principal,
+    .opciones-container {
+      padding: 15px;
+      width: 100%;
+    }
+    
+    /* Opciones grid */
+    .opciones-grid {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .opciones-grid button {
+      padding: 12px 16px;
+      font-size: 14px;
+      width: 100%;
+    }
+    
+    /* Menú */
+    nav.menu {
+      width: 260px;
+      left: -260px;
+    }
+    
+    /* Botón de menú */
+    .menu-toggle {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+    }
+    
+    /* Logos */
+    .logo-container {
+      top: 10px;
+      right: 10px;
+      gap: 15px;
+    }
+    
+    /* Fecha actual */
+    .fecha-actual {
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 15px;
+      padding: 4px 5px;
+    }
+    
+    /* Botón regresar */
+    .regresar-btn {
+      font-size: 14px;
+      padding: 10px 14px;
+    }
+    
+    /* Estado info */
+    .estado-info {
+      font-size: 20px;
+      margin-top: -30px;
+    }
+    
+    /* Instituto info */
+    .instituto-info {
+      padding: 25px 15px;
+    }
+    
+    .instituto-info h1 {
+      font-size: 1rem;
+    }
+    
+    .instituto-info h1,
+    .instituto-info h2,
+    .instituto-info h3 {
+      margin: 5px 0;
+      padding: 0;
+    }
+    
+    .instituto-info {
+      padding: 5px 1px;
+      margin-top: 0px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    
     .estado-info {
       top: -0.5rem;
       padding: 0.6rem 0;
     }
+    
     .estado-info h4 {
       font-size: 1rem;
     }
