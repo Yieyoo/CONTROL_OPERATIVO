@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="../../estados/diseños/estiloo.css">
 </head>
 <body>
+    <script>
+        // Esta será la contraseña que quieres poner
+        const passwordCorrecta = "DGCOR01"; // <-- Aquí pones la contraseña que tú quieras
+    
+        // Pedimos la contraseña
+        const entrada = prompt("Por favor, ingresa la contraseña para acceder:");
+    
+        // Si la contraseña no es correcta, mandamos a otra página o bloqueamos el contenido
+        if (entrada !== passwordCorrecta) {
+            alert("Contraseña incorrecta. No tienes acceso.");
+            window.location.href = "../../index.html"; // Aquí los puedes mandar a inicio o a otra página
+        }
+    </script>
+    
     <!-- Fondo oscuro para el menú -->
     <div class="menu-overlay"></div>
 
@@ -75,7 +89,7 @@
 
     <!-- Contenedor de logos -->
     <div class="logo-container">
-        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
+        <img src="../../imagenes/inm logo.png" alt="Logo 1">
     </div>
     
     <div class="header-container">
@@ -85,11 +99,7 @@
     <!-- Contenedor del PDF -->
     <div class="pdf-container">
         <!-- Usando solo el iframe para mostrar el PDF -->
-        <iframe 
-    src="../../../documentacion/plantillvdfvdfsvas_pe" 
-    class="pdf-embed"
-    frameborder="0"
-></iframe>
+        <iframe src="../../documentacion/datos_nacionales/PLANTILLA GENERAL 16 ABRIL 2025.pdf" class="pdf-embed"frameborder="0"></iframe>
 
     </div>
 
