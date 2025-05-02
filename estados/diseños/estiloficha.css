@@ -472,7 +472,10 @@ nav.menu ul li a:hover {
     }
 
     .menu-toggle {
-        top: 15px;
+        top: 10px;
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
     }
 }
 
