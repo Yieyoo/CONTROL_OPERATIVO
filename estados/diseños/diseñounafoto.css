@@ -35,12 +35,12 @@ header {
 }
 /* --- Logos mejorados --- */
 .logo-arriba-img {
-    width: 145px;  /* Cambia este valor según lo que necesites */
-    margin-left: 18px;
+  width: 300px;  /* Aumenta aún más el tamaño del logo */
+  margin-left: 18px;
 
-    height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
-    position: relative; /* Asegura que el logo se pueda posicionar */
-    top: -195px; /* Ajusta este valor para subir el logo */
+  height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
+  position: relative; /* Asegura que el logo se pueda posicionar */
+  top: -195px; /* Ajusta este valor para subir el logo */
 }
 
 

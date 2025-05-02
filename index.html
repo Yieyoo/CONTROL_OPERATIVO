@@ -150,6 +150,13 @@ function toggleSubmenu(event) {
         submenu.classList.add('active');
     }
 }
+  // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+  const menuOverlay = document.querySelector('.menu-overlay');
+    menuOverlay.addEventListener('click', () => {
+        const menu = document.querySelector('.menu');
+        menu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
 
 // Cerrar el submenú al hacer clic fuera de él
 document.addEventListener('click', (e) => {
