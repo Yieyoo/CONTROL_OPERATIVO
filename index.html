@@ -37,7 +37,7 @@
                     <li><a href="datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
                     <li><a href="datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
                     <li><a href="datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="datos_nacionales/opcionesdatos/inmueblesd.html">Inmuebles</a></li>
+                    <li><a href="construccion.html">Inmuebles</a></li>
                 </ul>
             </li>
 
@@ -126,38 +126,45 @@
             const menuOverlay = document.querySelector('.menu-overlay');
             menu.classList.toggle('active');
             menuOverlay.classList.toggle('active');
-        }
+        }// Función para cerrar todos los submenús
+function closeAllSubmenus() {
+    const submenus = document.querySelectorAll('.submenu.active');
+    submenus.forEach(submenu => {
+        submenu.classList.remove('active');
+    });
+}
 
-        // Cerrar el menú al hacer clic fuera de él
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menuOverlay.addEventListener('click', () => {
-            const menu = document.querySelector('.menu');
-            menu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
+// Función para mostrar/ocultar el submenú
+function toggleSubmenu(event) {
+    event.preventDefault(); // Evita que el enlace recargue la página
 
-        // Función para cerrar todos los submenús
-        function closeAllSubmenus() {
-            const submenus = document.querySelectorAll('.submenu.active');
-            submenus.forEach(submenu => {
-                submenu.classList.remove('active');
-            });
-        }
+    // Identificar el submenú al que pertenece el enlace
+    const submenu = event.target.closest('.submenu');
 
-        // Función para mostrar/ocultar el submenú
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            closeAllSubmenus();
-            const submenu = event.target.closest('.submenu');
-            submenu.classList.toggle('active');
-        }
+    // Si el submenú está abierto, lo cerramos; si está cerrado, lo abrimos
+    if (submenu.classList.contains('active')) {
+        submenu.classList.remove('active');
+    } else {
+        // Cerrar todos los submenús antes de abrir uno nuevo
+        closeAllSubmenus();
+        submenu.classList.add('active');
+    }
+}
 
-        // Cerrar el submenú al hacer clic fuera de él
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                closeAllSubmenus();
-            }
-        });
+// Cerrar el submenú al hacer clic fuera de él
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.submenu')) {
+        closeAllSubmenus();
+    }
+});
+
+// Cerrar el submenú al hacer clic en una opción de submenú
+const submenuLinks = document.querySelectorAll('.submenu-list a');
+submenuLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        closeAllSubmenus(); // Cierra todos los submenús
+    });
+});
 
         // Mostrar fecha actual
         document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {

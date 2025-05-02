@@ -30,8 +30,9 @@
                         <li><a href="../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                         <li><a href="../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
                         <li><a href="../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                        <li><a href="../../construccion.html">Unidades Caninas</a></li>
-                        <li><a href="../../construccion.html">Inmuebles</a>
+                        <li><a href="../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../construccion.html">Inmuebles</a></li>
                     </ul>
                 </li>
 
@@ -153,41 +154,45 @@ function toggleMenu() {
         menu.classList.remove('active');
         menuOverlay.classList.remove('active');
     });
+// Función para cerrar todos los submenús
+function closeAllSubmenus() {
+    const submenus = document.querySelectorAll('.submenu.active');
+    submenus.forEach(submenu => {
+        submenu.classList.remove('active');
+    });
+}
 
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
+// Función para mostrar/ocultar el submenú
+function toggleSubmenu(event) {
+    event.preventDefault(); // Evita que el enlace recargue la página
 
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault(); // Evita que el enlace recargue la página
+    // Identificar el submenú al que pertenece el enlace
+    const submenu = event.target.closest('.submenu');
 
+    // Si el submenú está abierto, lo cerramos; si está cerrado, lo abrimos
+    if (submenu.classList.contains('active')) {
+        submenu.classList.remove('active');
+    } else {
         // Cerrar todos los submenús antes de abrir uno nuevo
         closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
+        submenu.classList.add('active');
     }
+}
 
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
-        }
-    });
+// Cerrar el submenú al hacer clic fuera de él
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.submenu')) {
+        closeAllSubmenus();
+    }
+});
 
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
+// Cerrar el submenú al hacer clic en una opción de submenú
+const submenuLinks = document.querySelectorAll('.submenu-list a');
+submenuLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        closeAllSubmenus(); // Cierra todos los submenús
     });
+});
 // Mostrar la fecha actual
 document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
 
