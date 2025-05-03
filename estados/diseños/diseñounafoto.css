@@ -18,6 +18,20 @@ body {
     font-size: 14px;
     overflow-x: hidden;
 }
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 45%; /* Ajusta según el ancho de tu imagen */
+  height: 100vh;
+  background-image: url('../../imagenes/fondoderecha.jpg');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
+}
 
 /* --- Header mejorado --- */
 header {

@@ -18,7 +18,20 @@ body {
     font-size: 14px;
     overflow-x: hidden;
 }
-
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 45%; /* Ajusta según el ancho de tu imagen */
+  height: 100vh;
+  background-image: url('../imagenes/fondoderecha.jpg');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
+}
 /* --- Contenedor principal --- */
 .contenedor-principal {
     width: 100%;
@@ -500,21 +513,17 @@ nav.menu {
     height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
 }
 .instituto-info {
-    background: linear-gradient(to right, #6b1e3f, #320d1c); /* Fondo degradado */
-    color: white; /* Texto blanco */
-    text-align: center;
-    padding: 0px 0px; /* Aumenté el padding para mejor legibilidad */
-    border-radius: 0; /* Eliminé bordes redondeados para full-width */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
-    margin-top: 5%;
-    margin: 0; /* Eliminé margen auto */
-    width: 100vw; /* 100% del viewport width */
-    position: relative; /* Necesario para el ancho completo */
-    left: 0%; /* Centrado */
-    right: 0%; /* Centrado */
-    margin-left: -50vw; /* Compensación */
-    margin-right: -50vw; /* Compensación */
-    box-sizing: border-box; /* Incluye padding en el ancho */
+  background: linear-gradient(to right, #6b1e3f, #320d1c); /* Fondo degradado */
+  color: white; /* Texto blanco */
+  text-align: center;
+  padding: 3px 0; /* Reducí aún más el padding para hacerlo más delgado */
+  border-radius: 0; /* Eliminé bordes redondeados para full-width */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Sombra más sutil */
+  margin-top: -100px; /* Ajusté el margen superior para acercarlo al texto */
+  width: 100vw; /* 100% del viewport width */
+  position: relative; /* Necesario para el ancho completo */
+  left: 0; /* Asegura que comience desde el borde izquierdo */
+  box-sizing: border-box; /* Incluye padding en el ancho */
 }
 
 /* Versión para móviles */
@@ -526,22 +535,24 @@ nav.menu {
 
 /* Estilos para los títulos */
 .instituto-info h1 {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-transform: uppercase;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 5px; /* Reduce el espacio inferior */
+  text-transform: uppercase;
 }
 
 .instituto-info h2 {
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 8px;
+  font-size: 17px;
+  font-weight: 500;
+  margin-bottom: 4px; /* Reduce el espacio inferior */
 }
 
 .instituto-info h3 {
-    font-size: 10px;
-    font-weight: 400;
+  font-size: 17px;
+  font-weight: 400;
+  margin-bottom: 3px; /* Reduce el espacio inferior */
 }
+
 /* --- Estilos Responsivos para Móviles --- */
 @media screen and (max-width: 768px) {
     .instituto-info h1 {
