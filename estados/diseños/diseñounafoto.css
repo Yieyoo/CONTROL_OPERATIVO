@@ -602,3 +602,12 @@ h1 {
     transform: scale(1.02); /* Efecto zoom al pasar el mouse */
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
 }
+/* Definir la variable con el texto completo en CSS */
+.qna {
+  --header-text: "Plantilla de Personal QNA 9";  /* Cambia aquí el texto cuando lo necesites */
+}
+
+/* Insertamos el texto en el h1 usando el pseudoelemento ::before */
+.qna h1::before {
+  content: var(--header-text);
+}
