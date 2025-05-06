@@ -72,5 +72,16 @@ app.get('/ultimo-archivo', (req, res) => {
     res.json({ filename: sorted[0] }); // El más reciente
   });
 });
-nodemon server.js
+app.delete('/delete', (req, res) => {
+  const { filename } = req.body;
+  const filePath = path.join(__dirname, 'uploads', 'aguascalientes', filename);
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('Error al eliminar el archivo:', err);
+      return res.status(500).json({ message: 'Error al eliminar el archivo' });
+    }
+    res.json({ message: 'Archivo eliminado correctamente' });
+  });
+});
 
