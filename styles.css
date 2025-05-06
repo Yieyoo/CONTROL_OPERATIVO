@@ -316,6 +316,12 @@ nav.menu ul li a.active {
     font-size: 20px;
   }
 }
+@media (max-width: 768px) {
+  nav.menu ul {
+    margin-top: 5px; /* o el valor que veas apropiado */
+  }
+}
+
 .logo-arriba-img {
   height: 50px;
   margin-right: 10px;
