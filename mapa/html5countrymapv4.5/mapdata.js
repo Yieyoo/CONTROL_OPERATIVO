@@ -228,8 +228,11 @@ labels: {
   },
   MXCAM: {
     name: "Campeche",
-    parent_id: "MXCAM"
-  },
+    parent_id: "MXCAM",
+    x: 858.2,
+    y: 475.9
+  }
+  ,
   MXCHH: {
     name: "Chihuahua",
     parent_id: "MXCHH"
@@ -240,16 +243,22 @@ labels: {
   },
   MXCMX: {
     name: "Ciudad de México",
-    parent_id: "MXCMX"
-  },
+    parent_id: "MXCMX",
+    x: 596.8,
+    y: 459.4
+  }
+  ,
   MXCOA: {
     name: "Coahuila",
     parent_id: "MXCOA"
   },
   MXCOL: {
     name: "Colima",
-    parent_id: "MXCOL"
-  },
+    parent_id: "MXCOL",
+    x: 461.4,
+    y: 463.7
+  }
+  ,
   MXDUR: {
     name: "Durango",
     parent_id: "MXDUR"
@@ -296,8 +305,11 @@ labels: {
   },
   MXPUE: {
     name: "Puebla",
-    parent_id: "MXPUE"
-  },
+    parent_id: "MXPUE",
+    x: 626.1,
+    y: 479.6
+  }
+   ,
   MXQUE: {
     name: "Querétaro",
     parent_id: "MXQUE"
@@ -312,8 +324,11 @@ labels: {
   },
   MXSLP: {
     name: "San Luis Potosí",
-    parent_id: "MXSLP"
-  },
+    parent_id: "MXSLP",
+    x: 556.2,
+    y: 364.9
+  }
+  ,
   MXSON: {
     name: "Sonora",
     parent_id: "MXSON"
@@ -332,9 +347,11 @@ labels: {
   },
   MXVER: {
     name: "Veracruz",
-    parent_id: "MXVER"
+    parent_id: "MXVER",
+    x: 727.9,
+    y: 507.6
   },
-  MXYUC: {
+    MXYUC: {
     name: "Yucatán",
     parent_id: "MXYUC"
   },
