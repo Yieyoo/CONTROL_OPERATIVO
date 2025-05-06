@@ -513,15 +513,15 @@ nav.menu {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
   transition: background-color 0.3s ease;
 }
-
 @media (max-width: 768px) {
   .regresar-btn {
-    padding: 8px 12px;
-    font-size: 12px;
-    top: 30px;
-    left: 15px;
+    padding: 5px 8px;
+    font-size: 8px;
+    top: 25px;
+    left: 10px;
   }
 }
+
 
 .regresar-btn:hover {
     background-color: #8e5c71;
