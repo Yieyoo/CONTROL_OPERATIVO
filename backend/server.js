@@ -84,4 +84,28 @@ app.delete('/delete', (req, res) => {
     res.json({ message: 'Archivo eliminado correctamente' });
   });
 });
+app.get('/archivos', (req, res) => {
+  const dir = path.join(__dirname, 'uploads', 'aguascalientes');
+  fs.readdir(dir, (err, files) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al leer la carpeta' });
+    }
+
+    const pdfs = files.filter(file => file.endsWith('.pdf'));
+    res.json({ archivos: pdfs });
+  });
+});
+app.get('/files', (req, res) => {
+  const dir = path.join(__dirname, 'uploads', 'aguascalientes');
+  fs.readdir(dir, (err, files) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error al leer los archivos' });
+    }
+
+    // Solo devolver archivos PDF
+    const pdfs = files.filter(file => file.endsWith('.pdf'));
+    res.json(pdfs);
+  });
+});
+
 
