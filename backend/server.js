@@ -11,8 +11,15 @@ const PORT = process.env.PORT || 3000;
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// Configuración de CORS para permitir solicitudes desde tu dominio
+const corsOptions = {
+  origin: 'https://yieyoo.github.io',  // El dominio que deseas permitir
+  methods: ['GET', 'POST', 'DELETE'], // Métodos HTTP que quieres permitir
+  allowedHeaders: ['Content-Type'],    // Encabezados permitidos
+};
+
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));  // Configurar CORS con las opciones específicas
 app.use(express.json());
 
 // Configurar Cloudinary con variables de entorno

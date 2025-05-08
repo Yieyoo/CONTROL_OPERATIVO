@@ -49,6 +49,7 @@
                 <h3>Subir archivo</h3>
                 <form id="uploadForm" enctype="multipart/form-data">
                     <input type="file" id="file" name="file" accept="application/pdf" required>
+                    <input type="hidden" id="estado" name="estado" value="aguascalientes">
                     <button type="submit">Subir</button>
                 </form>
             </div>
@@ -80,6 +81,8 @@
 
     <!-- Scripts -->
     <script>
+        const estadoActual = 'aguascalientes'; // Estado fijo para esta página
+
         const uploadForm = document.getElementById('uploadForm');
         const pdfIframe = document.getElementById('pdfIframe');
         const fileListContainer = document.getElementById('fileList');
@@ -87,34 +90,30 @@
         const deleteFileButton = document.getElementById('deleteFileButton');
         const viewSelect = document.getElementById('viewSelect');
 
-        // Cargar lista de archivos al cargar la página
+        // Cargar lista de archivos desde el backend
         function cargarListaArchivos() {
-            fetch('https://control-operativo-1.onrender.com/archivos')
+            fetch(`https://control-operativo-1.onrender.com/archivos/${estadoActual}`)
                 .then(response => response.json())
                 .then(data => {
                     const files = data.archivos || [];
 
-                    // Limpiar las listas de archivos
                     fileListContainer.innerHTML = '';
                     fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
                     viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
 
                     files.forEach(file => {
-                        // Lista visible
                         const li = document.createElement('li');
-                        li.textContent = file;
+                        li.textContent = file.filename;
                         fileListContainer.appendChild(li);
 
-                        // Opción para eliminar
                         const deleteOption = document.createElement('option');
-                        deleteOption.value = file;
-                        deleteOption.textContent = file;
+                        deleteOption.value = file.public_id;
+                        deleteOption.textContent = file.filename;
                         fileSelect.appendChild(deleteOption);
 
-                        // Opción para ver
                         const viewOption = document.createElement('option');
-                        viewOption.value = file;
-                        viewOption.textContent = file;
+                        viewOption.value = file.url;
+                        viewOption.textContent = file.filename;
                         viewSelect.appendChild(viewOption);
                     });
                 })
@@ -124,9 +123,8 @@
         }
 
         // Mostrar PDF en el iframe
-        function mostrarPdf(filename) {
-            const pdfPath = `https://control-operativo-1.onrender.com/uploads/aguascalientes/${filename}`;
-            pdfIframe.src = pdfPath;
+        function mostrarPdf(url) {
+            pdfIframe.src = url;
         }
 
         // Subir archivo
@@ -134,6 +132,7 @@
             e.preventDefault();
 
             const formData = new FormData(uploadForm);
+            formData.append('estado', estadoActual);
 
             fetch('https://control-operativo-1.onrender.com/upload', {
                 method: 'POST',
@@ -141,9 +140,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.filename) {
-                    cargarListaArchivos(); // Recargar la lista de archivos
-                    mostrarPdf(data.filename); // Mostrar el PDF en el iframe
+                alert(data.message || 'Archivo subido');
+                cargarListaArchivos();
+                if (data.url) {
+                    mostrarPdf(data.url);
                 }
             })
             .catch(error => {
@@ -153,9 +153,9 @@
 
         // Eliminar archivo
         deleteFileButton.addEventListener('click', function () {
-            const filename = fileSelect.value;
+            const publicId = fileSelect.value;
 
-            if (!filename) {
+            if (!publicId) {
                 alert('Por favor, selecciona un archivo para eliminar.');
                 return;
             }
@@ -165,39 +165,29 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ filename })
+                body: JSON.stringify({ public_id: publicId })
             })
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
-                cargarListaArchivos(); // Recargar la lista de archivos después de eliminar
-                pdfIframe.src = ''; // Limpiar el iframe
+                cargarListaArchivos();
+                pdfIframe.src = '';
             })
             .catch(error => {
                 console.error('Error al eliminar el archivo:', error);
             });
         });
 
-        // Cargar la lista de archivos al iniciar
-        cargarListaArchivos();
-        window.addEventListener('DOMContentLoaded', () => {
-            fetch('https://control-operativo-1.onrender.com/ultimo-archivo')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.filename) {
-                        pdfIframe.src = `https://control-operativo-1.onrender.com/uploads/aguascalientes/${data.filename}`;
-                    }
-                })
-                .catch(err => console.error('Error al cargar PDF:', err));
-        });
-
-        // Visualizar PDF cuando se selecciona un archivo
+        // Ver PDF
         viewSelect.addEventListener('change', function () {
-            const selectedFile = viewSelect.value;
-            if (selectedFile) {
-                mostrarPdf(selectedFile);
+            const selectedUrl = viewSelect.value;
+            if (selectedUrl) {
+                mostrarPdf(selectedUrl);
             }
         });
+
+        // Cargar archivos al iniciar
+        window.addEventListener('DOMContentLoaded', cargarListaArchivos);
     </script>
 </body>
 </html>
