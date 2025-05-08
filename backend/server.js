@@ -13,10 +13,11 @@ const upload = multer({ storage });
 
 // Configuración de CORS para permitir solicitudes desde tu dominio
 const corsOptions = {
-  origin: 'https://yieyoo.github.io',  // El dominio que deseas permitir
-  methods: ['GET', 'POST', 'DELETE'], // Métodos HTTP que quieres permitir
+  origin: 'https://yieyoo.github.io',  // Permite el dominio exacto
+  methods: ['GET', 'POST', 'DELETE'], // Métodos HTTP permitidos
   allowedHeaders: ['Content-Type'],    // Encabezados permitidos
 };
+
 
 // Middlewares
 app.use(cors(corsOptions));  // Configurar CORS con las opciones específicas
