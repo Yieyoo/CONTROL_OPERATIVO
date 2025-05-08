@@ -7,28 +7,15 @@ const cloudinary = require('cloudinary').v2;
 require('dotenv').config();  // Para cargar las variables de entorno
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;  // Usar el puerto del entorno o 3000 como predeterminado
 
-// Configuración para almacenar los archivos subidos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, 'uploads', 'aguascalientes');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);  // Establece la carpeta de destino
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);  // Mantiene el nombre original del archivo
-  }
-});
-
+// Configuración para almacenar los archivos subidos temporalmente
+const storage = multer.memoryStorage();  // Usamos memoria para evitar archivos locales
 const upload = multer({ storage });
 
 // Habilitar CORS y procesamiento de JSON
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configuración de Cloudinary con las variables de entorno
 cloudinary.config({
@@ -44,65 +31,47 @@ app.post('/upload', upload.single('file'), (req, res) => {
   }
 
   // Subir archivo a Cloudinary
-  cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' }, (error, result) => {
-    if (error) {
-      return res.status(500).json({ message: 'Error al subir el archivo a Cloudinary', error });
+  cloudinary.uploader.upload_stream(
+    { resource_type: 'auto' },
+    (error, result) => {
+      if (error) {
+        return res.status(500).json({ message: 'Error al subir el archivo a Cloudinary', error });
+      }
+
+      res.json({
+        message: 'Archivo subido correctamente a Cloudinary',
+        url: result.url  // URL del archivo almacenado en Cloudinary
+      });
     }
-
-    // Elimina el archivo local después de subirlo a Cloudinary
-    fs.unlink(req.file.path, (err) => {
-      if (err) console.error('Error al eliminar el archivo local:', err);
-    });
-
-    res.json({ message: 'Archivo subido correctamente a Cloudinary', url: result.url });
-  });
+  ).end(req.file.buffer);  // Subimos el archivo a Cloudinary desde el buffer
 });
 
-// Ruta para eliminar archivos locales
+// Ruta para eliminar archivos en Cloudinary
 app.delete('/delete', (req, res) => {
-  const { filename } = req.body;  // Asumiendo que se envía el nombre del archivo para eliminar
-  const filePath = path.join(__dirname, 'uploads', 'aguascalientes', filename);
+  const { public_id } = req.body;  // Asumimos que se envía el public_id de Cloudinary
 
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error('Error al eliminar el archivo:', err);
-      return res.status(500).json({ message: 'Error al eliminar el archivo' });
+  cloudinary.uploader.destroy(public_id, (error, result) => {
+    if (error) {
+      return res.status(500).json({ message: 'Error al eliminar el archivo de Cloudinary', error });
     }
-    res.json({ message: 'Archivo eliminado correctamente' });
+
+    res.json({ message: 'Archivo eliminado correctamente de Cloudinary' });
   });
 });
 
-// Ruta para obtener el último archivo subido (solo PDF)
-app.get('/ultimo-archivo', (req, res) => {
-  const dir = path.join(__dirname, 'uploads', 'aguascalientes');
-  fs.readdir(dir, (err, files) => {
-    if (err) return res.status(500).json({ error: 'Error al leer la carpeta' });
-
-    const pdfs = files.filter(f => f.endsWith('.pdf'));
-    if (pdfs.length === 0) return res.json({ filename: null });
-
-    // Ordena por fecha de modificación
-    const sorted = pdfs.sort((a, b) => {
-      const aTime = fs.statSync(path.join(dir, a)).mtime.getTime();
-      const bTime = fs.statSync(path.join(dir, b)).mtime.getTime();
-      return bTime - aTime;
-    });
-
-    res.json({ filename: sorted[0] }); // El más reciente
-  });
-});
-
-// Ruta para obtener todos los archivos PDF en la carpeta
+// Ruta para obtener todos los archivos PDF desde Cloudinary
 app.get('/archivos', (req, res) => {
-  const dir = path.join(__dirname, 'uploads', 'aguascalientes');
-  fs.readdir(dir, (err, files) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error al leer la carpeta' });
-    }
+  cloudinary.api.resources(
+    { type: 'upload', prefix: 'aguascalientes/' },  // Filtramos por carpeta
+    (error, result) => {
+      if (error) {
+        return res.status(500).json({ message: 'Error al obtener los archivos', error });
+      }
 
-    const pdfs = files.filter(file => file.endsWith('.pdf'));
-    res.json({ archivos: pdfs });
-  });
+      const files = result.resources.map(resource => resource.url);  // Extraemos las URLs de los archivos
+      res.json({ archivos: files });
+    }
+  );
 });
 
 // Iniciar el servidor
