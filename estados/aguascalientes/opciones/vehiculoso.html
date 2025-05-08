@@ -6,13 +6,41 @@
     <title>Vehículos</title>
     <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <style>
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <div class="menu-overlay"></div>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
 
     <header>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
@@ -50,7 +78,8 @@
                 <form id="uploadForm" enctype="multipart/form-data">
                     <input type="file" id="file" name="file" accept="application/pdf" required>
                     <input type="hidden" id="estado" name="estado" value="aguascalientes">
-                    <button type="submit">Subir</button>
+                    <button type="submit" id="uploadButton">Subir</button>
+                    <p id="uploadStatus"></p>
                 </form>
             </div>
 
@@ -69,125 +98,207 @@
             </div>
         </div>
 
-        <!-- Eliminar archivo (centrado debajo de los tres) -->
+        <!-- Eliminar archivo -->
         <div class="delete-file">
             <h3>Eliminar archivo</h3>
             <select id="fileSelect">
-                <option value="">Selecciona un archivo</option>
+                <option value="">Selecciona un archivo para eliminar</option>
             </select>
             <button id="deleteFileButton" class="upload-button">Eliminar</button>
+            <p id="deleteStatus"></p>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
-        const estadoActual = 'aguascalientes'; // Estado fijo para esta página
-
+        const estadoActual = 'aguascalientes';
+        const loadingElement = document.getElementById('loading');
         const uploadForm = document.getElementById('uploadForm');
+        const uploadButton = document.getElementById('uploadButton');
+        const uploadStatus = document.getElementById('uploadStatus');
         const pdfIframe = document.getElementById('pdfIframe');
         const fileListContainer = document.getElementById('fileList');
         const fileSelect = document.getElementById('fileSelect');
         const deleteFileButton = document.getElementById('deleteFileButton');
+        const deleteStatus = document.getElementById('deleteStatus');
         const viewSelect = document.getElementById('viewSelect');
 
-        // Cargar lista de archivos desde el backend
-        function cargarListaArchivos() {
-            fetch(`https://control-operativo-1.onrender.com/archivos/${estadoActual}`)
-                .then(response => response.json())
-                .then(data => {
-                    const files = data.archivos || [];
-
-                    fileListContainer.innerHTML = '';
-                    fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
-                    viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
-
-                    files.forEach(file => {
-                        const li = document.createElement('li');
-                        li.textContent = file.filename;
-                        fileListContainer.appendChild(li);
-
-                        const deleteOption = document.createElement('option');
-                        deleteOption.value = file.public_id;
-                        deleteOption.textContent = file.filename;
-                        fileSelect.appendChild(deleteOption);
-
-                        const viewOption = document.createElement('option');
-                        viewOption.value = file.url;
-                        viewOption.textContent = file.filename;
-                        viewSelect.appendChild(viewOption);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error al cargar los archivos:', error);
-                });
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            loadingElement.style.display = show ? 'flex' : 'none';
         }
 
-        // Mostrar PDF en el iframe
+        // Cargar lista de archivos
+        async function cargarListaArchivos() {
+            showLoading(true);
+            try {
+                const response = await fetch(`https://control-operativo-1.onrender.com/archivos/${estadoActual}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const files = data.archivos || [];
+
+                fileListContainer.innerHTML = '';
+                fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
+                viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
+
+                files.forEach(file => {
+                    // Lista de archivos
+                    const li = document.createElement('li');
+                    li.textContent = file.filename || 'documento.pdf';
+                    fileListContainer.appendChild(li);
+
+                    // Selector para eliminar
+                    const deleteOption = document.createElement('option');
+                    deleteOption.value = file.public_id;
+                    deleteOption.textContent = file.filename || 'documento.pdf';
+                    fileSelect.appendChild(deleteOption);
+
+                    // Selector para visualizar
+                    const viewOption = document.createElement('option');
+                    viewOption.value = file.url;
+                    viewOption.textContent = file.filename || 'documento.pdf';
+                    viewSelect.appendChild(viewOption);
+                });
+            } catch (error) {
+                console.error('Error al cargar archivos:', error);
+                alert('Error al cargar archivos: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Mostrar PDF
         function mostrarPdf(url) {
             pdfIframe.src = url;
         }
 
         // Subir archivo
-        uploadForm.addEventListener('submit', function (e) {
+        uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            const fileInput = document.getElementById('file');
+            
+            if (!fileInput.files[0]) {
+                uploadStatus.textContent = 'No se seleccionó ningún archivo';
+                uploadStatus.style.color = 'red';
+                return;
+            }
+            
+            if (fileInput.files[0].type !== 'application/pdf') {
+                uploadStatus.textContent = 'Solo se permiten archivos PDF';
+                uploadStatus.style.color = 'red';
+                return;
+            }
 
-            const formData = new FormData(uploadForm);
-            formData.append('estado', estadoActual);
+            showLoading(true);
+            uploadButton.disabled = true;
+            uploadStatus.textContent = 'Subiendo archivo...';
+            uploadStatus.style.color = 'blue';
 
-            fetch('https://control-operativo-1.onrender.com/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message || 'Archivo subido');
+            try {
+                const formData = new FormData(uploadForm);
+                const response = await fetch('https://control-operativo-1.onrender.com/upload', {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al subir el archivo');
+                }
+                
+                const data = await response.json();
+                uploadStatus.textContent = data.message || 'Archivo subido correctamente';
+                uploadStatus.style.color = 'green';
+                
                 cargarListaArchivos();
                 if (data.url) {
                     mostrarPdf(data.url);
                 }
-            })
-            .catch(error => {
-                console.error('Error al subir el archivo:', error);
-            });
+                
+                uploadForm.reset();
+            } catch (error) {
+                console.error('Error al subir:', error);
+                uploadStatus.textContent = 'Error: ' + error.message;
+                uploadStatus.style.color = 'red';
+            } finally {
+                showLoading(false);
+                uploadButton.disabled = false;
+                setTimeout(() => {
+                    uploadStatus.textContent = '';
+                }, 5000);
+            }
         });
 
         // Eliminar archivo
-        deleteFileButton.addEventListener('click', function () {
+        deleteFileButton.addEventListener('click', async function() {
             const publicId = fileSelect.value;
-
+            
             if (!publicId) {
-                alert('Por favor, selecciona un archivo para eliminar.');
+                deleteStatus.textContent = 'Selecciona un archivo para eliminar';
+                deleteStatus.style.color = 'red';
                 return;
             }
+            
+            if (!confirm('¿Estás seguro de eliminar este archivo?')) return;
+            
+            showLoading(true);
+            deleteFileButton.disabled = true;
+            deleteStatus.textContent = 'Eliminando archivo...';
+            deleteStatus.style.color = 'blue';
 
-            fetch('https://control-operativo-1.onrender.com/delete', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ public_id: publicId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
+            try {
+                const response = await fetch('https://control-operativo-1.onrender.com/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ public_id: publicId }),
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al eliminar el archivo');
+                }
+                
+                const data = await response.json();
+                deleteStatus.textContent = data.message || 'Archivo eliminado correctamente';
+                deleteStatus.style.color = 'green';
+                
                 cargarListaArchivos();
                 pdfIframe.src = '';
-            })
-            .catch(error => {
-                console.error('Error al eliminar el archivo:', error);
-            });
+            } catch (error) {
+                console.error('Error al eliminar:', error);
+                deleteStatus.textContent = 'Error: ' + error.message;
+                deleteStatus.style.color = 'red';
+            } finally {
+                showLoading(false);
+                deleteFileButton.disabled = false;
+                setTimeout(() => {
+                    deleteStatus.textContent = '';
+                }, 5000);
+            }
         });
 
         // Ver PDF
-        viewSelect.addEventListener('change', function () {
+        viewSelect.addEventListener('change', function() {
             const selectedUrl = viewSelect.value;
             if (selectedUrl) {
                 mostrarPdf(selectedUrl);
+            } else {
+                pdfIframe.src = '';
             }
         });
 
         // Cargar archivos al iniciar
-        window.addEventListener('DOMContentLoaded', cargarListaArchivos);
+        document.addEventListener('DOMContentLoaded', cargarListaArchivos);
     </script>
 </body>
-</html>
+</html> 
