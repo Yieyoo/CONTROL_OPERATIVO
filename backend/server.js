@@ -9,101 +9,168 @@ const PORT = process.env.PORT || 3000;
 
 // Configuración de almacenamiento en memoria para archivos subidos
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // Límite de 10MB
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos PDF'), false);
+    }
+  }
+});
 
-// Configuración de CORS para permitir solicitudes desde tu dominio
+// Configuración mejorada de CORS
 const corsOptions = {
-  origin: 'https://yieyoo.github.io',  // Permite el dominio exacto
-  methods: ['GET', 'POST', 'DELETE'], // Métodos HTTP permitidos
-  allowedHeaders: ['Content-Type'],    // Encabezados permitidos
+  origin: [
+    'https://yieyoo.github.io',
+    'http://localhost:3000' // Para desarrollo local
+  ],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
 };
 
-
 // Middlewares
-app.use(cors(corsOptions));  // Configurar CORS con las opciones específicas
-app.use(express.json());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Preflight para todas las rutas
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
-// Configurar Cloudinary con variables de entorno
+// Configurar Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
+// Ruta de prueba
+app.get('/test-cors', (req, res) => {
+  res.json({ message: 'CORS configurado correctamente' });
+});
+
 // Subir archivo a Cloudinary
 app.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No se ha subido ningún archivo' });
-  }
-
-  const estado = req.body.estado || 'aguascalientes'; // Carpeta por estado
-
-  const uploadStream = cloudinary.uploader.upload_stream(
-    {
-      resource_type: 'auto',
-      folder: estado, // Carpeta dinámica
-    },
-    (error, result) => {
-      if (error) {
-        console.error('Error al subir a Cloudinary:', error);
-        return res.status(500).json({ message: 'Error al subir el archivo', error });
-      }
-
-      res.json({
-        message: 'Archivo subido correctamente',
-        url: result.secure_url,
-        public_id: result.public_id,
-      });
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No se ha subido ningún archivo' });
     }
-  );
 
-  uploadStream.end(req.file.buffer);
+    const estado = req.body.estado || 'aguascalientes';
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: 'raw',
+        folder: estado,
+        format: 'pdf'
+      },
+      (error, result) => {
+        if (error) {
+          console.error('Error al subir a Cloudinary:', error);
+          return res.status(500).json({ 
+            message: 'Error al subir el archivo',
+            error: error.message 
+          });
+        }
+
+        res.json({
+          message: 'Archivo subido correctamente',
+          url: result.secure_url,
+          public_id: result.public_id,
+          filename: req.file.originalname
+        });
+      }
+    );
+
+    uploadStream.end(req.file.buffer);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Error en el servidor',
+      error: error.message 
+    });
+  }
 });
 
 // Eliminar archivo de Cloudinary
 app.delete('/delete', (req, res) => {
-  const { public_id } = req.body;
+  try {
+    const { public_id } = req.body;
 
-  if (!public_id) {
-    return res.status(400).json({ message: 'public_id es requerido' });
-  }
-
-  cloudinary.uploader.destroy(public_id, (error, result) => {
-    if (error) {
-      console.error('Error al eliminar en Cloudinary:', error);
-      return res.status(500).json({ message: 'Error al eliminar el archivo', error });
+    if (!public_id) {
+      return res.status(400).json({ message: 'public_id es requerido' });
     }
 
-    res.json({ message: 'Archivo eliminado correctamente', result });
-  });
-});
-
-// Listar archivos desde Cloudinary por estado (opcional)
-app.get('/archivos/:estado', (req, res) => {
-  const estado = req.params.estado || 'aguascalientes';
-
-  cloudinary.api.resources(
-    {
-      type: 'upload',
-      prefix: `${estado}/`,
-      resource_type: 'raw',
-      max_results: 100,
-    },
-    (error, result) => {
+    cloudinary.uploader.destroy(public_id, (error, result) => {
       if (error) {
-        console.error('Error al obtener archivos:', error);
-        return res.status(500).json({ message: 'Error al obtener archivos', error });
+        console.error('Error al eliminar en Cloudinary:', error);
+        return res.status(500).json({ 
+          message: 'Error al eliminar el archivo',
+          error: error.message 
+        });
       }
 
-      const archivos = result.resources.map(resource => ({
-        url: resource.secure_url,
-        public_id: resource.public_id,
-        filename: resource.filename,
-      }));
+      res.json({ 
+        message: 'Archivo eliminado correctamente', 
+        result 
+      });
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Error en el servidor',
+      error: error.message 
+    });
+  }
+});
 
-      res.json({ archivos });
-    }
-  );
+// Listar archivos desde Cloudinary
+app.get('/archivos/:estado', (req, res) => {
+  try {
+    const estado = req.params.estado || 'aguascalientes';
+
+    cloudinary.api.resources(
+      {
+        type: 'upload',
+        prefix: `${estado}/`,
+        resource_type: 'raw',
+        max_results: 100,
+      },
+      (error, result) => {
+        if (error) {
+          console.error('Error al obtener archivos:', error);
+          return res.status(500).json({ 
+            message: 'Error al obtener archivos',
+            error: error.message 
+          });
+        }
+
+        const archivos = result.resources.map(resource => ({
+          url: resource.secure_url,
+          public_id: resource.public_id,
+          filename: resource.public_id.split('/').pop() || 'documento.pdf'
+        }));
+
+        res.json({ archivos });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Error en el servidor',
+      error: error.message 
+    });
+  }
+});
+
+// Manejador de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: 'Error interno del servidor',
+    error: err.message 
+  });
 });
 
 // Iniciar el servidor
