@@ -39,30 +39,47 @@
         </iframe>
     </div>
 
-    <!-- Subir archivo -->
-    <div class="upload-form">
-        <h2>Subir archivo de vehículo</h2>
-        <form id="uploadForm" enctype="multipart/form-data">
-            <label for="file">Seleccionar archivo PDF:</label>
-            <input type="file" id="file" name="file" accept="application/pdf" required>
-            <button type="submit">Subir Archivo</button>
-        </form>
+<!-- Panel de gestión de archivos -->
+<div class="gestion-archivos">
+    <h2>Gestión de Archivos PDF</h2>
+    
+    <div class="fila-superior">
+        <!-- Subir archivo -->
+        <div class="upload-form">
+            <h3>Subir archivo</h3>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="file" name="file" accept="application/pdf" required>
+                <button type="submit">Subir</button>
+            </form>
+        </div>
+
+        <!-- Archivos disponibles -->
+        <div class="file-list">
+            <h3>Archivos disponibles</h3>
+            <ul id="fileList"></ul>
+        </div>
+
+        <!-- Visualizar archivo -->
+        <div class="view-file">
+            <h3>Visualizar archivo</h3>
+            <select id="viewSelect">
+                <option value="">Selecciona un archivo</option>
+            </select>
+        </div>
     </div>
 
-    <!-- Lista de archivos subidos -->
-    <div class="file-list">
-        <h3>Archivos Disponibles:</h3>
-        <ul id="fileList"></ul>
-    </div>
-
-    <!-- Eliminar archivo -->
+    <!-- Eliminar archivo (centrado debajo de los tres) -->
     <div class="delete-file">
-        <h3>Eliminar archivo:</h3>
+        <h3>Eliminar archivo</h3>
         <select id="fileSelect">
-            <option value="">Selecciona un archivo para eliminar</option>
+            <option value="">Selecciona un archivo</option>
         </select>
-        <button id="deleteFileButton">Eliminar Archivo</button>
+        <button id="deleteFileButton" class="upload-button">Eliminar</button>
+
+
     </div>
+</div>
+
 
     <!-- Scripts -->
     <script>
@@ -74,28 +91,37 @@
 
         // Cargar lista de archivos al cargar la página
         function cargarListaArchivos() {
-            fetch('http://localhost:3000/files')
-                .then(response => response.json())
-                .then(files => {
-                    fileListContainer.innerHTML = ''; // Limpiar lista antes de agregar nuevos elementos
-                    fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>'; // Limpiar el select
-                    files.forEach(file => {
-                        // Agregar archivo a la lista
-                        const li = document.createElement('li');
-                        li.textContent = file;
-                        fileListContainer.appendChild(li);
+    fetch('http://localhost:3000/files')
+        .then(response => response.json())
+        .then(files => {
+            fileListContainer.innerHTML = '';
+            fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
+            viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
 
-                        // Agregar opción al select para eliminar
-                        const option = document.createElement('option');
-                        option.value = file;
-                        option.textContent = file;
-                        fileSelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error al cargar los archivos:', error);
-                });
-        }
+            files.forEach(file => {
+                // Lista visible
+                const li = document.createElement('li');
+                li.textContent = file;
+                fileListContainer.appendChild(li);
+
+                // Opción para eliminar
+                const deleteOption = document.createElement('option');
+                deleteOption.value = file;
+                deleteOption.textContent = file;
+                fileSelect.appendChild(deleteOption);
+
+                // Opción para ver
+                const viewOption = document.createElement('option');
+                viewOption.value = file;
+                viewOption.textContent = file;
+                viewSelect.appendChild(viewOption);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar los archivos:', error);
+        });
+}
+
 
         // Mostrar PDF en el iframe
         function mostrarPdf(filename) {
@@ -163,6 +189,14 @@
       }
     })
     .catch(err => console.error('Error al cargar PDF:', err));
+});
+const viewSelect = document.getElementById('viewSelect');
+
+viewSelect.addEventListener('change', function () {
+    const selectedFile = viewSelect.value;
+    if (selectedFile) {
+        mostrarPdf(selectedFile);
+    }
 });
 
     </script>

@@ -36,7 +36,7 @@ header {
 
 /* --- Contenedor del mapa --- */
 .map-container {
-    padding: 2vw;
+    padding: 10vw;
     text-align: center;
     margin-top: 2vw;
     margin-left: 18vw; /* Espacio para el menú en escritorio */
