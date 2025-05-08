@@ -107,4 +107,29 @@ app.get('/files', (req, res) => {
     res.json(pdfs);
   });
 });
+const cloudinary = require('cloudinary').v2;
+
+// Configura Cloudinary con tus claves API
+cloudinary.config({
+  cloud_name: 'dbl0vo8t4',  // Usa el "Cloud Name" de tu cuenta
+  api_key: '7919444259186274',  // API Key
+  api_secret: 'tu_api_secret'  // API Secret
+});
+
+// Ejemplo de cómo subir un archivo a Cloudinary
+app.post('/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No se ha subido ningún archivo' });
+  }
+
+  // Subir archivo a Cloudinary
+  cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' }, (error, result) => {
+    if (error) {
+      return res.status(500).json({ message: 'Error al subir el archivo', error });
+    }
+
+    res.json({ message: 'Archivo subido correctamente', url: result.url });
+  });
+});
+
 
