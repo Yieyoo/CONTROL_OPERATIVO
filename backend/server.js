@@ -1,80 +1,104 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
 const cloudinary = require('cloudinary').v2;
-require('dotenv').config();  // Para cargar las variables de entorno
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;  // Usar el puerto del entorno o 3000 como predeterminado
+const PORT = process.env.PORT || 3000;
 
-// Configuración para almacenar los archivos subidos temporalmente
-const storage = multer.memoryStorage();  // Usamos memoria para evitar archivos locales
+// Configuración de almacenamiento en memoria para archivos subidos
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Habilitar CORS y procesamiento de JSON
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Configuración de Cloudinary con las variables de entorno
+// Configurar Cloudinary con variables de entorno
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,  // Usa el Cloud Name de tu cuenta de Cloudinary
-  api_key: process.env.CLOUD_API_KEY,  // Usa la API Key de tu cuenta
-  api_secret: process.env.CLOUD_API_SECRET  // Usa la API Secret de tu cuenta
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
 });
 
-// Ruta para subir archivos a Cloudinary
+// Subir archivo a Cloudinary
 app.post('/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No se ha subido ningún archivo' });
   }
 
-  // Subir archivo a Cloudinary
-  cloudinary.uploader.upload_stream(
-    { resource_type: 'auto' },
+  const estado = req.body.estado || 'aguascalientes'; // Carpeta por estado
+
+  const uploadStream = cloudinary.uploader.upload_stream(
+    {
+      resource_type: 'auto',
+      folder: estado, // Carpeta dinámica
+    },
     (error, result) => {
       if (error) {
-        return res.status(500).json({ message: 'Error al subir el archivo a Cloudinary', error });
+        console.error('Error al subir a Cloudinary:', error);
+        return res.status(500).json({ message: 'Error al subir el archivo', error });
       }
 
       res.json({
-        message: 'Archivo subido correctamente a Cloudinary',
-        url: result.url  // URL del archivo almacenado en Cloudinary
+        message: 'Archivo subido correctamente',
+        url: result.secure_url,
+        public_id: result.public_id,
       });
     }
-  ).end(req.file.buffer);  // Subimos el archivo a Cloudinary desde el buffer
+  );
+
+  uploadStream.end(req.file.buffer);
 });
 
-// Ruta para eliminar archivos en Cloudinary
+// Eliminar archivo de Cloudinary
 app.delete('/delete', (req, res) => {
-  const { public_id } = req.body;  // Asumimos que se envía el public_id de Cloudinary
+  const { public_id } = req.body;
+
+  if (!public_id) {
+    return res.status(400).json({ message: 'public_id es requerido' });
+  }
 
   cloudinary.uploader.destroy(public_id, (error, result) => {
     if (error) {
-      return res.status(500).json({ message: 'Error al eliminar el archivo de Cloudinary', error });
+      console.error('Error al eliminar en Cloudinary:', error);
+      return res.status(500).json({ message: 'Error al eliminar el archivo', error });
     }
 
-    res.json({ message: 'Archivo eliminado correctamente de Cloudinary' });
+    res.json({ message: 'Archivo eliminado correctamente', result });
   });
 });
 
-// Ruta para obtener todos los archivos PDF desde Cloudinary
-app.get('/archivos', (req, res) => {
+// Listar archivos desde Cloudinary por estado (opcional)
+app.get('/archivos/:estado', (req, res) => {
+  const estado = req.params.estado || 'aguascalientes';
+
   cloudinary.api.resources(
-    { type: 'upload', prefix: 'aguascalientes/' },  // Filtramos por carpeta
+    {
+      type: 'upload',
+      prefix: `${estado}/`,
+      resource_type: 'raw',
+      max_results: 100,
+    },
     (error, result) => {
       if (error) {
-        return res.status(500).json({ message: 'Error al obtener los archivos', error });
+        console.error('Error al obtener archivos:', error);
+        return res.status(500).json({ message: 'Error al obtener archivos', error });
       }
 
-      const files = result.resources.map(resource => resource.url);  // Extraemos las URLs de los archivos
-      res.json({ archivos: files });
+      const archivos = result.resources.map(resource => ({
+        url: resource.secure_url,
+        public_id: resource.public_id,
+        filename: resource.filename,
+      }));
+
+      res.json({ archivos });
     }
   );
 });
 
 // Iniciar el servidor
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
