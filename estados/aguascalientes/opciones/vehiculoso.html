@@ -34,10 +34,64 @@
         .error-message {
             color: #d9534f;
             font-weight: bold;
+            margin-top: 10px;
         }
         .success-message {
             color: #5cb85c;
             font-weight: bold;
+            margin-top: 10px;
+        }
+        .pdf-embed {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .gestion-archivos {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .fila-superior {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .upload-form, .file-list, .view-file {
+            flex: 1;
+            min-width: 300px;
+        }
+        #fileList {
+            list-style-type: none;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #fileList li {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        select, input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -120,7 +174,7 @@
     <script>
         // Configuración global
         const BACKEND_URL = 'https://control-operativo-1.onrender.com';
-        const API_KEY = '919251141771441'; // Asegúrate que coincida con la de Render
+        const API_KEY = '919251141771441';
         const estadoActual = 'aguascalientes';
         
         // Elementos del DOM
@@ -150,24 +204,34 @@
             }, 5000);
         }
 
+        // Función para manejar errores de API
+        async function handleApiError(response) {
+            if (!response.ok) {
+                let errorMessage = `Error ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {
+                    console.error('Error parsing error response:', e);
+                }
+                throw new Error(errorMessage);
+            }
+            return response.json();
+        }
+
         // Cargar lista de archivos
         async function cargarListaArchivos() {
             showLoading(true);
             try {
                 const response = await fetch(`${BACKEND_URL}/archivos/${estadoActual}`, {
                     method: 'GET',
-                    mode: 'cors',
                     headers: {
-                        'x-api-key': API_KEY
+                        'x-api-key': API_KEY,
+                        'Accept': 'application/json'
                     }
                 });
                 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Error ${response.status}`);
-                }
-                
-                const data = await response.json();
+                const data = await handleApiError(response);
                 renderizarListaArchivos(data.archivos || []);
                 
             } catch (error) {
@@ -215,7 +279,12 @@
 
         // Mostrar PDF
         function mostrarPdf(url) {
-            pdfIframe.src = url;
+            if (url) {
+                pdfIframe.src = url;
+                pdfIframe.style.display = 'block';
+            } else {
+                pdfIframe.style.display = 'none';
+            }
         }
 
         // Validar archivo antes de subir
@@ -251,23 +320,20 @@
                 const response = await fetch(`${BACKEND_URL}/upload`, {
                     method: 'POST',
                     body: formData,
-                    mode: 'cors',
                     headers: {
                         'x-api-key': API_KEY
                     }
                 });
                 
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.message || 'Error al subir el archivo');
-                }
+                const data = await handleApiError(response);
                 
                 showStatus(uploadStatus, 'Archivo subido correctamente');
-                cargarListaArchivos();
+                await cargarListaArchivos();
                 
                 if (data.url) {
                     mostrarPdf(data.url);
+                    // Seleccionar automáticamente el archivo subido
+                    viewSelect.value = data.url;
                 }
                 
                 uploadForm.reset();
@@ -304,19 +370,19 @@
                         'Content-Type': 'application/json',
                         'x-api-key': API_KEY
                     },
-                    body: JSON.stringify({ public_id: publicId }),
-                    mode: 'cors'
+                    body: JSON.stringify({ public_id: publicId })
                 });
                 
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.message || 'Error al eliminar el archivo');
-                }
+                await handleApiError(response);
                 
                 showStatus(deleteStatus, 'Archivo eliminado correctamente');
-                cargarListaArchivos();
-                pdfIframe.src = '';
+                await cargarListaArchivos();
+                
+                // Si el PDF eliminado era el que se estaba viendo, limpiar el visor
+                if (pdfIframe.src.includes(publicId)) {
+                    mostrarPdf('');
+                    viewSelect.value = '';
+                }
                 
             } catch (error) {
                 console.error('Error al eliminar:', error);
@@ -329,34 +395,39 @@
 
         // Ver PDF
         viewSelect.addEventListener('change', function() {
-            const selectedUrl = viewSelect.value;
-            if (selectedUrl) {
-                mostrarPdf(selectedUrl);
-            } else {
-                pdfIframe.src = '';
-            }
+            mostrarPdf(viewSelect.value);
         });
 
         // Cargar archivos al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarListaArchivos();
-            
-            // Verificar conexión con el backend
-            fetch(`${BACKEND_URL}/health`, {
-                headers: {
-                    'x-api-key': API_KEY
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        console.warn('El backend parece tener problemas');
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Verificar conexión con el backend
+                const healthResponse = await fetch(`${BACKEND_URL}/health`, {
+                    headers: {
+                        'x-api-key': API_KEY
                     }
-                })
-                .catch(error => {
-                    console.error('No se pudo conectar al backend:', error);
-                    showStatus(uploadStatus, 'Error: No se puede conectar al servidor', true);
                 });
+                
+                if (!healthResponse.ok) {
+                    console.warn('El backend parece tener problemas');
+                    showStatus(uploadStatus, 'Advertencia: Problemas de conexión con el servidor', true);
+                }
+                
+                // Cargar lista de archivos
+                await cargarListaArchivos();
+            } catch (error) {
+                console.error('Error inicial:', error);
+                showStatus(uploadStatus, 'Error: No se puede conectar al servidor', true);
+            }
         });
+
+        // Función para el menú hamburguesa
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            const overlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
     </script>
 </body>
 </html>
