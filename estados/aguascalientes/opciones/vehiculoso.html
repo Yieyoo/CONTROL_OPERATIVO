@@ -174,8 +174,8 @@
     <script>
         // Configuración global
         const BACKEND_URL = 'https://control-operativo-1.onrender.com';
-        const API_KEY = '919251141771441';
         const estadoActual = 'aguascalientes';
+        const API_KEY = '919251141771441'; // Tu API Key de Cloudinary
         
         // Elementos del DOM
         const loadingElement = document.getElementById('loading');
@@ -226,8 +226,8 @@
                 const response = await fetch(`${BACKEND_URL}/archivos/${estadoActual}`, {
                     method: 'GET',
                     headers: {
-                        'x-api-key': API_KEY,
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'x-api-key': API_KEY // Envía la API Key en el header
                     }
                 });
                 
@@ -257,6 +257,8 @@
 
             files.forEach(file => {
                 const filename = file.filename || 'documento.pdf';
+                const pdfUrl = file.url.includes('res.cloudinary.com') ? 
+                    `${file.url}?dl=${encodeURIComponent(filename)}` : file.url;
                 
                 // Lista de archivos
                 const li = document.createElement('li');
@@ -271,7 +273,7 @@
 
                 // Selector para visualizar
                 const viewOption = document.createElement('option');
-                viewOption.value = file.url;
+                viewOption.value = pdfUrl;
                 viewOption.textContent = filename;
                 viewSelect.appendChild(viewOption);
             });
@@ -280,7 +282,10 @@
         // Mostrar PDF
         function mostrarPdf(url) {
             if (url) {
-                pdfIframe.src = url;
+                // Asegurar que los PDFs de Cloudinary se muestren correctamente
+                const pdfUrl = url.includes('res.cloudinary.com') ? 
+                    url.replace('/upload/', '/upload/fl_attachment/') : url;
+                pdfIframe.src = pdfUrl;
                 pdfIframe.style.display = 'block';
             } else {
                 pdfIframe.style.display = 'none';
@@ -308,21 +313,25 @@
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
             
             try {
-                validarArchivo(fileInput.files[0]);
+                validarArchivo(file);
                 
                 showLoading(true);
                 uploadButton.disabled = true;
                 uploadStatus.textContent = 'Subiendo archivo...';
                 
-                const formData = new FormData(uploadForm);
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('estado', estadoActual);
+
                 const response = await fetch(`${BACKEND_URL}/upload`, {
                     method: 'POST',
-                    body: formData,
                     headers: {
-                        'x-api-key': API_KEY
-                    }
+                        'x-api-key': API_KEY // Envía la API Key en el header
+                    },
+                    body: formData
                 });
                 
                 const data = await handleApiError(response);
@@ -368,9 +377,12 @@
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
+                        'x-api-key': API_KEY // Envía la API Key en el header
                     },
-                    body: JSON.stringify({ public_id: publicId })
+                    body: JSON.stringify({ 
+                        public_id: publicId,
+                        estado: estadoActual
+                    })
                 });
                 
                 await handleApiError(response);
@@ -404,7 +416,7 @@
                 // Verificar conexión con el backend
                 const healthResponse = await fetch(`${BACKEND_URL}/health`, {
                     headers: {
-                        'x-api-key': API_KEY
+                        'x-api-key': API_KEY // Envía la API Key en el header
                     }
                 });
                 
