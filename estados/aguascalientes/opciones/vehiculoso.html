@@ -1,5 +1,3 @@
-
-HTML 
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -127,7 +125,9 @@ HTML
         <iframe 
             id="pdfIframe"
             class="pdf-embed"
-            frameborder="0">
+            frameborder="0"
+            allowfullscreen
+            allow="autoplay">
         </iframe>
     </div>
 
@@ -270,8 +270,7 @@ HTML
 
             files.forEach(file => {
                 const filename = file.filename || 'documento.pdf';
-                const pdfUrl = file.url?.includes('res.cloudinary.com') ? 
-                    `${file.url.replace('/upload/', '/upload/fl_attachment/')}` : file.url;
+                const pdfUrl = file.url;
                 
                 if (!pdfUrl) return;
 
@@ -302,11 +301,10 @@ HTML
             }
 
             try {
-                // Asegurar que los PDFs de Cloudinary se muestren correctamente
-                const pdfUrl = url.includes('res.cloudinary.com') ? 
-                    url.replace('/upload/', '/upload/fl_attachment/') : url;
+                // Usar el visor de PDF de Google como solución universal
+                const finalUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
                 
-                pdfIframe.src = pdfUrl;
+                pdfIframe.src = finalUrl;
                 pdfIframe.style.display = 'block';
             } catch (error) {
                 console.error('Error al mostrar PDF:', error);

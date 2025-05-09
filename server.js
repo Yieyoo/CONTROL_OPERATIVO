@@ -170,7 +170,7 @@ router.get('/health', (req, res) => {
   });
 });
 
-// Subir archivo
+// Subir archivo - Modificado para asegurar visualización correcta
 router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, next) => {
   try {
     if (!req.file) {
@@ -187,7 +187,11 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
       use_filename: true,
       unique_filename: false,
       filename_override: originalName.replace('.pdf', ''),
-      overwrite: false
+      overwrite: false,
+      // Añadido para mejor compatibilidad con visualización
+      transformation: [
+        { flags: 'attachment' } // Forzar descarga como PDF
+      ]
     };
 
     const result = await new Promise((resolve, reject) => {
@@ -205,10 +209,13 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
       uploadStream.end(req.file.buffer);
     });
 
+    // Asegurar que la URL sea accesible directamente
+    const pdfUrl = result.secure_url.replace('/upload/', '/upload/fl_attachment/');
+
     res.status(201).json({
       status: 'success',
       data: {
-        url: result.secure_url,
+        url: pdfUrl, // Usamos la URL modificada para mejor visualización
         public_id: result.public_id,
         filename: originalName,
         size: req.file.size,
@@ -254,7 +261,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Listar archivos
+// Listar archivos - Modificado para URLs compatibles con visualización
 router.get('/archivos/:estado', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
@@ -269,7 +276,7 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
     });
 
     const archivos = result.resources.map(resource => ({
-      url: resource.secure_url,
+      url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'), // URL modificada
       public_id: resource.public_id,
       filename: resource.public_id.split('/').pop() + '.pdf',
       size: resource.bytes,
