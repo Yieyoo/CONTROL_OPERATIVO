@@ -173,9 +173,9 @@
 
     <script>
         // Configuración global
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com';
+        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const estadoActual = 'aguascalientes';
-        const API_KEY = '919251141771441'; // Tu API Key de Cloudinary
+        const API_KEY = 'tu_api_key_secreta'; // Deberías usar variables de entorno en producción
         
         // Elementos del DOM
         const loadingElement = document.getElementById('loading');
@@ -204,13 +204,19 @@
             }, 5000);
         }
 
-        // Función para manejar errores de API
+        // Función mejorada para manejar errores de API
         async function handleApiError(response) {
             if (!response.ok) {
                 let errorMessage = `Error ${response.status}`;
                 try {
                     const errorData = await response.json();
-                    errorMessage = errorData.message || errorMessage;
+                    console.error('Error detallado:', errorData);
+                    errorMessage = errorData.message || errorData.error?.message || errorMessage;
+                    
+                    // Manejo específico para errores de Cloudinary
+                    if (errorData.error?.http_code === 401) {
+                        errorMessage = 'Error de autenticación con Cloudinary';
+                    }
                 } catch (e) {
                     console.error('Error parsing error response:', e);
                 }
@@ -227,12 +233,17 @@
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
-                        'x-api-key': API_KEY // Envía la API Key en el header
+                        'x-api-key': API_KEY
                     }
                 });
                 
-                const data = await handleApiError(response);
-                renderizarListaArchivos(data.archivos || []);
+                const { data, status } = await handleApiError(response);
+                
+                if (status !== 'success') {
+                    throw new Error('Respuesta inesperada del servidor');
+                }
+                
+                renderizarListaArchivos(data || []);
                 
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
@@ -242,13 +253,13 @@
             }
         }
 
-        // Renderizar lista de archivos
+        // Renderizar lista de archivos mejorada
         function renderizarListaArchivos(files) {
             fileListContainer.innerHTML = '';
             fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
             viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
 
-            if (files.length === 0) {
+            if (!files || files.length === 0) {
                 const li = document.createElement('li');
                 li.textContent = 'No hay archivos disponibles';
                 fileListContainer.appendChild(li);
@@ -257,9 +268,11 @@
 
             files.forEach(file => {
                 const filename = file.filename || 'documento.pdf';
-                const pdfUrl = file.url.includes('res.cloudinary.com') ? 
-                    `${file.url}?dl=${encodeURIComponent(filename)}` : file.url;
+                const pdfUrl = file.url?.includes('res.cloudinary.com') ? 
+                    `${file.url.replace('/upload/', '/upload/fl_attachment/')}` : file.url;
                 
+                if (!pdfUrl) return;
+
                 // Lista de archivos
                 const li = document.createElement('li');
                 li.textContent = filename;
@@ -279,16 +292,23 @@
             });
         }
 
-        // Mostrar PDF
+        // Mostrar PDF mejorado
         function mostrarPdf(url) {
-            if (url) {
+            if (!url) {
+                pdfIframe.style.display = 'none';
+                return;
+            }
+
+            try {
                 // Asegurar que los PDFs de Cloudinary se muestren correctamente
                 const pdfUrl = url.includes('res.cloudinary.com') ? 
                     url.replace('/upload/', '/upload/fl_attachment/') : url;
+                
                 pdfIframe.src = pdfUrl;
                 pdfIframe.style.display = 'block';
-            } else {
-                pdfIframe.style.display = 'none';
+            } catch (error) {
+                console.error('Error al mostrar PDF:', error);
+                showStatus(uploadStatus, 'Error al cargar el PDF', true);
             }
         }
 
@@ -306,10 +326,38 @@
                 throw new Error('El archivo excede el límite de 10MB');
             }
             
+            // Validar nombre del archivo
+            if (!/^[\w\-\. ]+\.pdf$/i.test(file.name)) {
+                throw new Error('El nombre del archivo contiene caracteres no permitidos');
+            }
+            
             return true;
         }
 
-        // Subir archivo
+        // Función mejorada para subir archivos
+        async function subirArchivo(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('estado', estadoActual);
+
+            const response = await fetch(`${BACKEND_URL}/upload`, {
+                method: 'POST',
+                headers: {
+                    'x-api-key': API_KEY
+                },
+                body: formData
+            });
+
+            const { data, status } = await handleApiError(response);
+            
+            if (status !== 'success') {
+                throw new Error('Error al subir archivo');
+            }
+
+            return data;
+        }
+
+        // Manejador de formulario mejorado
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const fileInput = document.getElementById('file');
@@ -322,27 +370,14 @@
                 uploadButton.disabled = true;
                 uploadStatus.textContent = 'Subiendo archivo...';
                 
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('estado', estadoActual);
-
-                const response = await fetch(`${BACKEND_URL}/api/upload`, {
-                    method: 'POST',
-                    headers: {
-                        'x-api-key': API_KEY // Envía la API Key en el header
-                    },
-                    body: formData
-                });
-                
-                const data = await handleApiError(response);
+                const { url, public_id, filename } = await subirArchivo(file);
                 
                 showStatus(uploadStatus, 'Archivo subido correctamente');
                 await cargarListaArchivos();
                 
-                if (data.url) {
-                    mostrarPdf(data.url);
-                    // Seleccionar automáticamente el archivo subido
-                    viewSelect.value = data.url;
+                if (url) {
+                    mostrarPdf(url);
+                    viewSelect.value = url;
                 }
                 
                 uploadForm.reset();
@@ -356,7 +391,28 @@
             }
         });
 
-        // Eliminar archivo
+        // Función mejorada para eliminar archivos
+        async function eliminarArchivo(publicId) {
+            const response = await fetch(`${BACKEND_URL}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY
+                },
+                body: JSON.stringify({ 
+                    public_id: publicId,
+                    estado: estadoActual
+                })
+            });
+
+            const { status } = await handleApiError(response);
+            
+            if (status !== 'success') {
+                throw new Error('Error al eliminar archivo');
+            }
+        }
+
+        // Manejador de eliminación mejorado
         deleteFileButton.addEventListener('click', async function() {
             const publicId = fileSelect.value;
             
@@ -373,19 +429,7 @@
                 deleteFileButton.disabled = true;
                 deleteStatus.textContent = 'Eliminando archivo...';
                 
-                const response = await fetch(`${BACKEND_URL}/delete`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': API_KEY // Envía la API Key en el header
-                    },
-                    body: JSON.stringify({ 
-                        public_id: publicId,
-                        estado: estadoActual
-                    })
-                });
-                
-                await handleApiError(response);
+                await eliminarArchivo(publicId);
                 
                 showStatus(deleteStatus, 'Archivo eliminado correctamente');
                 await cargarListaArchivos();
@@ -416,11 +460,13 @@
                 // Verificar conexión con el backend
                 const healthResponse = await fetch(`${BACKEND_URL}/health`, {
                     headers: {
-                        'x-api-key': API_KEY // Envía la API Key en el header
+                        'x-api-key': API_KEY
                     }
                 });
                 
-                if (!healthResponse.ok) {
+                const { status } = await healthResponse.json();
+                
+                if (status !== 'healthy') {
                     console.warn('El backend parece tener problemas');
                     showStatus(uploadStatus, 'Advertencia: Problemas de conexión con el servidor', true);
                 }
