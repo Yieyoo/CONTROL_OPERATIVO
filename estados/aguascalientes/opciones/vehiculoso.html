@@ -31,6 +31,14 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .error-message {
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .success-message {
+            color: #5cb85c;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -110,7 +118,12 @@
     </div>
 
     <script>
+        // Configuración global
+        const BACKEND_URL = 'https://control-operativo-1.onrender.com';
+        const API_KEY = 'tu-api-key-secreta'; // Reemplaza con tu API Key real
         const estadoActual = 'aguascalientes';
+        
+        // Elementos del DOM
         const loadingElement = document.getElementById('loading');
         const uploadForm = document.getElementById('uploadForm');
         const uploadButton = document.getElementById('uploadButton');
@@ -127,50 +140,77 @@
             loadingElement.style.display = show ? 'flex' : 'none';
         }
 
+        // Mostrar mensaje de estado
+        function showStatus(element, message, isError = false) {
+            element.textContent = message;
+            element.className = isError ? 'error-message' : 'success-message';
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = '';
+            }, 5000);
+        }
+
         // Cargar lista de archivos
         async function cargarListaArchivos() {
             showLoading(true);
             try {
-                const response = await fetch(`https://control-operativo-1.onrender.com/archivos/${estadoActual}`, {
+                const response = await fetch(`${BACKEND_URL}/archivos/${estadoActual}`, {
                     method: 'GET',
-                    mode: 'cors'
+                    mode: 'cors',
+                    headers: {
+                        'x-api-key': API_KEY
+                    }
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `Error ${response.status}`);
                 }
                 
                 const data = await response.json();
-                const files = data.archivos || [];
-
-                fileListContainer.innerHTML = '';
-                fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
-                viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
-
-                files.forEach(file => {
-                    // Lista de archivos
-                    const li = document.createElement('li');
-                    li.textContent = file.filename || 'documento.pdf';
-                    fileListContainer.appendChild(li);
-
-                    // Selector para eliminar
-                    const deleteOption = document.createElement('option');
-                    deleteOption.value = file.public_id;
-                    deleteOption.textContent = file.filename || 'documento.pdf';
-                    fileSelect.appendChild(deleteOption);
-
-                    // Selector para visualizar
-                    const viewOption = document.createElement('option');
-                    viewOption.value = file.url;
-                    viewOption.textContent = file.filename || 'documento.pdf';
-                    viewSelect.appendChild(viewOption);
-                });
+                renderizarListaArchivos(data.archivos || []);
+                
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
-                alert('Error al cargar archivos: ' + error.message);
+                showStatus(uploadStatus, 'Error al cargar archivos: ' + error.message, true);
             } finally {
                 showLoading(false);
             }
+        }
+
+        // Renderizar lista de archivos
+        function renderizarListaArchivos(files) {
+            fileListContainer.innerHTML = '';
+            fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
+            viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
+
+            if (files.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No hay archivos disponibles';
+                fileListContainer.appendChild(li);
+                return;
+            }
+
+            files.forEach(file => {
+                const filename = file.filename || 'documento.pdf';
+                
+                // Lista de archivos
+                const li = document.createElement('li');
+                li.textContent = filename;
+                fileListContainer.appendChild(li);
+
+                // Selector para eliminar
+                const deleteOption = document.createElement('option');
+                deleteOption.value = file.public_id;
+                deleteOption.textContent = filename;
+                fileSelect.appendChild(deleteOption);
+
+                // Selector para visualizar
+                const viewOption = document.createElement('option');
+                viewOption.value = file.url;
+                viewOption.textContent = filename;
+                viewSelect.appendChild(viewOption);
+            });
         }
 
         // Mostrar PDF
@@ -178,61 +218,66 @@
             pdfIframe.src = url;
         }
 
+        // Validar archivo antes de subir
+        function validarArchivo(file) {
+            if (!file) {
+                throw new Error('No se seleccionó ningún archivo');
+            }
+            
+            if (file.type !== 'application/pdf') {
+                throw new Error('Solo se permiten archivos PDF');
+            }
+            
+            if (file.size > 10 * 1024 * 1024) {
+                throw new Error('El archivo excede el límite de 10MB');
+            }
+            
+            return true;
+        }
+
         // Subir archivo
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const fileInput = document.getElementById('file');
             
-            if (!fileInput.files[0]) {
-                uploadStatus.textContent = 'No se seleccionó ningún archivo';
-                uploadStatus.style.color = 'red';
-                return;
-            }
-            
-            if (fileInput.files[0].type !== 'application/pdf') {
-                uploadStatus.textContent = 'Solo se permiten archivos PDF';
-                uploadStatus.style.color = 'red';
-                return;
-            }
-
-            showLoading(true);
-            uploadButton.disabled = true;
-            uploadStatus.textContent = 'Subiendo archivo...';
-            uploadStatus.style.color = 'blue';
-
             try {
+                validarArchivo(fileInput.files[0]);
+                
+                showLoading(true);
+                uploadButton.disabled = true;
+                uploadStatus.textContent = 'Subiendo archivo...';
+                
                 const formData = new FormData(uploadForm);
-                const response = await fetch('https://control-operativo-1.onrender.com/upload', {
+                const response = await fetch(`${BACKEND_URL}/upload`, {
                     method: 'POST',
                     body: formData,
-                    mode: 'cors'
+                    mode: 'cors',
+                    headers: {
+                        'x-api-key': API_KEY
+                    }
                 });
                 
+                const data = await response.json();
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error al subir el archivo');
+                    throw new Error(data.message || 'Error al subir el archivo');
                 }
                 
-                const data = await response.json();
-                uploadStatus.textContent = data.message || 'Archivo subido correctamente';
-                uploadStatus.style.color = 'green';
-                
+                showStatus(uploadStatus, 'Archivo subido correctamente');
                 cargarListaArchivos();
+                
                 if (data.url) {
                     mostrarPdf(data.url);
                 }
                 
                 uploadForm.reset();
+                
             } catch (error) {
                 console.error('Error al subir:', error);
-                uploadStatus.textContent = 'Error: ' + error.message;
-                uploadStatus.style.color = 'red';
+                showStatus(uploadStatus, 'Error: ' + error.message, true);
             } finally {
                 showLoading(false);
                 uploadButton.disabled = false;
-                setTimeout(() => {
-                    uploadStatus.textContent = '';
-                }, 5000);
             }
         });
 
@@ -240,50 +285,45 @@
         deleteFileButton.addEventListener('click', async function() {
             const publicId = fileSelect.value;
             
-            if (!publicId) {
-                deleteStatus.textContent = 'Selecciona un archivo para eliminar';
-                deleteStatus.style.color = 'red';
-                return;
-            }
-            
-            if (!confirm('¿Estás seguro de eliminar este archivo?')) return;
-            
-            showLoading(true);
-            deleteFileButton.disabled = true;
-            deleteStatus.textContent = 'Eliminando archivo...';
-            deleteStatus.style.color = 'blue';
-
             try {
-                const response = await fetch('https://control-operativo-1.onrender.com/delete', {
+                if (!publicId) {
+                    throw new Error('Selecciona un archivo para eliminar');
+                }
+                
+                if (!confirm('¿Estás seguro de eliminar este archivo?')) {
+                    return;
+                }
+                
+                showLoading(true);
+                deleteFileButton.disabled = true;
+                deleteStatus.textContent = 'Eliminando archivo...';
+                
+                const response = await fetch(`${BACKEND_URL}/delete`, {
                     method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
                     },
                     body: JSON.stringify({ public_id: publicId }),
                     mode: 'cors'
                 });
                 
+                const data = await response.json();
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error al eliminar el archivo');
+                    throw new Error(data.message || 'Error al eliminar el archivo');
                 }
                 
-                const data = await response.json();
-                deleteStatus.textContent = data.message || 'Archivo eliminado correctamente';
-                deleteStatus.style.color = 'green';
-                
+                showStatus(deleteStatus, 'Archivo eliminado correctamente');
                 cargarListaArchivos();
                 pdfIframe.src = '';
+                
             } catch (error) {
                 console.error('Error al eliminar:', error);
-                deleteStatus.textContent = 'Error: ' + error.message;
-                deleteStatus.style.color = 'red';
+                showStatus(deleteStatus, 'Error: ' + error.message, true);
             } finally {
                 showLoading(false);
                 deleteFileButton.disabled = false;
-                setTimeout(() => {
-                    deleteStatus.textContent = '';
-                }, 5000);
             }
         });
 
@@ -298,8 +338,21 @@
         });
 
         // Cargar archivos al iniciar
-        document.addEventListener('DOMContentLoaded', cargarListaArchivos);
-        
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarListaArchivos();
+            
+            // Verificar conexión con el backend
+            fetch(`${BACKEND_URL}/health`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn('El backend parece tener problemas');
+                    }
+                })
+                .catch(error => {
+                    console.error('No se pudo conectar al backend:', error);
+                    showStatus(uploadStatus, 'Error: No se puede conectar al servidor', true);
+                });
+        });
     </script>
 </body>
-</html> 
+</html>
