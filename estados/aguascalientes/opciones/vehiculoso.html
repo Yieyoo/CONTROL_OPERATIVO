@@ -120,7 +120,7 @@
     <script>
         // Configuración global
         const BACKEND_URL = 'https://control-operativo-1.onrender.com';
-        const API_KEY = 'zTsJIIHZ5NBR-TPtk1sdrnJclUo'; // Reemplaza con tu API Key real
+        const API_KEY = 'zTsJIIHZ5NBR-TPtk1sdrnJclUo'; // Asegúrate que coincida con la de Render
         const estadoActual = 'aguascalientes';
         
         // Elementos del DOM
@@ -342,7 +342,11 @@
             cargarListaArchivos();
             
             // Verificar conexión con el backend
-            fetch(`${BACKEND_URL}/health`)
+            fetch(`${BACKEND_URL}/health`, {
+                headers: {
+                    'x-api-key': API_KEY
+                }
+            })
                 .then(response => {
                     if (!response.ok) {
                         console.warn('El backend parece tener problemas');
