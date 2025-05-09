@@ -267,9 +267,14 @@
             }
 
             files.forEach(file => {
+                // Asegurar que el public_id no tenga extensión
+                const publicId = file.public_id?.replace('.pdf', '') || '';
                 const filename = file.filename || 'documento.pdf';
+                
+                // Construir URL correcta para Cloudinary
                 const pdfUrl = file.url?.includes('res.cloudinary.com') ? 
-                    `${file.url.replace('/upload/', '/upload/fl_attachment/')}` : file.url;
+                    `${file.url.replace('/upload/', '/raw/upload/').replace('.pdf', '')}.pdf` : 
+                    file.url;
                 
                 if (!pdfUrl) return;
 
@@ -280,7 +285,7 @@
 
                 // Selector para eliminar
                 const deleteOption = document.createElement('option');
-                deleteOption.value = file.public_id;
+                deleteOption.value = publicId;
                 deleteOption.textContent = filename;
                 fileSelect.appendChild(deleteOption);
 
@@ -300,15 +305,20 @@
             }
 
             try {
-                // Asegurar que los PDFs de Cloudinary se muestren correctamente
-                const pdfUrl = url.includes('res.cloudinary.com') ? 
-                    url.replace('/upload/', '/upload/fl_attachment/') : url;
+                // Asegurar formato correcto para Cloudinary
+                let pdfUrl = url;
+                if (url.includes('res.cloudinary.com')) {
+                    // Si es de Cloudinary, forzar descarga/visualización
+                    pdfUrl = url.includes('/raw/upload/') ? 
+                           url.replace('/raw/upload/', '/raw/upload/fl_attachment/') :
+                           url.replace('/upload/', '/upload/fl_attachment/');
+                }
                 
                 pdfIframe.src = pdfUrl;
                 pdfIframe.style.display = 'block';
             } catch (error) {
                 console.error('Error al mostrar PDF:', error);
-                showStatus(uploadStatus, 'Error al cargar el PDF', true);
+                showStatus(uploadStatus, 'Error al cargar el PDF: ' + error.message, true);
             }
         }
 
