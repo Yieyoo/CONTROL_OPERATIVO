@@ -1,3 +1,5 @@
+
+HTML 
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -43,10 +45,9 @@
         }
         .pdf-embed {
             width: 100%;
-            height: 80vh;
+            height: 500px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            background: #f5f5f5;
         }
         .gestion-archivos {
             margin-top: 20px;
@@ -73,17 +74,11 @@
         #fileList li {
             padding: 8px;
             border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-        #fileList li:hover {
-            background-color: #f0f0f0;
         }
         select, input[type="file"] {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
         button {
             background-color: #4CAF50;
@@ -92,7 +87,6 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #45a049;
@@ -100,13 +94,6 @@
         button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
-        }
-        .download-btn {
-            background-color: #2196F3;
-            margin-top: 10px;
-        }
-        .download-btn:hover {
-            background-color: #0b7dda;
         }
     </style>
 </head>
@@ -140,10 +127,8 @@
         <iframe 
             id="pdfIframe"
             class="pdf-embed"
-            frameborder="0"
-            allowfullscreen>
+            frameborder="0">
         </iframe>
-        <button id="downloadBtn" class="download-btn" style="display: none;">Descargar PDF</button>
     </div>
 
     <!-- Panel de gestión de archivos -->
@@ -174,7 +159,6 @@
                 <select id="viewSelect">
                     <option value="">Selecciona un archivo</option>
                 </select>
-                <button id="viewBtn" style="margin-top: 10px;">Ver Documento</button>
             </div>
         </div>
 
@@ -184,7 +168,7 @@
             <select id="fileSelect">
                 <option value="">Selecciona un archivo para eliminar</option>
             </select>
-            <button id="deleteFileButton">Eliminar</button>
+            <button id="deleteFileButton" class="upload-button">Eliminar</button>
             <p id="deleteStatus"></p>
         </div>
     </div>
@@ -193,28 +177,23 @@
         // Configuración global
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const estadoActual = 'aguascalientes';
-        const API_KEY = 'Xhy2md57';
+        const API_KEY = 'Xhy2md57'; // Deberías usar variables de entorno en producción
         
         // Elementos del DOM
-        const elements = {
-            loading: document.getElementById('loading'),
-            uploadForm: document.getElementById('uploadForm'),
-            fileInput: document.getElementById('file'),
-            uploadButton: document.getElementById('uploadButton'),
-            uploadStatus: document.getElementById('uploadStatus'),
-            pdfIframe: document.getElementById('pdfIframe'),
-            fileList: document.getElementById('fileList'),
-            fileSelect: document.getElementById('fileSelect'),
-            deleteFileButton: document.getElementById('deleteFileButton'),
-            deleteStatus: document.getElementById('deleteStatus'),
-            viewSelect: document.getElementById('viewSelect'),
-            viewBtn: document.getElementById('viewBtn'),
-            downloadBtn: document.getElementById('downloadBtn')
-        };
+        const loadingElement = document.getElementById('loading');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadButton = document.getElementById('uploadButton');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const pdfIframe = document.getElementById('pdfIframe');
+        const fileListContainer = document.getElementById('fileList');
+        const fileSelect = document.getElementById('fileSelect');
+        const deleteFileButton = document.getElementById('deleteFileButton');
+        const deleteStatus = document.getElementById('deleteStatus');
+        const viewSelect = document.getElementById('viewSelect');
 
         // Mostrar/ocultar loading
         function showLoading(show) {
-            elements.loading.style.display = show ? 'flex' : 'none';
+            loadingElement.style.display = show ? 'flex' : 'none';
         }
 
         // Mostrar mensaje de estado
@@ -227,13 +206,19 @@
             }, 5000);
         }
 
-        // Manejo de errores de API
+        // Función mejorada para manejar errores de API
         async function handleApiError(response) {
             if (!response.ok) {
                 let errorMessage = `Error ${response.status}`;
                 try {
                     const errorData = await response.json();
+                    console.error('Error detallado:', errorData);
                     errorMessage = errorData.message || errorData.error?.message || errorMessage;
+                    
+                    // Manejo específico para errores de Cloudinary
+                    if (errorData.error?.http_code === 401) {
+                        errorMessage = 'Error de autenticación con Cloudinary';
+                    }
                 } catch (e) {
                     console.error('Error parsing error response:', e);
                 }
@@ -247,112 +232,111 @@
             showLoading(true);
             try {
                 const response = await fetch(`${BACKEND_URL}/archivos/${estadoActual}`, {
+                    method: 'GET',
                     headers: {
+                        'Accept': 'application/json',
                         'x-api-key': API_KEY
                     }
                 });
                 
-                const { data } = await handleApiError(response);
+                const { data, status } = await handleApiError(response);
+                
+                if (status !== 'success') {
+                    throw new Error('Respuesta inesperada del servidor');
+                }
+                
                 renderizarListaArchivos(data || []);
                 
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
-                showStatus(elements.uploadStatus, error.message, true);
+                showStatus(uploadStatus, 'Error al cargar archivos: ' + error.message, true);
             } finally {
                 showLoading(false);
             }
         }
 
-        // Renderizar lista de archivos
+        // Renderizar lista de archivos mejorada
         function renderizarListaArchivos(files) {
-            elements.fileList.innerHTML = '';
-            elements.fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
-            elements.viewSelect.innerHTML = '<option value="">Selecciona un archivo</option>';
+            fileListContainer.innerHTML = '';
+            fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
+            viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
 
             if (!files || files.length === 0) {
                 const li = document.createElement('li');
                 li.textContent = 'No hay archivos disponibles';
-                elements.fileList.appendChild(li);
+                fileListContainer.appendChild(li);
                 return;
             }
 
             files.forEach(file => {
-                const publicId = file.public_id?.replace('.pdf', '') || '';
                 const filename = file.filename || 'documento.pdf';
-                const pdfUrl = file.url || '';
+                const pdfUrl = file.url?.includes('res.cloudinary.com') ? 
+                    `${file.url.replace('/upload/', '/upload/fl_attachment/')}` : file.url;
+                
+                if (!pdfUrl) return;
 
-                // Elemento de lista
+                // Lista de archivos
                 const li = document.createElement('li');
                 li.textContent = filename;
-                li.addEventListener('click', () => {
-                    mostrarPdf(pdfUrl);
-                    elements.viewSelect.value = pdfUrl;
-                });
-                elements.fileList.appendChild(li);
+                fileListContainer.appendChild(li);
 
-                // Opción para eliminar
+                // Selector para eliminar
                 const deleteOption = document.createElement('option');
-                deleteOption.value = publicId;
+                deleteOption.value = file.public_id;
                 deleteOption.textContent = filename;
-                elements.fileSelect.appendChild(deleteOption);
+                fileSelect.appendChild(deleteOption);
 
-                // Opción para visualizar
+                // Selector para visualizar
                 const viewOption = document.createElement('option');
                 viewOption.value = pdfUrl;
                 viewOption.textContent = filename;
-                elements.viewSelect.appendChild(viewOption);
+                viewSelect.appendChild(viewOption);
             });
         }
 
-        // Mostrar PDF en el visor - FUNCIÓN CORREGIDA
+        // Mostrar PDF mejorado
         function mostrarPdf(url) {
             if (!url) {
-                elements.pdfIframe.style.display = 'none';
-                elements.downloadBtn.style.display = 'none';
+                pdfIframe.style.display = 'none';
                 return;
             }
 
             try {
-                // Si ya es una URL de Google Viewer, usarla directamente
-                if (url.includes('docs.google.com/viewer')) {
-                    elements.pdfIframe.src = url;
-                } else {
-                    // Para URLs de Cloudinary
-                    let cloudinaryUrl = url;
-                    
-                    // Asegurar que la URL sea directa al PDF
-                    if (url.includes('res.cloudinary.com')) {
-                        // Eliminar cualquier transformación existente
-                        cloudinaryUrl = url.split('/upload/')[0] + '/upload/fl_attachment/' + url.split('/upload/')[1];
-                        // Asegurar que termine en .pdf
-                        cloudinaryUrl = cloudinaryUrl.replace(/\..*$/, '.pdf');
-                    }
-                    
-                    // Codificar la URL para el visor de Google
-                    const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(cloudinaryUrl)}&embedded=true`;
-                    elements.pdfIframe.src = viewerUrl;
-                }
+                // Asegurar que los PDFs de Cloudinary se muestren correctamente
+                const pdfUrl = url.includes('res.cloudinary.com') ? 
+                    url.replace('/upload/', '/upload/fl_attachment/') : url;
                 
-                elements.pdfIframe.style.display = 'block';
-                elements.downloadBtn.style.display = 'block';
-                elements.downloadBtn.onclick = () => window.open(url, '_blank');
-                
+                pdfIframe.src = pdfUrl;
+                pdfIframe.style.display = 'block';
             } catch (error) {
                 console.error('Error al mostrar PDF:', error);
-                showStatus(elements.uploadStatus, 'Error al cargar el PDF: ' + error.message, true);
+                showStatus(uploadStatus, 'Error al cargar el PDF', true);
             }
         }
 
         // Validar archivo antes de subir
         function validarArchivo(file) {
-            if (!file) throw new Error('No se seleccionó ningún archivo');
-            if (file.type !== 'application/pdf') throw new Error('Solo se permiten archivos PDF');
-            if (file.size > 10 * 1024 * 1024) throw new Error('El archivo excede el límite de 10MB');
-            if (!/^[\w\-\. ]+\.pdf$/i.test(file.name)) throw new Error('Nombre de archivo no válido');
+            if (!file) {
+                throw new Error('No se seleccionó ningún archivo');
+            }
+            
+            if (file.type !== 'application/pdf') {
+                throw new Error('Solo se permiten archivos PDF');
+            }
+            
+            if (file.size > 10 * 1024 * 1024) {
+                throw new Error('El archivo excede el límite de 10MB');
+            }
+            
+            // Validar nombre del archivo
+            if (!/^[\w\-\. ]+\.pdf$/i.test(file.name)) {
+                throw new Error('El nombre del archivo contiene caracteres no permitidos');
+            }
+            
             return true;
         }
 
-        // Subir archivo al servidor - FUNCIÓN CORREGIDA
+        // Función mejorada para subir archivos
         async function subirArchivo(file) {
             const formData = new FormData();
             formData.append('file', file);
@@ -366,16 +350,50 @@
                 body: formData
             });
 
-            const result = await handleApiError(response);
+            const { data, status } = await handleApiError(response);
             
-            if (result.status !== 'success') {
-                throw new Error(result.error?.message || 'Error al subir archivo');
+            if (status !== 'success') {
+                throw new Error('Error al subir archivo');
             }
 
-            return result.data;
+            return data;
         }
 
-        // Eliminar archivo
+        // Manejador de formulario mejorado
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            
+            try {
+                validarArchivo(file);
+                
+                showLoading(true);
+                uploadButton.disabled = true;
+                uploadStatus.textContent = 'Subiendo archivo...';
+                
+                const { url, public_id, filename } = await subirArchivo(file);
+                
+                showStatus(uploadStatus, 'Archivo subido correctamente');
+                await cargarListaArchivos();
+                
+                if (url) {
+                    mostrarPdf(url);
+                    viewSelect.value = url;
+                }
+                
+                uploadForm.reset();
+                
+            } catch (error) {
+                console.error('Error al subir:', error);
+                showStatus(uploadStatus, 'Error: ' + error.message, true);
+            } finally {
+                showLoading(false);
+                uploadButton.disabled = false;
+            }
+        });
+
+        // Función mejorada para eliminar archivos
         async function eliminarArchivo(publicId) {
             const response = await fetch(`${BACKEND_URL}/delete`, {
                 method: 'DELETE',
@@ -389,108 +407,58 @@
                 })
             });
 
-            await handleApiError(response);
+            const { status } = await handleApiError(response);
+            
+            if (status !== 'success') {
+                throw new Error('Error al eliminar archivo');
+            }
         }
 
-        // Manejador del formulario de subida - CORREGIDO
-        elements.uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Manejador de eliminación mejorado
+        deleteFileButton.addEventListener('click', async function() {
+            const publicId = fileSelect.value;
             
-            const file = elements.fileInput.files[0];
-            if (!file) {
-                showStatus(elements.uploadStatus, 'No se seleccionó ningún archivo', true);
-                return;
-            }
-
             try {
-                // Validar el archivo
-                validarArchivo(file);
-                
-                showLoading(true);
-                elements.uploadButton.disabled = true;
-                elements.uploadStatus.textContent = 'Subiendo archivo...';
-                
-                // Subir el archivo
-                const { url, public_id, filename } = await subirArchivo(file);
-                
-                showStatus(elements.uploadStatus, 'Archivo subido correctamente');
-                
-                // Actualizar la lista de archivos
-                await cargarListaArchivos();
-                
-                // Mostrar el PDF recién subido
-                if (url) {
-                    mostrarPdf(url);
-                    elements.viewSelect.value = url;
+                if (!publicId) {
+                    throw new Error('Selecciona un archivo para eliminar');
                 }
                 
-                // Resetear el formulario
-                elements.uploadForm.reset();
-                
-            } catch (error) {
-                console.error('Error al subir archivo:', error);
-                showStatus(elements.uploadStatus, 'Error: ' + error.message, true);
-            } finally {
-                showLoading(false);
-                elements.uploadButton.disabled = false;
-            }
-        });
-
-        // Manejador para eliminar archivos
-        elements.deleteFileButton.addEventListener('click', async () => {
-            const publicId = elements.fileSelect.value;
-            if (!publicId) return;
-            
-            try {
-                if (!confirm('¿Estás seguro de eliminar este archivo?')) return;
+                if (!confirm('¿Estás seguro de eliminar este archivo?')) {
+                    return;
+                }
                 
                 showLoading(true);
+                deleteFileButton.disabled = true;
+                deleteStatus.textContent = 'Eliminando archivo...';
+                
                 await eliminarArchivo(publicId);
-                showStatus(elements.deleteStatus, 'Archivo eliminado correctamente');
                 
-                if (elements.pdfIframe.src.includes(publicId)) {
-                    mostrarPdf('');
-                    elements.viewSelect.value = '';
-                }
-                
+                showStatus(deleteStatus, 'Archivo eliminado correctamente');
                 await cargarListaArchivos();
                 
+                // Si el PDF eliminado era el que se estaba viendo, limpiar el visor
+                if (pdfIframe.src.includes(publicId)) {
+                    mostrarPdf('');
+                    viewSelect.value = '';
+                }
+                
             } catch (error) {
-                showStatus(elements.deleteStatus, error.message, true);
+                console.error('Error al eliminar:', error);
+                showStatus(deleteStatus, 'Error: ' + error.message, true);
             } finally {
                 showLoading(false);
+                deleteFileButton.disabled = false;
             }
         });
 
-        // Manejador para visualizar PDFs
-        elements.viewBtn.addEventListener('click', () => {
-            const selectedUrl = elements.viewSelect.value;
-            if (selectedUrl) {
-                mostrarPdf(selectedUrl);
-            } else {
-                showStatus(elements.uploadStatus, 'Selecciona un archivo primero', true);
-            }
+        // Ver PDF
+        viewSelect.addEventListener('change', function() {
+            mostrarPdf(viewSelect.value);
         });
 
-        // Validación de archivo al seleccionar
-        elements.fileInput.addEventListener('change', function() {
-            try {
-                if (this.files[0]) {
-                    validarArchivo(this.files[0]);
-                    showStatus(elements.uploadStatus, 'Archivo válido, listo para subir');
-                }
-            } catch (error) {
-                showStatus(elements.uploadStatus, error.message, true);
-                this.value = '';
-            }
-        });
-
-        // Inicialización
+        // Cargar archivos al iniciar
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // Cargar lista inicial de archivos
-                await cargarListaArchivos();
-                
                 // Verificar conexión con el backend
                 const healthResponse = await fetch(`${BACKEND_URL}/health`, {
                     headers: {
@@ -502,12 +470,14 @@
                 
                 if (status !== 'healthy') {
                     console.warn('El backend parece tener problemas');
-                    showStatus(elements.uploadStatus, 'Advertencia: Problemas de conexión con el servidor', true);
+                    showStatus(uploadStatus, 'Advertencia: Problemas de conexión con el servidor', true);
                 }
                 
+                // Cargar lista de archivos
+                await cargarListaArchivos();
             } catch (error) {
                 console.error('Error inicial:', error);
-                showStatus(elements.uploadStatus, 'Error: No se puede conectar al servidor', true);
+                showStatus(uploadStatus, 'Error: No se puede conectar al servidor', true);
             }
         });
 
