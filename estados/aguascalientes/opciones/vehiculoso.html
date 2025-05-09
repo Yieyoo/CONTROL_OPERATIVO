@@ -199,6 +199,7 @@
         const elements = {
             loading: document.getElementById('loading'),
             uploadForm: document.getElementById('uploadForm'),
+            fileInput: document.getElementById('file'),
             uploadButton: document.getElementById('uploadButton'),
             uploadStatus: document.getElementById('uploadStatus'),
             pdfIframe: document.getElementById('pdfIframe'),
@@ -303,7 +304,7 @@
             });
         }
 
-        // Mostrar PDF en el visor
+        // Mostrar PDF en el visor - FUNCIÓN CORREGIDA
         function mostrarPdf(url) {
             if (!url) {
                 elements.pdfIframe.style.display = 'none';
@@ -312,30 +313,33 @@
             }
 
             try {
-                let finalUrl = url;
-                
-                // Procesar URLs de Cloudinary
-                if (url.includes('res.cloudinary.com')) {
-                    finalUrl = url
-                        .replace('/upload/', '/upload/fl_attachment/')
-                        .replace('/raw/upload/', '/raw/upload/fl_attachment/')
-                        .replace('.pdf', '');
+                // Si ya es una URL de Google Viewer, usarla directamente
+                if (url.includes('docs.google.com/viewer')) {
+                    elements.pdfIframe.src = url;
+                } else {
+                    // Para URLs de Cloudinary
+                    let cloudinaryUrl = url;
+                    
+                    // Asegurar que la URL sea directa al PDF
+                    if (url.includes('res.cloudinary.com')) {
+                        // Eliminar cualquier transformación existente
+                        cloudinaryUrl = url.split('/upload/')[0] + '/upload/fl_attachment/' + url.split('/upload/')[1];
+                        // Asegurar que termine en .pdf
+                        cloudinaryUrl = cloudinaryUrl.replace(/\..*$/, '.pdf');
+                    }
+                    
+                    // Codificar la URL para el visor de Google
+                    const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(cloudinaryUrl)}&embedded=true`;
+                    elements.pdfIframe.src = viewerUrl;
                 }
                 
-                // Usar el visor de Google Docs
-                const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(finalUrl)}&embedded=true`;
-                elements.pdfIframe.src = viewerUrl;
                 elements.pdfIframe.style.display = 'block';
-                
-                // Configurar botón de descarga
                 elements.downloadBtn.style.display = 'block';
-                elements.downloadBtn.onclick = () => {
-                    window.open(url, '_blank');
-                };
+                elements.downloadBtn.onclick = () => window.open(url, '_blank');
                 
             } catch (error) {
                 console.error('Error al mostrar PDF:', error);
-                showStatus(elements.uploadStatus, 'Error al cargar el PDF', true);
+                showStatus(elements.uploadStatus, 'Error al cargar el PDF: ' + error.message, true);
             }
         }
 
@@ -348,7 +352,7 @@
             return true;
         }
 
-        // Subir archivo al servidor
+        // Subir archivo al servidor - FUNCIÓN CORREGIDA
         async function subirArchivo(file) {
             const formData = new FormData();
             formData.append('file', file);
@@ -362,7 +366,13 @@
                 body: formData
             });
 
-            return handleApiError(response);
+            const result = await handleApiError(response);
+            
+            if (result.status !== 'success') {
+                throw new Error(result.error?.message || 'Error al subir archivo');
+            }
+
+            return result.data;
         }
 
         // Eliminar archivo
@@ -382,35 +392,51 @@
             await handleApiError(response);
         }
 
-        // Event Listeners
+        // Manejador del formulario de subida - CORREGIDO
         elements.uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const file = elements.file.files[0];
             
+            const file = elements.fileInput.files[0];
+            if (!file) {
+                showStatus(elements.uploadStatus, 'No se seleccionó ningún archivo', true);
+                return;
+            }
+
             try {
+                // Validar el archivo
                 validarArchivo(file);
+                
                 showLoading(true);
                 elements.uploadButton.disabled = true;
+                elements.uploadStatus.textContent = 'Subiendo archivo...';
                 
-                const { url } = await subirArchivo(file);
+                // Subir el archivo
+                const { url, public_id, filename } = await subirArchivo(file);
+                
                 showStatus(elements.uploadStatus, 'Archivo subido correctamente');
+                
+                // Actualizar la lista de archivos
                 await cargarListaArchivos();
                 
+                // Mostrar el PDF recién subido
                 if (url) {
                     mostrarPdf(url);
                     elements.viewSelect.value = url;
                 }
                 
+                // Resetear el formulario
                 elements.uploadForm.reset();
                 
             } catch (error) {
-                showStatus(elements.uploadStatus, error.message, true);
+                console.error('Error al subir archivo:', error);
+                showStatus(elements.uploadStatus, 'Error: ' + error.message, true);
             } finally {
                 showLoading(false);
                 elements.uploadButton.disabled = false;
             }
         });
 
+        // Manejador para eliminar archivos
         elements.deleteFileButton.addEventListener('click', async () => {
             const publicId = elements.fileSelect.value;
             if (!publicId) return;
@@ -436,30 +462,18 @@
             }
         });
 
+        // Manejador para visualizar PDFs
         elements.viewBtn.addEventListener('click', () => {
             const selectedUrl = elements.viewSelect.value;
-            if (selectedUrl) mostrarPdf(selectedUrl);
-        });
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await cargarListaArchivos();
-            } catch (error) {
-                console.error('Error inicial:', error);
+            if (selectedUrl) {
+                mostrarPdf(selectedUrl);
+            } else {
+                showStatus(elements.uploadStatus, 'Selecciona un archivo primero', true);
             }
         });
 
-        // Menú hamburguesa
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const overlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-
         // Validación de archivo al seleccionar
-        elements.file.addEventListener('change', function() {
+        elements.fileInput.addEventListener('change', function() {
             try {
                 if (this.files[0]) {
                     validarArchivo(this.files[0]);
@@ -470,6 +484,40 @@
                 this.value = '';
             }
         });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Cargar lista inicial de archivos
+                await cargarListaArchivos();
+                
+                // Verificar conexión con el backend
+                const healthResponse = await fetch(`${BACKEND_URL}/health`, {
+                    headers: {
+                        'x-api-key': API_KEY
+                    }
+                });
+                
+                const { status } = await healthResponse.json();
+                
+                if (status !== 'healthy') {
+                    console.warn('El backend parece tener problemas');
+                    showStatus(elements.uploadStatus, 'Advertencia: Problemas de conexión con el servidor', true);
+                }
+                
+            } catch (error) {
+                console.error('Error inicial:', error);
+                showStatus(elements.uploadStatus, 'Error: No se puede conectar al servidor', true);
+            }
+        });
+
+        // Función para el menú hamburguesa
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            const overlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
     </script>
 </body>
 </html>
