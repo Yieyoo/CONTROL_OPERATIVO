@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 // 1. Configuración de Seguridad Mejorada
 app.use(helmet());
 app.use(morgan('dev'));
-app.set('trust proxy', true); // Soluciona el error de X-Forwarded-For
+app.set('trust proxy', true);
 
 // 2. Rate Limiting más estricto
 const apiLimiter = rateLimit({
@@ -40,6 +40,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn('Intento de acceso desde origen no permitido:', origin);
       callback(new Error('Origen no permitido por CORS'));
     }
   },
@@ -56,7 +57,7 @@ app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 5. Configuración de Cloudinary con validación mejorada
+// 5. Configuración de Cloudinary optimizada para PDFs
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'API_KEY', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
@@ -71,7 +72,9 @@ const validateCloudinaryConfig = () => {
       cloud_name: process.env.CLOUD_NAME,
       api_key: process.env.CLOUD_API_KEY,
       api_secret: process.env.CLOUD_API_SECRET,
-      secure: true
+      secure: true,
+      private_cdn: false,
+      secure_distribution: null
     });
     console.log('✅ Cloudinary configurado correctamente');
   } catch (error) {
@@ -170,7 +173,7 @@ router.get('/health', (req, res) => {
   });
 });
 
-// Subir archivo - Modificado para asegurar visualización correcta
+// Subir archivo - Optimizado para visualización multiplataforma
 router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, next) => {
   try {
     if (!req.file) {
@@ -188,10 +191,13 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
       unique_filename: false,
       filename_override: originalName.replace('.pdf', ''),
       overwrite: false,
-      // Añadido para mejor compatibilidad con visualización
+      type: 'upload',
+      access_mode: 'public',
       transformation: [
-        { flags: 'attachment' } // Forzar descarga como PDF
-      ]
+        { flags: 'attachment' }, // Forzar descarga como archivo
+        { quality: 'auto', fetch_format: 'auto' }
+      ],
+      allowed_formats: ['pdf']
     };
 
     const result = await new Promise((resolve, reject) => {
@@ -209,17 +215,19 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
       uploadStream.end(req.file.buffer);
     });
 
-    // Asegurar que la URL sea accesible directamente
-    const pdfUrl = result.secure_url.replace('/upload/', '/upload/fl_attachment/');
+    // URL directa sin transformaciones para mejor compatibilidad
+    const pdfUrl = result.secure_url;
 
     res.status(201).json({
       status: 'success',
       data: {
-        url: pdfUrl, // Usamos la URL modificada para mejor visualización
+        url: pdfUrl,
         public_id: result.public_id,
         filename: originalName,
         size: req.file.size,
-        estado
+        estado,
+        // Añadir URL alternativa para visualización
+        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}`
       }
     });
   } catch (error) {
@@ -261,7 +269,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Listar archivos - Modificado para URLs compatibles con visualización
+// Listar archivos - Mejorado para compatibilidad
 router.get('/archivos/:estado', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
@@ -276,11 +284,13 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
     });
 
     const archivos = result.resources.map(resource => ({
-      url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'), // URL modificada
+      url: resource.secure_url, // URL directa
       public_id: resource.public_id,
       filename: resource.public_id.split('/').pop() + '.pdf',
       size: resource.bytes,
-      uploaded_at: resource.created_at
+      uploaded_at: resource.created_at,
+      // Añadir URL alternativa para visualización
+      view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}`
     }));
 
     res.json({
