@@ -326,7 +326,7 @@
                 formData.append('file', file);
                 formData.append('estado', estadoActual);
 
-                const response = await fetch(`${BACKEND_URL}/upload`, {
+                const response = await fetch(`${BACKEND_URL}/api/upload`, {
                     method: 'POST',
                     headers: {
                         'x-api-key': API_KEY // Envía la API Key en el header
