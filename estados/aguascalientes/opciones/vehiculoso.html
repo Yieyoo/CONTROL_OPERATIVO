@@ -6,8 +6,6 @@
     <title>Vehículos</title>
     <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-    <!-- Añadir PDF.js para visualización alternativa -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
     <style>
         .loading {
             display: none;
@@ -43,11 +41,19 @@
             font-weight: bold;
             margin-top: 10px;
         }
-        .pdf-embed {
+        .pdf-viewer-container {
             width: 100%;
             height: 500px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        #pdf-viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         .gestion-archivos {
             margin-top: 20px;
@@ -74,11 +80,17 @@
         #fileList li {
             padding: 8px;
             border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        #fileList li:hover {
+            background-color: #f0f0f0;
         }
         select, input[type="file"] {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         button {
             background-color: #4CAF50;
@@ -87,6 +99,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background-color: #45a049;
@@ -95,20 +108,18 @@
             background-color: #cccccc;
             cursor: not-allowed;
         }
-        /* Estilos para el visor alternativo de PDF */
-        #pdf-alt-container {
+        .pdf-fallback {
             display: none;
-            width: 100%;
-            height: 500px;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-        }
-        #pdf-fallback {
-            display: none;
-            margin-top: 10px;
-            padding: 10px;
+            padding: 15px;
             background: #f8d7da;
             border-radius: 4px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .pdf-fallback a {
+            color: #721c24;
+            font-weight: bold;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -137,22 +148,11 @@
         <h1>Vehículos</h1>
     </div>
 
-    <!-- Visualizador PDF -->
-    <div class="pdf-container">
-        <iframe 
-            id="pdfIframe"
-            class="pdf-embed"
-            frameborder="0"
-            allowfullscreen
-            allow="autoplay">
-        </iframe>
-        <!-- Contenedor alternativo para PDF.js -->
-        <div id="pdf-alt-container">
-            <canvas id="pdf-canvas"></canvas>
-        </div>
-        <!-- Mensaje de fallback -->
-        <div id="pdf-fallback">
-            <p>No se puede visualizar el PDF directamente. <a id="pdf-download-link" href="#" target="_blank">Descargar PDF</a></p>
+    <!-- Contenedor del visor PDF -->
+    <div class="pdf-viewer-container">
+        <iframe id="pdf-viewer" frameborder="0" allowfullscreen></iframe>
+        <div class="pdf-fallback" id="pdf-fallback">
+            <p>No se puede visualizar el PDF. <a id="pdf-download-link" href="#" target="_blank">Haz clic aquí para descargarlo</a></p>
         </div>
     </div>
 
@@ -193,7 +193,7 @@
             <select id="fileSelect">
                 <option value="">Selecciona un archivo para eliminar</option>
             </select>
-            <button id="deleteFileButton" class="upload-button">Eliminar</button>
+            <button id="deleteFileButton">Eliminar</button>
             <p id="deleteStatus"></p>
         </div>
     </div>
@@ -209,9 +209,7 @@
         const uploadForm = document.getElementById('uploadForm');
         const uploadButton = document.getElementById('uploadButton');
         const uploadStatus = document.getElementById('uploadStatus');
-        const pdfIframe = document.getElementById('pdfIframe');
-        const pdfAltContainer = document.getElementById('pdf-alt-container');
-        const pdfCanvas = document.getElementById('pdf-canvas');
+        const pdfViewer = document.getElementById('pdf-viewer');
         const pdfFallback = document.getElementById('pdf-fallback');
         const pdfDownloadLink = document.getElementById('pdf-download-link');
         const fileListContainer = document.getElementById('fileList');
@@ -235,24 +233,59 @@
             }, 5000);
         }
 
-        // Función mejorada para manejar errores de API
-        async function handleApiError(response) {
-            if (!response.ok) {
-                let errorMessage = `Error ${response.status}`;
+        // Función para mostrar PDF mejorada
+        async function mostrarPdf(url) {
+            if (!url) {
+                pdfViewer.style.display = 'none';
+                pdfFallback.style.display = 'none';
+                return;
+            }
+
+            // Configurar el enlace de descarga
+            pdfDownloadLink.href = url;
+            
+            // Ocultar fallback inicialmente
+            pdfFallback.style.display = 'none';
+            
+            // Mostrar el visor
+            pdfViewer.style.display = 'block';
+            
+            // Primero intentamos con la URL directa
+            pdfViewer.src = url;
+            
+            // Verificar si el PDF se carga correctamente
+            const checkLoaded = () => {
                 try {
-                    const errorData = await response.json();
-                    console.error('Error detallado:', errorData);
-                    errorMessage = errorData.message || errorData.error?.message || errorMessage;
-                    
-                    if (errorData.error?.http_code === 401) {
-                        errorMessage = 'Error de autenticación con Cloudinary';
+                    // Si el iframe tiene contenido, asumimos que cargó bien
+                    if (pdfViewer.contentDocument && pdfViewer.contentDocument.readyState === 'complete') {
+                        console.log('PDF cargado correctamente');
+                        return true;
                     }
                 } catch (e) {
-                    console.error('Error parsing error response:', e);
+                    // Error de CORS al acceder al contentDocument
+                    console.log('Error al verificar carga del PDF:', e);
                 }
-                throw new Error(errorMessage);
-            }
-            return response.json();
+                return false;
+            };
+
+            // Esperar un momento y verificar
+            setTimeout(() => {
+                if (!checkLoaded()) {
+                    console.log('Falló carga directa, intentando con Google Viewer');
+                    // Si falla, probamos con Google Viewer
+                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+                    pdfViewer.src = googleViewerUrl;
+                    
+                    // Verificar nuevamente después de un tiempo
+                    setTimeout(() => {
+                        if (!checkLoaded()) {
+                            console.log('Google Viewer también falló');
+                            pdfViewer.style.display = 'none';
+                            pdfFallback.style.display = 'block';
+                        }
+                    }, 3000);
+                }
+            }, 2000);
         }
 
         // Cargar lista de archivos
@@ -267,7 +300,11 @@
                     }
                 });
                 
-                const { data, status } = await handleApiError(response);
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}`);
+                }
+                
+                const { data, status } = await response.json();
                 
                 if (status !== 'success') {
                     throw new Error('Respuesta inesperada del servidor');
@@ -283,11 +320,11 @@
             }
         }
 
-        // Renderizar lista de archivos mejorada
+        // Renderizar lista de archivos
         function renderizarListaArchivos(files) {
             fileListContainer.innerHTML = '';
             fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
-            viewSelect.innerHTML = '<option value="">Selecciona un archivo para ver</option>';
+            viewSelect.innerHTML = '<option value="">Selecciona un archivo</option>';
 
             if (!files || files.length === 0) {
                 const li = document.createElement('li');
@@ -302,9 +339,13 @@
                 
                 if (!pdfUrl) return;
 
-                // Lista de archivos
+                // Lista de archivos (clickable)
                 const li = document.createElement('li');
                 li.textContent = filename;
+                li.addEventListener('click', () => {
+                    viewSelect.value = pdfUrl;
+                    mostrarPdf(pdfUrl);
+                });
                 fileListContainer.appendChild(li);
 
                 // Selector para eliminar
@@ -319,68 +360,6 @@
                 viewOption.textContent = filename;
                 viewSelect.appendChild(viewOption);
             });
-        }
-
-        // Mostrar PDF con múltiples métodos de visualización
-        async function mostrarPdf(url) {
-            if (!url) {
-                pdfIframe.style.display = 'none';
-                pdfAltContainer.style.display = 'none';
-                pdfFallback.style.display = 'none';
-                return;
-            }
-
-            // Configurar el enlace de descarga
-            pdfDownloadLink.href = url;
-
-            // Ocultar todos los visualizadores primero
-            pdfIframe.style.display = 'none';
-            pdfAltContainer.style.display = 'none';
-            pdfFallback.style.display = 'none';
-
-            // Intentar con Google Viewer primero
-            try {
-                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                pdfIframe.src = googleViewerUrl;
-                pdfIframe.style.display = 'block';
-                
-                // Verificar si el iframe carga correctamente
-                const iframeLoaded = await new Promise(resolve => {
-                    pdfIframe.onload = () => resolve(true);
-                    setTimeout(() => resolve(false), 5000);
-                });
-
-                if (iframeLoaded) return;
-            } catch (e) {
-                console.log("Google Viewer falló, intentando con PDF.js");
-            }
-
-            // Si Google Viewer falla, intentar con PDF.js
-            try {
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 
-                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
-                
-                const loadingTask = pdfjsLib.getDocument(url);
-                const pdf = await loadingTask.promise;
-                const page = await pdf.getPage(1);
-                const viewport = page.getViewport({ scale: 1.5 });
-                
-                // Preparar el canvas
-                pdfCanvas.height = viewport.height;
-                pdfCanvas.width = viewport.width;
-                
-                // Renderizar la página del PDF en el canvas
-                await page.render({
-                    canvasContext: pdfCanvas.getContext('2d'),
-                    viewport: viewport
-                }).promise;
-                
-                pdfAltContainer.style.display = 'block';
-            } catch (error) {
-                console.error('Error con PDF.js:', error);
-                // Si todo falla, mostrar opción de descarga
-                pdfFallback.style.display = 'block';
-            }
         }
 
         // Validar archivo antes de subir
@@ -404,7 +383,7 @@
             return true;
         }
 
-        // Función mejorada para subir archivos
+        // Función para subir archivos
         async function subirArchivo(file) {
             const formData = new FormData();
             formData.append('file', file);
@@ -418,7 +397,11 @@
                 body: formData
             });
 
-            const { data, status } = await handleApiError(response);
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}`);
+            }
+
+            const { data, status } = await response.json();
             
             if (status !== 'success') {
                 throw new Error('Error al subir archivo');
@@ -427,7 +410,7 @@
             return data;
         }
 
-        // Manejador de formulario mejorado
+        // Manejador de formulario de subida
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const fileInput = document.getElementById('file');
@@ -461,7 +444,7 @@
             }
         });
 
-        // Función mejorada para eliminar archivos
+        // Función para eliminar archivos
         async function eliminarArchivo(publicId) {
             const response = await fetch(`${BACKEND_URL}/delete`, {
                 method: 'DELETE',
@@ -475,14 +458,18 @@
                 })
             });
 
-            const { status } = await handleApiError(response);
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}`);
+            }
+
+            const { status } = await response.json();
             
             if (status !== 'success') {
                 throw new Error('Error al eliminar archivo');
             }
         }
 
-        // Manejador de eliminación mejorado
+        // Manejador de eliminación
         deleteFileButton.addEventListener('click', async function() {
             const publicId = fileSelect.value;
             
@@ -504,8 +491,8 @@
                 showStatus(deleteStatus, 'Archivo eliminado correctamente');
                 await cargarListaArchivos();
                 
-                // Si el PDF eliminado era el que se estaba viendo, limpiar el visor
-                if (pdfIframe.src.includes(publicId) || pdfAltContainer.style.display === 'block') {
+                // Limpiar visor si estaba viendo el archivo eliminado
+                if (pdfViewer.src.includes(publicId)) {
                     mostrarPdf('');
                     viewSelect.value = '';
                 }
@@ -519,7 +506,7 @@
             }
         });
 
-        // Ver PDF
+        // Cambiar PDF al seleccionar del dropdown
         viewSelect.addEventListener('change', function() {
             mostrarPdf(viewSelect.value);
         });
