@@ -1,0 +1,651 @@
+/* --- Fondo de la página --- */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-image: url('../../imagenes/fondo.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 14px;
+    overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 45%; /* Ajusta según el ancho de tu imagen */
+  height: 100vh;
+  background-image: url('../../imagenes/fondoderecha.jpg');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --- Header mejorado --- */
+header {
+    background-color: #691932;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-weight: bold;
+    border-bottom: 4px solid #A5852E;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+/* --- Logos mejorados --- */
+.logo-arriba-img {
+  width: 300px;  /* Aumenta aún más el tamaño del logo */
+  margin-left: 18px;
+
+  height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
+  position: relative; /* Asegura que el logo se pueda posicionar */
+  top: -195px; /* Ajusta este valor para subir el logo */
+}
+
+
+/* --- Logos en la esquina superior derecha --- */
+.logo-container {
+    position: fixed;
+    top: 40px;
+    right: 20px;
+    display: flex;
+    gap: 20px;
+    z-index: 100;
+}
+
+.logo-container img {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+/* --- Fecha debajo del logo --- */
+.fecha-actual {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #691932;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+/* --- Menú lateral estilizado --- *//* Menú principal - Diseño mejorado */
+nav.menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: linear-gradient(135deg, #691932 0%, #4d1224 100%);
+    padding-top: 100px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    overflow: hidden;
+  }
+  
+  /* Efecto de borde sutil */
+  nav.menu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, #A5852E, #c49d3a);
+  }
+  
+  nav.menu.active {
+    left: 0;
+  }
+  
+  /* Fondo overlay con efecto de difuminado */
+  .menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .menu-overlay.active {
+    display: block;
+  }
+  
+  /* Logo del menú */
+  .logo-arriba-img {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  
+  /* Lista del menú - Diseño premium */
+  
+/* Lista del menú - Diseño premium */
+nav.menu ul {
+  list-style-type: none;
+  padding: 0 20px;
+  margin-top: 70px;
+}
+
+nav.menu > ul {
+  margin-top: 70px; /* Solo afecta a las ideas principales */
+}
+
+nav.menu ul ul {
+  margin-top: 5%; /* Ajusta el margen para evitar que se baje demasiado */
+}
+
+  
+  nav.menu ul li {
+    margin-bottom: 15px;
+    position: relative;
+  }
+  
+  nav.menu ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    display: block;
+    padding: 14px 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid transparent;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  nav.menu ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    transform: translateX(8px);
+    border-left: 3px solid #A5852E;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Submenú - Diseño acordeón mejorado */
+  .submenu-list {
+    display: none;
+    padding-left: 10px;
+    animation: slideDown 0.3s ease;
+    margin-top: 10px;
+    border-left: 2px dashed rgba(255, 255, 255, 0.1);
+  }
+  
+  .submenu.active .submenu-list {
+    display: block;
+  }
+  
+  .submenu-list li a {
+    padding: 12px 18px;
+    font-size: 14px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .submenu-list li a:hover {
+    background-color: rgba(165, 133, 46, 0.2);
+    transform: translateX(5px);
+  }
+  
+  /* Indicador de submenú */
+  .submenu > a::after {
+    content: '›';
+    position: absolute;
+    right: 20px;
+    transform: rotate(90deg);
+    transition: transform 0.3s ease;
+  }
+  
+  .submenu.active > a::after {
+    transform: rotate(270deg);
+  }
+  
+  /* Botón de menú - Diseño premium */
+  .menu-toggle {
+    background: linear-gradient(135deg, #A5852E 0%, #c49d3a 100%);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    position: fixed;
+    top: 100px;
+    left: 20px;
+    border-radius: 50%;
+    z-index: 100000;
+    box-shadow: 0 8px 25px rgba(165, 133, 46, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .menu-toggle:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
+  }
+  
+  /* Scroll del submenú - Estilo mejorado */
+  .submenu {
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #A5852E transparent;
+    padding-right: 5px;
+  }
+  
+  .submenu::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .submenu::-webkit-scrollbar-thumb {
+    background-color: #A5852E;
+    border-radius: 4px;
+    background-clip: padding-box;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .submenu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* Animaciones */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideDown {
+    from { 
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Efecto de iluminación para items activos */
+  nav.menu ul li a.active {
+    background-color: rgba(165, 133, 46, 0.3);
+    border-left: 3px solid #A5852E;
+    font-weight: 600;
+  }
+  
+  /* Responsive para móviles */
+  @media (max-width: 768px) {
+    nav.menu {
+      width: 260px;
+      left: -260px;
+    }
+    
+    .menu-toggle {
+      width: 30px;
+      top: 11%;
+      height: 30px;
+      font-size: 20px;
+    }
+  }
+  /* Estilos generales */
+.loading {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    color: #d9534f;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.success-message {
+    color: #5cb85c;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Estilos mejorados para el visor PDF */
+.pdf-viewer-container {
+    width: 100%;
+    height: 70vh;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    background: #525659;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.pdf-toolbar {
+    background: #2c3e50;
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pdf-toolbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.pdf-toolbar button {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pdf-toolbar button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+#pdf-viewer {
+    width: 100%;
+    height: calc(100% - 40px);
+    border: none;
+    display: none;
+}
+
+#pdfjs-viewer {
+    width: 100%;
+    height: calc(100% - 40px);
+    display: none;
+    overflow-y: auto;
+}
+
+.pdf-pages-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.pdf-page {
+    margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    background: white;
+    position: relative;
+}
+
+.page-number {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.pdf-fallback {
+    display: none;
+    padding: 20px;
+    background: #fff3f3;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 500px;
+    text-align: center;
+    color: #721c24;
+    border: 1px solid #f8d7da;
+}
+
+.pdf-fallback a {
+    color: #721c24;
+    font-weight: bold;
+    text-decoration: underline;
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: #f8d7da;
+    border-radius: 4px;
+}
+
+/* Estilos para la gestión de archivos */
+.gestion-archivos {
+    margin: 40px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    max-width: 1200px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.fila-superior {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.upload-form {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    border: 2px dashed rgba(105, 25, 50, 0.2);
+    transition: all 0.3s ease;
+}
+.upload-form.dragover {
+    border-color: #691932;
+    background: rgba(105, 25, 50, 0.05);
+}
+.file-list-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.delete-file {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+#fileList {
+    list-style-type: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#fileList li {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#fileList li:hover {
+    background-color: #f0f0f0;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.filename {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px;
+    color: #333;
+}
+
+.file-meta {
+    font-size: 0.8em;
+    color: #666;
+    display: block;
+}
+
+.file-actions {
+    display: flex;
+    gap: 8px;
+}
+
+select, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    font-size: 14px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-view {
+    background-color: #2196F3;
+}
+
+.btn-view:hover {
+    background-color: #0b7dda;
+}
+
+.btn-delete {
+    background-color: #f44336;
+}
+
+.btn-delete:hover {
+    background-color: #da190b;
+}
+
+/* Zoom controls */
+.zoom-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.zoom-controls button {
+    background: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #333;
+    border-radius: 0;
+}
+
+.zoom-controls button:hover {
+    background: #f0f0f0;
+}
+
+.zoom-controls button:first-child {
+    border-bottom: 1px solid #eee;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .fila-superior {
+        flex-direction: column;
+    }
+
+    .pdf-viewer-container {
+        height: 50vh;
+    }
+}
