@@ -1,4 +1,3 @@
-html:
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,6 +6,8 @@ html:
     <title>Vehículos</title>
     <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <!-- Incluir PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <style>
         .loading {
             display: none;
@@ -55,6 +56,11 @@ html:
             width: 100%;
             height: 100%;
             border: none;
+        }
+        #pdfjs-viewer {
+            width: 100%;
+            height: 100%;
+            display: none;
         }
         .gestion-archivos {
             margin-top: 20px;
@@ -152,6 +158,7 @@ html:
     <!-- Contenedor del visor PDF -->
     <div class="pdf-viewer-container">
         <iframe id="pdf-viewer" frameborder="0" allowfullscreen></iframe>
+        <div id="pdfjs-viewer"></div>
         <div class="pdf-fallback" id="pdf-fallback">
             <p>No se puede visualizar el PDF. <a id="pdf-download-link" href="#" target="_blank">Haz clic aquí para descargarlo</a></p>
         </div>
@@ -211,6 +218,7 @@ html:
         const uploadButton = document.getElementById('uploadButton');
         const uploadStatus = document.getElementById('uploadStatus');
         const pdfViewer = document.getElementById('pdf-viewer');
+        const pdfjsViewer = document.getElementById('pdfjs-viewer');
         const pdfFallback = document.getElementById('pdf-fallback');
         const pdfDownloadLink = document.getElementById('pdf-download-link');
         const fileListContainer = document.getElementById('fileList');
@@ -218,6 +226,9 @@ html:
         const deleteFileButton = document.getElementById('deleteFileButton');
         const deleteStatus = document.getElementById('deleteStatus');
         const viewSelect = document.getElementById('viewSelect');
+
+        // Configurar PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
         // Mostrar/ocultar loading
         function showLoading(show) {
@@ -234,10 +245,57 @@ html:
             }, 5000);
         }
 
+        // Función para mostrar PDF con PDF.js
+        async function mostrarConPDFJS(url) {
+            try {
+                // Ocultar otros visores
+                pdfViewer.style.display = 'none';
+                pdfFallback.style.display = 'none';
+                
+                // Mostrar contenedor PDF.js
+                pdfjsViewer.style.display = 'block';
+                pdfjsViewer.innerHTML = '';
+                
+                // Configurar el enlace de descarga
+                pdfDownloadLink.href = url;
+                
+                // Cargar el PDF
+                const loadingTask = pdfjsLib.getDocument(url);
+                const pdf = await loadingTask.promise;
+                
+                // Obtener la primera página
+                const page = await pdf.getPage(1);
+                
+                // Configurar el escalado y viewport
+                const scale = 1.5;
+                const viewport = page.getViewport({ scale });
+                
+                // Preparar el canvas
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Añadir el canvas al contenedor
+                pdfjsViewer.appendChild(canvas);
+                
+                // Renderizar la página
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+                
+            } catch (error) {
+                console.error('Error al cargar con PDF.js:', error);
+                mostrarPdfFallback(url);
+            }
+        }
+
         // Función para mostrar PDF mejorada
         async function mostrarPdf(url) {
             if (!url) {
                 pdfViewer.style.display = 'none';
+                pdfjsViewer.style.display = 'none';
                 pdfFallback.style.display = 'none';
                 return;
             }
@@ -248,45 +306,50 @@ html:
             // Ocultar fallback inicialmente
             pdfFallback.style.display = 'none';
             
-            // Mostrar el visor
-            pdfViewer.style.display = 'block';
+            // Primero intentamos con PDF.js
+            mostrarConPDFJS(url);
             
-            // Primero intentamos con la URL directa
-            pdfViewer.src = url;
-            
-            // Verificar si el PDF se carga correctamente
-            const checkLoaded = () => {
-                try {
-                    // Si el iframe tiene contenido, asumimos que cargó bien
-                    if (pdfViewer.contentDocument && pdfViewer.contentDocument.readyState === 'complete') {
-                        console.log('PDF cargado correctamente');
-                        return true;
-                    }
-                } catch (e) {
-                    // Error de CORS al acceder al contentDocument
-                    console.log('Error al verificar carga del PDF:', e);
-                }
-                return false;
-            };
-
-            // Esperar un momento y verificar
+            // Luego intentamos con iframe como fallback
             setTimeout(() => {
-                if (!checkLoaded()) {
-                    console.log('Falló carga directa, intentando con Google Viewer');
-                    // Si falla, probamos con Google Viewer
-                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                    pdfViewer.src = googleViewerUrl;
+                if (pdfjsViewer.children.length === 0) {
+                    console.log('Falló PDF.js, intentando con iframe directo');
+                    pdfjsViewer.style.display = 'none';
+                    pdfViewer.style.display = 'block';
+                    pdfViewer.src = url + '#toolbar=0&navpanes=0&scrollbar=0';
                     
-                    // Verificar nuevamente después de un tiempo
+                    // Verificar si el iframe se carga correctamente
                     setTimeout(() => {
-                        if (!checkLoaded()) {
-                            console.log('Google Viewer también falló');
-                            pdfViewer.style.display = 'none';
-                            pdfFallback.style.display = 'block';
+                        try {
+                            if (!pdfViewer.contentDocument || pdfViewer.contentDocument.readyState !== 'complete') {
+                                console.log('Falló iframe directo, intentando con Google Viewer');
+                                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+                                pdfViewer.src = googleViewerUrl;
+                                
+                                setTimeout(() => {
+                                    try {
+                                        if (!pdfViewer.contentDocument || pdfViewer.contentDocument.readyState !== 'complete') {
+                                            console.log('Google Viewer también falló');
+                                            mostrarPdfFallback(url);
+                                        }
+                                    } catch (e) {
+                                        mostrarPdfFallback(url);
+                                    }
+                                }, 3000);
+                            }
+                        } catch (e) {
+                            mostrarPdfFallback(url);
                         }
                     }, 3000);
                 }
-            }, 2000);
+            }, 1000);
+        }
+
+        // Mostrar fallback para PDF
+        function mostrarPdfFallback(url) {
+            pdfViewer.style.display = 'none';
+            pdfjsViewer.style.display = 'none';
+            pdfFallback.style.display = 'block';
+            pdfDownloadLink.href = url;
         }
 
         // Cargar lista de archivos
@@ -493,7 +556,7 @@ html:
                 await cargarListaArchivos();
                 
                 // Limpiar visor si estaba viendo el archivo eliminado
-                if (pdfViewer.src.includes(publicId)) {
+                if (pdfViewer.src.includes(publicId) || pdfjsViewer.dataset.publicId === publicId) {
                     mostrarPdf('');
                     viewSelect.value = '';
                 }

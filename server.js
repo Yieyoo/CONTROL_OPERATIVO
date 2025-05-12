@@ -1,5 +1,3 @@
-
-server.js
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -7,6 +5,7 @@ const cloudinary = require('cloudinary').v2;
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -149,11 +148,15 @@ const router = express.Router();
 router.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: '1.0.2',
+    services: {
+      cloudinary: 'active'
+    }
   });
 });
 
-// Subir archivo - Versión corregida
+// Subir archivo - Versión optimizada
 router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, next) => {
   try {
     if (!req.file) {
@@ -161,7 +164,12 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
     }
 
     const estado = req.body.estado || 'aguascalientes';
-    const originalName = req.file.originalname;
+    const originalName = req.file.originalname.replace(/[^\w\-\. ]/gi, '');
+
+    // Validar nombre de archivo
+    if (!/^[\w\-\. ]+\.pdf$/i.test(originalName)) {
+      throw new Error('El nombre del archivo contiene caracteres no permitidos');
+    }
 
     const uploadOptions = {
       resource_type: 'raw',
@@ -169,8 +177,12 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
       format: 'pdf',
       type: 'upload',
       access_mode: 'public',
-      // Eliminamos transformaciones que afectan la visualización
-      transformation: []
+      // Eliminamos transformaciones que podrían afectar los PDFs
+      transformation: [],
+      // Forzar la extensión .pdf
+      filename_override: `${path.parse(originalName).name}.pdf`,
+      unique_filename: false,
+      overwrite: true
     };
 
     const result = await new Promise((resolve, reject) => {
@@ -191,7 +203,9 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
         public_id: result.public_id,
         filename: originalName,
         // URL alternativa para visualización
-        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`
+        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
+        // URL directa para descarga
+        download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/')
       }
     });
   } catch (error) {
@@ -199,13 +213,22 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
   }
 });
 
-// Eliminar archivo
+// Eliminar archivo - Versión mejorada
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
-    const { public_id } = req.body;
+    const { public_id, estado } = req.body;
 
     if (!public_id) {
       throw new Error('public_id es requerido');
+    }
+
+    // Verificar que el archivo pertenece al estado correcto
+    if (estado && !public_id.startsWith(`${estado}/`)) {
+      return res.status(403).json({
+        status: 'error',
+        error: 'forbidden',
+        message: 'No tienes permiso para eliminar este archivo'
+      });
     }
 
     const result = await cloudinary.uploader.destroy(public_id, {
@@ -222,14 +245,18 @@ router.delete('/delete', authenticate, async (req, res, next) => {
 
     res.json({
       status: 'success',
-      message: 'Archivo eliminado'
+      message: 'Archivo eliminado',
+      data: {
+        public_id: public_id,
+        deleted_at: new Date().toISOString()
+      }
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Listar archivos - Versión corregida
+// Listar archivos - Versión optimizada
 router.get('/archivos/:estado', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
@@ -241,17 +268,27 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
       max_results: 500
     });
 
-    const archivos = result.resources.map(resource => ({
-      url: resource.secure_url,
-      public_id: resource.public_id,
-      filename: resource.public_id.split('/').pop() + '.pdf',
-      // URL alternativa para visualización
-      view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`
-    }));
+    const archivos = result.resources.map(resource => {
+      const filename = resource.public_id.split('/').pop() + '.pdf';
+      return {
+        url: resource.secure_url,
+        public_id: resource.public_id,
+        filename: filename,
+        // URL alternativa para visualización
+        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
+        // URL directa para descarga
+        download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
+        uploaded_at: resource.created_at,
+        size: resource.bytes,
+        format: resource.format
+      };
+    });
 
     res.json({
       status: 'success',
-      data: archivos
+      data: archivos,
+      count: archivos.length,
+      estado: estado
     });
   } catch (error) {
     next(error);
@@ -265,11 +302,14 @@ app.use('/api', apiLimiter, router);
 app.get('/', (req, res) => {
   res.json({
     status: 'success',
+    version: '1.0.2',
     endpoints: [
-      { method: 'POST', path: '/api/upload', desc: 'Subir PDF' },
-      { method: 'GET', path: '/api/archivos/:estado', desc: 'Listar PDFs' },
-      { method: 'DELETE', path: '/api/delete', desc: 'Eliminar PDF' }
-    ]
+      { method: 'POST', path: '/api/upload', desc: 'Subir PDF', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/archivos/:estado', desc: 'Listar PDFs', auth: 'x-api-key' },
+      { method: 'DELETE', path: '/api/delete', desc: 'Eliminar PDF', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/health', desc: 'Estado del servicio' }
+    ],
+    note: 'Todos los endpoints (excepto /health) requieren el header x-api-key'
   });
 });
 
@@ -277,7 +317,14 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     status: 'error',
-    error: 'not_found'
+    error: 'not_found',
+    message: 'Ruta no encontrada',
+    suggested_routes: [
+      '/api/upload',
+      '/api/archivos/:estado',
+      '/api/delete',
+      '/api/health'
+    ]
   });
 });
 
@@ -286,13 +333,17 @@ app.use(handleError);
 
 // Iniciar servidor
 const server = app.listen(PORT, () => {
-  console.log(`Servidor en puerto ${PORT}`);
+  console.log(`🚀 Servidor en puerto ${PORT}`);
+  console.log(`🔒 Modo seguro: ${process.env.NODE_ENV === 'production' ? 'ON' : 'OFF'}`);
+  console.log(`🌍 Cloudinary configurado para: ${process.env.CLOUD_NAME}`);
 });
 
 // Manejo de cierre
 process.on('SIGTERM', () => {
   server.close(() => {
-    console.log('Servidor cerrado');
+    console.log('🛑 Servidor cerrado');
   });
 });
 
+// Exportar para testing
+module.exports = app;
