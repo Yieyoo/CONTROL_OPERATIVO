@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,9 +7,87 @@
     <title>Gestión de Archivos PDF</title>
     <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
     <link rel="stylesheet" href="diseñog.css">
-    <!-- Incluir PDF.js -->
+    <style>
+        /* ESTILOS MEJORADOS PARA EL VISOR PDF */
+        .pdf-viewer-container {
+            width: 100%;
+            height: 70vh;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+            background: #525659;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #pdf-main-viewer {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pdfjs-viewer {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .pdf-pages-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .pdf-page {
+            background: white;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .pdf-page canvas {
+            width: 100% !important;
+            height: auto !important;
+            display: block;
+        }
+
+        /* SCROLLBAR PERSONALIZADA */
+        #pdfjs-viewer::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #pdfjs-viewer::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        #pdfjs-viewer::-webkit-scrollbar-thumb {
+            background: #A5852E;
+            border-radius: 5px;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
+<body>
 <body>
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
@@ -193,48 +272,99 @@
                 mostrarPdfFallback(url);
             }
         }
-
-        // Función para renderizar una página específica
+  // FUNCIÓN MODIFICADA PARA RENDERIZAR PÁGINAS
         async function renderPage(pageNum) {
             if (!currentPdf || pageNum < 1 || pageNum > totalPages) return;
             
             const pagesContainer = pdfjsViewer.querySelector('.pdf-pages-container');
-            pagesContainer.innerHTML = ''; // Limpiar páginas anteriores
+            
+            // Limpiar solo si es nueva página
+            if (pagesContainer.querySelector(`.page-${pageNum}`)) {
+                pagesContainer.querySelector(`.page-${pageNum}`).remove();
+            }
             
             const page = await currentPdf.getPage(pageNum);
             
-            // Crear contenedor de página
+            // Calcular escala basada en el ancho del contenedor
+            const containerWidth = pagesContainer.offsetWidth - 40; // Margen
+            const viewport = page.getViewport({ scale: 1 });
+            const scale = (containerWidth / viewport.width) * currentScale;
+            const scaledViewport = page.getViewport({ scale });
+            
             const pageDiv = document.createElement('div');
-            pageDiv.className = 'pdf-page';
+            pageDiv.className = `pdf-page page-${pageNum}`;
+            pageDiv.style.width = `${scaledViewport.width}px`;
+            pageDiv.style.height = `${scaledViewport.height}px`;
             
-            // Configurar el escalado y viewport
-            const viewport = page.getViewport({ scale: currentScale });
-            
-            // Preparar el canvas
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+            canvas.height = scaledViewport.height;
+            canvas.width = scaledViewport.width;
             
-            // Añadir número de página
             const pageNumber = document.createElement('div');
             pageNumber.className = 'page-number';
             pageNumber.textContent = `Página ${pageNum} de ${totalPages}`;
             
-            // Añadir elementos al DOM
             pageDiv.appendChild(canvas);
             pageDiv.appendChild(pageNumber);
             pagesContainer.appendChild(pageDiv);
             
-            // Renderizar la página
             await page.render({
                 canvasContext: context,
-                viewport: viewport
+                viewport: scaledViewport
             }).promise;
             
             currentPage = pageNum;
             updatePageInfo();
+            
+            // Auto-scroll para mantener posición
+            if (pageNum > 1) {
+                pageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
+
+        // EVENTOS PARA SCROLL Y ZOOM
+        zoomInBtn.addEventListener('click', () => {
+            currentScale = Math.min(currentScale + 0.25, 3.0); // Límite máximo de zoom
+            if (currentPdf) {
+                renderPage(currentPage);
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            currentScale = Math.max(currentScale - 0.25, 0.5); // Límite mínimo de zoom
+            if (currentPdf) {
+                renderPage(currentPage);
+            }
+        });
+
+        // MANEJO DE SCROLL TÁCTIL
+        let touchStartY = 0;
+        let isScrolling = false;
+
+        pdfjsViewer.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+            isScrolling = true;
+        }, { passive: true });
+
+        pdfjsViewer.addEventListener('touchmove', (e) => {
+            if (!isScrolling) return;
+            const y = e.touches[0].clientY;
+            const deltaY = touchStartY - y;
+            pdfjsViewer.scrollTop += deltaY * 2;
+            touchStartY = y;
+        }, { passive: false });
+
+        pdfjsViewer.addEventListener('touchend', () => {
+            isScrolling = false;
+        }, { passive: true });
+
+        // SCROLL CON RUEDA DEL MOUSE
+        pdfjsViewer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            pdfjsViewer.scrollTop += e.deltaY;
+        }, { passive: false });
+
 
         // Actualizar información de página
         function updatePageInfo() {
