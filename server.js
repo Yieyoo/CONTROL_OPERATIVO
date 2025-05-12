@@ -179,10 +179,15 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
       access_mode: 'public',
       // Eliminamos transformaciones que podrían afectar los PDFs
       transformation: [],
-      // Forzar la extensión .pdf
-      filename_override: `${path.parse(originalName).name}.pdf`,
+      // Conservar el nombre original del archivo
+      filename_override: originalName,
       unique_filename: false,
-      overwrite: true
+      overwrite: true,
+      // Metadatos adicionales
+      context: {
+        original_filename: originalName,
+        uploaded_at: new Date().toISOString()
+      }
     };
 
     const result = await new Promise((resolve, reject) => {
@@ -205,7 +210,9 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
         // URL alternativa para visualización
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
         // URL directa para descarga
-        download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/')
+        download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
+        uploaded_at: result.created_at,
+        size: result.bytes
       }
     });
   } catch (error) {
@@ -256,7 +263,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Listar archivos - Versión optimizada
+// Listar archivos - Versión optimizada con nombres originales
 router.get('/archivos/:estado', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
@@ -265,15 +272,19 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
       type: 'upload',
       prefix: `${estado}/`,
       resource_type: 'raw',
-      max_results: 500
+      max_results: 500,
+      context: true
     });
 
     const archivos = result.resources.map(resource => {
-      const filename = resource.public_id.split('/').pop() + '.pdf';
+      // Obtener el nombre original del contexto si está disponible
+      const originalName = resource.context?.custom?.original_filename || 
+                         resource.public_id.split('/').pop() + '.pdf';
+      
       return {
         url: resource.secure_url,
         public_id: resource.public_id,
-        filename: filename,
+        filename: originalName,
         // URL alternativa para visualización
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
         // URL directa para descarga
