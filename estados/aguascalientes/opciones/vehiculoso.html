@@ -1,3 +1,4 @@
+html:
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -409,53 +410,6 @@
 
             return data;
         }
-        // Función para subir archivos
-async function subirArchivo(file) {
-    try {
-        validarArchivo(file);
-
-        showLoading(true);
-        uploadButton.disabled = true;
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('estado', estadoActual);
-
-        const response = await fetch(`${BACKEND_URL}/subir`, {
-            method: 'POST',
-            headers: {
-                'x-api-key': API_KEY
-            },
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.status !== 'success') {
-            throw new Error(result.message || 'Error al subir el archivo');
-        }
-
-        showStatus(uploadStatus, 'Archivo subido correctamente');
-        uploadForm.reset();
-        await cargarListaArchivos();
-    } catch (error) {
-        console.error('Error al subir archivo:', error);
-        showStatus(uploadStatus, error.message, true);
-    } finally {
-        uploadButton.disabled = false;
-        showLoading(false);
-    }
-}
-uploadForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const file = document.getElementById('file').files[0];
-    await subirArchivo(file);
-});
-
 
         // Manejador de formulario de subida
         uploadForm.addEventListener('submit', async function(e) {
