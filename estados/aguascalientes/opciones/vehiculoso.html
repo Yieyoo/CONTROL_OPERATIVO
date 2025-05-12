@@ -9,6 +9,7 @@
     <!-- Incluir PDF.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <style>
+        /* Estilos generales */
         .loading {
             display: none;
             position: fixed;
@@ -43,25 +44,59 @@
             font-weight: bold;
             margin-top: 10px;
         }
+        
+        /* Estilos para el visor PDF */
         .pdf-viewer-container {
             width: 100%;
-            height: 500px;
+            height: 600px;
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-bottom: 20px;
             position: relative;
             overflow: hidden;
+            background: #525659;
         }
         #pdf-viewer {
             width: 100%;
             height: 100%;
             border: none;
+            display: none;
         }
         #pdfjs-viewer {
             width: 100%;
             height: 100%;
             display: none;
+            overflow-y: auto;
         }
+        .pdf-pages-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .pdf-page {
+            margin: 0 auto;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            background: white;
+        }
+        .pdf-fallback {
+            display: none;
+            padding: 15px;
+            background: #f8d7da;
+            border-radius: 4px;
+            margin-top: 10px;
+            text-align: center;
+            color: #721c24;
+        }
+        .pdf-fallback a {
+            color: #721c24;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        
+        /* Estilos para la gestión de archivos */
         .gestion-archivos {
             margin-top: 20px;
             padding: 20px;
@@ -78,19 +113,37 @@
             flex: 1;
             min-width: 300px;
         }
+        .delete-file {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
         #fileList {
             list-style-type: none;
             padding: 0;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         #fileList li {
-            padding: 8px;
+            padding: 10px;
             border-bottom: 1px solid #eee;
             cursor: pointer;
+            transition: background 0.2s;
         }
         #fileList li:hover {
             background-color: #f0f0f0;
+        }
+        .filename {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .file-meta {
+            font-size: 0.8em;
+            color: #666;
+            display: block;
         }
         select, input[type="file"] {
             width: 100%;
@@ -98,6 +151,7 @@
             margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            background: white;
         }
         button {
             background-color: #4CAF50;
@@ -107,6 +161,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            transition: background 0.2s;
         }
         button:hover {
             background-color: #45a049;
@@ -114,19 +169,6 @@
         button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
-        }
-        .pdf-fallback {
-            display: none;
-            padding: 15px;
-            background: #f8d7da;
-            border-radius: 4px;
-            margin-top: 10px;
-            text-align: center;
-        }
-        .pdf-fallback a {
-            color: #721c24;
-            font-weight: bold;
-            text-decoration: underline;
         }
     </style>
 </head>
@@ -245,7 +287,7 @@
             }, 5000);
         }
 
-        // Función para mostrar PDF con PDF.js
+        // Función para mostrar PDF con PDF.js (versión mejorada)
         async function mostrarConPDFJS(url) {
             try {
                 // Ocultar otros visores
@@ -254,7 +296,7 @@
                 
                 // Mostrar contenedor PDF.js
                 pdfjsViewer.style.display = 'block';
-                pdfjsViewer.innerHTML = '';
+                pdfjsViewer.innerHTML = '<div class="pdf-pages-container"></div>';
                 
                 // Configurar el enlace de descarga
                 pdfDownloadLink.href = url;
@@ -263,27 +305,37 @@
                 const loadingTask = pdfjsLib.getDocument(url);
                 const pdf = await loadingTask.promise;
                 
-                // Obtener la primera página
-                const page = await pdf.getPage(1);
+                // Contenedor para todas las páginas
+                const pagesContainer = pdfjsViewer.querySelector('.pdf-pages-container');
                 
-                // Configurar el escalado y viewport
-                const scale = 1.5;
-                const viewport = page.getViewport({ scale });
-                
-                // Preparar el canvas
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                // Añadir el canvas al contenedor
-                pdfjsViewer.appendChild(canvas);
-                
-                // Renderizar la página
-                await page.render({
-                    canvasContext: context,
-                    viewport: viewport
-                }).promise;
+                // Renderizar todas las páginas
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    
+                    // Crear contenedor de página
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'pdf-page';
+                    
+                    // Configurar el escalado y viewport
+                    const scale = 1.5;
+                    const viewport = page.getViewport({ scale });
+                    
+                    // Preparar el canvas
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    // Añadir el canvas al contenedor de página
+                    pageDiv.appendChild(canvas);
+                    pagesContainer.appendChild(pageDiv);
+                    
+                    // Renderizar la página
+                    await page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise;
+                }
                 
             } catch (error) {
                 console.error('Error al cargar con PDF.js:', error);
@@ -311,7 +363,7 @@
             
             // Luego intentamos con iframe como fallback
             setTimeout(() => {
-                if (pdfjsViewer.children.length === 0) {
+                if (pdfjsViewer.children.length === 0 || pdfjsViewer.querySelector('.pdf-pages-container').children.length === 0) {
                     console.log('Falló PDF.js, intentando con iframe directo');
                     pdfjsViewer.style.display = 'none';
                     pdfViewer.style.display = 'block';
@@ -352,6 +404,27 @@
             pdfDownloadLink.href = url;
         }
 
+        // Formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Formatear fecha
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-MX', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
         // Cargar lista de archivos
         async function cargarListaArchivos() {
             showLoading(true);
@@ -384,7 +457,7 @@
             }
         }
 
-        // Renderizar lista de archivos
+        // Renderizar lista de archivos (versión mejorada)
         function renderizarListaArchivos(files) {
             fileListContainer.innerHTML = '';
             fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
@@ -397,15 +470,23 @@
                 return;
             }
 
+            // Ordenar archivos por fecha de subida (más recientes primero)
+            files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+
             files.forEach(file => {
-                const filename = file.filename || 'documento.pdf';
+                // Usar filename si está disponible, de lo contrario usar public_id
+                const displayName = file.filename || 
+                                  (file.public_id.split('/').pop() + '.pdf');
                 const pdfUrl = file.url;
                 
                 if (!pdfUrl) return;
 
                 // Lista de archivos (clickable)
                 const li = document.createElement('li');
-                li.textContent = filename;
+                li.innerHTML = `
+                    <span class="filename">${displayName}</span>
+                    <span class="file-meta">${formatFileSize(file.size)} • ${formatDate(file.uploaded_at)}</span>
+                `;
                 li.addEventListener('click', () => {
                     viewSelect.value = pdfUrl;
                     mostrarPdf(pdfUrl);
@@ -415,13 +496,13 @@
                 // Selector para eliminar
                 const deleteOption = document.createElement('option');
                 deleteOption.value = file.public_id;
-                deleteOption.textContent = filename;
+                deleteOption.textContent = displayName;
                 fileSelect.appendChild(deleteOption);
 
                 // Selector para visualizar
                 const viewOption = document.createElement('option');
                 viewOption.value = pdfUrl;
-                viewOption.textContent = filename;
+                viewOption.textContent = displayName;
                 viewSelect.appendChild(viewOption);
             });
         }
