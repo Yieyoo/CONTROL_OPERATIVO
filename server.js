@@ -7,7 +7,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const expressSanitizer = require('express-sanitizer');
-const LRU = require('lru-cache');
+const { LRUCache } = require('lru-cache');
 const promBundle = require('express-prom-bundle');
 const { sanitize } = require('sanitizer');
 
@@ -23,7 +23,7 @@ const metricsMiddleware = promBundle({
 });
 
 // 2. Configuración de caché
-const cache = new LRU({
+const cache = new LRUCache({
   max: process.env.MAX_CACHE_ITEMS || 500,
   ttl: process.env.CACHE_TTL || 900000
 });
@@ -171,10 +171,14 @@ const errorDictionary = {
     missing_api_key: 'Clave API no proporcionada',
     invalid_state: 'Estado no válido',
     rate_limit_exceeded: 'Límite de solicitudes excedido',
-    // ... otros mensajes
+    server_error: 'Error interno del servidor'
   },
   EN: {
-    // ... traducciones en inglés
+    invalid_api_key: 'Invalid API Key',
+    missing_api_key: 'API Key not provided',
+    invalid_state: 'Invalid state',
+    rate_limit_exceeded: 'Rate limit exceeded',
+    server_error: 'Internal server error'
   }
 };
 
@@ -232,10 +236,12 @@ router.post('/upload',
         }
       };
 
-      const result = await cloudinary.uploader.upload_stream(
-        uploadOptions, 
-        (error, result) => error ? reject(error) : resolve(result)
-      ).end(req.file.buffer);
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          uploadOptions, 
+          (error, result) => error ? reject(error) : resolve(result)
+        ).end(req.file.buffer);
+      });
 
       cache.delete(`archivos_${req.estado}`);
 
@@ -355,7 +361,7 @@ app.use(errorHandler);
 const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`🔒 Modo: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌎 CORS permitidos: ${corsOptions.origin.join(', ') || 'ninguno'}`);
+  console.log(`🌎 CORS permitidos: ${process.env.ALLOWED_ORIGINS || 'ninguno'}`);
 });
 
 process.on('SIGTERM', () => {
