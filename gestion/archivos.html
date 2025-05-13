@@ -6,7 +6,6 @@
     <title>Gestión de Archivos PDF</title>
     <link rel="icon" type="image/png" href="../imagenes/descargar.png">
     <link rel="stylesheet" href="diseñog.css">
-    
 </head>
 <body>
     <div class="menu-overlay"></div>
@@ -84,36 +83,33 @@
         const API_KEY = 'Xhy2md57';
         let currentCarpeta = 'aguascalientes';
         
-        // Elementos del DOM
-        const loadingElement = document.getElementById('loading');
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadButton = document.getElementById('uploadButton');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const pdfTitle = document.getElementById('pdf-title');
-        const fileListContainer = document.getElementById('fileList');
-        const fileSelect = document.getElementById('fileSelect');
-        const deleteFileButton = document.getElementById('deleteFileButton');
-        const deleteStatus = document.getElementById('deleteStatus');
-        const carpetaSelect = document.getElementById('carpetaSelect');
+        // Elementos del DOM (se inicializarán después de DOMContentLoaded)
+        let loadingElement, uploadForm, uploadButton, uploadStatus, pdfViewer, pdfTitle, 
+            fileListContainer, fileSelect, deleteFileButton, deleteStatus, carpetaSelect;
 
         // Mostrar/ocultar loading
         function showLoading(show) {
-            loadingElement.style.display = show ? 'flex' : 'none';
+            if (loadingElement) {
+                loadingElement.style.display = show ? 'flex' : 'none';
+            }
         }
 
         // Mostrar mensaje de estado
         function showStatus(element, message, isError = false) {
-            element.textContent = message;
-            element.className = isError ? 'error-message' : 'success-message';
-            setTimeout(() => {
-                element.textContent = '';
-                element.className = '';
-            }, 5000);
+            if (element) {
+                element.textContent = message;
+                element.className = isError ? 'error-message' : 'success-message';
+                setTimeout(() => {
+                    element.textContent = '';
+                    element.className = '';
+                }, 5000);
+            }
         }
 
         // Función para mostrar PDF
         function mostrarPdf(url, filename = '') {
+            if (!pdfViewer || !pdfTitle) return;
+            
             if (!url) {
                 pdfViewer.style.display = 'none';
                 pdfTitle.textContent = 'Visualizador de PDF';
@@ -163,7 +159,9 @@
                 
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
-                showStatus(uploadStatus, 'Error al cargar archivos', true);
+                if (uploadStatus) {
+                    showStatus(uploadStatus, 'Error al cargar archivos', true);
+                }
             } finally {
                 showLoading(false);
             }
@@ -171,6 +169,8 @@
 
         // Renderizar lista de archivos
         function renderizarListaArchivos(files) {
+            if (!fileListContainer || !fileSelect) return;
+            
             fileListContainer.innerHTML = '';
             fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
 
@@ -208,7 +208,8 @@
             // Eventos para los botones
             document.querySelectorAll('.btn-view').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    mostrarPdf(btn.dataset.url, btn.parentElement.querySelector('.filename').textContent);
+                    const filenameElement = btn.closest('li')?.querySelector('.filename');
+                    mostrarPdf(btn.dataset.url, filenameElement?.textContent || '');
                 });
             });
 
@@ -222,45 +223,90 @@
             });
         }
 
-        // Subir archivo
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = document.getElementById('file').files[0];
-            currentCarpeta = carpetaSelect.value;
-            
-            try {
-                if (!file) throw new Error('Selecciona un archivo');
-                if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
-                
-                showLoading(true);
-                uploadButton.disabled = true;
-                
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('estado', currentCarpeta);
-                
-                const response = await fetch(`${BACKEND_URL}/upload`, {
-                    method: 'POST',
-                    headers: {
-                        'x-api-key': API_KEY
-                    },
-                    body: formData
+        // Cargar al iniciar
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Inicializar elementos del DOM
+            loadingElement = document.getElementById('loading');
+            uploadForm = document.getElementById('uploadForm');
+            uploadButton = document.getElementById('uploadButton');
+            uploadStatus = document.getElementById('uploadStatus');
+            pdfViewer = document.getElementById('pdf-viewer');
+            pdfTitle = document.getElementById('pdf-title');
+            fileListContainer = document.getElementById('fileList');
+            fileSelect = document.getElementById('fileSelect');
+            deleteFileButton = document.getElementById('deleteFileButton');
+            deleteStatus = document.getElementById('deleteStatus');
+            carpetaSelect = document.getElementById('carpetaSelect');
+
+            // Configurar eventos
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const file = document.getElementById('file')?.files[0];
+                    currentCarpeta = carpetaSelect?.value || 'aguascalientes';
+                    
+                    try {
+                        if (!file) throw new Error('Selecciona un archivo');
+                        if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
+                        
+                        showLoading(true);
+                        if (uploadButton) uploadButton.disabled = true;
+                        
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('estado', currentCarpeta);
+                        
+                        const response = await fetch(`${BACKEND_URL}/upload`, {
+                            method: 'POST',
+                            headers: {
+                                'x-api-key': API_KEY
+                            },
+                            body: formData
+                        });
+                        
+                        if (!response.ok) throw new Error('Error al subir');
+                        
+                        const { data } = await response.json();
+                        if (uploadStatus) showStatus(uploadStatus, 'Archivo subido correctamente');
+                        await cargarListaArchivos();
+                        mostrarPdf(data.url, data.filename);
+                        if (uploadForm) uploadForm.reset();
+                        
+                    } catch (error) {
+                        console.error('Error al subir:', error);
+                        if (uploadStatus) showStatus(uploadStatus, error.message, true);
+                    } finally {
+                        showLoading(false);
+                        if (uploadButton) uploadButton.disabled = false;
+                    }
                 });
-                
-                if (!response.ok) throw new Error('Error al subir');
-                
-                const { data } = await response.json();
-                showStatus(uploadStatus, 'Archivo subido correctamente');
+            }
+
+            if (deleteFileButton) {
+                deleteFileButton.addEventListener('click', async () => {
+                    if (!fileSelect) return;
+                    const publicId = fileSelect.value;
+                    if (!publicId) {
+                        if (deleteStatus) showStatus(deleteStatus, 'Selecciona un archivo', true);
+                        return;
+                    }
+                    if (confirm('¿Estás seguro de eliminar este archivo?')) {
+                        await eliminarArchivo(publicId);
+                    }
+                });
+            }
+
+            if (carpetaSelect) {
+                carpetaSelect.addEventListener('change', () => {
+                    currentCarpeta = carpetaSelect.value;
+                    cargarListaArchivos();
+                });
+            }
+
+            try {
                 await cargarListaArchivos();
-                mostrarPdf(data.url, data.filename);
-                uploadForm.reset();
-                
             } catch (error) {
-                console.error('Error al subir:', error);
-                showStatus(uploadStatus, error.message, true);
-            } finally {
-                showLoading(false);
-                uploadButton.disabled = false;
+                console.error('Error inicial:', error);
             }
         });
 
@@ -282,49 +328,26 @@
                 
                 if (!response.ok) throw new Error('Error al eliminar');
                 
-                showStatus(deleteStatus, 'Archivo eliminado');
+                if (deleteStatus) showStatus(deleteStatus, 'Archivo eliminado');
                 await cargarListaArchivos();
                 mostrarPdf('');
                 
             } catch (error) {
                 console.error('Error al eliminar:', error);
-                showStatus(deleteStatus, error.message, true);
+                if (deleteStatus) showStatus(deleteStatus, error.message, true);
             } finally {
                 showLoading(false);
             }
         }
 
-        // Eliminar desde el select
-        deleteFileButton.addEventListener('click', async () => {
-            const publicId = fileSelect.value;
-            if (!publicId) {
-                showStatus(deleteStatus, 'Selecciona un archivo', true);
-                return;
-            }
-            if (confirm('¿Estás seguro de eliminar este archivo?')) {
-                await eliminarArchivo(publicId);
-            }
-        });
-
-        // Cambiar carpeta
-        carpetaSelect.addEventListener('change', () => {
-            currentCarpeta = carpetaSelect.value;
-            cargarListaArchivos();
-        });
-
-        // Cargar al iniciar
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await cargarListaArchivos();
-            } catch (error) {
-                console.error('Error inicial:', error);
-            }
-        });
-
         // Menú hamburguesa
         function toggleMenu() {
-            document.querySelector('.menu').classList.toggle('active');
-            document.querySelector('.menu-overlay').classList.toggle('active');
+            const menu = document.querySelector('.menu');
+            const overlay = document.querySelector('.menu-overlay');
+            if (menu && overlay) {
+                menu.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
         }
     </script>
 </body>
