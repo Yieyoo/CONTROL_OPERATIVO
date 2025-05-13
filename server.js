@@ -358,4 +358,3 @@ process.on('SIGTERM', () => {
 
 // Exportar para testing
 module.exports = app;
-
