@@ -1,444 +1,330 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Archivos PDF</title>
-    <link rel="icon" type="image/png" href="../imagenes/descargar.png">
-    <link rel="stylesheet" href="diseñog.css">
-    <style>
-        /* Estilos adicionales para mejorar la visualización */
-        .pdf-viewer-container {
-            border: 1px solid #ddd;
-            margin: 20px auto;
-            width: 90%;
-            height: 600px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        #pdf-viewer {
-            flex-grow: 1;
-            border: none;
-            display: none;
-        }
-        
-        .file-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .file-list li {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .file-actions button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        
-        .error-message {
-            color: #d9534f;
-        }
-        
-        .success-message {
-            color: #5cb85c;
-        }
-    </style>
-</head>
-<body>
-    <div class="menu-overlay"></div>
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-    </div>
-
-    <header>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <nav class="menu">
-            <ul>
-                <li><a href="../../../index.html">Inicio</a></li>
-                <li><a href="../../../construccion.html">Información de ORs</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <div class="logo-container">
-        <img src="../imagenes/inm logo.png" alt="Logo INM">
-    </div>
-
-    <div class="header-container">
-        <h1>GESTOR DE ARCHIVOS</h1>
-    </div>
-
-    <!-- Contenedor del visor PDF simplificado -->
-    <div class="pdf-viewer-container">
-        <div class="pdf-toolbar">
-            <div id="pdf-title">Visualizador de PDF</div>
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gestión de Archivos PDF</title>
+        <link rel="icon" type="image/png" href="../imagenes/descargar.png">
+        <link rel="stylesheet" href="diseñog.css">
+    </head>
+    <body>
+        <div class="menu-overlay"></div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
         </div>
-        <iframe id="pdf-viewer" type="application/pdf" width="100%" height="100%"></iframe>
-    </div>
 
-    <!-- Panel de gestión de archivos -->
-    <div class="gestion-archivos">
-        <h2>Gestión de Archivos PDF</h2>
-        
-        <div class="fila-superior">
-            <!-- Subir archivo -->
-            <div class="upload-form">
-                <h3>Subir archivo</h3>
-                <form id="uploadForm" enctype="multipart/form-data">
-                    <input type="file" id="file" name="file" accept="application/pdf" required>
-                    <select id="carpetaSelect">
-                        <option value="aguascalientes">Aguascalientes</option>
-                        <option value="jalisco">Jalisco</option>
-                        <option value="nuevo-leon">Nuevo León</option>
-                    </select>
-                    <button type="submit" id="uploadButton">Subir</button>
-                    <p id="uploadStatus"></p>
-                </form>
+        <header>
+            <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+            <nav class="menu">
+                <ul>
+                    <li><a href="../../../index.html">Inicio</a></li>
+                    <li><a href="../../../construccion.html">Información de ORs</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="logo-container">
+            <img src="../imagenes/inm logo.png" alt="Logo INM">
+        </div>
+
+        <div class="header-container">
+            <h1>GESTOR DE ARCHIVOS</h1>
+        </div>
+
+        <!-- Contenedor del visor PDF simplificado -->
+        <div class="pdf-viewer-container">
+            <div class="pdf-toolbar">
+                <div id="pdf-title">Visualizador de PDF</div>
+            </div>
+            <iframe id="pdf-viewer"></iframe>
+        </div>
+
+        <!-- Panel de gestión de archivos -->
+        <div class="gestion-archivos">
+            <h2>Gestión de Archivos PDF</h2>
+            
+            <div class="fila-superior">
+                <!-- Subir archivo -->
+                <div class="upload-form">
+                    <h3>Subir archivo</h3>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <input type="file" id="file" name="file" accept="application/pdf" required>
+                        <select id="carpetaSelect">
+                            <option value="aguascalientes">Aguascalientes</option>
+                            <option value="jalisco">Jalisco</option>
+                            <option value="nuevo-leon">Nuevo León</option>
+                        </select>
+                        <button type="submit" id="uploadButton">Subir</button>
+                        <p id="uploadStatus"></p>
+                    </form>
+                </div>
+
+                <!-- Archivos disponibles -->
+                <div class="file-list">
+                    <h3>Archivos disponibles</h3>
+                    <ul id="fileList"></ul>
+                </div>
             </div>
 
-            <!-- Archivos disponibles -->
-            <div class="file-list">
-                <h3>Archivos disponibles</h3>
-                <ul id="fileList"></ul>
+            <!-- Eliminar archivo -->
+            <div class="delete-file">
+                <h3>Eliminar archivo</h3>
+                <select id="fileSelect">
+                    <option value="">Selecciona un archivo para eliminar</option>
+                </select>
+                <button id="deleteFileButton">Eliminar</button>
+                <p id="deleteStatus"></p>
             </div>
         </div>
 
-        <!-- Eliminar archivo -->
-        <div class="delete-file">
-            <h3>Eliminar archivo</h3>
-            <select id="fileSelect">
-                <option value="">Selecciona un archivo para eliminar</option>
-            </select>
-            <button id="deleteFileButton">Eliminar</button>
-            <p id="deleteStatus"></p>
-        </div>
-    </div>
-
-    <script>
-        // Configuración global
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-        const API_KEY = 'Xhy2md57';
-        let currentCarpeta = 'aguascalientes';
-        
-        // Elementos del DOM
-        const loadingElement = document.getElementById('loading');
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadButton = document.getElementById('uploadButton');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const pdfTitle = document.getElementById('pdf-title');
-        const fileListContainer = document.getElementById('fileList');
-        const fileSelect = document.getElementById('fileSelect');
-        const deleteFileButton = document.getElementById('deleteFileButton');
-        const deleteStatus = document.getElementById('deleteStatus');
-        const carpetaSelect = document.getElementById('carpetaSelect');
-
-        // Mostrar/ocultar loading
-        function showLoading(show) {
-            loadingElement.style.display = show ? 'flex' : 'none';
-        }
-
-        // Mostrar mensaje de estado
-        function showStatus(element, message, isError = false) {
-            element.textContent = message;
-            element.className = isError ? 'error-message' : 'success-message';
-            setTimeout(() => {
-                element.textContent = '';
-                element.className = '';
-            }, 5000);
-        }
-
-        // Función para mostrar PDF (mejorada)
-        function mostrarPdf(url, filename = '') {
-            console.log('Intentando mostrar PDF:', url); // Depuración
+        <script>
+            // Configuración global
+            const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+            const API_KEY = 'Xhy2md57';
+            let currentCarpeta = 'aguascalientes';
             
-            if (!url) {
-                pdfViewer.style.display = 'none';
-                pdfTitle.textContent = 'Visualizador de PDF';
-                return;
-            }
-            
-            // Verificar si la URL es válida
-            try {
-                new URL(url);
-            } catch (e) {
-                console.error('URL inválida:', url);
-                showStatus(uploadStatus, 'La URL del PDF no es válida', true);
-                return;
-            }
-            
-            // Configurar el visor PDF
-            pdfViewer.style.display = 'block';
-            pdfViewer.src = `${url}#toolbar=1&navpanes=1&scrollbar=1`;
-            pdfTitle.textContent = filename || 'Documento PDF';
-            
-            // Manejar errores de carga
-            pdfViewer.onerror = () => {
-                console.error('Error al cargar el PDF');
-                pdfViewer.style.display = 'none';
-                pdfTitle.textContent = 'Error al cargar el documento';
-                showStatus(uploadStatus, 'Error al cargar el PDF. Verifica la URL.', true);
-            };
-        }
+            // Elementos del DOM
+            const loadingElement = document.getElementById('loading');
+            const uploadForm = document.getElementById('uploadForm');
+            const uploadButton = document.getElementById('uploadButton');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const pdfTitle = document.getElementById('pdf-title');
+            const fileListContainer = document.getElementById('fileList');
+            const fileSelect = document.getElementById('fileSelect');
+            const deleteFileButton = document.getElementById('deleteFileButton');
+            const deleteStatus = document.getElementById('deleteStatus');
+            const carpetaSelect = document.getElementById('carpetaSelect');
 
-        // Formatear tamaño de archivo
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Formatear fecha
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-MX', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        // Cargar lista de archivos (mejorada con manejo de errores)
-        async function cargarListaArchivos() {
-            showLoading(true);
-            try {
-                const response = await fetch(`${BACKEND_URL}/archivos/${currentCarpeta}`, {
-                    headers: {
-                        'x-api-key': API_KEY
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                
-                if (!result || !result.data) {
-                    throw new Error('La respuesta del servidor no contiene datos válidos');
-                }
-                
-                renderizarListaArchivos(result.data);
-                
-            } catch (error) {
-                console.error('Error al cargar archivos:', error);
-                showStatus(uploadStatus, 'Error al cargar archivos: ' + error.message, true);
-                renderizarListaArchivos([]); // Mostrar lista vacía
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // Renderizar lista de archivos (mejorada)
-        function renderizarListaArchivos(files) {
-            fileListContainer.innerHTML = '';
-            fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
-
-            if (!files || files.length === 0) {
-                fileListContainer.innerHTML = '<li>No hay archivos disponibles</li>';
-                return;
+            // Mostrar/ocultar loading
+            function showLoading(show) {
+                loadingElement.style.display = show ? 'flex' : 'none';
             }
 
-            // Ordenar por fecha (más reciente primero)
-            files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+            // Mostrar mensaje de estado
+            function showStatus(element, message, isError = false) {
+                element.textContent = message;
+                element.className = isError ? 'error-message' : 'success-message';
+                setTimeout(() => {
+                    element.textContent = '';
+                    element.className = '';
+                }, 5000);
+            }
 
-            files.forEach(file => {
-                // Verificar que el archivo tenga los campos necesarios
-                if (!file.public_id || !file.url) {
-                    console.warn('Archivo con estructura incorrecta:', file);
+            // Función para mostrar PDF
+            function mostrarPdf(url, filename = '') {
+                if (!url) {
+                    pdfViewer.style.display = 'none';
+                    pdfTitle.textContent = 'Visualizador de PDF';
                     return;
                 }
                 
-                const displayName = file.filename || file.public_id.split('/').pop() + '.pdf';
-                
-                // Item en la lista
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <div class="file-info">
-                        <span class="filename">${displayName}</span>
-                        <span class="file-meta">${formatFileSize(file.size || 0)} • ${formatDate(file.uploaded_at || new Date().toISOString())}</span>
-                    </div>
-                    <div class="file-actions">
-                        <button class="btn-view" data-url="${file.url}">Ver</button>
-                        <button class="btn-delete" data-id="${file.public_id}">Eliminar</button>
-                    </div>
-                `;
-                fileListContainer.appendChild(li);
+                pdfViewer.style.display = 'block';
+                pdfViewer.src = url;
+                pdfTitle.textContent = filename || 'Documento PDF';
+            }
 
-                // Opción para eliminar
-                const option = document.createElement('option');
-                option.value = file.public_id;
-                option.textContent = displayName;
-                fileSelect.appendChild(option);
-            });
+            // Formatear tamaño de archivo
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
 
-            // Eventos para los botones "Ver"
-            document.querySelectorAll('.btn-view').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const url = btn.dataset.url;
-                    const filename = btn.closest('.file-info').querySelector('.filename').textContent;
-                    console.log('Mostrando PDF:', url, filename); // Depuración
-                    mostrarPdf(url, filename);
+            // Formatear fecha
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('es-MX', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
-            });
+            }
 
-            // Eventos para los botones "Eliminar"
-            document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (confirm('¿Estás seguro de eliminar este archivo?')) {
-                        eliminarArchivo(btn.dataset.id);
-                    }
-                });
-            });
-        }
-
-        // Subir archivo (mejorado con validaciones)
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = document.getElementById('file').files[0];
-            currentCarpeta = carpetaSelect.value;
-            
-            try {
-                // Validaciones
-                if (!file) throw new Error('Selecciona un archivo PDF');
-                if (file.type !== 'application/pdf') throw new Error('El archivo debe ser un PDF');
-                if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
-                
+            // Cargar lista de archivos
+            async function cargarListaArchivos() {
                 showLoading(true);
-                uploadButton.disabled = true;
-                
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('estado', currentCarpeta);
-                
-                const response = await fetch(`${BACKEND_URL}/upload`, {
-                    method: 'POST',
-                    headers: {
-                        'x-api-key': API_KEY
-                    },
-                    body: formData
+                try {
+                    const response = await fetch(`${BACKEND_URL}/archivos/${currentCarpeta}`, {
+                        headers: {
+                            'x-api-key': API_KEY
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error(`Error ${response.status}`);
+                    
+                    const { data } = await response.json();
+                    renderizarListaArchivos(data || []);
+                    
+                } catch (error) {
+                    console.error('Error al cargar archivos:', error);
+                    showStatus(uploadStatus, 'Error al cargar archivos', true);
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            // Renderizar lista de archivos
+            function renderizarListaArchivos(files) {
+                fileListContainer.innerHTML = '';
+                fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
+
+                if (!files || files.length === 0) {
+                    fileListContainer.innerHTML = '<li>No hay archivos disponibles</li>';
+                    return;
+                }
+
+                files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+
+                files.forEach(file => {
+                    const displayName = file.filename || file.public_id.split('/').pop() + '.pdf';
+                    
+                    // Item en la lista
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="file-info">
+                            <span class="filename">${displayName}</span>
+                            <span class="file-meta">${formatFileSize(file.size)} • ${formatDate(file.uploaded_at)}</span>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn-view" data-url="${file.url}">Ver</button>
+                            <button class="btn-delete" data-id="${file.public_id}">Eliminar</button>
+                        </div>
+                    `;
+                    fileListContainer.appendChild(li);
+
+                    // Opción para eliminar
+                    const option = document.createElement('option');
+                    option.value = file.public_id;
+                    option.textContent = displayName;
+                    fileSelect.appendChild(option);
                 });
-                
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Error al subir el archivo');
-                }
-                
-                const { data } = await response.json();
-                
-                if (!data || !data.url) {
-                    throw new Error('La respuesta del servidor no contiene la URL del archivo');
-                }
-                
-                showStatus(uploadStatus, 'Archivo subido correctamente');
-                await cargarListaArchivos();
-                mostrarPdf(data.url, data.filename);
-                uploadForm.reset();
-                
-            } catch (error) {
-                console.error('Error al subir:', error);
-                showStatus(uploadStatus, error.message, true);
-            } finally {
-                showLoading(false);
-                uploadButton.disabled = false;
-            }
-        });
 
-        // Eliminar archivo (mejorado)
-        async function eliminarArchivo(publicId) {
-            if (!publicId) {
-                showStatus(deleteStatus, 'ID de archivo no válido', true);
-                return;
-            }
-            
-            showLoading(true);
-            try {
-                const response = await fetch(`${BACKEND_URL}/delete`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
-                    },
-                    body: JSON.stringify({
-                        public_id: publicId,
-                        estado: currentCarpeta
-                    })
+                // Eventos para los botones
+                document.querySelectorAll('.btn-view').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        mostrarPdf(btn.dataset.url, btn.parentElement.querySelector('.filename').textContent);
+                    });
                 });
+
+                document.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (confirm('¿Eliminar este archivo?')) {
+                            eliminarArchivo(btn.dataset.id);
+                        }
+                    });
+                });
+            }
+
+            // Subir archivo
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const file = document.getElementById('file').files[0];
+                currentCarpeta = carpetaSelect.value;
                 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Error al eliminar el archivo');
+                try {
+                    if (!file) throw new Error('Selecciona un archivo');
+                    if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
+                    
+                    showLoading(true);
+                    uploadButton.disabled = true;
+                    
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('estado', currentCarpeta);
+                    
+                    const response = await fetch(`${BACKEND_URL}/upload`, {
+                        method: 'POST',
+                        headers: {
+                            'x-api-key': API_KEY
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) throw new Error('Error al subir');
+                    
+                    const { data } = await response.json();
+                    showStatus(uploadStatus, 'Archivo subido correctamente');
+                    await cargarListaArchivos();
+                    mostrarPdf(data.url, data.filename);
+                    uploadForm.reset();
+                    
+                } catch (error) {
+                    console.error('Error al subir:', error);
+                    showStatus(uploadStatus, error.message, true);
+                } finally {
+                    showLoading(false);
+                    uploadButton.disabled = false;
                 }
-                
-                showStatus(deleteStatus, 'Archivo eliminado correctamente');
-                await cargarListaArchivos();
-                mostrarPdf(''); // Limpiar el visor
-                
-            } catch (error) {
-                console.error('Error al eliminar:', error);
-                showStatus(deleteStatus, error.message, true);
-            } finally {
-                showLoading(false);
-            }
-        }
+            });
 
-        // Eliminar desde el select
-        deleteFileButton.addEventListener('click', async () => {
-            const publicId = fileSelect.value;
-            if (!publicId) {
-                showStatus(deleteStatus, 'Selecciona un archivo', true);
-                return;
-            }
-            if (confirm('¿Estás seguro de eliminar este archivo?')) {
-                await eliminarArchivo(publicId);
-            }
-        });
-
-        // Cambiar carpeta
-        carpetaSelect.addEventListener('change', () => {
-            currentCarpeta = carpetaSelect.value;
-            cargarListaArchivos();
-        });
-
-        // Cargar al iniciar (mejorado)
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                // Verificar conexión con el backend
-                const testResponse = await fetch(`${BACKEND_URL}/test`, {
-                    headers: {
-                        'x-api-key': API_KEY
-                    }
-                }).catch(() => null);
-                
-                if (!testResponse || !testResponse.ok) {
-                    console.warn('No se pudo conectar con el backend');
+            // Eliminar archivo
+            async function eliminarArchivo(publicId) {
+                showLoading(true);
+                try {
+                    const response = await fetch(`${BACKEND_URL}/delete`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': API_KEY
+                        },
+                        body: JSON.stringify({
+                            public_id: publicId,
+                            estado: currentCarpeta
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('Error al eliminar');
+                    
+                    showStatus(deleteStatus, 'Archivo eliminado');
+                    await cargarListaArchivos();
+                    mostrarPdf('');
+                    
+                } catch (error) {
+                    console.error('Error al eliminar:', error);
+                    showStatus(deleteStatus, error.message, true);
+                } finally {
+                    showLoading(false);
                 }
-                
-                await cargarListaArchivos();
-            } catch (error) {
-                console.error('Error inicial:', error);
-                showStatus(uploadStatus, 'Error al cargar los archivos: ' + error.message, true);
             }
-        });
 
-        // Menú hamburguesa
-        function toggleMenu() {
-            document.querySelector('.menu').classList.toggle('active');
-            document.querySelector('.menu-overlay').classList.toggle('active');
-        }
-    </script>
-</body>
-</html>
+            // Eliminar desde el select
+            deleteFileButton.addEventListener('click', async () => {
+                const publicId = fileSelect.value;
+                if (!publicId) {
+                    showStatus(deleteStatus, 'Selecciona un archivo', true);
+                    return;
+                }
+                if (confirm('¿Estás seguro de eliminar este archivo?')) {
+                    await eliminarArchivo(publicId);
+                }
+            });
+
+            // Cambiar carpeta
+            carpetaSelect.addEventListener('change', () => {
+                currentCarpeta = carpetaSelect.value;
+                cargarListaArchivos();
+            });
+
+            // Cargar al iniciar
+            document.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    await cargarListaArchivos();
+                } catch (error) {
+                    console.error('Error inicial:', error);
+                }
+            });
+
+            // Menú hamburguesa
+            function toggleMenu() {
+                document.querySelector('.menu').classList.toggle('active');
+                document.querySelector('.menu-overlay').classList.toggle('active');
+            }
+        </script>
+    </body>
+    </html>
