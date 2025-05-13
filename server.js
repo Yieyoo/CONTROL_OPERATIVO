@@ -56,8 +56,8 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // 4. Middlewares para parsear el cuerpo de las peticiones
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // 5. Configuración de Cloudinary optimizada para PDFs
 const validateCloudinaryConfig = () => {
@@ -117,7 +117,7 @@ const authenticate = (req, res, next) => {
 const pdfUpload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 15 * 1024 * 1024 // Aumentado a 15MB
+    fileSize: 15 * 1024 * 1024 // 15MB
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'application/pdf') {
@@ -177,24 +177,20 @@ router.get('/health', (req, res) => {
   res.json(healthCheck);
 });
 
-// Subir archivo - Versión optimizada con validaciones mejoradas
+// Subir archivo - Versión optimizada para conservar nombres originales
 router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
     try {
-      if (err) {
-        throw err;
-      }
-
-      if (!req.file) {
-        throw new Error('No se ha subido ningún archivo');
-      }
+      if (err) throw err;
+      if (!req.file) throw new Error('No se ha subido ningún archivo');
 
       const estado = req.body.estado || 'aguascalientes';
-      const originalName = req.file.originalname.replace(/[^\w\-\. ]/gi, '');
+      const originalName = req.file.originalname;
+      const cleanName = originalName.replace(/[^\w\-\. ]/gi, '');
 
-      // Validación mejorada del nombre de archivo
-      if (!/^[\w\-\. ]+\.pdf$/i.test(originalName)) {
-        throw new Error('El nombre del archivo contiene caracteres no permitidos. Solo se permiten letras, números, guiones, puntos y espacios.');
+      // Validación del nombre de archivo
+      if (!/^[\w\-\. ]+\.pdf$/i.test(cleanName)) {
+        throw new Error('El nombre del archivo contiene caracteres no permitidos');
       }
 
       // Validar tamaño del archivo
@@ -202,18 +198,23 @@ router.post('/upload', authenticate, (req, res, next) => {
         throw new Error('El archivo excede el límite de 15MB');
       }
 
+      // Configuración clave para mantener el nombre original
       const uploadOptions = {
         resource_type: 'raw',
         folder: estado,
+        public_id: `${estado}/${path.parse(cleanName).name}`, // Conserva el nombre sin extensión
         format: 'pdf',
         type: 'upload',
         access_mode: 'public',
-        transformation: [],
-        filename_override: originalName,
+        use_filename: true,
         unique_filename: false,
         overwrite: true,
+        invalidate: true,
+        filename_override: cleanName,
+        discard_original_filename: false,
         context: {
           original_filename: originalName,
+          custom_filename: cleanName,
           uploaded_at: new Date().toISOString(),
           estado: estado
         },
@@ -223,28 +224,24 @@ router.post('/upload', authenticate, (req, res, next) => {
       const result = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           uploadOptions,
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
+          (error, result) => error ? reject(error) : resolve(result)
         );
         uploadStream.end(req.file.buffer);
       });
 
-      // Respuesta mejorada con más metadatos
       res.status(201).json({
         status: 'success',
         data: {
           url: result.secure_url,
           public_id: result.public_id,
-          filename: originalName,
+          original_name: originalName,
+          clean_name: cleanName,
           view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
           download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
           uploaded_at: result.created_at,
           size: result.bytes,
           format: result.format,
-          estado: estado,
-          pages: result.pages // Si Cloudinary extrae esta información
+          estado: estado
         }
       });
     } catch (error) {
@@ -262,7 +259,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       throw new Error('El parámetro public_id es requerido');
     }
 
-    // Verificación mejorada de estado
+    // Verificación de estado
     if (estado && !public_id.startsWith(`${estado}/`)) {
       return res.status(403).json({
         status: 'error',
@@ -274,7 +271,8 @@ router.delete('/delete', authenticate, async (req, res, next) => {
 
     // Verificar primero si el archivo existe
     const resource = await cloudinary.api.resource(public_id, {
-      resource_type: 'raw'
+      resource_type: 'raw',
+      context: true
     }).catch(() => null);
 
     if (!resource) {
@@ -299,6 +297,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       message: 'Archivo eliminado correctamente',
       data: {
         public_id: public_id,
+        filename: resource.context?.original_filename || public_id.split('/').pop(),
         deleted_at: new Date().toISOString(),
         estado: estado
       }
@@ -308,7 +307,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Listar archivos - Versión optimizada con paginación
+// Listar archivos - Versión optimizada que conserva nombres originales
 router.get('/archivos/:estado', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
@@ -319,19 +318,22 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
       type: 'upload',
       prefix: `${estado}/`,
       resource_type: 'raw',
-      max_results: Math.min(limit, 500), // Máximo 500 por petición
+      max_results: Math.min(limit, 500),
       next_cursor: req.query.cursor,
       context: true
     });
 
     const archivos = result.resources.map(resource => {
+      // Obtener el nombre original del contexto o del public_id
       const originalName = resource.context?.original_filename || 
+                         resource.context?.custom?.original_filename ||
                          resource.public_id.split('/').pop() + '.pdf';
       
       return {
         url: resource.secure_url,
         public_id: resource.public_id,
         filename: originalName,
+        original_name: resource.context?.original_filename || originalName,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
         download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
         uploaded_at: resource.created_at,
@@ -346,11 +348,10 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
       status: 'success',
       data: archivos,
       count: archivos.length,
-      total_count: result.resources.length, // Nota: Cloudinary no devuelve el total exacto
+      total_count: result.resources.length,
       estado: estado
     };
 
-    // Agregar paginación si hay más resultados
     if (result.next_cursor) {
       response.pagination = {
         next_cursor: result.next_cursor,
@@ -379,7 +380,7 @@ app.get('/', (req, res) => {
       { 
         method: 'POST', 
         path: '/api/upload', 
-        description: 'Subir archivo PDF',
+        description: 'Subir archivo PDF conservando el nombre original',
         authentication: 'x-api-key header',
         limits: '15MB por archivo',
         parameters: [
@@ -390,93 +391,55 @@ app.get('/', (req, res) => {
       { 
         method: 'GET', 
         path: '/api/archivos/:estado', 
-        description: 'Listar archivos PDF',
-        authentication: 'x-api-key header',
-        parameters: [
-          { name: 'estado', type: 'string', required: true, description: 'Estado/carpeta a listar' },
-          { name: 'limit', type: 'number', required: false, description: 'Número máximo de resultados (default: 100)' },
-          { name: 'cursor', type: 'string', required: false, description: 'Cursor para paginación' }
-        ]
+        description: 'Listar archivos PDF con nombres originales',
+        authentication: 'x-api-key header'
       },
       { 
         method: 'DELETE', 
         path: '/api/delete', 
         description: 'Eliminar archivo PDF',
-        authentication: 'x-api-key header',
-        body: [
-          { name: 'public_id', type: 'string', required: true, description: 'ID público del archivo en Cloudinary' },
-          { name: 'estado', type: 'string', required: false, description: 'Estado/carpeta del archivo para validación' }
-        ]
+        authentication: 'x-api-key header'
       },
       { 
         method: 'GET', 
         path: '/api/health', 
-        description: 'Estado del servicio',
-        authentication: 'none'
+        description: 'Estado del servicio'
       }
-    ],
-    notes: [
-      'Todos los endpoints (excepto /health) requieren el header x-api-key',
-      'Límite de tasa: 100 peticiones por 15 minutos',
-      'Tamaño máximo de archivo: 15MB'
     ]
   });
 });
 
-// Ruta de documentación Swagger/OpenAPI (puedes implementarla luego)
-app.get('/docs', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'Documentación OpenAPI en desarrollo',
-    coming_soon: true
-  });
-});
-
-// Manejo de rutas no encontradas mejorado
-app.use((req, res, next) => {
+// Manejo de rutas no encontradas
+app.use((req, res) => {
   res.status(404).json({
     status: 'error',
     error: 'not_found',
-    message: `Ruta ${req.method} ${req.path} no encontrada`,
+    message: 'Ruta no encontrada',
     suggested_routes: [
-      { method: 'POST', path: '/api/upload', desc: 'Subir PDF' },
-      { method: 'GET', path: '/api/archivos/:estado', desc: 'Listar PDFs' },
-      { method: 'DELETE', path: '/api/delete', desc: 'Eliminar PDF' },
-      { method: 'GET', path: '/api/health', desc: 'Estado del servicio' }
-    ],
-    documentation: `${req.protocol}://${req.get('host')}/docs`
+      '/api/upload',
+      '/api/archivos/:estado',
+      '/api/delete',
+      '/api/health'
+    ]
   });
 });
 
 // Middleware de errores
 app.use(handleError);
 
-// Iniciar servidor con manejo mejorado
+// Iniciar servidor
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Servidor escuchando en puerto ${PORT}`);
-  console.log(`🔒 Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌍 Orígenes permitidos: ${allowedOrigins.join(', ')}`);
-  console.log(`📁 Tamaño máximo de PDF: 15MB`);
+  console.log(`🚀 Servidor en puerto ${PORT}`);
+  console.log(`🔒 Modo seguro: ${process.env.NODE_ENV === 'production' ? 'ON' : 'OFF'}`);
+  console.log(`🌍 Cloudinary configurado para: ${process.env.CLOUD_NAME}`);
+  console.log(`📁 Conservación de nombres originales: ACTIVADA`);
 });
 
-// Manejo de cierre mejorado
-const shutdown = (signal) => {
-  console.log(`\n🛑 Recibido ${signal}, cerrando servidor...`);
+// Manejo de cierre
+process.on('SIGTERM', () => {
   server.close(() => {
-    console.log('✅ Servidor cerrado correctamente');
-    process.exit(0);
+    console.log('🛑 Servidor cerrado');
   });
+});
 
-  // Forzar cierre después de 5 segundos si hay conexiones pendientes
-  setTimeout(() => {
-    console.warn('⚠️ Forzando cierre por timeout');
-    process.exit(1);
-  }, 5000);
-};
-
-// Manejadores de señales
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
-
-// Exportar para testing
-module.exports = { app, server };
+module.exports = app;
