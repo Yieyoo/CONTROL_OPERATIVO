@@ -6,6 +6,51 @@
     <title>Gestión de Archivos PDF</title>
     <link rel="icon" type="image/png" href="../imagenes/descargar.png">
     <link rel="stylesheet" href="diseñog.css">
+    <style>
+        /* Estilos adicionales para mejorar la visualización */
+        .pdf-viewer-container {
+            border: 1px solid #ddd;
+            margin: 20px auto;
+            width: 90%;
+            height: 600px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #pdf-viewer {
+            flex-grow: 1;
+            border: none;
+            display: none;
+        }
+        
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .file-list li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-actions button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .error-message {
+            color: #d9534f;
+        }
+        
+        .success-message {
+            color: #5cb85c;
+        }
+    </style>
 </head>
 <body>
     <div class="menu-overlay"></div>
@@ -36,7 +81,7 @@
         <div class="pdf-toolbar">
             <div id="pdf-title">Visualizador de PDF</div>
         </div>
-        <iframe id="pdf-viewer"></iframe>
+        <iframe id="pdf-viewer" type="application/pdf" width="100%" height="100%"></iframe>
     </div>
 
     <!-- Panel de gestión de archivos -->
@@ -111,17 +156,37 @@
             }, 5000);
         }
 
-        // Función para mostrar PDF
+        // Función para mostrar PDF (mejorada)
         function mostrarPdf(url, filename = '') {
+            console.log('Intentando mostrar PDF:', url); // Depuración
+            
             if (!url) {
                 pdfViewer.style.display = 'none';
                 pdfTitle.textContent = 'Visualizador de PDF';
                 return;
             }
             
+            // Verificar si la URL es válida
+            try {
+                new URL(url);
+            } catch (e) {
+                console.error('URL inválida:', url);
+                showStatus(uploadStatus, 'La URL del PDF no es válida', true);
+                return;
+            }
+            
+            // Configurar el visor PDF
             pdfViewer.style.display = 'block';
-            pdfViewer.src = url;
+            pdfViewer.src = `${url}#toolbar=1&navpanes=1&scrollbar=1`;
             pdfTitle.textContent = filename || 'Documento PDF';
+            
+            // Manejar errores de carga
+            pdfViewer.onerror = () => {
+                console.error('Error al cargar el PDF');
+                pdfViewer.style.display = 'none';
+                pdfTitle.textContent = 'Error al cargar el documento';
+                showStatus(uploadStatus, 'Error al cargar el PDF. Verifica la URL.', true);
+            };
         }
 
         // Formatear tamaño de archivo
@@ -145,7 +210,7 @@
             });
         }
 
-        // Cargar lista de archivos
+        // Cargar lista de archivos (mejorada con manejo de errores)
         async function cargarListaArchivos() {
             showLoading(true);
             try {
@@ -155,20 +220,28 @@
                     }
                 });
                 
-                if (!response.ok) throw new Error(`Error ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
                 
-                const { data } = await response.json();
-                renderizarListaArchivos(data || []);
+                const result = await response.json();
+                
+                if (!result || !result.data) {
+                    throw new Error('La respuesta del servidor no contiene datos válidos');
+                }
+                
+                renderizarListaArchivos(result.data);
                 
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
-                showStatus(uploadStatus, 'Error al cargar archivos', true);
+                showStatus(uploadStatus, 'Error al cargar archivos: ' + error.message, true);
+                renderizarListaArchivos([]); // Mostrar lista vacía
             } finally {
                 showLoading(false);
             }
         }
 
-        // Renderizar lista de archivos
+        // Renderizar lista de archivos (mejorada)
         function renderizarListaArchivos(files) {
             fileListContainer.innerHTML = '';
             fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
@@ -178,9 +251,16 @@
                 return;
             }
 
+            // Ordenar por fecha (más reciente primero)
             files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
 
             files.forEach(file => {
+                // Verificar que el archivo tenga los campos necesarios
+                if (!file.public_id || !file.url) {
+                    console.warn('Archivo con estructura incorrecta:', file);
+                    return;
+                }
+                
                 const displayName = file.filename || file.public_id.split('/').pop() + '.pdf';
                 
                 // Item en la lista
@@ -188,7 +268,7 @@
                 li.innerHTML = `
                     <div class="file-info">
                         <span class="filename">${displayName}</span>
-                        <span class="file-meta">${formatFileSize(file.size)} • ${formatDate(file.uploaded_at)}</span>
+                        <span class="file-meta">${formatFileSize(file.size || 0)} • ${formatDate(file.uploaded_at || new Date().toISOString())}</span>
                     </div>
                     <div class="file-actions">
                         <button class="btn-view" data-url="${file.url}">Ver</button>
@@ -204,31 +284,37 @@
                 fileSelect.appendChild(option);
             });
 
-            // Eventos para los botones
+            // Eventos para los botones "Ver"
             document.querySelectorAll('.btn-view').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    mostrarPdf(btn.dataset.url, btn.parentElement.querySelector('.filename').textContent);
+                    const url = btn.dataset.url;
+                    const filename = btn.closest('.file-info').querySelector('.filename').textContent;
+                    console.log('Mostrando PDF:', url, filename); // Depuración
+                    mostrarPdf(url, filename);
                 });
             });
 
+            // Eventos para los botones "Eliminar"
             document.querySelectorAll('.btn-delete').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (confirm('¿Eliminar este archivo?')) {
+                    if (confirm('¿Estás seguro de eliminar este archivo?')) {
                         eliminarArchivo(btn.dataset.id);
                     }
                 });
             });
         }
 
-        // Subir archivo
+        // Subir archivo (mejorado con validaciones)
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const file = document.getElementById('file').files[0];
             currentCarpeta = carpetaSelect.value;
             
             try {
-                if (!file) throw new Error('Selecciona un archivo');
+                // Validaciones
+                if (!file) throw new Error('Selecciona un archivo PDF');
+                if (file.type !== 'application/pdf') throw new Error('El archivo debe ser un PDF');
                 if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
                 
                 showLoading(true);
@@ -246,9 +332,17 @@
                     body: formData
                 });
                 
-                if (!response.ok) throw new Error('Error al subir');
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Error al subir el archivo');
+                }
                 
                 const { data } = await response.json();
+                
+                if (!data || !data.url) {
+                    throw new Error('La respuesta del servidor no contiene la URL del archivo');
+                }
+                
                 showStatus(uploadStatus, 'Archivo subido correctamente');
                 await cargarListaArchivos();
                 mostrarPdf(data.url, data.filename);
@@ -263,8 +357,13 @@
             }
         });
 
-        // Eliminar archivo
+        // Eliminar archivo (mejorado)
         async function eliminarArchivo(publicId) {
+            if (!publicId) {
+                showStatus(deleteStatus, 'ID de archivo no válido', true);
+                return;
+            }
+            
             showLoading(true);
             try {
                 const response = await fetch(`${BACKEND_URL}/delete`, {
@@ -279,11 +378,14 @@
                     })
                 });
                 
-                if (!response.ok) throw new Error('Error al eliminar');
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Error al eliminar el archivo');
+                }
                 
-                showStatus(deleteStatus, 'Archivo eliminado');
+                showStatus(deleteStatus, 'Archivo eliminado correctamente');
                 await cargarListaArchivos();
-                mostrarPdf('');
+                mostrarPdf(''); // Limpiar el visor
                 
             } catch (error) {
                 console.error('Error al eliminar:', error);
@@ -311,12 +413,24 @@
             cargarListaArchivos();
         });
 
-        // Cargar al iniciar
+        // Cargar al iniciar (mejorado)
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                // Verificar conexión con el backend
+                const testResponse = await fetch(`${BACKEND_URL}/test`, {
+                    headers: {
+                        'x-api-key': API_KEY
+                    }
+                }).catch(() => null);
+                
+                if (!testResponse || !testResponse.ok) {
+                    console.warn('No se pudo conectar con el backend');
+                }
+                
                 await cargarListaArchivos();
             } catch (error) {
                 console.error('Error inicial:', error);
+                showStatus(uploadStatus, 'Error al cargar los archivos: ' + error.message, true);
             }
         });
 
