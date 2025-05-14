@@ -126,13 +126,42 @@ const pdfUpload = multer({
   }
 });
 
-// 8. Manejo centralizado de errores
+// 8. Definición de tipos de documentos
+const DOCUMENT_TYPES = {
+  FICHA_CURRICULAR: 'ficha_curricular',
+  ORGANIGRAMA: 'organigrama',
+  PLANTILLA_PERSONAL: 'plantilla_personal',
+  VISITA_SUPERVISION: 'visita_supervision',
+  ACUERDOS_VISITA: 'acuerdos_visita',
+  VEHICULOS: 'vehiculos',
+  INMUEBLES: 'inmuebles',
+  UNIDAD_CANINA: 'unidad_canina'
+};
+
+// Middleware para validar tipo de documento
+const validateDocumentType = (req, res, next) => {
+  const docType = req.params.docType?.toLowerCase();
+  
+  if (!docType || !Object.values(DOCUMENT_TYPES).includes(docType)) {
+    return res.status(400).json({
+      error: 'invalid_document_type',
+      message: 'Tipo de documento no válido',
+      valid_types: Object.values(DOCUMENT_TYPES)
+    });
+  }
+  
+  req.docType = docType;
+  next();
+};
+
+// 9. Manejo centralizado de errores
 const handleError = (error, req, res, next) => {
   console.error('🔴 Error:', error.message);
 
   const status = error.message.includes('CORS') ? 403 : 
                 error.message.includes('PDF') ? 400 : 
-                error.message.includes('tamaño') ? 413 : 500;
+                error.message.includes('tamaño') ? 413 : 
+                error.message.includes('documento') ? 400 : 500;
 
   res.status(status).json({
     status: 'error',
@@ -141,7 +170,7 @@ const handleError = (error, req, res, next) => {
   });
 };
 
-// 9. Rutas API
+// 10. Rutas API
 const router = express.Router();
 
 // Ruta de salud
@@ -149,21 +178,23 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: '1.0.2',
+    version: '1.1.0',
     services: {
       cloudinary: 'active'
-    }
+    },
+    document_types: DOCUMENT_TYPES
   });
 });
 
-// Subir archivo - Versión optimizada
-router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, next) => {
+// Subir archivo - Versión mejorada con tipos de documento
+router.post('/upload/:docType', authenticate, validateDocumentType, pdfUpload.single('file'), async (req, res, next) => {
   try {
     if (!req.file) {
       throw new Error('No se ha subido ningún archivo');
     }
 
     const estado = req.body.estado || 'aguascalientes';
+    const { docType } = req;
     const originalName = req.file.originalname.replace(/[^\w\-\. ]/gi, '');
 
     // Validar nombre de archivo
@@ -173,20 +204,19 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
 
     const uploadOptions = {
       resource_type: 'raw',
-      folder: estado,
+      folder: `${estado}/${docType}`,
       format: 'pdf',
       type: 'upload',
       access_mode: 'public',
-      // Eliminamos transformaciones que podrían afectar los PDFs
       transformation: [],
-      // Conservar el nombre original del archivo
       filename_override: originalName,
       unique_filename: false,
       overwrite: true,
-      // Metadatos adicionales
       context: {
         original_filename: originalName,
-        uploaded_at: new Date().toISOString()
+        uploaded_at: new Date().toISOString(),
+        document_type: docType,
+        estado: estado
       }
     };
 
@@ -207,9 +237,9 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
         url: result.secure_url,
         public_id: result.public_id,
         filename: originalName,
-        // URL alternativa para visualización
+        document_type: docType,
+        estado: estado,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
-        // URL directa para descarga
         download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
         uploaded_at: result.created_at,
         size: result.bytes
@@ -263,31 +293,35 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Listar archivos - Versión optimizada con nombres originales
-router.get('/archivos/:estado', authenticate, async (req, res, next) => {
+// Listar archivos por estado y tipo
+router.get('/archivos/:estado/:docType?', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
+    const docType = req.params.docType;
+    
+    // Construir prefijo de búsqueda
+    const prefix = docType ? `${estado}/${docType}` : `${estado}`;
 
     const result = await cloudinary.api.resources({
       type: 'upload',
-      prefix: `${estado}/`,
+      prefix: prefix,
       resource_type: 'raw',
       max_results: 500,
       context: true
     });
 
     const archivos = result.resources.map(resource => {
-      // Obtener el nombre original del contexto si está disponible
-      const originalName = resource.context?.custom?.original_filename || 
+      const originalName = resource.context?.original_filename || 
                          resource.public_id.split('/').pop() + '.pdf';
+      const documentType = resource.public_id.split('/')[1] || 'general';
       
       return {
         url: resource.secure_url,
         public_id: resource.public_id,
         filename: originalName,
-        // URL alternativa para visualización
+        document_type: documentType,
+        estado: estado,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
-        // URL directa para descarga
         download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
         uploaded_at: resource.created_at,
         size: resource.bytes,
@@ -297,13 +331,26 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
 
     res.json({
       status: 'success',
-      data: archivos,
-      count: archivos.length,
-      estado: estado
+      data: {
+        archivos: archivos,
+        count: archivos.length,
+        estado: estado,
+        tipo_documento: docType || 'todos'
+      }
     });
   } catch (error) {
     next(error);
   }
+});
+
+// Obtener tipos de documentos disponibles
+router.get('/tipos-documento', authenticate, (req, res) => {
+  res.json({
+    status: 'success',
+    data: {
+      tipos_documento: DOCUMENT_TYPES
+    }
+  });
 });
 
 // Montar rutas
@@ -313,10 +360,12 @@ app.use('/api', apiLimiter, router);
 app.get('/', (req, res) => {
   res.json({
     status: 'success',
-    version: '1.0.2',
+    version: '1.1.0',
     endpoints: [
-      { method: 'POST', path: '/api/upload', desc: 'Subir PDF', auth: 'x-api-key' },
-      { method: 'GET', path: '/api/archivos/:estado', desc: 'Listar PDFs', auth: 'x-api-key' },
+      { method: 'POST', path: '/api/upload/:docType', desc: 'Subir PDF por tipo', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/archivos/:estado', desc: 'Listar todos los PDFs de un estado', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/archivos/:estado/:docType', desc: 'Listar PDFs filtrados por tipo', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/tipos-documento', desc: 'Obtener tipos de documentos disponibles', auth: 'x-api-key' },
       { method: 'DELETE', path: '/api/delete', desc: 'Eliminar PDF', auth: 'x-api-key' },
       { method: 'GET', path: '/api/health', desc: 'Estado del servicio' }
     ],
@@ -331,8 +380,10 @@ app.use((req, res) => {
     error: 'not_found',
     message: 'Ruta no encontrada',
     suggested_routes: [
-      '/api/upload',
-      '/api/archivos/:estado',
+      '/api/upload/[tipo]',
+      '/api/archivos/[estado]',
+      '/api/archivos/[estado]/[tipo]',
+      '/api/tipos-documento',
       '/api/delete',
       '/api/health'
     ]
@@ -347,6 +398,7 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`🔒 Modo seguro: ${process.env.NODE_ENV === 'production' ? 'ON' : 'OFF'}`);
   console.log(`🌍 Cloudinary configurado para: ${process.env.CLOUD_NAME}`);
+  console.log(`📄 Tipos de documentos soportados: ${Object.values(DOCUMENT_TYPES).join(', ')}`);
 });
 
 // Manejo de cierre
