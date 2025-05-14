@@ -6,10 +6,48 @@
     <title>PLANTILLA DE PERSONAL</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <style>
+        .error-message {
+            color: red;
+            padding: 10px;
+            background-color: #ffeeee;
+            border: 1px solid #ffcccc;
+            margin: 10px 0;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <!-- Fondo oscuro para el menú -->
     <div class="menu-overlay"></div>
+    
+    <!-- Loading spinner -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
 
     <header>
         <!-- Botón para abrir el menú en móviles -->
@@ -91,11 +129,12 @@
             class="pdf-embed"
             frameborder="0"
         ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
     <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
     <div class="mobile-images">
-        <!-- Este contenido se cargará dinámicamente -->
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
     <button class="regresar-btn">Regresar</button>
@@ -106,6 +145,31 @@
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
         
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        // Mostrar mensaje de error
+        function showError(message, target = 'both') {
+            if (target === 'both' || target === 'pdf') {
+                const pdfError = document.getElementById('pdf-error');
+                pdfError.textContent = message;
+                pdfError.style.display = 'block';
+            }
+            if (target === 'both' || target === 'mobile') {
+                const mobileError = document.getElementById('mobile-error');
+                mobileError.textContent = message;
+                mobileError.style.display = 'block';
+            }
+        }
+
+        // Ocultar errores
+        function hideErrors() {
+            document.getElementById('pdf-error').style.display = 'none';
+            document.getElementById('mobile-error').style.display = 'none';
+        }
+
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
             const menu = document.querySelector('.menu');
@@ -205,24 +269,41 @@
         // Cargar el PDF del estado
         async function loadStatePDF() {
             const estado = getCurrentState();
-            if (!estado) return;
+            if (!estado) {
+                showError('No se pudo determinar el estado', 'both');
+                return;
+            }
+
+            showLoading(true);
+            hideErrors();
 
             try {
+                console.log(`Consultando API para estado: ${estado}`);
                 const response = await fetch(`${BACKEND_URL}/archivos/${estado}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
                 
-                if (!response.ok) throw new Error('Error al cargar PDF');
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
                 
-                const { data } = await response.json();
+                const result = await response.json();
+                console.log('Respuesta del servidor:', result);
+                
+                if (!result || !result.data) {
+                    throw new Error('Formato de respuesta inesperado');
+                }
+
                 const pdfViewer = document.getElementById('pdf-viewer');
                 const mobileImagesContainer = document.querySelector('.mobile-images');
                 
-                if (data && data.length > 0) {
+                if (result.data.length > 0) {
                     // Mostrar el PDF más reciente (ordenado por fecha)
-                    const latestPDF = data.sort((a, b) => 
+                    const latestPDF = result.data.sort((a, b) => 
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
+                    
+                    console.log('Mostrando PDF:', latestPDF.url);
                     
                     // Actualizar el iframe
                     pdfViewer.src = latestPDF.url;
@@ -234,14 +315,16 @@
                     `;
                 } else {
                     // No hay PDFs para este estado
+                    console.log('No hay documentos para este estado');
                     pdfViewer.src = '';
-                    mobileImagesContainer.innerHTML = '<p>No hay documentos disponibles para este estado</p>';
+                    showError('No hay documentos disponibles para este estado', 'both');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al cargar PDF:', error);
+                showError(`Error al cargar el documento: ${error.message}`, 'both');
                 document.getElementById('pdf-viewer').src = '';
-                document.querySelector('.mobile-images').innerHTML = 
-                    '<p>Error al cargar el documento</p>';
+            } finally {
+                showLoading(false);
             }
         }
 
