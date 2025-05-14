@@ -11,14 +11,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ======================
-// 1. Security Configuration
+// 1. Configuración de Seguridad
 // ======================
 app.use(helmet());
 app.use(morgan('dev'));
 app.set('trust proxy', true);
 
 // ======================
-// 2. Rate Limiting
+// 2. Limitación de Tasas
 // ======================
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -32,7 +32,7 @@ const apiLimiter = rateLimit({
 });
 
 // ======================
-// 3. CORS Configuration
+// 3. Configuración CORS
 // ======================
 const allowedOrigins = [
   'https://yieyoo.github.io',
@@ -46,7 +46,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.warn('Attempted access from unauthorized origin:', origin);
+      console.warn('Intento de acceso desde origen no autorizado:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -60,20 +60,20 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // ======================
-// 4. Body Parsing Middleware
+// 4. Middleware para Parsear el Cuerpo
 // ======================
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // ======================
-// 5. Cloudinary Configuration
+// 5. Configuración de Cloudinary
 // ======================
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
 
   if (missingVars.length > 0) {
-    console.error('❌ Missing required environment variables:', missingVars.join(', '));
+    console.error('❌ Variables de entorno requeridas faltantes:', missingVars.join(', '));
     process.exit(1);
   }
 
@@ -84,9 +84,9 @@ const validateCloudinaryConfig = () => {
       api_secret: process.env.CLOUD_API_SECRET,
       secure: true
     });
-    console.log('✅ Cloudinary configured successfully');
+    console.log('✅ Cloudinary configurado correctamente');
   } catch (error) {
-    console.error('❌ Error configuring Cloudinary:', error);
+    console.error('❌ Error configurando Cloudinary:', error);
     process.exit(1);
   }
 };
@@ -94,16 +94,16 @@ const validateCloudinaryConfig = () => {
 validateCloudinaryConfig();
 
 // ======================
-// 6. Authentication Middleware
+// 6. Middleware de Autenticación
 // ======================
 const authenticate = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
-  
+
   if (!apiKey) {
     return res.status(401).json({
       status: 'error',
       error: 'unauthorized',
-      message: 'API Key not provided'
+      message: 'API Key no proporcionada'
     });
   }
 
@@ -111,7 +111,7 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({
       status: 'error',
       error: 'unauthorized',
-      message: 'Invalid API Key'
+      message: 'API Key inválida'
     });
   }
 
@@ -119,24 +119,22 @@ const authenticate = (req, res, next) => {
 };
 
 // ======================
-// 7. Multer Configuration for PDFs
+// 7. Configuración de Multer para PDFs
 // ======================
 const pdfUpload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 15 * 1024 * 1024 // 15MB
-  },
+  limits: { fileSize: 15 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'application/pdf') {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF files are allowed'), false);
+      cb(new Error('Solo se permiten archivos PDF'), false);
     }
   }
 });
 
 // ======================
-// 8. Document Types Definition
+// 8. Definición de Tipos de Documentos
 // ======================
 const DOCUMENT_TYPES = {
   FICHA_CURRICULAR: 'ficha_curricular',
@@ -150,33 +148,33 @@ const DOCUMENT_TYPES = {
 };
 
 // ======================
-// 9. Document Type Validation Middleware
+// 9. Middleware de Validación de Tipo de Documento
 // ======================
 const validateDocumentType = (req, res, next) => {
   const docType = req.params.docType?.toLowerCase();
-  
+
   if (!docType || !Object.values(DOCUMENT_TYPES).includes(docType)) {
     return res.status(400).json({
       error: 'invalid_document_type',
-      message: 'Invalid document type',
+      message: 'Tipo de documento inválido',
       valid_types: Object.values(DOCUMENT_TYPES)
     });
   }
-  
+
   req.docType = docType;
   next();
 };
 
 // ======================
-// 10. Error Handling Middleware
+// 10. Middleware de Manejo de Errores
 // ======================
 const handleError = (error, req, res, next) => {
   console.error('🔴 Error:', error.message);
 
-  const status = error.message.includes('CORS') ? 403 : 
-                error.message.includes('PDF') ? 400 : 
-                error.message.includes('size') ? 413 : 
-                error.message.includes('document') ? 400 : 500;
+  const status = error.message.includes('CORS') ? 403 :
+                 error.message.includes('PDF') ? 400 :
+                 error.message.includes('size') ? 413 :
+                 error.message.includes('document') ? 400 : 500;
 
   res.status(status).json({
     status: 'error',
@@ -186,37 +184,30 @@ const handleError = (error, req, res, next) => {
 };
 
 // ======================
-// 11. API Routes
+// 11. Rutas de la API
 // ======================
 const router = express.Router();
 
-// Health check endpoint
 router.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
     version: '1.1.0',
-    services: {
-      cloudinary: 'active'
-    },
+    services: { cloudinary: 'active' },
     document_types: DOCUMENT_TYPES
   });
 });
 
-// Upload file endpoint
 router.post('/upload/:docType', authenticate, validateDocumentType, pdfUpload.single('file'), async (req, res, next) => {
   try {
-    if (!req.file) {
-      throw new Error('No file uploaded');
-    }
+    if (!req.file) throw new Error('No se subió ningún archivo');
 
     const estado = req.body.estado || 'aguascalientes';
     const { docType } = req;
     const originalName = req.file.originalname.replace(/[^\w\-\. ]/gi, '');
 
-    // Validate filename
     if (!/^[\w\-\. ]+\.pdf$/i.test(originalName)) {
-      throw new Error('Filename contains invalid characters');
+      throw new Error('El nombre del archivo contiene caracteres inválidos');
     }
 
     const uploadOptions = {
@@ -233,18 +224,15 @@ router.post('/upload/:docType', authenticate, validateDocumentType, pdfUpload.si
         original_filename: originalName,
         uploaded_at: new Date().toISOString(),
         document_type: docType,
-        estado: estado
+        estado
       }
     };
 
     const result = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        uploadOptions,
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
+      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      });
       uploadStream.end(req.file.buffer);
     });
 
@@ -255,7 +243,7 @@ router.post('/upload/:docType', authenticate, validateDocumentType, pdfUpload.si
         public_id: result.public_id,
         filename: originalName,
         document_type: docType,
-        estado: estado,
+        estado,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
         download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
         uploaded_at: result.created_at,
@@ -267,21 +255,16 @@ router.post('/upload/:docType', authenticate, validateDocumentType, pdfUpload.si
   }
 });
 
-// Delete file endpoint
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
     const { public_id, estado } = req.body;
 
-    if (!public_id) {
-      throw new Error('public_id is required');
-    }
-
-    // Verify file belongs to the correct state
+    if (!public_id) throw new Error('public_id es requerido');
     if (estado && !public_id.startsWith(`${estado}/`)) {
       return res.status(403).json({
         status: 'error',
         error: 'forbidden',
-        message: 'You are not authorized to delete this file'
+        message: 'No estás autorizado para eliminar este archivo'
       });
     }
 
@@ -293,15 +276,15 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       return res.status(404).json({
         status: 'error',
         error: 'not_found',
-        message: 'File not found'
+        message: 'Archivo no encontrado'
       });
     }
 
     res.json({
       status: 'success',
-      message: 'File deleted',
+      message: 'Archivo eliminado',
       data: {
-        public_id: public_id,
+        public_id,
         deleted_at: new Date().toISOString()
       }
     });
@@ -310,48 +293,38 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// List files endpoint
 router.get('/archivos/:estado/:docType?', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
     const docType = req.params.docType;
-    
-    // Build search prefix
-    const prefix = docType ? `${estado}/${docType}` : `${estado}`;
 
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: prefix,
-      resource_type: 'raw',
-      max_results: 500,
-      context: true
-    });
+    const folderPath = docType ? `${estado}/${docType}` : estado;
 
-    const archivos = result.resources.map(resource => {
-      const originalName = resource.context?.original_filename || 
-                         resource.public_id.split('/').pop() + '.pdf';
-      const documentType = resource.public_id.split('/')[1] || 'general';
-      
-      return {
-        url: resource.secure_url,
-        public_id: resource.public_id,
-        filename: originalName,
-        document_type: documentType,
-        estado: estado,
-        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
-        download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
-        uploaded_at: resource.created_at,
-        size: resource.bytes,
-        format: resource.format
-      };
-    });
+    const result = await cloudinary.search
+      .expression(`resource_type:raw AND folder:"${folderPath}"`)
+      .sort_by('created_at', 'desc')
+      .max_results(500)
+      .execute();
+
+    const archivos = result.resources.map(resource => ({
+      url: resource.secure_url,
+      public_id: resource.public_id,
+      filename: resource.context?.custom?.original_filename || resource.public_id.split('/').pop() + '.pdf',
+      document_type: docType || resource.public_id.split('/')[1] || 'general',
+      estado: estado,
+      view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
+      download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
+      uploaded_at: resource.created_at,
+      size: resource.bytes,
+      format: resource.format
+    }));
 
     res.json({
       status: 'success',
       data: {
-        archivos: archivos,
+        archivos,
         count: archivos.length,
-        estado: estado,
+        estado,
         tipo_documento: docType || 'all'
       }
     });
@@ -360,7 +333,6 @@ router.get('/archivos/:estado/:docType?', authenticate, async (req, res, next) =
   }
 });
 
-// Get document types endpoint
 router.get('/tipos-documento', authenticate, (req, res) => {
   res.json({
     status: 'success',
@@ -370,32 +342,29 @@ router.get('/tipos-documento', authenticate, (req, res) => {
   });
 });
 
-// Mount routes
 app.use('/api', apiLimiter, router);
 
-// Basic documentation
 app.get('/', (req, res) => {
   res.json({
     status: 'success',
     version: '1.1.0',
     endpoints: [
-      { method: 'POST', path: '/api/upload/:docType', desc: 'Upload PDF by type', auth: 'x-api-key' },
-      { method: 'GET', path: '/api/archivos/:estado', desc: 'List all PDFs for a state', auth: 'x-api-key' },
-      { method: 'GET', path: '/api/archivos/:estado/:docType', desc: 'List PDFs filtered by type', auth: 'x-api-key' },
-      { method: 'GET', path: '/api/tipos-documento', desc: 'Get available document types', auth: 'x-api-key' },
-      { method: 'DELETE', path: '/api/delete', desc: 'Delete PDF', auth: 'x-api-key' },
-      { method: 'GET', path: '/api/health', desc: 'Service status' }
+      { method: 'POST', path: '/api/upload/:docType', desc: 'Subir PDF por tipo', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/archivos/:estado', desc: 'Listar todos los PDFs de un estado', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/archivos/:estado/:docType', desc: 'Listar PDFs filtrados por tipo', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/tipos-documento', desc: 'Obtener tipos de documentos disponibles', auth: 'x-api-key' },
+      { method: 'DELETE', path: '/api/delete', desc: 'Eliminar PDF', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/health', desc: 'Estado del servicio' }
     ],
-    note: 'All endpoints (except /health) require x-api-key header'
+    note: 'Todos los endpoints (excepto /health) requieren el header x-api-key'
   });
 });
 
-// Handle 404
 app.use((req, res) => {
   res.status(404).json({
     status: 'error',
     error: 'not_found',
-    message: 'Route not found',
+    message: 'Ruta no encontrada',
     suggested_routes: [
       '/api/upload/[type]',
       '/api/archivos/[state]',
@@ -407,21 +376,18 @@ app.use((req, res) => {
   });
 });
 
-// Error handler
 app.use(handleError);
 
-// Start server
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🔒 Secure mode: ${process.env.NODE_ENV === 'production' ? 'ON' : 'OFF'}`);
-  console.log(`🌍 Cloudinary configured for: ${process.env.CLOUD_NAME}`);
-  console.log(`📄 Supported document types: ${Object.values(DOCUMENT_TYPES).join(', ')}`);
+  console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
+  console.log(`🔒 Modo seguro: ${process.env.NODE_ENV === 'production' ? 'ACTIVADO' : 'DESACTIVADO'}`);
+  console.log(`🌍 Cloudinary configurado para: ${process.env.CLOUD_NAME}`);
+  console.log(`📄 Tipos de documentos soportados: ${Object.values(DOCUMENT_TYPES).join(', ')}`);
 });
 
-// Handle shutdown
 process.on('SIGTERM', () => {
   server.close(() => {
-    console.log('🛑 Server stopped');
+    console.log('🛑 Servidor detenido');
   });
 });
 
