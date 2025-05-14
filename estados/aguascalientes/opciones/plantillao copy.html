@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PLANTILLA DE PERSONAL</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
+    <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+</head>
+<body>
+    <!-- Fondo oscuro para el menú -->
+    <div class="menu-overlay"></div>
+
+    <header>
+        <!-- Botón para abrir el menú en móviles -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+        <!-- Menú principal -->
+        <nav class="menu">
+            <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
+            <ul>
+                <li><a href="../../../index.html">Inicio</a></li>
+                <!-- Submenú Datos Nacionales -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
+                    </ul>
+                </li>
+
+                <!-- Submenú Información de ORs -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <li><a href="../aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
+                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
+                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
+                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
+                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
+                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
+                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
+                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
+                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
+                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
+                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
+                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
+                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
+                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
+                        <li><a href="../../nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
+                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
+                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
+                        <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
+                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
+                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
+                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
+                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
+                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
+                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
+                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
+                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
+                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
+                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenedor de logos -->
+    <div class="logo-container">
+        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
+    </div>
+    
+    <div class="header-container qna">
+        <h1></h1>
+    </div>
+    
+    <!-- Contenedor del PDF -->
+    <div class="pdf-container">
+        <iframe 
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+        ></iframe>
+    </div>
+
+    <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
+    <div class="mobile-images">
+        <!-- Este contenido se cargará dinámicamente -->
+    </div>
+
+    <button class="regresar-btn">Regresar</button>
+
+    <!-- Scripts -->
+    <script>
+        // Configuración
+        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+        const API_KEY = 'Xhy2md57';
+        
+        // Función para abrir y cerrar el menú lateral
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        }
+
+        // Cerrar el menú al hacer clic fuera de él
+        const menuOverlay = document.querySelector('.menu-overlay');
+        menuOverlay.addEventListener('click', () => {
+            const menu = document.querySelector('.menu');
+            menu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        });
+
+        // Función para cerrar todos los submenús
+        function closeAllSubmenus() {
+            const submenus = document.querySelectorAll('.submenu.active');
+            submenus.forEach(submenu => {
+                submenu.classList.remove('active');
+            });
+        }
+
+        // Función para mostrar/ocultar el submenú
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            closeAllSubmenus();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+
+        // Cerrar el submenú al hacer clic fuera de él
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.submenu')) {
+                closeAllSubmenus();
+            }
+        });
+
+        // Cerrar el submenú al hacer clic en una opción
+        const submenuLinks = document.querySelectorAll('.submenu-list a');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeAllSubmenus();
+            });
+        });
+
+        // Regresar al historial
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        // Obtener el estado actual de la URL (ej: aguascalientesindex.html -> "aguascalientes")
+        function getCurrentState() {
+            const path = window.location.pathname;
+            const filename = path.split('/').pop(); // Ej: "aguascalientesindex.html"
+            
+            // Mapeo de nombres de archivo a valores de carpeta
+            const stateMap = {
+                'aguascalientesindex.html': 'aguascalientes',
+                'baja_californiaindex.html': 'baja-california',
+                'baja_california_surindex.html': 'baja-california-sur',
+                'campecheindex.html': 'campeche',
+                'chiapasindex.html': 'chiapas',
+                'chihuahuaindex.html': 'chihuahua',
+                'coahuilaindex.html': 'coahuila',
+                'colimaindex.html': 'colima',
+                'cdmxindex.html': 'ciudad-de-mexico',
+                'durangoindex.html': 'durango',
+                'guanajuatoindex.html': 'guanajuato',
+                'guerreroindex.html': 'guerrero',
+                'hidalgoindex.html': 'hidalgo',
+                'jaliscoindex.html': 'jalisco',
+                'edomexindex.html': 'estado-de-mexico',
+                'michoacanindex.html': 'michoacan',
+                'morelosindex.html': 'morelos',
+                'nayaritindex.html': 'nayarit',
+                'nuevo_leonindex.html': 'nuevo-leon',
+                'oaxacaindex.html': 'oaxaca',
+                'pueblaindex.html': 'puebla',
+                'queretaroindex.html': 'queretaro',
+                'quintanarooindex.html': 'quintana-roo',
+                'san_luisindex.html': 'san-luis-potosi',
+                'sinaloaindex.html': 'sinaloa',
+                'sonoraindex.html': 'sonora',
+                'tabascoindex.html': 'tabasco',
+                'tamaulipasindex.html': 'tamaulipas',
+                'tlaxcalaindex.html': 'tlaxcala',
+                'veracruzindex.html': 'veracruz',
+                'yucatanindex.html': 'yucatan',
+                'zacatecasindex.html': 'zacatecas'
+            };
+            
+            return stateMap[filename] || filename.replace('index.html', '').replace('.html', '');
+        }
+
+        // Cargar el PDF del estado
+        async function loadStatePDF() {
+            const estado = getCurrentState();
+            if (!estado) return;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/archivos/${estado}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (!response.ok) throw new Error('Error al cargar PDF');
+                
+                const { data } = await response.json();
+                const pdfViewer = document.getElementById('pdf-viewer');
+                const mobileImagesContainer = document.querySelector('.mobile-images');
+                
+                if (data && data.length > 0) {
+                    // Mostrar el PDF más reciente (ordenado por fecha)
+                    const latestPDF = data.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+                    
+                    // Actualizar el iframe
+                    pdfViewer.src = latestPDF.url;
+                    
+                    // Limpiar y actualizar imágenes móviles (opcional)
+                    mobileImagesContainer.innerHTML = `
+                        <img src="${latestPDF.url.replace('.pdf', '_page-0001.jpg')}" alt="Página 1">
+                        <img src="${latestPDF.url.replace('.pdf', '_page-0002.jpg')}" alt="Página 2">
+                    `;
+                } else {
+                    // No hay PDFs para este estado
+                    pdfViewer.src = '';
+                    mobileImagesContainer.innerHTML = '<p>No hay documentos disponibles para este estado</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('pdf-viewer').src = '';
+                document.querySelector('.mobile-images').innerHTML = 
+                    '<p>Error al cargar el documento</p>';
+            }
+        }
+
+        // Cargar el PDF cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', loadStatePDF);
+    </script>
+</body>
+</html>
