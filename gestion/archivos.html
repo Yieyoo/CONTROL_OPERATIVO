@@ -158,6 +158,23 @@
     </div>
 
     <script>
+        // Al seleccionar un estado
+function seleccionarEstado(estado) {
+  // Guardar en localStorage
+  localStorage.setItem('estadoSeleccionado', estado);
+  
+  // Guardar en el estado de tu aplicación (React, Vue, etc.)
+  this.estadoActual = estado;
+  
+  // Hacer la petición al backend
+  fetchArchivos(estado);
+}
+
+// Al cargar la página
+function inicializar() {
+  const estadoGuardado = localStorage.getItem('estadoSeleccionado') || 'aguascalientes';
+  seleccionarEstado(estadoGuardado);
+}
         // Configuración global
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = '***REMOVED***';
