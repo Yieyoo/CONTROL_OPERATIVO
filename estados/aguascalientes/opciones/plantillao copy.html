@@ -6,48 +6,10 @@
     <title>PLANTILLA DE PERSONAL</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-    <style>
-        .error-message {
-            color: red;
-            padding: 10px;
-            background-color: #ffeeee;
-            border: 1px solid #ffcccc;
-            margin: 10px 0;
-        }
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
 </head>
 <body>
     <!-- Fondo oscuro para el menú -->
     <div class="menu-overlay"></div>
-    
-    <!-- Loading spinner -->
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-    </div>
 
     <header>
         <!-- Botón para abrir el menú en móviles -->
@@ -122,54 +84,30 @@
         <h1></h1>
     </div>
     
+    
+
     <!-- Contenedor del PDF -->
     <div class="pdf-container">
+        <!-- Usando solo el iframe para mostrar el PDF -->
         <iframe 
-            id="pdf-viewer" 
-            class="pdf-embed"
-            frameborder="0"
-        ></iframe>
-        <div id="pdf-error" class="error-message" style="display: none;"></div>
+    src="../../../documentacion/plantillas_personal/aguascp/AC1.pdf" 
+    class="pdf-embed"
+    frameborder="0"
+></iframe>
+
     </div>
 
     <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
     <div class="mobile-images">
-        <div id="mobile-error" class="error-message" style="display: none;"></div>
+        <img src="../../../documentacion/plantillas_personal/aguascp/AC1_page-0001.jpg" alt="Imagen 1">
+        <img src="../../../documentacion/plantillas_personal/aguascp/AC1_page-0002.jpg" alt="Imagen 2">
+
     </div>
 
     <button class="regresar-btn">Regresar</button>
 
     <!-- Scripts -->
     <script>
-        // Configuración
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-        const API_KEY = 'Xhy2md57';
-        
-        // Mostrar/ocultar loading
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
-        }
-
-        // Mostrar mensaje de error
-        function showError(message, target = 'both') {
-            if (target === 'both' || target === 'pdf') {
-                const pdfError = document.getElementById('pdf-error');
-                pdfError.textContent = message;
-                pdfError.style.display = 'block';
-            }
-            if (target === 'both' || target === 'mobile') {
-                const mobileError = document.getElementById('mobile-error');
-                mobileError.textContent = message;
-                mobileError.style.display = 'block';
-            }
-        }
-
-        // Ocultar errores
-        function hideErrors() {
-            document.getElementById('pdf-error').style.display = 'none';
-            document.getElementById('mobile-error').style.display = 'none';
-        }
-
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
             const menu = document.querySelector('.menu');
@@ -221,115 +159,6 @@
         document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
-
-        // Obtener el estado actual de la URL (ej: aguascalientesindex.html -> "aguascalientes")
-        function getCurrentState() {
-            const path = window.location.pathname;
-            const filename = path.split('/').pop(); // Ej: "aguascalientesindex.html"
-            
-            // Mapeo de nombres de archivo a valores de carpeta
-            const stateMap = {
-                'aguascalientesindex.html': 'aguascalientes',
-                'baja_californiaindex.html': 'baja-california',
-                'baja_california_surindex.html': 'baja-california-sur',
-                'campecheindex.html': 'campeche',
-                'chiapasindex.html': 'chiapas',
-                'chihuahuaindex.html': 'chihuahua',
-                'coahuilaindex.html': 'coahuila',
-                'colimaindex.html': 'colima',
-                'cdmxindex.html': 'ciudad-de-mexico',
-                'durangoindex.html': 'durango',
-                'guanajuatoindex.html': 'guanajuato',
-                'guerreroindex.html': 'guerrero',
-                'hidalgoindex.html': 'hidalgo',
-                'jaliscoindex.html': 'jalisco',
-                'edomexindex.html': 'estado-de-mexico',
-                'michoacanindex.html': 'michoacan',
-                'morelosindex.html': 'morelos',
-                'nayaritindex.html': 'nayarit',
-                'nuevo_leonindex.html': 'nuevo-leon',
-                'oaxacaindex.html': 'oaxaca',
-                'pueblaindex.html': 'puebla',
-                'queretaroindex.html': 'queretaro',
-                'quintanarooindex.html': 'quintana-roo',
-                'san_luisindex.html': 'san-luis-potosi',
-                'sinaloaindex.html': 'sinaloa',
-                'sonoraindex.html': 'sonora',
-                'tabascoindex.html': 'tabasco',
-                'tamaulipasindex.html': 'tamaulipas',
-                'tlaxcalaindex.html': 'tlaxcala',
-                'veracruzindex.html': 'veracruz',
-                'yucatanindex.html': 'yucatan',
-                'zacatecasindex.html': 'zacatecas'
-            };
-            
-            return stateMap[filename] || filename.replace('index.html', '').replace('.html', '');
-        }
-
-        // Cargar el PDF del estado
-        async function loadStatePDF() {
-            const estado = getCurrentState();
-            if (!estado) {
-                showError('No se pudo determinar el estado', 'both');
-                return;
-            }
-
-            showLoading(true);
-            hideErrors();
-
-            try {
-                console.log(`Consultando API para estado: ${estado}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${estado}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                console.log('Respuesta del servidor:', result);
-                
-                if (!result || !result.data) {
-                    throw new Error('Formato de respuesta inesperado');
-                }
-
-                const pdfViewer = document.getElementById('pdf-viewer');
-                const mobileImagesContainer = document.querySelector('.mobile-images');
-                
-                if (result.data.length > 0) {
-                    // Mostrar el PDF más reciente (ordenado por fecha)
-                    const latestPDF = result.data.sort((a, b) => 
-                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                    )[0];
-                    
-                    console.log('Mostrando PDF:', latestPDF.url);
-                    
-                    // Actualizar el iframe
-                    pdfViewer.src = latestPDF.url;
-                    
-                    // Limpiar y actualizar imágenes móviles (opcional)
-                    mobileImagesContainer.innerHTML = `
-                        <img src="${latestPDF.url.replace('.pdf', '_page-0001.jpg')}" alt="Página 1">
-                        <img src="${latestPDF.url.replace('.pdf', '_page-0002.jpg')}" alt="Página 2">
-                    `;
-                } else {
-                    // No hay PDFs para este estado
-                    console.log('No hay documentos para este estado');
-                    pdfViewer.src = '';
-                    showError('No hay documentos disponibles para este estado', 'both');
-                }
-            } catch (error) {
-                console.error('Error al cargar PDF:', error);
-                showError(`Error al cargar el documento: ${error.message}`, 'both');
-                document.getElementById('pdf-viewer').src = '';
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // Cargar el PDF cuando la página esté lista
-        document.addEventListener('DOMContentLoaded', loadStatePDF);
     </script>
 </body>
 </html>
