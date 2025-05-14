@@ -28,7 +28,7 @@ const apiLimiter = rateLimit({
   }
 });
 
-// 3. Configuración de CORS mejorada
+// 3. Configuración de CORS
 const allowedOrigins = [
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
