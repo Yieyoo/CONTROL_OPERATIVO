@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PLANTILLA DE PERSONAL</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
+    <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+</head>
+<body>
+    <!-- Fondo oscuro para el menú -->
+    <div class="menu-overlay"></div>
+
+    <header>
+        <!-- Botón para abrir el menú en móviles -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+        <!-- Menú principal -->
+        <nav class="menu">
+            <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
+
+            
+            <ul>
+                
+                <li><a href="../../../index.html">Inicio</a></li>
+                <!-- Submenú Datos Nacionales -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                   <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                    <li><a href="../../../construccion.html">Inmuebles</a></li>
+                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
+                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
+                    </ul>
+                </li>
+
+                <!-- Submenú Información de ORs -->
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
+                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
+                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
+                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
+                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
+                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
+                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
+                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
+                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
+                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
+                        <li><a href="../cdmxindex.html">Ciudad de México</a></li>
+                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
+                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
+                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
+                        <li><a href="../../nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
+                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
+                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
+                        <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
+                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
+                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
+                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
+                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
+                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
+                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
+                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
+                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
+                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
+                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenedor de logos -->
+    <div class="logo-container">
+        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
+    </div>
+    
+    <div class="header-container qna">
+        <h1></h1>
+    </div>
+    
+
+    <!-- Contenedor del PDF -->
+    <div class="pdf-container">
+        <!-- Usando solo el iframe para mostrar el PDF -->
+        <iframe 
+    src="../../../documentacion/plantillas_personal/cdmxp/CDMX1.pdf" 
+    class="pdf-embed"
+    frameborder="0"
+></iframe>
+
+    </div>
+
+    <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
+    <div class="mobile-images">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0001.jpg" alt="Imagen 1">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0002.jpg" alt="Imagen 2">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0003.jpg" alt="Imagen 3">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0004.jpg" alt="Imagen 4">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0005.jpg" alt="Imagen 5">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0006.jpg" alt="Imagen 6">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0007.jpg" alt="Imagen 7">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0008.jpg" alt="Imagen 8">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0009.jpg" alt="Imagen 9">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0010.jpg" alt="Imagen 10">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0011.jpg" alt="Imagen 11">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0012.jpg" alt="Imagen 12">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0013.jpg" alt="Imagen 13">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0014.jpg" alt="Imagen 14">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0015.jpg" alt="Imagen 15">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0016.jpg" alt="Imagen 16">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0017.jpg" alt="Imagen 17">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0018.jpg" alt="Imagen 18">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0019.jpg" alt="Imagen 19">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0020.jpg" alt="Imagen 20">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0021.jpg" alt="Imagen 21">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0022.jpg" alt="Imagen 22">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0023.jpg" alt="Imagen 23">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0024.jpg" alt="Imagen 24">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0025.jpg" alt="Imagen 25">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0026.jpg" alt="Imagen 26">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0027.jpg" alt="Imagen 27">
+        <img src="../../../documentacion/plantillas_personal/cdmxp/CDMX1_page-0028.jpg" alt="Imagen 28">
+
+
+
+
+
+    </div>
+
+    <button class="regresar-btn">Regresar</button>
+
+    <!-- Scripts -->
+    <script>
+        // Función para abrir y cerrar el menú lateral
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            menu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        }
+
+        // Cerrar el menú al hacer clic fuera de él
+        const menuOverlay = document.querySelector('.menu-overlay');
+        menuOverlay.addEventListener('click', () => {
+            const menu = document.querySelector('.menu');
+            menu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        });
+
+        // Función para cerrar todos los submenús
+        function closeAllSubmenus() {
+            const submenus = document.querySelectorAll('.submenu.active');
+            submenus.forEach(submenu => {
+                submenu.classList.remove('active');
+            });
+        }
+
+        // Función para mostrar/ocultar el submenú
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            closeAllSubmenus();
+            const submenu = event.target.closest('.submenu');
+            submenu.classList.toggle('active');
+        }
+
+        // Cerrar el submenú al hacer clic fuera de él
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.submenu')) {
+                closeAllSubmenus();
+            }
+        });
+
+        // Cerrar el submenú al hacer clic en una opción
+        const submenuLinks = document.querySelectorAll('.submenu-list a');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeAllSubmenus();
+            });
+        });
+
+        // Regresar al historial
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>
