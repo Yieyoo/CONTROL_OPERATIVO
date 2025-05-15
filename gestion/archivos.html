@@ -6,8 +6,6 @@
     <title>Gestión de Archivos PDF - INM</title>
     <link rel="icon" type="image/png" href="../imagenes/descargar.png">
     <link rel="stylesheet" href="diseñog.css">
-    <!-- Incluir PDF.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
     <style>
         /* Estilos mejorados */
         .current-filter {
@@ -46,49 +44,25 @@
             border: none;
         }
 
-        /* Estilos para el visor PDF.js */
+        /* Estilos para el visor de PDF */
         #pdf-viewer-container {
             width: 100%;
             height: 600px;
             border: 1px solid #ddd;
             margin-top: 20px;
-            overflow: auto;
-            position: relative;
         }
 
-        #pdf-canvas {
-            display: block;
-            margin: 0 auto;
+        .pdf-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
-        .pdf-toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .pdf-title {
             padding: 10px;
             background: #f8f9fa;
             border-bottom: 1px solid #ddd;
-        }
-
-        .pdf-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .pdf-controls button {
-            padding: 5px 10px;
-            background: #1a3e72;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        /* Estilo para el fallback iframe */
-        .pdf-fallback {
-            width: 100%;
-            height: 600px;
-            border: none;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -165,29 +139,20 @@
         <h1>GESTOR DE ARCHIVOS</h1>
     </div>
 
-    <!-- Contenedor del visor PDF actualizado -->
+    <!-- Contenedor del visor PDF simplificado con iframe -->
     <div class="pdf-viewer-container">
-        <div class="pdf-toolbar">
-            <div id="pdf-title">Visualizador de PDF</div>
-            <div class="pdf-controls">
-                <button id="prev-page">Anterior</button>
-                <span id="page-num">1</span> / <span id="page-count">0</span>
-                <button id="next-page">Siguiente</button>
-                <button id="zoom-in">+</button>
-                <button id="zoom-out">-</button>
-            </div>
-        </div>
+        <div class="pdf-title" id="pdf-title">Visualizador de PDF</div>
         <div id="pdf-viewer-container">
-            <canvas id="pdf-canvas"></canvas>
+            <iframe id="pdf-iframe" class="pdf-iframe"></iframe>
         </div>
     </div>
 
-    <!-- Panel de gestión de archivos simplificado -->
+    <!-- Panel de gestión de archivos -->
     <div class="gestion-archivos">
         <h2>Gestión de Archivos PDF</h2>
         
         <div class="fila-superior">
-            <!-- Subir archivo (único lugar con filtros) -->
+            <!-- Subir archivo -->
             <div class="upload-form">
                 <h3>Subir archivo</h3>
                 <form id="uploadForm" enctype="multipart/form-data">
@@ -246,7 +211,7 @@
                 </form>
             </div>
 
-            <!-- Archivos disponibles (sin filtros duplicados) -->
+            <!-- Archivos disponibles -->
             <div class="file-list">
                 <h3>Archivos disponibles</h3>
                 <div class="current-filter">
@@ -274,17 +239,6 @@
         const API_KEY = 'Xhy2md57';
         let currentCarpeta = 'aguascalientes';
         let currentTipoDocumento = 'ficha_curricular';
-        
-        // Variables para PDF.js
-        let pdfDoc = null,
-            pageNum = 1,
-            pageRendering = false,
-            pageNumPending = null,
-            scale = 1.5;
-
-        // Configurar PDF.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
 
         // Mostrar/ocultar loading
         function showLoading(show) {
@@ -306,10 +260,11 @@
             }
         }
 
-        // Función para mostrar PDF con PDF.js
+        // Función para mostrar PDF con iframe
         function mostrarPdf(url, filename = '') {
             const pdfContainer = document.getElementById('pdf-viewer-container');
             const pdfTitle = document.getElementById('pdf-title');
+            const pdfIframe = document.getElementById('pdf-iframe');
             
             if (!url) {
                 pdfContainer.style.display = 'none';
@@ -319,94 +274,7 @@
 
             pdfContainer.style.display = 'block';
             pdfTitle.textContent = filename || 'Documento PDF';
-
-            // Limpiar contenedor
-            pdfContainer.innerHTML = '<canvas id="pdf-canvas"></canvas>';
-
-            // Cargar el documento PDF
-            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page-count').textContent = pdfDoc.numPages;
-                
-                // Mostrar la primera página
-                renderPage(pageNum);
-            }).catch(function(error) {
-                console.error('Error al cargar PDF:', error);
-                showStatus(document.getElementById('uploadStatus'), 'Error al cargar el PDF', true);
-                
-                // Fallback: Mostrar en iframe si PDF.js falla
-                const fallbackIframe = document.createElement('iframe');
-                fallbackIframe.src = url;
-                fallbackIframe.className = 'pdf-fallback';
-                pdfContainer.innerHTML = '';
-                pdfContainer.appendChild(fallbackIframe);
-            });
-        }
-
-        // Función para renderizar una página
-        function renderPage(num) {
-            pageRendering = true;
-            
-            pdfDoc.getPage(num).then(function(page) {
-                const viewport = page.getViewport({ scale: scale });
-                const canvas = document.getElementById('pdf-canvas');
-                const context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                const renderContext = {
-                    canvasContext: context,
-                    viewport: viewport
-                };
-                
-                const renderTask = page.render(renderContext);
-                
-                renderTask.promise.then(function() {
-                    pageRendering = false;
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
-                });
-            });
-            
-            document.getElementById('page-num').textContent = num;
-        }
-
-        // Función para ir a la página anterior
-        function prevPage() {
-            if (pageNum <= 1) return;
-            pageNum--;
-            queueRenderPage(pageNum);
-        }
-
-        // Función para ir a la página siguiente
-        function nextPage() {
-            if (pageNum >= pdfDoc.numPages) return;
-            pageNum++;
-            queueRenderPage(pageNum);
-        }
-
-        // Función para encolar la renderización de página
-        function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
-            }
-        }
-
-        // Función para zoom in
-        function zoomIn() {
-            scale += 0.25;
-            queueRenderPage(pageNum);
-        }
-
-        // Función para zoom out
-        function zoomOut() {
-            if (scale <= 0.5) return;
-            scale -= 0.25;
-            queueRenderPage(pageNum);
+            pdfIframe.src = url;
         }
 
         // Formatear tamaño de archivo
@@ -622,12 +490,6 @@
                     await eliminarArchivo(selected.public_id, selected.estado, selected.tipo_documento);
                 }
             });
-
-            // Agregar event listeners para los controles PDF
-            document.getElementById('prev-page').addEventListener('click', prevPage);
-            document.getElementById('next-page').addEventListener('click', nextPage);
-            document.getElementById('zoom-in').addEventListener('click', zoomIn);
-            document.getElementById('zoom-out').addEventListener('click', zoomOut);
 
             // Cargar archivos iniciales
             await cargarListaArchivos();
