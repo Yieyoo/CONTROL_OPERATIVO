@@ -42,7 +42,7 @@ app.use(helmet({
 app.use(morgan('combined', {
   skip: (req, res) => req.path === '/api/health' || req.path === '/favicon.ico',
   stream: process.env.NODE_ENV === 'production' ? 
-    fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' } : 
+    fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) :
     process.stdout
 }));
 
@@ -187,7 +187,7 @@ const pdfUpload = multer({
     const validMimeTypes = ['application/pdf', 'application/x-pdf'];
     const validExtensions = ['.pdf'];
     
-    if (validMimeTypes.includes(file.mimetype) {
+    if (validMimeTypes.includes(file.mimetype)) {
       const ext = path.extname(file.originalname).toLowerCase();
       if (validExtensions.includes(ext)) {
         return cb(null, true);
