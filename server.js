@@ -84,6 +84,7 @@ const corsOptions = {
     if (allowedOrigins.some(allowedOrigin => 
       origin === allowedOrigin || 
       origin?.startsWith(allowedOrigin)
+    ) 
     ) {
       callback(null, true);
     } else {
