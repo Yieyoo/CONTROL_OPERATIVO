@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ======================
-// 1. Mejoras en Configuración de Seguridad
+// 1. Configuración de Seguridad
 // ======================
 const securityMiddleware = [
   helmet({
@@ -37,7 +37,7 @@ const securityMiddleware = [
 
 app.use(securityMiddleware);
 
-// Configuración mejorada de logs
+// Configuración de logs
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'), 
   { flags: 'a' }
@@ -47,7 +47,7 @@ app.use(morgan('combined', { stream: accessLogStream }));
 app.set('trust proxy', 1);
 
 // ======================
-// 2. Limitación de Tasas Mejorada
+// 2. Limitación de Tasas
 // ======================
 const limiterConfig = {
   windowMs: 15 * 60 * 1000, // 15 minutos
@@ -66,7 +66,7 @@ const limiterConfig = {
 const apiLimiter = rateLimit(limiterConfig);
 
 // ======================
-// 3. Configuración CORS Optimizada
+// 3. Configuración CORS
 // ======================
 const allowedOrigins = [
   'https://yieyoo.github.io',
@@ -84,8 +84,7 @@ const corsOptions = {
     if (allowedOrigins.some(allowedOrigin => 
       origin === allowedOrigin || 
       origin?.startsWith(allowedOrigin)
-    ) 
-    ) {
+    )) {
       callback(null, true);
     } else {
       console.warn(`⚠️  Intento de acceso desde origen no permitido: ${origin}`);
@@ -103,7 +102,7 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // ======================
-// 4. Configuración de Cloudinary Mejorada
+// 4. Configuración de Cloudinary
 // ======================
 const setupCloudinary = () => {
   const requiredConfig = {
@@ -135,7 +134,7 @@ const setupCloudinary = () => {
 setupCloudinary();
 
 // ======================
-// 5. Middleware de Autenticación Reforzada
+// 5. Middleware de Autenticación
 // ======================
 const authenticate = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
@@ -162,7 +161,7 @@ const authenticate = (req, res, next) => {
 };
 
 // ======================
-// 6. Configuración de Multer con Validaciones Mejoradas
+// 6. Configuración de Multer
 // ======================
 const pdfUpload = multer({
   storage: multer.memoryStorage(),
@@ -185,7 +184,7 @@ const pdfUpload = multer({
 }).single('file');
 
 // ======================
-// 7. Tipos de Documentos con Validación Dinámica
+// 7. Tipos de Documentos
 // ======================
 const DOCUMENT_TYPES = {
   FICHA_CURRICULAR: 'ficha_curricular',
@@ -217,7 +216,7 @@ const validateDocumentType = (req, res, next) => {
 };
 
 // ======================
-// 8. Sistema de Logs Mejorado
+// 8. Sistema de Logs
 // ======================
 const errorLogStream = fs.createWriteStream(
   path.join(__dirname, 'error.log'), 
@@ -232,7 +231,7 @@ const logError = (error) => {
 };
 
 // ======================
-// 9. Middleware de Errores Avanzado
+// 9. Middleware de Errores
 // ======================
 const errorHandler = (error, req, res, next) => {
   logError(error);
@@ -280,11 +279,11 @@ const deleteFromCloudinary = (publicId) => {
 };
 
 // ======================
-// 11. Rutas Actualizadas
+// 11. Rutas
 // ======================
 const router = express.Router();
 
-// Endpoint de salud mejorado
+// Endpoint de salud
 router.get('/health', (req, res) => {
   const healthCheck = {
     status: 'healthy',
@@ -302,11 +301,10 @@ router.get('/health', (req, res) => {
   res.json(healthCheck);
 });
 
-// Upload con mejor manejo de errores
+// Upload
 router.post(
-  '/upload/:docType',
+  '/upload',
   authenticate,
-  validateDocumentType,
   (req, res, next) => {
     pdfUpload(req, res, (err) => {
       if (err) {
@@ -324,13 +322,17 @@ router.post(
         throw new Error('No se proporcionó ningún archivo para subir');
       }
 
-      const { estado } = req.body;
-      const { docType } = req;
+      const { estado, tipoDocumento } = req.body;
+
+      if (!estado || !tipoDocumento) {
+        throw new Error('Estado y tipoDocumento son requeridos');
+      }
+
       const originalName = sanitizeFilename(req.file.originalname);
 
       const uploadOptions = {
         resource_type: 'raw',
-        folder: `${estado}/${docType}`,
+        folder: `${estado}/${tipoDocumento}`,
         format: 'pdf',
         type: 'upload',
         access_mode: 'public',
@@ -341,7 +343,7 @@ router.post(
           custom: {
             original_filename: originalName,
             uploaded_at: new Date().toISOString(),
-            document_type: docType,
+            document_type: tipoDocumento,
             estado
           }
         }
@@ -351,7 +353,7 @@ router.post(
 
       res.status(201).json({
         status: 'success',
-        data: formatCloudinaryResponse(result, docType, estado)
+        data: formatCloudinaryResponse(result, tipoDocumento, estado)
       });
     } catch (error) {
       next(error);
@@ -359,7 +361,7 @@ router.post(
   }
 );
 
-// Eliminar archivo con validación mejorada
+// Eliminar archivo
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
     const { public_id, estado } = req.body;
@@ -399,40 +401,32 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Listar archivos con paginación
-router.get('/archivos/:estado/:docType?', authenticate, async (req, res, next) => {
+// Listar archivos con filtro doble (estado + tipoDocumento)
+router.get('/archivos/:estado/:tipoDocumento?', authenticate, async (req, res, next) => {
   try {
-    const { estado, docType } = req.params;
-    const { page = 1, limit = 50 } = req.query;
+    const { estado, tipoDocumento } = req.params;
+    
+    if (!estado) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'El parámetro estado es requerido'
+      });
+    }
 
-    const folderPath = docType ? `${estado}/${docType}` : estado;
-    const maxResults = Math.min(parseInt(limit), 500);
-    const offset = (Math.max(1, parseInt(page)) - 1) * maxResults;
-
-    const searchParams = {
+    // Construir la ruta de búsqueda
+    const folderPath = tipoDocumento ? `${estado}/${tipoDocumento}` : estado;
+    
+    const result = await cloudinary.search({
       expression: `resource_type:raw AND folder:"${folderPath}"`,
       sort_by: { created_at: 'desc' },
-      max_results: maxResults,
-      next_cursor: offset > 0 ? req.query.cursor : undefined
-    };
-
-    const result = await cloudinary.search(searchParams);
-
-    const archivos = result.resources.map(resource => 
-      formatCloudinaryResponse(resource, docType, estado)
-    );
+      max_results: 100
+    });
 
     res.json({
       status: 'success',
       data: {
-        archivos,
-        count: archivos.length,
-        total: result.total_count,
-        page: parseInt(page),
-        total_pages: Math.ceil(result.total_count / maxResults),
-        estado,
-        tipo_documento: docType || 'all',
-        ...(result.next_cursor && { next_cursor: result.next_cursor })
+        archivos: result.resources.map(resource => 
+          formatCloudinaryResponse(resource, tipoDocumento, estado))
       }
     });
   } catch (error) {
@@ -466,17 +460,6 @@ const sanitizeFilename = (filename) => {
     .substring(0, 100);
 };
 
-// Documentación de tipos de documentos
-router.get('/tipos-documento', authenticate, (req, res) => {
-  res.json({
-    status: 'success',
-    data: {
-      tipos_documento: DOCUMENT_TYPES,
-      count: Object.keys(DOCUMENT_TYPES).length
-    }
-  });
-});
-
 // Registrar rutas
 app.use('/api', apiLimiter, router);
 
@@ -489,20 +472,23 @@ app.get('/', (req, res) => {
     endpoints: [
       {
         method: 'POST',
-        path: '/api/upload/:docType',
+        path: '/api/upload',
         description: 'Subir archivo PDF',
         authentication: 'Requiere header x-api-key',
         parameters: [
-          { name: 'docType', required: true, enum: Object.values(DOCUMENT_TYPES) },
           { name: 'file', type: 'PDF', max_size: '15MB' },
-          { name: 'estado', required: true }
+          { name: 'estado', required: true },
+          { name: 'tipoDocumento', required: true }
         ]
       },
       {
         method: 'GET',
-        path: '/api/archivos/:estado',
-        description: 'Listar archivos por estado',
-        pagination: true
+        path: '/api/archivos/:estado/:tipoDocumento?',
+        description: 'Listar archivos por estado y tipo de documento',
+        parameters: [
+          { name: 'estado', required: true },
+          { name: 'tipoDocumento', required: false }
+        ]
       },
       {
         method: 'DELETE',
@@ -523,10 +509,9 @@ app.use((req, res) => {
     error: 'not_found',
     message: 'Ruta no encontrada',
     suggested_routes: [
-      '/api/upload/[type]',
-      '/api/archivos/[state]',
-      '/api/archivos/[state]/[type]',
-      '/api/tipos-documento',
+      '/api/upload',
+      '/api/archivos/[estado]',
+      '/api/archivos/[estado]/[tipoDocumento]',
       '/api/delete',
       '/api/health'
     ],
