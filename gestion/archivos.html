@@ -5,8 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Archivos PDF - INM</title>
     <link rel="icon" type="image/png" href="../imagenes/descargar.png">
-     <link rel="stylesheet" href="diseñog.css">
-  
+    <link rel="stylesheet" href="diseñog.css">
+    <style>
+        /* Estilos adicionales para la versión simplificada */
+        .current-filter {
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .current-filter span {
+            color: #1a3e72;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-view, .btn-delete {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        
+        .btn-view {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+    </style>
 </head>
 <body>
     <div class="menu-overlay"></div>
@@ -89,12 +125,12 @@
         <iframe id="pdf-viewer"></iframe>
     </div>
 
-    <!-- Panel de gestión de archivos -->
+    <!-- Panel de gestión de archivos simplificado -->
     <div class="gestion-archivos">
         <h2>Gestión de Archivos PDF</h2>
         
         <div class="fila-superior">
-            <!-- Subir archivo -->
+            <!-- Subir archivo (único lugar con filtros) -->
             <div class="upload-form">
                 <h3>Subir archivo</h3>
                 <form id="uploadForm" enctype="multipart/form-data">
@@ -153,55 +189,12 @@
                 </form>
             </div>
 
-            <!-- Archivos disponibles -->
+            <!-- Archivos disponibles (sin filtros duplicados) -->
             <div class="file-list">
                 <h3>Archivos disponibles</h3>
-                <div class="filters">
-                    <select id="filtroEstado">
-                        <option value="aguascalientes">Aguascalientes</option>
-                        <option value="baja-california">Baja California</option>
-                        <option value="baja-california-sur">Baja California Sur</option>
-                        <option value="campeche">Campeche</option>
-                        <option value="chiapas">Chiapas</option>
-                        <option value="chihuahua">Chihuahua</option>
-                        <option value="ciudad-de-mexico">Ciudad de México</option>
-                        <option value="coahuila">Coahuila</option>
-                        <option value="colima">Colima</option>
-                        <option value="durango">Durango</option>
-                        <option value="estado-de-mexico">Estado de México</option>
-                        <option value="guanajuato">Guanajuato</option>
-                        <option value="guerrero">Guerrero</option>
-                        <option value="hidalgo">Hidalgo</option>
-                        <option value="jalisco">Jalisco</option>
-                        <option value="michoacan">Michoacán</option>
-                        <option value="morelos">Morelos</option>
-                        <option value="nayarit">Nayarit</option>
-                        <option value="nuevo-leon">Nuevo León</option>
-                        <option value="oaxaca">Oaxaca</option>
-                        <option value="puebla">Puebla</option>
-                        <option value="queretaro">Querétaro</option>
-                        <option value="quintana-roo">Quintana Roo</option>
-                        <option value="san-luis-potosi">San Luis Potosí</option>
-                        <option value="sinaloa">Sinaloa</option>
-                        <option value="sonora">Sonora</option>
-                        <option value="tabasco">Tabasco</option>
-                        <option value="tamaulipas">Tamaulipas</option>
-                        <option value="tlaxcala">Tlaxcala</option>
-                        <option value="veracruz">Veracruz</option>
-                        <option value="yucatan">Yucatán</option>
-                        <option value="zacatecas">Zacatecas</option>
-                    </select>
-                    
-                    <select id="filtroTipoDocumento">
-                        <option value="ficha_curricular">Ficha Curricular</option>
-                        <option value="organigrama">Organigrama</option>
-                        <option value="plantilla_personal">Plantilla de Personal</option>
-                        <option value="visita_supervision">Última Visita de Supervisión</option>
-                        <option value="acuerdos_visita">Acuerdos de Visita</option>
-                        <option value="vehiculos">Vehículos</option>
-                        <option value="inmuebles">Inmuebles</option>
-                        <option value="unidad_canina">Unidad Canina</option>
-                    </select>
+                <div class="current-filter">
+                    Mostrando: <span id="currentEstado">Aguascalientes</span> / 
+                    <span id="currentTipo">Vehículos</span>
                 </div>
                 <ul id="fileList"></ul>
             </div>
@@ -228,7 +221,7 @@
         // Elementos del DOM
         let loadingElement, uploadForm, uploadButton, uploadStatus, pdfViewer, pdfTitle, 
             fileListContainer, fileSelect, deleteFileButton, deleteStatus, 
-            carpetaSelect, tipoDocumentoSelect, filtroEstado, filtroTipoDocumento;
+            carpetaSelect, tipoDocumentoSelect, currentEstadoSpan, currentTipoSpan;
 
         // Mostrar/ocultar loading
         function showLoading(show) {
@@ -300,6 +293,12 @@
                 
                 const { data } = await response.json();
                 renderizarListaArchivos(data || []);
+                
+                // Actualizar los textos de filtros actuales
+                if (currentEstadoSpan && currentTipoSpan) {
+                    currentEstadoSpan.textContent = carpetaSelect.options[carpetaSelect.selectedIndex].text;
+                    currentTipoSpan.textContent = tipoDocumentoSelect.options[tipoDocumentoSelect.selectedIndex].text;
+                }
                 
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
@@ -410,28 +409,18 @@
             deleteStatus = document.getElementById('deleteStatus');
             carpetaSelect = document.getElementById('carpetaSelect');
             tipoDocumentoSelect = document.getElementById('tipoDocumentoSelect');
-            filtroEstado = document.getElementById('filtroEstado');
-            filtroTipoDocumento = document.getElementById('filtroTipoDocumento');
+            currentEstadoSpan = document.getElementById('currentEstado');
+            currentTipoSpan = document.getElementById('currentTipo');
 
-            // Configurar eventos de filtros
-            [carpetaSelect, tipoDocumentoSelect, filtroEstado, filtroTipoDocumento].forEach(select => {
-                select?.addEventListener('change', () => {
-                    if (select === carpetaSelect || select === filtroEstado) {
-                        currentCarpeta = select.value;
-                        // Sincronizar los selects de estado
-                        if (select === carpetaSelect && filtroEstado) filtroEstado.value = select.value;
-                        if (select === filtroEstado && carpetaSelect) carpetaSelect.value = select.value;
-                    }
-                    
-                    if (select === tipoDocumentoSelect || select === filtroTipoDocumento) {
-                        currentTipoDocumento = select.value;
-                        // Sincronizar los selects de tipo documento
-                        if (select === tipoDocumentoSelect && filtroTipoDocumento) filtroTipoDocumento.value = select.value;
-                        if (select === filtroTipoDocumento && tipoDocumentoSelect) tipoDocumentoSelect.value = select.value;
-                    }
-                    
-                    cargarListaArchivos();
-                });
+            // Configurar eventos de los filtros
+            carpetaSelect?.addEventListener('change', function() {
+                currentCarpeta = this.value;
+                cargarListaArchivos();
+            });
+
+            tipoDocumentoSelect?.addEventListener('change', function() {
+                currentTipoDocumento = this.value;
+                cargarListaArchivos();
             });
 
             // Evento para subir archivo
