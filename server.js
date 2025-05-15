@@ -115,7 +115,7 @@ const authenticate = (req, res, next) => {
 const pdfUpload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB
+    fileSize: 15 * 1024 * 1024 // 15MB (aumentado desde 10MB)
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'application/pdf') {
@@ -149,14 +149,14 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: '1.0.2',
+    version: '1.0.3',
     services: {
       cloudinary: 'active'
     }
   });
 });
 
-// Subir archivo - Versión optimizada
+// Subir archivo - Versión actualizada con tipo de documento
 router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, next) => {
   try {
     if (!req.file) {
@@ -164,6 +164,7 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
     }
 
     const estado = req.body.estado || 'aguascalientes';
+    const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
     const originalName = req.file.originalname.replace(/[^\w\-\. ]/gi, '');
 
     // Validar nombre de archivo
@@ -173,20 +174,21 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
 
     const uploadOptions = {
       resource_type: 'raw',
-      folder: estado,
+      folder: `${estado}/${tipoDocumento}`,
       format: 'pdf',
       type: 'upload',
       access_mode: 'public',
-      // Eliminamos transformaciones que podrían afectar los PDFs
       transformation: [],
-      // Conservar el nombre original del archivo
       filename_override: originalName,
       unique_filename: false,
       overwrite: true,
-      // Metadatos adicionales
       context: {
         original_filename: originalName,
-        uploaded_at: new Date().toISOString()
+        uploaded_at: new Date().toISOString(),
+        custom: {
+          estado: estado,
+          tipo_documento: tipoDocumento
+        }
       }
     };
 
@@ -207,9 +209,9 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
         url: result.secure_url,
         public_id: result.public_id,
         filename: originalName,
-        // URL alternativa para visualización
+        estado: estado,
+        tipo_documento: tipoDocumento,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
-        // URL directa para descarga
         download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
         uploaded_at: result.created_at,
         size: result.bytes
@@ -220,17 +222,17 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
   }
 });
 
-// Eliminar archivo - Versión mejorada
+// Eliminar archivo - Versión actualizada
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
-    const { public_id, estado } = req.body;
+    const { public_id, estado, tipo_documento } = req.body;
 
     if (!public_id) {
       throw new Error('public_id es requerido');
     }
 
-    // Verificar que el archivo pertenece al estado correcto
-    if (estado && !public_id.startsWith(`${estado}/`)) {
+    // Verificar que el archivo pertenece al estado y tipo correcto
+    if (estado && tipo_documento && !public_id.startsWith(`${estado}/${tipo_documento}/`)) {
       return res.status(403).json({
         status: 'error',
         error: 'forbidden',
@@ -255,6 +257,8 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       message: 'Archivo eliminado',
       data: {
         public_id: public_id,
+        estado: estado,
+        tipo_documento: tipo_documento,
         deleted_at: new Date().toISOString()
       }
     });
@@ -263,21 +267,21 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Listar archivos - Versión optimizada con nombres originales
-router.get('/archivos/:estado', authenticate, async (req, res, next) => {
+// Listar archivos - Versión actualizada con filtro por estado y tipo de documento
+router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
+    const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
 
     const result = await cloudinary.api.resources({
       type: 'upload',
-      prefix: `${estado}/`,
+      prefix: `${estado}/${tipoDocumento}/`,
       resource_type: 'raw',
       max_results: 500,
       context: true
     });
 
     const archivos = result.resources.map(resource => {
-      // Obtener el nombre original del contexto si está disponible
       const originalName = resource.context?.custom?.original_filename || 
                          resource.public_id.split('/').pop() + '.pdf';
       
@@ -285,9 +289,9 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
         url: resource.secure_url,
         public_id: resource.public_id,
         filename: originalName,
-        // URL alternativa para visualización
+        estado: estado,
+        tipo_documento: tipoDocumento,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
-        // URL directa para descarga
         download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
         uploaded_at: resource.created_at,
         size: resource.bytes,
@@ -299,7 +303,8 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
       status: 'success',
       data: archivos,
       count: archivos.length,
-      estado: estado
+      estado: estado,
+      tipo_documento: tipoDocumento
     });
   } catch (error) {
     next(error);
@@ -313,10 +318,10 @@ app.use('/api', apiLimiter, router);
 app.get('/', (req, res) => {
   res.json({
     status: 'success',
-    version: '1.0.2',
+    version: '1.0.3',
     endpoints: [
       { method: 'POST', path: '/api/upload', desc: 'Subir PDF', auth: 'x-api-key' },
-      { method: 'GET', path: '/api/archivos/:estado', desc: 'Listar PDFs', auth: 'x-api-key' },
+      { method: 'GET', path: '/api/archivos/:estado/:tipoDocumento', desc: 'Listar PDFs', auth: 'x-api-key' },
       { method: 'DELETE', path: '/api/delete', desc: 'Eliminar PDF', auth: 'x-api-key' },
       { method: 'GET', path: '/api/health', desc: 'Estado del servicio' }
     ],
@@ -332,7 +337,7 @@ app.use((req, res) => {
     message: 'Ruta no encontrada',
     suggested_routes: [
       '/api/upload',
-      '/api/archivos/:estado',
+      '/api/archivos/:estado/:tipoDocumento',
       '/api/delete',
       '/api/health'
     ]
@@ -347,6 +352,7 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`🔒 Modo seguro: ${process.env.NODE_ENV === 'production' ? 'ON' : 'OFF'}`);
   console.log(`🌍 Cloudinary configurado para: ${process.env.CLOUD_NAME}`);
+  console.log(`📂 Estructura de carpetas: estado/tipoDocumento/archivo.pdf`);
 });
 
 // Manejo de cierre
@@ -358,5 +364,3 @@ process.on('SIGTERM', () => {
 
 // Exportar para testing
 module.exports = app;
-
-
