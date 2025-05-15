@@ -29,6 +29,7 @@
             padding: 5px 10px;
             font-size: 14px;
             border-radius: 4px;
+            cursor: pointer;
         }
         
         .btn-view {
@@ -41,6 +42,43 @@
             background-color: #dc3545;
             color: white;
             border: none;
+        }
+        
+        /* Estilos para el visor PDF */
+        .pdf-viewer-container {
+            width: 100%;
+            height: 600px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            display: none; /* Oculto inicialmente */
+        }
+        
+        #pdf-viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .pdf-toolbar {
+            background: #1a3e72;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #pdf-title {
+            font-weight: bold;
+        }
+        
+        .close-pdf {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -117,12 +155,13 @@
         <h1>GESTOR DE ARCHIVOS</h1>
     </div>
 
-    <!-- Contenedor del visor PDF -->
+    <!-- Contenedor del visor PDF actualizado -->
     <div class="pdf-viewer-container">
         <div class="pdf-toolbar">
             <div id="pdf-title">Visualizador de PDF</div>
+            <button class="close-pdf" onclick="cerrarPDF()">Cerrar</button>
         </div>
-        <iframe id="pdf-viewer"></iframe>
+        <iframe id="pdf-viewer" type="application/pdf"></iframe>
     </div>
 
     <!-- Panel de gestión de archivos simplificado -->
@@ -194,7 +233,7 @@
                 <h3>Archivos disponibles</h3>
                 <div class="current-filter">
                     Mostrando: <span id="currentEstado">Aguascalientes</span> / 
-                    <span id="currentTipo">Vehículos</span>
+                    <span id="currentTipo">Ficha Curricular</span>
                 </div>
                 <ul id="fileList"></ul>
             </div>
@@ -242,19 +281,33 @@
             }
         }
 
-        // Función para mostrar PDF
+        // Función para mostrar PDF (actualizada)
         function mostrarPdf(url, filename = '') {
-            if (!pdfViewer || !pdfTitle) return;
+            const pdfViewerContainer = document.querySelector('.pdf-viewer-container');
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const pdfTitle = document.getElementById('pdf-title');
             
             if (!url) {
-                pdfViewer.style.display = 'none';
-                pdfTitle.textContent = 'Visualizador de PDF';
+                cerrarPDF();
                 return;
             }
             
-            pdfViewer.style.display = 'block';
-            pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+            pdfViewerContainer.style.display = 'block';
+            pdfViewer.src = url;
             pdfTitle.textContent = filename || 'Documento PDF';
+            
+            // Desplazar la vista al visor PDF
+            pdfViewerContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Función para cerrar el visor PDF
+        function cerrarPDF() {
+            const pdfViewerContainer = document.querySelector('.pdf-viewer-container');
+            const pdfViewer = document.getElementById('pdf-viewer');
+            
+            pdfViewerContainer.style.display = 'none';
+            pdfViewer.src = '';
+            document.getElementById('pdf-title').textContent = 'Visualizador de PDF';
         }
 
         // Formatear tamaño de archivo
@@ -384,7 +437,7 @@
                 
                 showStatus(deleteStatus, 'Archivo eliminado');
                 await cargarListaArchivos();
-                mostrarPdf('');
+                cerrarPDF();
                 
             } catch (error) {
                 console.error('Error al eliminar:', error);
