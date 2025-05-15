@@ -29,6 +29,8 @@
             padding: 5px 10px;
             font-size: 14px;
             border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
         .btn-view {
@@ -37,10 +39,95 @@
             border: none;
         }
         
+        .btn-view:hover {
+            background-color: #218838;
+        }
+        
         .btn-delete {
             background-color: #dc3545;
             color: white;
             border: none;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        /* Estilos mejorados para el visor PDF */
+        .pdf-viewer-container {
+            width: 100%;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            display: none; /* Oculto inicialmente */
+        }
+        
+        .pdf-toolbar {
+            background: #1a3e72;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: none;
+            background: #f9f9f9;
+        }
+        
+        #download-pdf {
+            padding: 5px 10px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        #download-pdf:hover {
+            background-color: #138496;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1a3e72;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -117,12 +204,13 @@
         <h1>GESTOR DE ARCHIVOS</h1>
     </div>
 
-    <!-- Contenedor del visor PDF -->
+    <!-- Contenedor del visor PDF - VERSIÓN MEJORADA -->
     <div class="pdf-viewer-container">
         <div class="pdf-toolbar">
             <div id="pdf-title">Visualizador de PDF</div>
+            <button id="download-pdf" class="btn-view">Descargar</button>
         </div>
-        <iframe id="pdf-viewer"></iframe>
+        <embed id="pdf-viewer" type="application/pdf" width="100%" height="100%">
     </div>
 
     <!-- Panel de gestión de archivos simplificado -->
@@ -217,6 +305,7 @@
         const API_KEY = 'Xhy2md57';
         let currentCarpeta = 'aguascalientes';
         let currentTipoDocumento = 'ficha_curricular';
+        let currentPdfUrl = '';
         
         // Elementos del DOM
         let loadingElement, uploadForm, uploadButton, uploadStatus, pdfViewer, pdfTitle, 
@@ -242,19 +331,35 @@
             }
         }
 
-        // Función para mostrar PDF
+        // Función para mostrar PDF - VERSIÓN MEJORADA
         function mostrarPdf(url, filename = '') {
             if (!pdfViewer || !pdfTitle) return;
             
             if (!url) {
                 pdfViewer.style.display = 'none';
                 pdfTitle.textContent = 'Visualizador de PDF';
+                document.getElementById('download-pdf').style.display = 'none';
                 return;
             }
             
-            pdfViewer.style.display = 'block';
-            pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+            // Guardar la URL actual para descarga
+            currentPdfUrl = url;
+            
+            // Mostrar el contenedor del PDF
+            document.querySelector('.pdf-viewer-container').style.display = 'block';
+            pdfViewer.src = url + '#toolbar=1&navpanes=1&scrollbar=1';
             pdfTitle.textContent = filename || 'Documento PDF';
+            
+            // Configurar botón de descarga
+            const downloadBtn = document.getElementById('download-pdf');
+            downloadBtn.style.display = 'inline-block';
+            downloadBtn.onclick = () => {
+                const link = document.createElement('a');
+                link.href = currentPdfUrl;
+                link.download = filename || 'documento.pdf';
+                link.target = '_blank';
+                link.click();
+            };
         }
 
         // Formatear tamaño de archivo
@@ -278,8 +383,18 @@
             });
         }
 
-        // Cargar lista de archivos
+        // Cargar lista de archivos con caché
+        const fileCache = new Map();
+        
         async function cargarListaArchivos() {
+            const cacheKey = `${currentCarpeta}-${currentTipoDocumento}`;
+            
+            // Verificar caché primero
+            if (fileCache.has(cacheKey)) {
+                renderizarListaArchivos(fileCache.get(cacheKey));
+                return;
+            }
+            
             showLoading(true);
             try {
                 const response = await fetch(
@@ -292,6 +407,10 @@
                 if (!response.ok) throw new Error(`Error ${response.status}`);
                 
                 const { data } = await response.json();
+                
+                // Almacenar en caché
+                fileCache.set(cacheKey, data || []);
+                
                 renderizarListaArchivos(data || []);
                 
                 // Actualizar los textos de filtros actuales
@@ -320,6 +439,7 @@
                 return;
             }
 
+            // Ordenar por fecha (más recientes primero)
             files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
 
             files.forEach(file => {
@@ -381,6 +501,9 @@
                 });
                 
                 if (!response.ok) throw new Error('Error al eliminar');
+                
+                // Limpiar caché para esta combinación
+                fileCache.delete(`${estado}-${tipoDocumento}`);
                 
                 showStatus(deleteStatus, 'Archivo eliminado');
                 await cargarListaArchivos();
@@ -447,6 +570,9 @@
                     });
                     
                     if (!response.ok) throw new Error('Error al subir');
+                    
+                    // Limpiar caché para esta combinación
+                    fileCache.delete(`${currentCarpeta}-${currentTipoDocumento}`);
                     
                     showStatus(uploadStatus, 'Archivo subido correctamente');
                     await cargarListaArchivos();
