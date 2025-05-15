@@ -52,6 +52,20 @@
         .btn-delete:hover {
             background-color: #c82333;
         }
+
+        /* Asegurar que el visor PDF tenga dimensiones adecuadas */
+        .pdf-viewer-container {
+            width: 100%;
+            height: 600px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            display: none; /* Inicialmente oculto */
+        }
+
+        #pdf-viewer {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -132,8 +146,9 @@
         <div class="pdf-toolbar">
             <div id="pdf-title">Visualizador de PDF</div>
             <button id="download-pdf" class="btn-view">Descargar</button>
+            <button id="close-pdf" class="btn-delete">Cerrar</button>
         </div>
-        <embed id="pdf-viewer" type="application/pdf" width="100%" height="100%">
+        <iframe id="pdf-viewer" width="100%" height="100%"></iframe>
     </div>
 
     <!-- Panel de gestión de archivos simplificado -->
@@ -246,22 +261,19 @@
         function showStatus(element, message, isError = false) {
             if (element) {
                 element.textContent = message;
-                element.className = isError ? 'error-message' : 'success-message';
+                element.style.color = isError ? 'red' : 'green';
                 setTimeout(() => {
                     element.textContent = '';
-                    element.className = '';
                 }, 5000);
             }
         }
 
-        // Función para mostrar PDF - VERSIÓN MEJORADA
+        // Función para mostrar PDF - VERSIÓN SIMPLIFICADA
         function mostrarPdf(url, filename = '') {
-            if (!pdfViewer || !pdfTitle) return;
+            const viewerContainer = document.querySelector('.pdf-viewer-container');
             
             if (!url) {
-                pdfViewer.style.display = 'none';
-                pdfTitle.textContent = 'Visualizador de PDF';
-                document.getElementById('download-pdf').style.display = 'none';
+                viewerContainer.style.display = 'none';
                 return;
             }
             
@@ -269,20 +281,9 @@
             currentPdfUrl = url;
             
             // Mostrar el contenedor del PDF
-            document.querySelector('.pdf-viewer-container').style.display = 'block';
-            pdfViewer.src = url + '#toolbar=1&navpanes=1&scrollbar=1';
+            viewerContainer.style.display = 'block';
+            pdfViewer.src = url;
             pdfTitle.textContent = filename || 'Documento PDF';
-            
-            // Configurar botón de descarga
-            const downloadBtn = document.getElementById('download-pdf');
-            downloadBtn.style.display = 'inline-block';
-            downloadBtn.onclick = () => {
-                const link = document.createElement('a');
-                link.href = currentPdfUrl;
-                link.download = filename || 'documento.pdf';
-                link.target = '_blank';
-                link.click();
-            };
         }
 
         // Formatear tamaño de archivo
@@ -306,18 +307,8 @@
             });
         }
 
-        // Cargar lista de archivos con caché
-        const fileCache = new Map();
-        
+        // Cargar lista de archivos
         async function cargarListaArchivos() {
-            const cacheKey = `${currentCarpeta}-${currentTipoDocumento}`;
-            
-            // Verificar caché primero
-            if (fileCache.has(cacheKey)) {
-                renderizarListaArchivos(fileCache.get(cacheKey));
-                return;
-            }
-            
             showLoading(true);
             try {
                 const response = await fetch(
@@ -330,10 +321,6 @@
                 if (!response.ok) throw new Error(`Error ${response.status}`);
                 
                 const { data } = await response.json();
-                
-                // Almacenar en caché
-                fileCache.set(cacheKey, data || []);
-                
                 renderizarListaArchivos(data || []);
                 
                 // Actualizar los textos de filtros actuales
@@ -362,9 +349,6 @@
                 return;
             }
 
-            // Ordenar por fecha (más recientes primero)
-            files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
-
             files.forEach(file => {
                 const li = document.createElement('li');
                 li.innerHTML = `
@@ -380,11 +364,7 @@
                 fileListContainer.appendChild(li);
 
                 const option = document.createElement('option');
-                option.value = JSON.stringify({
-                    public_id: file.public_id,
-                    estado: currentCarpeta,
-                    tipo_documento: currentTipoDocumento
-                });
+                option.value = file.public_id;
                 option.textContent = file.filename;
                 fileSelect.appendChild(option);
             });
@@ -400,14 +380,14 @@
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (confirm('¿Eliminar este archivo?')) {
-                        eliminarArchivo(btn.dataset.id, currentCarpeta, currentTipoDocumento);
+                        eliminarArchivo(btn.dataset.id);
                     }
                 });
             });
         }
 
         // Eliminar archivo
-        async function eliminarArchivo(publicId, estado, tipoDocumento) {
+        async function eliminarArchivo(publicId) {
             showLoading(true);
             try {
                 const response = await fetch(`${BACKEND_URL}/delete`, {
@@ -418,15 +398,12 @@
                     },
                     body: JSON.stringify({
                         public_id: publicId,
-                        estado: estado,
-                        tipo_documento: tipoDocumento
+                        estado: currentCarpeta,
+                        tipo_documento: currentTipoDocumento
                     })
                 });
                 
                 if (!response.ok) throw new Error('Error al eliminar');
-                
-                // Limpiar caché para esta combinación
-                fileCache.delete(`${estado}-${tipoDocumento}`);
                 
                 showStatus(deleteStatus, 'Archivo eliminado');
                 await cargarListaArchivos();
@@ -494,9 +471,6 @@
                     
                     if (!response.ok) throw new Error('Error al subir');
                     
-                    // Limpiar caché para esta combinación
-                    fileCache.delete(`${currentCarpeta}-${currentTipoDocumento}`);
-                    
                     showStatus(uploadStatus, 'Archivo subido correctamente');
                     await cargarListaArchivos();
                     uploadForm.reset();
@@ -512,14 +486,30 @@
 
             // Evento para eliminar archivo desde el select
             deleteFileButton?.addEventListener('click', async () => {
-                const selected = fileSelect.value ? JSON.parse(fileSelect.value) : null;
-                if (!selected?.public_id) {
+                const publicId = fileSelect.value;
+                if (!publicId) {
                     showStatus(deleteStatus, 'Selecciona un archivo', true);
                     return;
                 }
                 
                 if (confirm('¿Estás seguro de eliminar este archivo?')) {
-                    await eliminarArchivo(selected.public_id, selected.estado, selected.tipo_documento);
+                    await eliminarArchivo(publicId);
+                }
+            });
+
+            // Botón para cerrar el visor PDF
+            document.getElementById('close-pdf')?.addEventListener('click', () => {
+                mostrarPdf('');
+            });
+
+            // Botón para descargar PDF
+            document.getElementById('download-pdf')?.addEventListener('click', () => {
+                if (currentPdfUrl) {
+                    const link = document.createElement('a');
+                    link.href = currentPdfUrl;
+                    link.download = pdfTitle.textContent || 'documento.pdf';
+                    link.target = '_blank';
+                    link.click();
                 }
             });
 
@@ -570,3 +560,4 @@
         });
     </script>
 </body>
+</html>
