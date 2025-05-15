@@ -164,31 +164,32 @@ router.post('/upload', authenticate, pdfUpload.single('file'), async (req, res, 
     }
 
     const estado = req.body.estado || 'aguascalientes';
-    const originalName = req.file.originalname.replace(/[^\w\-\. ]/gi, '');
+const tipo = req.body.tipo || 'otros'; // nuevo campo para tipo de documento
+    
 
     // Validar nombre de archivo
     if (!/^[\w\-\. ]+\.pdf$/i.test(originalName)) {
       throw new Error('El nombre del archivo contiene caracteres no permitidos');
     }
 
-    const uploadOptions = {
-      resource_type: 'raw',
-      folder: estado,
-      format: 'pdf',
-      type: 'upload',
-      access_mode: 'public',
-      // Eliminamos transformaciones que podrían afectar los PDFs
-      transformation: [],
-      // Conservar el nombre original del archivo
-      filename_override: originalName,
-      unique_filename: false,
-      overwrite: true,
-      // Metadatos adicionales
-      context: {
-        original_filename: originalName,
-        uploaded_at: new Date().toISOString()
-      }
-    };
+   
+const uploadOptions = {
+  resource_type: 'raw',
+  folder: `${estado}/${tipo}`, // ahora organiza por estado/tipo
+  format: 'pdf',
+  type: 'upload',
+  access_mode: 'public',
+  transformation: [],
+  filename_override: originalName,
+  unique_filename: false,
+  overwrite: true,
+  context: {
+    original_filename: originalName,
+    uploaded_at: new Date().toISOString(),
+    estado: estado,
+    tipo: tipo
+  }
+};
 
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
@@ -268,13 +269,14 @@ router.get('/archivos/:estado', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
 
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: `${estado}/`,
-      resource_type: 'raw',
-      max_results: 500,
-      context: true
-    });
+const result = await cloudinary.api.resources({
+  type: 'upload',
+  prefix: `${estado}/`,
+  resource_type: 'raw',
+  max_results: 500,
+  context: true
+});
+
 
     const archivos = result.resources.map(resource => {
       // Obtener el nombre original del contexto si está disponible
