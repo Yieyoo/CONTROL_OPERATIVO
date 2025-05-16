@@ -112,49 +112,64 @@
         const API_KEY = 'tu_api_key'; // Reemplaza con tu API key
         const FOLDER_PATH = 'aguascalientes/plantilla_personal';
 
-        // Función para cargar el PDF desde Cloudinary
-        async function loadPdfFromCloudinary() {
-            const statusElement = document.getElementById('pdf-status-message');
-            const pdfViewer = document.getElementById('cloudinary-pdf-viewer');
-            const mobileContainer = document.getElementById('mobile-images-container');
-            
-            try {
-                statusElement.textContent = 'Cargando documento...';
-                
-                // 1. Obtener lista de archivos de la carpeta en Cloudinary
-                const response = await axios.get(`/api/archivos/${FOLDER_PATH.split('/')[0]}/${FOLDER_PATH.split('/')[1]}`, {
-                    headers: {
-                        'x-api-key': API_KEY
-                    }
-                });
-                
-                if (response.data.data && response.data.data.length > 0) {
-                    // 2. Tomar el primer PDF encontrado
-                    const pdfFile = response.data.data[0];
-                    const pdfUrl = pdfFile.url;
-                    
-                    // 3. Cargar el PDF en el visor
-                    pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
-                    statusElement.textContent = '';
-                    
-                    // 4. Para móviles: cargar imágenes (opcional)
-                    if (window.innerWidth <= 768) {
-                        mobileContainer.innerHTML = `
-                            <img src="${pdfUrl.replace('/upload/', '/upload/w_500/')}_page-0001.jpg" alt="Página 1">
-                            <img src="${pdfUrl.replace('/upload/', '/upload/w_500/')}_page-0002.jpg" alt="Página 2">
-                        `;
-                    }
-                } else {
-                    statusElement.textContent = 'No se encontraron archivos PDF en la carpeta.';
-                }
-            } catch (error) {
-                console.error('Error al cargar el PDF:', error);
-                statusElement.textContent = 'Error al cargar el documento. Por favor intenta más tarde.';
-                
-                // Mostrar PDF local como respaldo
-                pdfViewer.src = "../../../documentacion/plantillas_personal/aguascp/AC1.pdf";
-            }
+       async function loadPdfFromCloudinary() {
+    const statusElement = document.getElementById('pdf-status-message');
+    const pdfViewer = document.getElementById('cloudinary-pdf-viewer');
+    
+    try {
+        statusElement.textContent = 'Cargando documento...';
+        statusElement.style.color = '#333';
+        
+        // 1. Verificar si la API está disponible
+        const apiCheck = await axios.get('/api/health');
+        if (apiCheck.data.status !== 'healthy') {
+            throw new Error('API no disponible');
         }
+
+        // 2. Obtener lista de archivos
+        const response = await axios.get(`/api/archivos/aguascalientes/plantilla_personal`, {
+            headers: {
+                'x-api-key': API_KEY,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.data.data || response.data.data.length === 0) {
+            throw new Error('No se encontraron archivos en Cloudinary');
+        }
+
+        // 3. Tomar el primer PDF encontrado
+        const pdfFile = response.data.data[0];
+        const pdfUrl = pdfFile.url;
+        
+        // 4. Cargar el PDF en el visor
+        pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+        statusElement.textContent = '';
+
+    } catch (error) {
+        console.error('Error al cargar el PDF:', error);
+        
+        // Mostrar mensaje de error detallado
+        let errorMessage = 'Error al cargar el documento';
+        
+        if (error.response) {
+            // Error de la API
+            if (error.response.status === 404) {
+                errorMessage = 'La ruta del API no fue encontrada (404)';
+            } else if (error.response.status === 401) {
+                errorMessage = 'No autorizado - verifica tu API key';
+            }
+        } else if (error.message.includes('No se encontraron archivos')) {
+            errorMessage = 'No hay documentos en la carpeta de Aguascalientes';
+        }
+        
+        statusElement.textContent = `${errorMessage}. Cargando versión local...`;
+        statusElement.style.color = '#d9534f';
+        
+        // Cargar PDF local como respaldo
+        pdfViewer.src = "../../../documentacion/plantillas_personal/aguascp/AC1.pdf";
+    }
+}
 
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
