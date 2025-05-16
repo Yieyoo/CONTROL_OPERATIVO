@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -11,32 +10,13 @@ const fs = require('fs');
 const { promisify } = require('util');
 const zlib = require('zlib');
 const stream = require('stream');
-const hpp = require('hpp');
-const os = require('os');
-const client = require('prom-client');
-
 const pipeline = promisify(stream.pipeline);
+require('dotenv').config();
 
-// Inicializar métricas de Prometheus
-const collectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics({ timeout: 5000 });
-
-class AppError extends Error {
-  constructor(message, statusCode, errorCode) {
-    super(message);
-    this.statusCode = statusCode || 500;
-    this.errorCode = errorCode || 'server_error';
-    this.isOperational = true;
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-
-// Configuración inicial
 const app = express();
 const PORT = process.env.PORT || 3000;
-const isProduction = process.env.NODE_ENV === 'production';
 
-// 1. Middlewares de Seguridad Avanzada
+// 1. Configuración Avanzada de Seguridad
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -55,52 +35,32 @@ app.use(helmet({
     includeSubDomains: true,
     preload: true
   },
-  frameguard: { action: 'deny' },
-  referrerPolicy: { policy: 'same-origin' }
+  frameguard: {
+    action: 'deny'
+  },
+  referrerPolicy: {
+    policy: 'same-origin'
+  }
 }));
 
-app.use(hpp());
+app.use(morgan('combined', {
+  skip: (req, res) => req.path === '/api/health' || req.path === '/favicon.ico',
+  stream: process.env.NODE_ENV === 'production' 
+    ? fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) 
+    : process.stdout
+}));
+
 app.set('trust proxy', 1);
 
-// 2. Configuración de CORS
-const allowedOrigins = new Set([
-  'https://yieyoo.github.io',
-  'https://yieyoo.github.io/CONTROL_OPERATIVO/',
-  'http://localhost:3000',
-  ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [])
-]);
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin && !isProduction) {
-      return callback(null, true);
-    }
-    
-    if (origin && allowedOrigins.has(origin)) {
-      return callback(null, true);
-    }
-    
-    console.warn(`Intento de acceso desde origen no permitido: ${origin || 'null'}`);
-    callback(new AppError('Origen no permitido por CORS', 403, 'cors_not_allowed'));
-  },
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-  exposedHeaders: ['x-ratelimit-limit', 'x-ratelimit-remaining'],
-  credentials: true,
-  maxAge: 86400,
-  preflightContinue: false
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-
-// 3. Rate Limiting
+// 2. Rate Limiting Mejorado
 const apiLimiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW || '15') * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX || (isProduction ? '100' : '1000')),
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip,
+  keyGenerator: (req) => {
+    return req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip;
+  },
   handler: (req, res) => {
     res.status(429).json({
       status: 'error',
@@ -111,11 +71,54 @@ const apiLimiter = rateLimit({
   }
 });
 
-// 4. Configuración de Cloudinary
+// 3. Configuración de CORS Optimizada
+const allowedOrigins = new Set([
+  'https://yieyoo.github.io',
+  'https://yieyoo.github.io/CONTROL_OPERATIVO/',
+  'http://localhost:3000',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
+]);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, true);
+    } else {
+      console.warn('Intento de acceso desde origen no permitido:', origin);
+      callback(new Error('Origen no permitido por CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+  credentials: true,
+  optionsSuccessStatus: 204,
+  maxAge: 86400,
+  preflightContinue: false
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+// 4. Middlewares para parsear el cuerpo de las peticiones
+app.use(express.json({
+  limit: '10mb',
+  inflate: true,
+  strict: true,
+  type: 'application/json'
+}));
+
+app.use(express.urlencoded({
+  extended: true,
+  limit: '10mb',
+  parameterLimit: 1000,
+  inflate: true
+}));
+
+// 5. Configuración Avanzada de Cloudinary
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
-
+  
   if (missingVars.length > 0) {
     console.error('❌ Error: Faltan variables de entorno requeridas:', missingVars.join(', '));
     process.exit(1);
@@ -132,11 +135,10 @@ const validateCloudinaryConfig = () => {
       cdn_subdomain: true,
       shorten: true,
       sign_url: true,
-      api_proxy: process.env.PROXY_URL,
-      timeout: 30000
+      api_proxy: process.env.PROXY_URL
     });
-    
     console.log('✅ Cloudinary configurado correctamente');
+    return true;
   } catch (error) {
     console.error('❌ Error configurando Cloudinary:', error);
     process.exit(1);
@@ -145,65 +147,7 @@ const validateCloudinaryConfig = () => {
 
 validateCloudinaryConfig();
 
-// 5. Middlewares de Aplicación
-app.use(morgan(isProduction ? 'combined' : 'dev', {
-  skip: (req, res) => req.path === '/api/health' || req.path === '/metrics',
-  stream: isProduction ? 
-    fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) : 
-    process.stdout
-}));
-
-app.use(express.json({ 
-  limit: '10mb',
-  inflate: true,
-  strict: true,
-  type: 'application/json'
-}));
-
-app.use(express.urlencoded({ 
-  extended: true, 
-  limit: '10mb',
-  parameterLimit: 1000,
-  inflate: true
-}));
-
-app.use(require('compression')({ 
-  level: zlib.constants.Z_BEST_COMPRESSION,
-  threshold: 1024,
-  filter: (req, res) => {
-    if (req.headers['x-no-compression']) return false;
-    return /json|text|javascript|pdf/.test(res.getHeader('Content-Type'));
-  }
-}));
-
-// 6. Configuración de Multer para PDFs
-const memoryStorage = multer.memoryStorage();
-const pdfUpload = multer({
-  storage: memoryStorage,
-  limits: {
-    fileSize: 15 * 1024 * 1024,
-    files: 1,
-    fields: 5,
-    parts: 10
-  },
-  fileFilter: (req, file, cb) => {
-    const validMimeTypes = ['application/pdf'];
-    const validExtensions = ['.pdf'];
-    
-    if (!validMimeTypes.includes(file.mimetype) || 
-        !validExtensions.includes(path.extname(file.originalname).toLowerCase())) {
-      return cb(new AppError('Solo se permiten archivos PDF', 400, 'invalid_file_type'), false);
-    }
-    
-    if (!/^[\w\-\. ]+\.pdf$/i.test(file.originalname)) {
-      return cb(new AppError('Nombre de archivo no válido', 400, 'invalid_filename'), false);
-    }
-    
-    cb(null, true);
-  }
-}).single('file');
-
-// 7. Autenticación
+// 6. Middleware de autenticación mejorado
 const authenticate = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
   
@@ -212,7 +156,9 @@ const authenticate = (req, res, next) => {
       status: 'error',
       error: 'unauthorized',
       message: 'API Key no proporcionada',
-      code: 'MISSING_API_KEY'
+      code: 'MISSING_API_KEY',
+      timestamp: new Date().toISOString(),
+      path: req.path
     });
   }
 
@@ -222,81 +168,194 @@ const authenticate = (req, res, next) => {
       status: 'error',
       error: 'unauthorized',
       message: 'API Key inválida',
-      code: 'INVALID_API_KEY'
+      code: 'INVALID_API_KEY',
+      timestamp: new Date().toISOString()
     });
   }
-
+  
   next();
 };
 
-// 8. Manejo de Archivos en Cloudinary
+// 7. Configuración Optimizada de Multer para PDFs
+const memoryStorage = multer.memoryStorage();
+const pdfUpload = multer({
+  storage: memoryStorage,
+  limits: {
+    fileSize: 15 * 1024 * 1024,
+    files: 1,
+    fields: 5
+  },
+  fileFilter: (req, file, cb) => {
+    const validMimeTypes = ['application/pdf', 'application/x-pdf'];
+    const validExtensions = ['.pdf'];
+    
+    if (validMimeTypes.includes(file.mimetype)) {
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (validExtensions.includes(ext)) {
+        return cb(null, true);
+      }
+    }
+    cb(new Error('Solo se permiten archivos PDF (extensión .pdf)'), false);
+  }
+}).single('file');
+
+// 8. Compresión GZIP para respuestas
+const shouldCompress = (req, res) => {
+  if (req.headers['x-no-compression']) return false;
+  return /json|text|javascript|pdf/.test(res.getHeader('Content-Type'));
+};
+
+app.use(require('compression')({
+  level: zlib.constants.Z_BEST_COMPRESSION,
+  threshold: 1024,
+  filter: shouldCompress
+}));
+
+// 9. Cache-Control para respuestas estáticas
+const setCacheControl = (req, res, next) => {
+  const cacheTime = 86400; // 1 día en segundos
+  if (req.method === 'GET') {
+    res.set('Cache-Control', `public, max-age=${cacheTime}`);
+  } else {
+    res.set('Cache-Control', 'no-store');
+  }
+  next();
+};
+
+app.use(setCacheControl);
+
+// 10. Manejo Avanzado de Errores
+class AppError extends Error {
+  constructor(message, statusCode, errorCode) {
+    super(message);
+    this.statusCode = statusCode || 500;
+    this.errorCode = errorCode || 'server_error';
+    this.isOperational = true;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+const handleError = (error, req, res, next) => {
+  const statusCode = error.statusCode || 500;
+  const errorCode = error.errorCode || 'server_error';
+  
+  console.error(`🔴 [${new Date().toISOString()}] Error ${statusCode}:`, {
+    message: error.message,
+    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+    path: req.path,
+    method: req.method,
+    ip: req.ip
+  });
+
+  if (process.env.NODE_ENV === 'production' && !error.isOperational) {
+    return res.status(500).json({
+      status: 'error',
+      error: 'server_error',
+      message: 'Algo salió mal en el servidor'
+    });
+  }
+
+  res.status(statusCode).json({
+    status: 'error',
+    error: errorCode,
+    message: error.message,
+    ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+  });
+};
+
+// 11. Rutas API Optimizadas
+const router = express.Router();
+
+// Ruta de salud mejorada
+router.get('/health', async (req, res) => {
+  const healthcheck = {
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    version: '1.1.0',
+    checks: {
+      memoryUsage: process.memoryUsage(),
+      cloudinary: 'active',
+      database: 'n/a',
+      diskSpace: {
+        free: promisify(fs.statfs || (() => {}))('/')
+          .then(stats => stats.bfree * stats.bsize)
+          .catch(() => 'n/a'),
+        total: promisify(fs.statfs || (() => {}))('/')
+          .then(stats => stats.blocks * stats.bsize)
+          .catch(() => 'n/a')
+      }
+    }
+  };
+
+  try {
+    await cloudinary.api.ping();
+    res.json({
+      ...healthcheck,
+      status: 'healthy',
+      dbStatus: 'connected'
+    });
+  } catch (error) {
+    healthcheck.status = 'degraded';
+    healthcheck.dbStatus = 'disconnected';
+    healthcheck.error = error.message;
+    res.status(503).json(healthcheck);
+  }
+});
+
+// Subir archivo - Versión optimizada
 const processUpload = async (file, estado, tipoDocumento) => {
   if (!file) throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
   
-  const originalName = path.parse(file.originalname).name.replace(/[^\w\- ]/gi, '') + '.pdf';
-  
+  const originalName = path.parse(file.originalname).name.replace(/[^\w- ]/gi, '') + '.pdf';
+  if (!/^[\w- ]+\.pdf$/i.test(originalName)) {
+    throw new AppError('El nombre del archivo contiene caracteres no permitidos', 400, 'invalid_filename');
+  }
+
   const uploadOptions = {
     resource_type: 'raw',
     folder: `${estado}/${tipoDocumento}`,
     format: 'pdf',
     type: 'upload',
     access_mode: 'public',
+    transformation: [{ quality: 'auto', fetch_format: 'auto' }],
     filename_override: originalName,
     unique_filename: false,
     overwrite: true,
     context: {
       original_filename: originalName,
       uploaded_at: new Date().toISOString(),
-      custom: { estado, tipo_documento: tipoDocumento, uploaded_by: 'api' }
+      custom: {
+        estado: estado,
+        tipo_documento: tipoDocumento,
+        uploaded_by: 'api'
+      }
+    },
+    responsive_breakpoints: {
+      create_derived: false,
+      bytes_step: 20000,
+      min_width: 200,
+      max_width: 1000,
+      transformation: { crop: 'limit' }
     }
   };
 
   try {
     return await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => 
-        error ? reject(error) : resolve(result));
+      const uploadStream = cloudinary.uploader.upload_stream(
+        uploadOptions,
+        (error, result) => error ? reject(error) : resolve(result)
+      );
       
-      pipeline(stream.Readable.from(file.buffer), uploadStream).catch(reject);
+      pipeline(
+        stream.Readable.from(file.buffer),
+        uploadStream
+      ).catch(reject);
     });
   } catch (error) {
     throw new AppError(`Error al subir a Cloudinary: ${error.message}`, 502, 'cloudinary_error');
   }
 };
 
-// 9. Cache para listado de archivos
-const listFilesCache = new Map();
-const CACHE_TTL = 60000;
-
-// 10. Rutas
-const router = express.Router();
-
-// Health Check (modificado para no usar diskusage)
-router.get('/health', async (req, res) => {
-  const healthcheck = {
-    status: 'healthy',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-    version: '1.2.0',
-    checks: {
-      memoryUsage: process.memoryUsage(),
-      cloudinary: 'connected',
-      load: os.loadavg()
-    },
-    environment: process.env.NODE_ENV || 'development'
-  };
-
-  try {
-    await cloudinary.api.resources({ max_results: 1 });
-    res.json(healthcheck);
-  } catch (error) {
-    healthcheck.status = 'degraded';
-    healthcheck.cloudinary = 'disconnected';
-    healthcheck.error = error.message;
-    res.status(503).json(healthcheck);
-  }
-});
-
-// Subir archivo
 router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
     try {
@@ -304,14 +363,12 @@ router.post('/upload', authenticate, (req, res, next) => {
         if (err.code === 'LIMIT_FILE_SIZE') {
           throw new AppError('El archivo excede el límite de 15MB', 413, 'file_too_large');
         }
-        throw err;
+        throw new AppError(err.message, 400, 'upload_error');
       }
 
-      const { estado = 'aguascalientes', tipo_documento = 'ficha_curricular' } = req.body;
-      
-      if (!req.file) throw new AppError('No se ha subido ningún archivo', 400, 'no_file_uploaded');
-      
-      const result = await processUpload(req.file, estado, tipo_documento);
+      const estado = req.body.estado || 'aguascalientes';
+      const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
+      const result = await processUpload(req.file, estado, tipoDocumento);
 
       res.status(201).json({
         status: 'success',
@@ -319,11 +376,15 @@ router.post('/upload', authenticate, (req, res, next) => {
           url: result.secure_url,
           public_id: result.public_id,
           filename: result.original_filename,
-          estado,
-          tipo_documento,
+          estado: estado,
+          tipo_documento: tipoDocumento,
           view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
+          download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
           uploaded_at: result.created_at,
-          size: result.bytes
+          size: result.bytes,
+          pages: result.pages,
+          format: result.format,
+          etag: result.etag
         }
       });
     } catch (error) {
@@ -332,23 +393,31 @@ router.post('/upload', authenticate, (req, res, next) => {
   });
 });
 
-// Eliminar archivo
+// Eliminar archivo - Versión optimizada con verificación
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
     const { public_id, estado, tipo_documento } = req.body;
-
-    if (!public_id) throw new AppError('public_id es requerido', 400, 'missing_public_id');
-    if (!estado || !tipo_documento) {
-      throw new AppError('Estado y tipo de documento son requeridos', 400, 'missing_parameters');
+    
+    if (!public_id) {
+      throw new AppError('public_id es requerido', 400, 'missing_public_id');
     }
 
+    // Verificación de la estructura del public_id
     const expectedPrefix = `${estado}/${tipo_documento}/`;
-    if (!public_id.startsWith(expectedPrefix)) {
+    if (estado && tipo_documento && !public_id.startsWith(expectedPrefix)) {
       throw new AppError('No tienes permiso para eliminar este archivo', 403, 'forbidden');
     }
 
-    await cloudinary.api.resource(public_id, { resource_type: 'raw' });
-    
+    // Verificar que el archivo existe
+    try {
+      await cloudinary.api.resource(public_id, { resource_type: 'raw' });
+    } catch (error) {
+      if (error.http_code === 404) {
+        throw new AppError('Archivo no encontrado', 404, 'not_found');
+      }
+      throw error;
+    }
+
     const result = await cloudinary.uploader.destroy(public_id, {
       resource_type: 'raw',
       invalidate: true
@@ -361,22 +430,30 @@ router.delete('/delete', authenticate, async (req, res, next) => {
     res.json({
       status: 'success',
       message: 'Archivo eliminado',
-      data: { public_id, deleted_at: new Date().toISOString() }
+      data: {
+        public_id: public_id,
+        estado: estado,
+        tipo_documento: tipo_documento,
+        deleted_at: new Date().toISOString(),
+        deletion_result: result
+      }
     });
   } catch (error) {
-    if (error.http_code === 404) {
-      error = new AppError('Archivo no encontrado', 404, 'not_found');
-    }
     next(error);
   }
 });
 
-// Listar archivos
+// Listar archivos - Versión con caché
+const listFilesCache = new Map();
+const CACHE_TTL = 60000; // 1 minuto
+
 router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
-    const { estado = 'aguascalientes', tipoDocumento = 'ficha_curricular' } = req.params;
+    const estado = req.params.estado || 'aguascalientes';
+    const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
     const cacheKey = `${estado}:${tipoDocumento}`;
-    
+
+    // Verificar caché
     if (listFilesCache.has(cacheKey)) {
       const cached = listFilesCache.get(cacheKey);
       if (Date.now() - cached.timestamp < CACHE_TTL) {
@@ -388,102 +465,140 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
       type: 'upload',
       prefix: `${estado}/${tipoDocumento}/`,
       resource_type: 'raw',
-      max_results: 500
+      max_results: 500,
+      context: true,
+      tags: true,
+      moderations: true
     });
 
-    const archivos = result.resources.map(resource => ({
-      url: resource.secure_url,
-      public_id: resource.public_id,
-      filename: resource.context?.custom?.original_filename || path.parse(resource.public_id).name + '.pdf',
-      estado,
-      tipo_documento: tipoDocumento,
-      view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
-      uploaded_at: resource.created_at,
-      size: resource.bytes
-    }));
+    const archivos = result.resources.map(resource => {
+      const originalName = resource.context?.custom?.original_filename || 
+                         path.parse(resource.public_id).name + '.pdf';
+      return {
+        url: resource.secure_url,
+        public_id: resource.public_id,
+        filename: originalName,
+        estado: estado,
+        tipo_documento: tipoDocumento,
+        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
+        download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
+        uploaded_at: resource.created_at,
+        size: resource.bytes,
+        format: resource.format,
+        width: resource.width,
+        height: resource.height,
+        etag: resource.etag,
+        tags: resource.tags,
+        moderation: resource.moderation
+      };
+    });
 
     const responseData = {
       status: 'success',
       data: archivos,
       count: archivos.length,
-      estado,
-      tipo_documento,
+      estado: estado,
+      tipo_documento: tipoDocumento,
       timestamp: new Date().toISOString()
     };
 
-    listFilesCache.set(cacheKey, { timestamp: Date.now(), data: responseData });
+    // Almacenar en caché
+    listFilesCache.set(cacheKey, {
+      timestamp: Date.now(),
+      data: responseData
+    });
+
     res.json(responseData);
   } catch (error) {
     next(error);
   }
 });
 
-// Métricas
-router.get('/metrics', async (req, res) => {
-  res.set('Content-Type', client.register.contentType);
-  res.end(await client.register.metrics());
-});
-
 // Montar rutas
 app.use('/api', apiLimiter, router);
 
-// Documentación
+// Documentación mejorada
 app.get('/', (req, res) => {
-  res.json({
+  const documentation = {
     status: 'success',
-    message: 'API de Gestión de Archivos PDF',
-    version: '1.2.0',
-    endpoints: {
-      health: '/api/health',
-      upload: '/api/upload',
-      delete: '/api/delete',
-      list: '/api/archivos/:estado/:tipoDocumento',
-      metrics: '/api/metrics'
-    }
-  });
-});
-
-// Manejo de errores
-app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
+    version: '1.1.0',
+    description: 'API de Gestión de Archivos PDF para el Instituto Nacional de Migración',
+    endpoints: [
+      {
+        method: 'POST',
+        path: '/api/upload',
+        description: 'Subir archivo PDF',
+        authentication: 'x-api-key',
+        parameters: [
+          { name: 'file', type: 'binary', required: true, description: 'Archivo PDF (max 15MB)' },
+          { name: 'estado', type: 'string', required: false, description: 'Estado asociado al archivo' },
+          { name: 'tipo_documento', type: 'string', required: false, description: 'Tipo de documento' }
+        ]
+      },
+      {
+        method: 'GET',
+        path: '/api/archivos/:estado/:tipoDocumento',
+        description: 'Listar archivos PDF',
+        authentication: 'x-api-key',
+        parameters: [
+          { name: 'estado', type: 'string', required: true, description: 'Estado a filtrar' },
+          { name: 'tipoDocumento', type: 'string', required: true, description: 'Tipo de documento a filtrar' }
+        ]
+      },
+      {
+        method: 'DELETE',
+        path: '/api/delete',
+        description: 'Eliminar archivo PDF',
+        authentication: 'x-api-key',
+        parameters: [
+          { name: 'public_id', type: 'string', required: true, description: 'ID público del archivo en Cloudinary' },
+          { name: 'estado', type: 'string', required: false, description: 'Estado asociado al archivo' },
+          { name: 'tipo_documento', type: 'string', required: false, description: 'Tipo de documento' }
+        ]
+      },
+      {
+        method: 'GET',
+        path: '/api/health',
+        description: 'Estado del servicio',
+        authentication: 'none'
+      }
+    ],
+    rateLimiting: {
+      windowMs: 15 * 60 * 1000,
+      maxRequests: process.env.NODE_ENV === 'production' ? 100 : 1000
+    },
+    notes: [
+      'Todos los endpoints (excepto /health) requieren el header x-api-key',
+      'Los archivos se almacenan en Cloudinary con estructura: estado/tipoDocumento/archivo.pdf',
+      'Versión optimizada para alto rendimiento con caché y compresión'
+    ]
+  };
   
-  console.error(`🔴 [${new Date().toISOString()}] Error ${statusCode}:`, {
-    message: err.message,
-    stack: !isProduction ? err.stack : undefined,
-    path: req.path,
-    method: req.method,
-    ip: req.ip
-  });
-
-  res.status(statusCode).json({
-    status: 'error',
-    error: err.errorCode || 'server_error',
-    message: err.message,
-    ...(!isProduction && { stack: err.stack })
-  });
+  res.json(documentation);
 });
 
-// Ruta no encontrada
+// Manejo de rutas no encontradas
 app.use((req, res, next) => {
   next(new AppError(`Ruta no encontrada: ${req.method} ${req.path}`, 404, 'not_found'));
 });
 
-// Iniciar servidor
+// Middleware de errores
+app.use(handleError);
+
+// Iniciar servidor optimizado
 const server = app.listen(PORT, () => {
-  console.log(`
-🚀 Servidor en puerto ${PORT}
-🔒 Modo seguro: ${isProduction ? 'ON' : 'OFF'}
-🌍 Cloudinary: ${process.env.CLOUD_NAME}
-📂 Estructura: estado/tipoDocumento/archivo.pdf
-⚡ Versión: 1.2.0 - ${new Date().toISOString()}
-  `);
+  console.log(`🚀 Servidor en puerto ${PORT}`);
+  console.log(`🔒 Modo seguro: ${process.env.NODE_ENV === 'production' ? 'ON' : 'OFF'}`);
+  console.log(`🌍 Cloudinary configurado para: ${process.env.CLOUD_NAME}`);
+  console.log(`📂 Estructura de carpetas: estado/tipoDocumento/archivo.pdf`);
+  console.log(`⚡ Versión optimizada 1.1.0 - ${new Date().toISOString()}`);
 });
 
-// Manejo de cierre
+// Manejo de cierre con limpieza
 const shutdown = async (signal) => {
   console.log(`🛑 Recibido ${signal}, cerrando servidor...`);
   try {
-    await new Promise(resolve => server.close(resolve));
+    await new Promise((resolve) => server.close(resolve));
     console.log('✅ Servidor cerrado correctamente');
     process.exit(0);
   } catch (err) {
@@ -494,10 +609,19 @@ const shutdown = async (signal) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('unhandledRejection', err => console.error('⚠️ Unhandled Rejection:', err));
-process.on('uncaughtException', err => {
+process.on('unhandledRejection', (err) => {
+  console.error('⚠️ Unhandled Rejection:', err);
+});
+process.on('uncaughtException', (err) => {
   console.error('⚠️ Uncaught Exception:', err);
   shutdown('uncaughtException');
 });
 
-module.exports = { app, server };
+// Exportar para testing
+module.exports = {
+  app,
+  server,
+  shutdown,
+  validateCloudinaryConfig,
+  processUpload
+};
