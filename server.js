@@ -67,33 +67,54 @@ const apiLimiter = rateLimit({
   }
 });
 
-// 3. Configuración de CORS Optimizada
+// 3. Configuración de CORS Optimizada (Versión mejorada)
 const allowedOrigins = new Set([
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
   'http://localhost:3000',
-  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
+  'http://localhost:5173', // Añadido para desarrollo con Vite
+  ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [])
 ]);
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.has(origin)) {
-      callback(null, true);
-    } else {
-      console.warn('Intento de acceso desde origen no permitido:', origin);
-      callback(new Error('Origen no permitido por CORS'));
+    // Permitir solicitudes sin origen (como apps móviles o curl)
+    if (!origin) return callback(null, true);
+    
+    // Verificar dominios permitidos
+    if (allowedOrigins.has(origin) {
+      return callback(null, true);
     }
+
+    // Verificar patrones de dominio (para subdominios)
+    const originDomain = new URL(origin).hostname;
+    const isAllowed = [...allowedOrigins].some(allowed => {
+      if (allowed.startsWith('*')) {
+        const domainPattern = allowed.replace('*.', '').replace('/', '');
+        return originDomain.endsWith(domainPattern);
+      }
+      return false;
+    });
+
+    if (isAllowed) {
+      return callback(null, true);
+    }
+
+    console.warn('Intento de acceso desde origen no permitido:', origin);
+    callback(new Error('Origen no permitido por CORS'), false);
   },
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS', 'PUT', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'Origin', 'Accept'],
+  exposedHeaders: ['Content-Length', 'X-Request-ID'],
   credentials: true,
   optionsSuccessStatus: 204,
   maxAge: 86400,
   preflightContinue: false
 };
 
+// Aplicar CORS de manera más robusta
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('*', cors(corsOptions)); // Habilitar pre-vuelo para todas las rutas
 
 // 4. Middlewares para parsear el cuerpo de las peticiones con compresión
 app.use(express.json({ 
@@ -272,7 +293,7 @@ router.get('/health', async (req, res) => {
   const healthcheck = {
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    version: '1.1.0',
+    version: '1.2.0',
     checks: {
       memoryUsage: process.memoryUsage(),
       cloudinary: 'active',
@@ -523,7 +544,7 @@ app.use('/api', apiLimiter, router);
 app.get('/', (req, res) => {
   const documentation = {
     status: 'success',
-    version: '1.1.0',
+    version: '1.2.0',
     description: 'API de Gestión de Archivos PDF para el Instituto Nacional de Migración',
     endpoints: [
       { 
@@ -593,7 +614,7 @@ const server = app.listen(PORT, () => {
   console.log(`🔒 Modo seguro: ${process.env.NODE_ENV === 'production' ? 'ON' : 'OFF'}`);
   console.log(`🌍 Cloudinary configurado para: ${process.env.CLOUD_NAME}`);
   console.log(`📂 Estructura de carpetas: estado/tipoDocumento/archivo.pdf`);
-  console.log(`⚡ Versión optimizada 1.1.0 - ${new Date().toISOString()}`);
+  console.log(`⚡ Versión optimizada 1.2.0 - ${new Date().toISOString()}`);
 });
 
 // Manejo de cierre con limpieza

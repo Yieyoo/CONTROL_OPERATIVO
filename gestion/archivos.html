@@ -150,15 +150,6 @@
     <div class="header-container">
         <h1>GESTOR DE ARCHIVOS</h1>
     </div>
-
-    <!-- Contenedor del visor PDF simplificado con iframe -->
-    <div class="pdf-viewer-container">
-        <div class="pdf-title" id="pdf-title">Visualizador de PDF</div>
-        <div id="pdf-viewer-container">
-            <iframe id="pdf-iframe" class="pdf-iframe"></iframe>
-        </div>
-    </div>
-
     <!-- Panel de gestión de archivos -->
     <div class="gestion-archivos">
         <h2>Gestión de Archivos PDF</h2>
@@ -242,6 +233,14 @@
             </select>
             <button id="deleteFileButton">Eliminar</button>
             <p id="deleteStatus"></p>
+        </div>
+    </div>
+
+    <!-- Contenedor del visor PDF simplificado con iframe (ahora abajo del panel de gestión) -->
+    <div class="pdf-viewer-container">
+        <div class="pdf-title" id="pdf-title">Visualizador de PDF</div>
+        <div id="pdf-viewer-container">
+            <iframe id="pdf-iframe" class="pdf-iframe"></iframe>
         </div>
     </div>
 
