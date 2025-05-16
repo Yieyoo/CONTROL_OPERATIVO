@@ -3,16 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL</title>
+    <title>PLANTILLA DE PERSONAL - AGUASCALIENTES</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .error-message {
+            color: red;
+            padding: 10px;
+            background-color: #ffeeee;
+            border: 1px solid #ffcccc;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .pdf-container {
+            width: 100%;
+            height: 80vh;
+            margin: 20px 0;
+        }
+        .pdf-embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .mobile-images {
+            display: none;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #1a3e72;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .download-btn:hover {
+            background-color: #0d2b57;
+        }
+        .file-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .pdf-container {
+                display: none;
+            }
+            .mobile-images {
+                display: block;
+                text-align: center;
+            }
+            .mobile-images img {
+                max-width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="header-container qna">
+        <h1>PLANTILLA DE PERSONAL - AGUASCALIENTES</h1>
+    </div>
+    <!-- Fondo oscuro para el menú -->
     <div class="menu-overlay"></div>
+    
+    <!-- Loading spinner -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
 
     <header>
+        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+        <!-- Menú principal -->
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
@@ -21,228 +112,179 @@
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a></li>
-                        <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                        <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                    <li><a href="../../../construccion.html">Inmuebles</a></li>
+                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
+                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
                         <li><a href="../aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
-                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                        <!-- Otros estados... -->
                     </ul>
                 </li>
             </ul>
         </nav>
     </header>
 
+    <!-- Contenedor de logos -->
     <div class="logo-container">
-        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
+        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
-    <div class="header-container qna">
-        <h1 id="document-title">Cargando documento...</h1>
-    </div>
-    
+    <!-- Contenedor del PDF -->
     <div class="pdf-container">
-        <iframe id="pdf-viewer" class="pdf-embed" frameborder="0"></iframe>
+        <iframe 
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+            title="Visualizador de PDF"
+        ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <div id="pdf-status-message" class="status-message"></div>
+    <!-- Contenedor de imágenes para móviles -->
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
+    </div>
 
-    <button class="regresar-btn">Regresar</button>
+    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
+    <!-- Scripts -->
     <script>
-        // Configuración dinámica basada en parámetros URL
-        const API_BASE_URL = 'https://control-operativo-1.onrender.com/api';
-        const LOCAL_BASE_PATH = '../../../documentacion/plantillas_personal';
+        // Configuración
+        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+        const API_KEY = 'Xhy2md57';
+        const ESTADO_FIJO = 'aguascalientes';
+        const TIPO_DOCUMENTO = 'plantilla_personal';
         
-        // Obtener parámetros de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const estado = urlParams.get('estado') || 'aguascalientes';
-        const tipoDocumento = urlParams.get('tipo') || 'plantilla_personal';
-        
-        // Mapeo de nombres legibles
-        const NOMBRES_ESTADOS = {
-            aguascalientes: 'Aguascalientes',
-            baja_california: 'Baja California',
-            baja_california_sur: 'Baja California Sur',
-            campeche: 'Campeche',
-            chiapas: 'Chiapas',
-            chihuahua: 'Chihuahua',
-            cdmx: 'Ciudad de México',
-            coahuila: 'Coahuila',
-            colima: 'Colima',
-            durango: 'Durango',
-            guanajuato: 'Guanajuato',
-            guerrero: 'Guerrero',
-            hidalgo: 'Hidalgo',
-            jalisco: 'Jalisco',
-            edomex: 'Estado de México',
-            michoacan: 'Michoacán',
-            morelos: 'Morelos',
-            nayarit: 'Nayarit',
-            nuevo_leon: 'Nuevo León',
-            oaxaca: 'Oaxaca',
-            puebla: 'Puebla',
-            quererato: 'Querétaro',
-            quintanaroo: 'Quintana Roo',
-            san_luis: 'San Luis Potosí',
-            sinaloa: 'Sinaloa',
-            sonora: 'Sonora',
-            tabasco: 'Tabasco',
-            tamaulipas: 'Tamaulipas',
-            tlaxcala: 'Tlaxcala',
-            veracruz: 'Veracruz',
-            yucatan: 'Yucatán',
-            zacatecas: 'Zacatecas'
-        };
-        
-        const NOMBRES_DOCUMENTOS = {
-            plantilla_personal: 'Plantilla de Personal',
-            ficha_curricular: 'Ficha Curricular',
-            organigrama: 'Organigrama',
-            visita_supervision: 'Visita de Supervisión',
-            acuerdos_visita: 'Acuerdos de Visita',
-            vehiculos: 'Vehículos',
-            inmuebles: 'Inmuebles',
-            unidad_canina: 'Unidad Canina'
-        };
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
 
-        async function loadPDF() {
-            const statusElement = document.getElementById('pdf-status-message');
-            const pdfViewer = document.getElementById('pdf-viewer');
-            const titleElement = document.getElementById('document-title');
-            
-            // Actualizar título del documento
-            const estadoNombre = NOMBRES_ESTADOS[estado] || estado;
-            const docNombre = NOMBRES_DOCUMENTOS[tipoDocumento] || tipoDocumento;
-            titleElement.textContent = `${docNombre} - ${estadoNombre}`;
-            document.title = `${docNombre} - ${estadoNombre}`;
-            
-            try {
-                statusElement.textContent = 'Cargando documento...';
-                statusElement.style.color = '#333';
-                
-                // 1. Intento desde API
-                const apiUrl = `${API_BASE_URL}/archivos/${estado}/${tipoDocumento}?v=${Date.now()}`;
-                const response = await axios.get(apiUrl, {
-                    timeout: 8000,
-                    headers: { 
-                        'Cache-Control': 'no-cache',
-                        'x-api-key': 'Xhy2md57' // Asegúrate de usar tu API key real
-                    }
-                });
-
-                if (response.data?.url) {
-                    pdfViewer.src = response.data.url;
-                    statusElement.textContent = '';
-                } else {
-                    throw new Error('Formato de respuesta inválido');
-                }
-                
-            } catch (error) {
-                console.error('Error API:', error);
-                
-                // 2. Intento desde archivo local
-                const localPath = `${LOCAL_BASE_PATH}/${estado}/${tipoDocumento}.pdf`;
-                pdfViewer.src = localPath;
-                
-                // Manejo de errores para el PDF local
-                pdfViewer.onerror = () => {
-                    statusElement.textContent = 'Documento no disponible en el servidor ni localmente';
-                    statusElement.style.color = '#dc3545';
-                    pdfViewer.src = '';
-                };
-                
-                pdfViewer.onload = () => {
-                    statusElement.textContent = 'Documento local cargado correctamente';
-                    statusElement.style.color = '#28a745';
-                    setTimeout(() => statusElement.textContent = '', 3000);
-                };
+        // Mostrar mensaje de error
+        function showError(message, target = 'both') {
+            if (target === 'both' || target === 'pdf') {
+                const pdfError = document.getElementById('pdf-error');
+                pdfError.textContent = message;
+                pdfError.style.display = 'block';
+            }
+            if (target === 'both' || target === 'mobile') {
+                const mobileError = document.getElementById('mobile-error');
+                mobileError.textContent = message;
+                mobileError.style.display = 'block';
             }
         }
 
-        // Funciones del menú (se mantienen igual)
+        // Ocultar errores
+        function hideErrors() {
+            document.getElementById('pdf-error').style.display = 'none';
+            document.getElementById('mobile-error').style.display = 'none';
+        }
+
+        // Función para abrir/cerrar el menú
         function toggleMenu() {
             const menu = document.querySelector('.menu');
-            const menuOverlay = document.querySelector('.menu-overlay');
+            const overlay = document.querySelector('.menu-overlay');
             menu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
 
-        function closeAllSubmenus() {
-            const submenus = document.querySelectorAll('.submenu.active');
-            submenus.forEach(submenu => {
-                submenu.classList.remove('active');
-            });
-        }
+        // Cerrar menú al hacer clic fuera
+        document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
 
+        // Función para submenús
         function toggleSubmenu(event) {
             event.preventDefault();
-            closeAllSubmenus();
-            const submenu = event.target.closest('.submenu');
-            submenu.classList.toggle('active');
+            document.querySelectorAll('.submenu.active').forEach(sub => {
+                if (sub !== event.target.closest('.submenu')) {
+                    sub.classList.remove('active');
+                }
+            });
+            event.target.closest('.submenu').classList.toggle('active');
         }
 
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                closeAllSubmenus();
-            }
-        });
+        // Formatear fecha legible
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-MX', options);
+        }
 
-        const submenuLinks = document.querySelectorAll('.submenu-list a');
-        submenuLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                closeAllSubmenus();
+        // Cargar PDF de Plantilla de Personal de Aguascalientes
+        async function loadPlantillaPersonal() {
+            showLoading(true);
+            hideErrors();
+
+            try {
+                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+                
+                const result = await response.json();
+                console.log('Respuesta API:', result);
+                
+                if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+                const pdfViewer = document.getElementById('pdf-viewer');
+                const mobileContainer = document.querySelector('.mobile-images');
+                
+                if (result.data.length > 0) {
+                    // Ordenar por fecha y obtener el más reciente
+                    const latestPDF = result.data.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+                    
+                    // Cargar PDF en el visor
+                    pdfViewer.src = latestPDF.url;
+                    
+                    // Para móviles, mostrar información y opción de descarga
+                    mobileContainer.innerHTML = `
+                        <div class="file-info">
+                            <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar Plantilla
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar PDF al iniciar
+            if (document.getElementById('pdf-viewer')) {
+                loadPlantillaPersonal();
+            }
+            
+            // Cerrar menús al hacer clic en opción
+            document.querySelectorAll('.submenu-list a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.querySelectorAll('.submenu').forEach(sub => {
+                        sub.classList.remove('active');
+                    });
+                });
             });
         });
-
-        document.querySelector('.regresar-btn').addEventListener('click', function() {
-            window.history.back();
-        });
-
-        // Cargar el PDF cuando la página esté lista
-        document.addEventListener('DOMContentLoaded', loadPDF);
-
-        // Recargar cada 5 minutos para mantener actualizado
-        setInterval(loadPDF, 300000);
     </script>
 </body>
 </html>
