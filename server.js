@@ -71,17 +71,22 @@ const apiLimiter = rateLimit({
   }
 });
 
-// 3. Configuración de CORS Optimizada
+// 3. Configuración de CORS Optimizada (Corregida)
 const allowedOrigins = new Set([
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
   'http://localhost:3000',
+  'http://localhost',       // Para acceso directo sin puerto
+  'null',                  // Para permitir solicitudes sin origen
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
 ]);
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.has(origin)) {
+    // Permitir solicitudes sin origen (como desde Postman o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.has(origin)) {
       callback(null, true);
     } else {
       console.warn('Intento de acceso desde origen no permitido:', origin);
