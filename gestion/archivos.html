@@ -50,6 +50,7 @@
             height: 600px;
             border: 1px solid #ddd;
             margin-top: 20px;
+            display: none; /* Oculto inicialmente */
         }
 
         .pdf-iframe {
@@ -62,6 +63,17 @@
             padding: 10px;
             background: #f8f9fa;
             border-bottom: 1px solid #ddd;
+            font-weight: bold;
+        }
+        
+        /* Estilos para mensajes */
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            color: #dc3545;
             font-weight: bold;
         }
     </style>
@@ -216,7 +228,7 @@
                 <h3>Archivos disponibles</h3>
                 <div class="current-filter">
                     Mostrando: <span id="currentEstado">Aguascalientes</span> / 
-                    <span id="currentTipo">Vehículos</span>
+                    <span id="currentTipo">Ficha Curricular</span>
                 </div>
                 <ul id="fileList"></ul>
             </div>
@@ -260,7 +272,7 @@
             }
         }
 
-        // Función para mostrar PDF con iframe
+        // Función para mostrar PDF con iframe (con cache buster)
         function mostrarPdf(url, filename = '') {
             const pdfContainer = document.getElementById('pdf-viewer-container');
             const pdfTitle = document.getElementById('pdf-title');
@@ -272,9 +284,13 @@
                 return;
             }
 
+            // Añadir parámetro de versión para evitar caché del navegador
+            const cacheBuster = `?v=${Date.now()}`;
+            const finalUrl = url.includes('?') ? `${url}&${cacheBuster.slice(1)}` : url + cacheBuster;
+            
             pdfContainer.style.display = 'block';
             pdfTitle.textContent = filename || 'Documento PDF';
-            pdfIframe.src = url;
+            pdfIframe.src = finalUrl;
         }
 
         // Formatear tamaño de archivo
@@ -302,12 +318,14 @@
         async function cargarListaArchivos() {
             showLoading(true);
             try {
-                const response = await fetch(
-                    `${BACKEND_URL}/archivos/${currentCarpeta}/${currentTipoDocumento}`, 
-                    {
-                        headers: { 'x-api-key': API_KEY }
-                    }
-                );
+                // Añadir parámetro de versión para evitar caché del navegador
+                const cacheBuster = `?v=${Date.now()}`;
+                const url = `${BACKEND_URL}/archivos/${currentCarpeta}/${currentTipoDocumento}${cacheBuster}`;
+                
+                const response = await fetch(url, {
+                    headers: { 'x-api-key': API_KEY },
+                    cache: 'no-store' // Evitar caché del navegador
+                });
                 
                 if (!response.ok) throw new Error(`Error ${response.status}`);
                 
@@ -391,7 +409,7 @@
             });
         }
 
-        // Eliminar archivo
+        // Eliminar archivo con invalidación de caché
         async function eliminarArchivo(publicId, estado, tipoDocumento) {
             showLoading(true);
             try {
@@ -404,13 +422,14 @@
                     body: JSON.stringify({
                         public_id: publicId,
                         estado: estado,
-                        tipo_documento: tipoDocumento
+                        tipo_documento: tipoDocumento,
+                        invalidate_cache: true // Asegurar que se invalide el caché
                     })
                 });
                 
                 if (!response.ok) throw new Error('Error al eliminar');
                 
-                showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado');
+                showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado y caché invalidado');
                 await cargarListaArchivos();
                 mostrarPdf('');
                 
@@ -453,6 +472,7 @@
                     formData.append('file', file);
                     formData.append('estado', currentCarpeta);
                     formData.append('tipo_documento', currentTipoDocumento);
+                    formData.append('invalidate_cache', 'true'); // Forzar invalidación de caché
                     
                     const response = await fetch(`${BACKEND_URL}/upload`, {
                         method: 'POST',
