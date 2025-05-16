@@ -3,42 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - Aguascalientes</title>
+    <title>PLANTILLA DE PERSONAL</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-    <!-- Agregamos axios para las peticiones HTTP -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    <!-- Fondo oscuro para el menú -->
     <div class="menu-overlay"></div>
 
     <header>
-        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-                <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
-                       <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="../../../construccion.html">Inmuebles</a></li>
-                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
+                        <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
+                        <li><a href="../../../construccion.html">Padron Vehicular</a></li>
+                        <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
                     </ul>
                 </li>
-
-                <!-- Submenú Información de ORs -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
@@ -80,111 +72,134 @@
         </nav>
     </header>
 
-    <!-- Contenedor de logos -->
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo 1">
     </div>
     
     <div class="header-container qna">
-        <h1>Plantilla de Personal - Aguascalientes</h1>
+        <h1 id="document-title">Cargando documento...</h1>
     </div>
     
-    <!-- Contenedor del PDF -->
     <div class="pdf-container">
         <iframe id="pdf-viewer" class="pdf-embed" frameborder="0"></iframe>
     </div>
 
-    <!-- Mensaje de estado -->
     <div id="pdf-status-message" class="status-message"></div>
 
     <button class="regresar-btn">Regresar</button>
 
-    <!-- Scripts -->
     <script>
-        // Configuración de la aplicación
+        // Configuración dinámica basada en parámetros URL
         const API_BASE_URL = 'https://control-operativo-1.onrender.com/api';
-        const LOCAL_PDF_PATH = '../../../documentacion/plantillas_personal/aguascp/AC1.pdf';
-        const TIPO_DOCUMENTO = 'plantilla_personal'; // Tipo de documento específico
+        const LOCAL_BASE_PATH = '../../../documentacion/plantillas_personal';
+        
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const estado = urlParams.get('estado') || 'aguascalientes';
+        const tipoDocumento = urlParams.get('tipo') || 'plantilla_personal';
+        
+        // Mapeo de nombres legibles
+        const NOMBRES_ESTADOS = {
+            aguascalientes: 'Aguascalientes',
+            baja_california: 'Baja California',
+            baja_california_sur: 'Baja California Sur',
+            campeche: 'Campeche',
+            chiapas: 'Chiapas',
+            chihuahua: 'Chihuahua',
+            cdmx: 'Ciudad de México',
+            coahuila: 'Coahuila',
+            colima: 'Colima',
+            durango: 'Durango',
+            guanajuato: 'Guanajuato',
+            guerrero: 'Guerrero',
+            hidalgo: 'Hidalgo',
+            jalisco: 'Jalisco',
+            edomex: 'Estado de México',
+            michoacan: 'Michoacán',
+            morelos: 'Morelos',
+            nayarit: 'Nayarit',
+            nuevo_leon: 'Nuevo León',
+            oaxaca: 'Oaxaca',
+            puebla: 'Puebla',
+            quererato: 'Querétaro',
+            quintanaroo: 'Quintana Roo',
+            san_luis: 'San Luis Potosí',
+            sinaloa: 'Sinaloa',
+            sonora: 'Sonora',
+            tabasco: 'Tabasco',
+            tamaulipas: 'Tamaulipas',
+            tlaxcala: 'Tlaxcala',
+            veracruz: 'Veracruz',
+            yucatan: 'Yucatán',
+            zacatecas: 'Zacatecas'
+        };
+        
+        const NOMBRES_DOCUMENTOS = {
+            plantilla_personal: 'Plantilla de Personal',
+            ficha_curricular: 'Ficha Curricular',
+            organigrama: 'Organigrama',
+            visita_supervision: 'Visita de Supervisión',
+            acuerdos_visita: 'Acuerdos de Visita',
+            vehiculos: 'Vehículos',
+            inmuebles: 'Inmuebles',
+            unidad_canina: 'Unidad Canina'
+        };
 
         async function loadPDF() {
             const statusElement = document.getElementById('pdf-status-message');
             const pdfViewer = document.getElementById('pdf-viewer');
+            const titleElement = document.getElementById('document-title');
+            
+            // Actualizar título del documento
+            const estadoNombre = NOMBRES_ESTADOS[estado] || estado;
+            const docNombre = NOMBRES_DOCUMENTOS[tipoDocumento] || tipoDocumento;
+            titleElement.textContent = `${docNombre} - ${estadoNombre}`;
+            document.title = `${docNombre} - ${estadoNombre}`;
             
             try {
                 statusElement.textContent = 'Cargando documento...';
                 statusElement.style.color = '#333';
                 
-                // Intento 1: Cargar desde la API con tipo de documento
-                const response = await axios.get(`${API_BASE_URL}/archivos/aguascalientes/${TIPO_DOCUMENTO}`, {
-                    timeout: 5000, // 5 segundos de timeout
-                    headers: {
-                        'Cache-Control': 'no-cache', // Evitar caché
-                        'Pragma': 'no-cache'
+                // 1. Intento desde API
+                const apiUrl = `${API_BASE_URL}/archivos/${estado}/${tipoDocumento}?v=${Date.now()}`;
+                const response = await axios.get(apiUrl, {
+                    timeout: 8000,
+                    headers: { 
+                        'Cache-Control': 'no-cache',
+                        'x-api-key': 'Xhy2md57' // Asegúrate de usar tu API key real
                     }
                 });
 
-                if (response.data && response.data.url) {
-                    // Usar el visor de Google o mostrar directamente
-                    const pdfUrl = response.data.url;
-                    
-                    // Opción 1: Usar visor de Google
-                    // pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
-                    
-                    // Opción 2: Mostrar directamente (mejor para móviles)
-                    pdfViewer.src = pdfUrl;
-                    
+                if (response.data?.url) {
+                    pdfViewer.src = response.data.url;
                     statusElement.textContent = '';
-                } else if (response.data && response.data.error) {
-                    throw new Error(response.data.error);
                 } else {
-                    throw new Error('La API no devolvió un PDF válido');
+                    throw new Error('Formato de respuesta inválido');
                 }
+                
             } catch (error) {
-                console.error('Error al cargar desde la API:', error);
+                console.error('Error API:', error);
                 
-                // Mostrar mensaje de error apropiado
-                let errorMessage = 'Error al cargar el documento desde el servidor';
+                // 2. Intento desde archivo local
+                const localPath = `${LOCAL_BASE_PATH}/${estado}/${tipoDocumento}.pdf`;
+                pdfViewer.src = localPath;
                 
-                if (error.response) {
-                    if (error.response.status === 404) {
-                        errorMessage = 'Documento no encontrado en el servidor';
-                    } else if (error.response.status === 401) {
-                        errorMessage = 'No autorizado para acceder al documento';
-                    } else if (error.response.data && error.response.data.message) {
-                        errorMessage = error.response.data.message;
-                    }
-                } else if (error.code === 'ECONNABORTED') {
-                    errorMessage = 'Tiempo de espera agotado al conectar con el servidor';
-                } else if (error.message) {
-                    errorMessage = error.message;
-                }
+                // Manejo de errores para el PDF local
+                pdfViewer.onerror = () => {
+                    statusElement.textContent = 'Documento no disponible en el servidor ni localmente';
+                    statusElement.style.color = '#dc3545';
+                    pdfViewer.src = '';
+                };
                 
-                statusElement.textContent = `${errorMessage}. Cargando versión local...`;
-                statusElement.style.color = '#d9534f';
-                
-                // Cargar PDF local como respaldo
-                try {
-                    pdfViewer.src = LOCAL_PDF_PATH;
-                    // Verificar si el PDF local se carga correctamente
-                    pdfViewer.onload = function() {
-                        statusElement.textContent = 'Documento local cargado correctamente';
-                        statusElement.style.color = '#28a745';
-                        setTimeout(() => {
-                            statusElement.textContent = '';
-                        }, 3000);
-                    };
-                    pdfViewer.onerror = function() {
-                        statusElement.textContent = 'Error al cargar el documento local';
-                        statusElement.style.color = '#dc3545';
-                    };
-                } catch (localError) {
-                    console.error('Error al cargar PDF local:', localError);
-                    statusElement.textContent = 'Error al cargar ambas versiones del documento';
-                }
+                pdfViewer.onload = () => {
+                    statusElement.textContent = 'Documento local cargado correctamente';
+                    statusElement.style.color = '#28a745';
+                    setTimeout(() => statusElement.textContent = '', 3000);
+                };
             }
         }
 
-        // Función para abrir y cerrar el menú lateral
+        // Funciones del menú (se mantienen igual)
         function toggleMenu() {
             const menu = document.querySelector('.menu');
             const menuOverlay = document.querySelector('.menu-overlay');
@@ -192,15 +207,6 @@
             menuOverlay.classList.toggle('active');
         }
 
-        // Cerrar el menú al hacer clic fuera de él
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menuOverlay.addEventListener('click', () => {
-            const menu = document.querySelector('.menu');
-            menu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-
-        // Función para cerrar todos los submenús
         function closeAllSubmenus() {
             const submenus = document.querySelectorAll('.submenu.active');
             submenus.forEach(submenu => {
@@ -208,7 +214,6 @@
             });
         }
 
-        // Función para mostrar/ocultar el submenú
         function toggleSubmenu(event) {
             event.preventDefault();
             closeAllSubmenus();
@@ -216,14 +221,12 @@
             submenu.classList.toggle('active');
         }
 
-        // Cerrar el submenú al hacer clic fuera de él
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.submenu')) {
                 closeAllSubmenus();
             }
         });
 
-        // Cerrar el submenú al hacer clic en una opción
         const submenuLinks = document.querySelectorAll('.submenu-list a');
         submenuLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -231,7 +234,6 @@
             });
         });
 
-        // Regresar al historial
         document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
