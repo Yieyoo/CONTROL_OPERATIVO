@@ -12,7 +12,6 @@ const { promisify } = require('util');
 const zlib = require('zlib');
 const stream = require('stream');
 const hpp = require('hpp');
-const diskusage = require('diskusage');
 const os = require('os');
 const client = require('prom-client');
 
@@ -271,7 +270,7 @@ const CACHE_TTL = 60000;
 // 10. Rutas
 const router = express.Router();
 
-// Health Check
+// Health Check (modificado para no usar diskusage)
 router.get('/health', async (req, res) => {
   const healthcheck = {
     status: 'healthy',
@@ -281,10 +280,6 @@ router.get('/health', async (req, res) => {
     checks: {
       memoryUsage: process.memoryUsage(),
       cloudinary: 'connected',
-      disk: {
-        free: `${(diskusage.checkSync('/').free / 1024 / 1024).toFixed(2)} MB`,
-        total: `${(diskusage.checkSync('/').total / 1024 / 1024).toFixed(2)} MB`
-      },
       load: os.loadavg()
     },
     environment: process.env.NODE_ENV || 'development'
