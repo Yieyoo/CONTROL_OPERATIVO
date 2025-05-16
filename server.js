@@ -395,60 +395,101 @@ router.post('/upload', authenticate, (req, res, next) => {
 });
 
 // Eliminar archivo - Versión optimizada con verificación
+// Eliminar la caché después de una eliminación exitosa
 router.delete('/delete', authenticate, async (req, res, next) => {
+    // Validación más robusta del cuerpo de la petición
+    const { public_id, estado, tipo_documento } = req.body;
+
+    // Validación completa de parámetros
+    if (!public_id || !estado || !tipo_documento) {
+        console.error('Missing required parameters:', { public_id, estado, tipo_documento });
+        return next(new AppError('Todos los parámetros (public_id, estado, tipo_documento) son requeridos', 400, 'missing_parameters'));
+    }
+
+    // Validación de estructura del public_id
+    const expectedPrefix = `${estado}/${tipo_documento}/`;
+    if (!public_id.startsWith(expectedPrefix)) {
+        console.error('Public ID mismatch:', { public_id, expectedPrefix });
+        return next(new AppError('El public_id no coincide con el estado y tipo de documento', 400, 'id_mismatch'));
+    }
+
     try {
-        console.log('DELETE Request Body:', req.body); // Log del cuerpo
-        
-        const { public_id, estado, tipo_documento } = req.body;
-
-        if (!public_id) {
-            console.error('Missing public_id in request');
-            throw new AppError('public_id es requerido', 400, 'missing_public_id');
-        }
-
-        console.log('Attempting to delete:', public_id);
-        
-        // Verificar que el archivo existe
+        // Verificación de existencia del archivo con timeout
         try {
-            await cloudinary.api.resource(public_id, { resource_type: 'raw' });
-            console.log('File exists, proceeding with deletion');
+            await Promise.race([
+                cloudinary.api.resource(public_id, { resource_type: 'raw' }),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout al verificar recurso')), 5000)
+                )
+            ]);
+            console.log(`File verified: ${public_id}`);
         } catch (error) {
-            console.error('Cloudinary resource check failed:', error);
-            if (error.http_code === 404) {
-                throw new AppError('Archivo no encontrado', 404, 'not_found');
+            if (error.http_code === 404 || error.message.includes('not found')) {
+                console.warn(`File not found: ${public_id}`);
+                return next(new AppError('El archivo no existe o ya fue eliminado', 404, 'not_found'));
             }
-            throw error;
+            console.error('Error verifying file:', error);
+            throw new AppError(`Error al verificar el archivo: ${error.message}`, 500, 'verification_error');
         }
 
-        const result = await cloudinary.uploader.destroy(public_id, {
-            resource_type: 'raw',
-            invalidate: true
-        });
-
-        console.log('Cloudinary deletion result:', result);
+        // Eliminación con manejo de timeout
+        const result = await Promise.race([
+            cloudinary.uploader.destroy(public_id, {
+                resource_type: 'raw',
+                invalidate: true,
+                type: 'upload'
+            }),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Timeout al eliminar recurso')), 10000)
+            )
+        ]);
 
         if (result.result !== 'ok') {
-            console.error('Cloudinary returned non-ok result:', result);
-            throw new AppError('Error al eliminar el archivo', 500, 'delete_failed');
+            console.error('Cloudinary deletion failed:', result);
+            throw new AppError('Error al eliminar el archivo en Cloudinary', 502, 'cloudinary_error');
         }
 
+        // Limpieza de caché con verificación
+        const cacheKey = `${estado}:${tipo_documento}`;
+        if (listFilesCache.has(cacheKey)) {
+            listFilesCache.delete(cacheKey);
+            console.log(`Cache invalidated for ${cacheKey}`);
+        }
+
+        // Respuesta detallada
         res.json({
             status: 'success',
-            message: 'Archivo eliminado',
+            message: 'Archivo eliminado exitosamente',
             data: {
-                public_id: public_id,
-                estado: estado,
-                tipo_documento: tipo_documento,
+                public_id,
+                estado,
+                tipo_documento,
                 deleted_at: new Date().toISOString(),
-                deletion_result: result
+                cloudinary_result: result
+            },
+            metadata: {
+                cache_invalidated: listFilesCache.has(cacheKey) ? false : true,
+                timestamp: Date.now()
             }
         });
+
     } catch (error) {
-        console.error('Error in DELETE /delete:', error);
+        console.error('Error in DELETE operation:', {
+            error: error.message,
+            stack: error.stack,
+            public_id,
+            estado,
+            tipo_documento
+        });
+        
+        if (error.message.includes('Timeout')) {
+            error.statusCode = 504;
+            error.errorCode = 'timeout_error';
+        }
+        
         next(error);
     }
 });
-
 // Listar archivos - Versión con paginación y caché
 const listFilesCache = new Map();
 const CACHE_TTL = 60000; // 1 minuto
