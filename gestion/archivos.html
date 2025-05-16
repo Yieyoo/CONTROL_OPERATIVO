@@ -392,35 +392,40 @@
         }
 
         // Eliminar archivo
-        async function eliminarArchivo(publicId, estado, tipoDocumento) {
-            showLoading(true);
-            try {
-                const response = await fetch(`${BACKEND_URL}/delete`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
-                    },
-                    body: JSON.stringify({
-                        public_id: publicId,
-                        estado: estado,
-                        tipo_documento: tipoDocumento
-                    })
-                });
-                
-                if (!response.ok) throw new Error('Error al eliminar');
-                
-                showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado');
-                await cargarListaArchivos();
-                mostrarPdf('');
-                
-            } catch (error) {
-                console.error('Error al eliminar:', error);
-                showStatus(document.getElementById('deleteStatus'), error.message, true);
-            } finally {
-                showLoading(false);
-            }
+   async function eliminarArchivo(publicId, estado, tipoDocumento) {
+    showLoading(true);
+    try {
+        const response = await fetch(`${BACKEND_URL}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': API_KEY
+            },
+            body: JSON.stringify({
+                public_id: publicId,
+                estado: estado,
+                tipo_documento: tipoDocumento
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al eliminar');
         }
+        
+        const result = await response.json();
+        showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado');
+        await cargarListaArchivos();
+        mostrarPdf('');
+        
+    } catch (error) {
+        console.error('Error al eliminar:', error);
+        showStatus(document.getElementById('deleteStatus'), 
+                  `Error al eliminar: ${error.message}`, true);
+    } finally {
+        showLoading(false);
+    }
+}
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', async () => {
