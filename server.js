@@ -235,32 +235,32 @@ class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
-
+// Reemplaza tu handleError con esta versión mejorada
 const handleError = (error, req, res, next) => {
   const statusCode = error.statusCode || 500;
   const errorCode = error.errorCode || 'server_error';
   
   console.error(`🔴 [${new Date().toISOString()}] Error ${statusCode}:`, {
     message: error.message,
-    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+    stack: error.stack, // Asegúrate de mostrar el stack trace
     path: req.path,
     method: req.method,
-    ip: req.ip
+    ip: req.ip,
+    body: req.body, // Agrega el cuerpo de la petición
+    headers: req.headers // Agrega los headers relevantes
   });
-
-  if (process.env.NODE_ENV === 'production' && !error.isOperational) {
-    return res.status(500).json({
-      status: 'error',
-      error: 'server_error',
-      message: 'Algo salió mal en el servidor'
-    });
-  }
 
   res.status(statusCode).json({
     status: 'error',
     error: errorCode,
-    message: error.message,
-    ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+    message: error.message || 'Error interno del servidor',
+    ...(process.env.NODE_ENV === 'development' && { 
+      stack: error.stack,
+      details: {
+        body: req.body,
+        params: req.params
+      }
+    })
   });
 };
 
@@ -396,52 +396,57 @@ router.post('/upload', authenticate, (req, res, next) => {
 
 // Eliminar archivo - Versión optimizada con verificación
 router.delete('/delete', authenticate, async (req, res, next) => {
-  try {
-    const { public_id, estado, tipo_documento } = req.body;
-
-    if (!public_id) {
-      throw new AppError('public_id es requerido', 400, 'missing_public_id');
-    }
-
-    // Verificación avanzada de la estructura del public_id
-    const expectedPrefix = `${estado}/${tipo_documento}/`;
-    if (estado && tipo_documento && !public_id.startsWith(expectedPrefix)) {
-      throw new AppError('No tienes permiso para eliminar este archivo', 403, 'forbidden');
-    }
-
-    // Verificar que el archivo existe antes de intentar borrarlo
     try {
-      await cloudinary.api.resource(public_id, { resource_type: 'raw' });
+        console.log('DELETE Request Body:', req.body); // Log del cuerpo
+        
+        const { public_id, estado, tipo_documento } = req.body;
+
+        if (!public_id) {
+            console.error('Missing public_id in request');
+            throw new AppError('public_id es requerido', 400, 'missing_public_id');
+        }
+
+        console.log('Attempting to delete:', public_id);
+        
+        // Verificar que el archivo existe
+        try {
+            await cloudinary.api.resource(public_id, { resource_type: 'raw' });
+            console.log('File exists, proceeding with deletion');
+        } catch (error) {
+            console.error('Cloudinary resource check failed:', error);
+            if (error.http_code === 404) {
+                throw new AppError('Archivo no encontrado', 404, 'not_found');
+            }
+            throw error;
+        }
+
+        const result = await cloudinary.uploader.destroy(public_id, {
+            resource_type: 'raw',
+            invalidate: true
+        });
+
+        console.log('Cloudinary deletion result:', result);
+
+        if (result.result !== 'ok') {
+            console.error('Cloudinary returned non-ok result:', result);
+            throw new AppError('Error al eliminar el archivo', 500, 'delete_failed');
+        }
+
+        res.json({
+            status: 'success',
+            message: 'Archivo eliminado',
+            data: {
+                public_id: public_id,
+                estado: estado,
+                tipo_documento: tipo_documento,
+                deleted_at: new Date().toISOString(),
+                deletion_result: result
+            }
+        });
     } catch (error) {
-      if (error.http_code === 404) {
-        throw new AppError('Archivo no encontrado', 404, 'not_found');
-      }
-      throw error;
+        console.error('Error in DELETE /delete:', error);
+        next(error);
     }
-
-    const result = await cloudinary.uploader.destroy(public_id, {
-      resource_type: 'raw',
-      invalidate: true
-    });
-
-    if (result.result !== 'ok') {
-      throw new AppError('Error al eliminar el archivo', 500, 'delete_failed');
-    }
-
-    res.json({
-      status: 'success',
-      message: 'Archivo eliminado',
-      data: {
-        public_id: public_id,
-        estado: estado,
-        tipo_documento: tipo_documento,
-        deleted_at: new Date().toISOString(),
-        deletion_result: result
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
 });
 
 // Listar archivos - Versión con paginación y caché
