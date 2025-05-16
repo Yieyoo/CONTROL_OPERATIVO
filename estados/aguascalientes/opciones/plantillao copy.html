@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL</title>
+    <title>PLANTILLA DE PERSONAL - Aguascalientes</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
     <!-- Agregamos axios para las peticiones HTTP -->
@@ -89,9 +89,9 @@
         <h1>Plantilla de Personal - Aguascalientes</h1>
     </div>
     
-    <!-- Contenedor del PDF desde Cloudinary -->
+    <!-- Contenedor del PDF -->
     <div class="pdf-container">
-        <iframe id="cloudinary-pdf-viewer" class="pdf-embed" frameborder="0"></iframe>
+        <iframe id="pdf-viewer" class="pdf-embed" frameborder="0"></iframe>
     </div>
 
     <!-- Mensaje de estado -->
@@ -106,70 +106,53 @@
 
     <!-- Scripts -->
     <script>
-        // Configuración de Cloudinary
-        const CLOUDINARY_BASE_URL = 'https://res.cloudinary.com';
-        const CLOUD_NAME = 'tu_cloud_name'; // Reemplaza con tu cloud name de Cloudinary
-        const API_KEY = 'tu_api_key'; // Reemplaza con tu API key
-        const FOLDER_PATH = 'aguascalientes/plantilla_personal';
+        // Configuración de la aplicación
+        const API_BASE_URL = 'https://control-operativo-1.onrender.com/api';
+        const LOCAL_PDF_PATH = '../../../documentacion/plantillas_personal/aguascp/AC1.pdf';
 
-       async function loadPdfFromCloudinary() {
-    const statusElement = document.getElementById('pdf-status-message');
-    const pdfViewer = document.getElementById('cloudinary-pdf-viewer');
-    
-    try {
-        statusElement.textContent = 'Cargando documento...';
-        statusElement.style.color = '#333';
-        
-        // 1. Verificar si la API está disponible
-        const apiCheck = await axios.get('/api/health');
-        if (apiCheck.data.status !== 'healthy') {
-            throw new Error('API no disponible');
-        }
+        async function loadPDF() {
+            const statusElement = document.getElementById('pdf-status-message');
+            const pdfViewer = document.getElementById('pdf-viewer');
+            
+            try {
+                statusElement.textContent = 'Cargando documento...';
+                statusElement.style.color = '#333';
+                
+                // Intento 1: Cargar desde la API
+                const response = await axios.get(`${API_BASE_URL}/archivos/aguascalientes`, {
+                    timeout: 5000 // 5 segundos de timeout
+                });
 
-        // 2. Obtener lista de archivos
-        const response = await axios.get(`/api/archivos/aguascalientes/plantilla_personal`, {
-            headers: {
-                'x-api-key': API_KEY,
-                'Content-Type': 'application/json'
+                if (response.data && response.data.url) {
+                    // Si la API devuelve una URL directa al PDF
+                    pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(response.data.url)}&embedded=true`;
+                    statusElement.textContent = '';
+                } else {
+                    throw new Error('La API no devolvió un PDF válido');
+                }
+            } catch (error) {
+                console.error('Error al cargar desde la API:', error);
+                
+                // Mostrar mensaje de error apropiado
+                let errorMessage = 'Error al cargar el documento desde el servidor';
+                
+                if (error.response) {
+                    if (error.response.status === 404) {
+                        errorMessage = 'Documento no encontrado en el servidor';
+                    } else if (error.response.status === 401) {
+                        errorMessage = 'No autorizado para acceder al documento';
+                    }
+                } else if (error.code === 'ECONNABORTED') {
+                    errorMessage = 'Tiempo de espera agotado al conectar con el servidor';
+                }
+                
+                statusElement.textContent = `${errorMessage}. Cargando versión local...`;
+                statusElement.style.color = '#d9534f';
+                
+                // Cargar PDF local como respaldo
+                pdfViewer.src = LOCAL_PDF_PATH;
             }
-        });
-
-        if (!response.data.data || response.data.data.length === 0) {
-            throw new Error('No se encontraron archivos en Cloudinary');
         }
-
-        // 3. Tomar el primer PDF encontrado
-        const pdfFile = response.data.data[0];
-        const pdfUrl = pdfFile.url;
-        
-        // 4. Cargar el PDF en el visor
-        pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
-        statusElement.textContent = '';
-
-    } catch (error) {
-        console.error('Error al cargar el PDF:', error);
-        
-        // Mostrar mensaje de error detallado
-        let errorMessage = 'Error al cargar el documento';
-        
-        if (error.response) {
-            // Error de la API
-            if (error.response.status === 404) {
-                errorMessage = 'La ruta del API no fue encontrada (404)';
-            } else if (error.response.status === 401) {
-                errorMessage = 'No autorizado - verifica tu API key';
-            }
-        } else if (error.message.includes('No se encontraron archivos')) {
-            errorMessage = 'No hay documentos en la carpeta de Aguascalientes';
-        }
-        
-        statusElement.textContent = `${errorMessage}. Cargando versión local...`;
-        statusElement.style.color = '#d9534f';
-        
-        // Cargar PDF local como respaldo
-        pdfViewer.src = "../../../documentacion/plantillas_personal/aguascp/AC1.pdf";
-    }
-}
 
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
@@ -224,7 +207,7 @@
         });
 
         // Cargar el PDF cuando la página esté lista
-        document.addEventListener('DOMContentLoaded', loadPdfFromCloudinary);
+        document.addEventListener('DOMContentLoaded', loadPDF);
     </script>
 </body>
 </html>
