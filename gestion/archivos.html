@@ -382,51 +382,119 @@
             });
 
             document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    if (confirm('¿Eliminar este archivo?')) {
-                        eliminarArchivo(btn.dataset.id, currentCarpeta, currentTipoDocumento);
+                    if (confirm('¿Eliminar este archivo permanentemente?')) {
+                        await eliminarArchivo(
+                            btn.dataset.id, 
+                            currentCarpeta, 
+                            currentTipoDocumento
+                        );
+                        // Limpiar el visor PDF si se estaba mostrando este archivo
+                        const iframeSrc = document.getElementById('pdf-iframe').src;
+                        if (iframeSrc.includes(btn.dataset.id)) {
+                            mostrarPdf('');
+                        }
                     }
                 });
             });
-        }
+        } // <-- Cierre de la función renderizarListaArchivos
 
         // Eliminar archivo
    async function eliminarArchivo(publicId, estado, tipoDocumento) {
     showLoading(true);
     try {
+        // 1. Validación básica de parámetros
+        if (!publicId || !estado || !tipoDocumento) {
+            throw new Error('Datos incompletos para la eliminación');
+        }
+
+        // 2. Configurar la petición con timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
+
         const response = await fetch(`${BACKEND_URL}/delete`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': API_KEY
+                'x-api-key': API_KEY,
+                'Cache-Control': 'no-cache'
             },
             body: JSON.stringify({
                 public_id: publicId,
                 estado: estado,
                 tipo_documento: tipoDocumento
-            })
+            }),
+            signal: controller.signal
         });
         
+        clearTimeout(timeoutId);
+
+        // 3. Manejo de respuestas no exitosas
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error al eliminar');
+            let errorMsg = 'Error al eliminar';
+            try {
+                const errorData = await response.json();
+                errorMsg = errorData.message || errorMsg;
+                
+                // Manejo especial para errores 404 (no encontrado)
+                if (response.status === 404) {
+                    errorMsg = 'El archivo ya fue eliminado o no existe';
+                }
+            } catch (e) {
+                console.error('Error parsing error response:', e);
+            }
+            throw new Error(errorMsg);
         }
         
+        // 4. Procesar respuesta exitosa
         const result = await response.json();
-        showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado');
-        await cargarListaArchivos();
-        mostrarPdf('');
+        
+        // 5. Actualizar UI y forzar recarga sin caché
+        showStatus(
+            document.getElementById('deleteStatus'), 
+            '✓ Archivo eliminado correctamente', 
+            false
+        );
+        
+        // Forzar recarga limpia de la lista
+        await cargarListaArchivos(true);
+        
+        // Cerrar el visor PDF si estaba abierto
+        if (document.getElementById('pdf-iframe').src.includes(publicId)) {
+            mostrarPdf('');
+        }
+        
+        // Opcional: Mostrar notificación toast
+        mostrarNotificacion('success', 'Archivo eliminado con éxito');
         
     } catch (error) {
-        console.error('Error al eliminar:', error);
-        showStatus(document.getElementById('deleteStatus'), 
-                  `Error al eliminar: ${error.message}`, true);
+        console.error('Error en eliminarArchivo:', {
+            error: error.message,
+            publicId,
+            estado,
+            tipoDocumento
+        });
+        
+        // Manejo especial para timeout
+        if (error.name === 'AbortError') {
+            showStatus(
+                document.getElementById('deleteStatus'),
+                '⚠️ Tiempo de espera agotado. Intente nuevamente',
+                true
+            );
+        } else {
+            showStatus(
+                document.getElementById('deleteStatus'), 
+                `❌ ${error.message || 'Error al eliminar el archivo'}`,
+                true
+            );
+        }
+        
     } finally {
         showLoading(false);
     }
 }
-
         // Inicialización
         document.addEventListener('DOMContentLoaded', async () => {
             // Configurar eventos de los filtros
