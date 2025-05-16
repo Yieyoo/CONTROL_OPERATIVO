@@ -64,17 +64,6 @@
             border-bottom: 1px solid #ddd;
             font-weight: bold;
         }
-
-        /* Estilos para mensajes de estado */
-        .success-message {
-            color: #28a745;
-            font-weight: bold;
-        }
-
-        .error-message {
-            color: #dc3545;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -320,10 +309,7 @@
                     }
                 );
                 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || `Error ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Error ${response.status}`);
                 
                 const { data } = await response.json();
                 renderizarListaArchivos(data || []);
@@ -341,7 +327,7 @@
                 
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
-                showStatus(document.getElementById('uploadStatus'), error.message || 'Error al cargar archivos', true);
+                showStatus(document.getElementById('uploadStatus'), 'Error al cargar archivos', true);
             } finally {
                 showLoading(false);
             }
@@ -405,11 +391,9 @@
             });
         }
 
-        // Eliminar archivo - Versión mejorada con manejo de errores
+        // Eliminar archivo
         async function eliminarArchivo(publicId, estado, tipoDocumento) {
             showLoading(true);
-            const deleteStatus = document.getElementById('deleteStatus');
-            
             try {
                 const response = await fetch(`${BACKEND_URL}/delete`, {
                     method: 'DELETE',
@@ -424,41 +408,15 @@
                     })
                 });
                 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Error al eliminar el archivo');
-                }
+                if (!response.ok) throw new Error('Error al eliminar');
                 
-                const result = await response.json();
-                
-                if (result.success) {
-                    showStatus(deleteStatus, 'Archivo eliminado correctamente');
-                    await cargarListaArchivos();
-                    mostrarPdf('');
-                    
-                    // Actualizar el select de archivos para eliminar
-                    const fileSelect = document.getElementById('fileSelect');
-                    if (fileSelect) {
-                        fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
-                    }
-                } else {
-                    throw new Error(result.message || 'No se pudo eliminar el archivo');
-                }
+                showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado');
+                await cargarListaArchivos();
+                mostrarPdf('');
                 
             } catch (error) {
                 console.error('Error al eliminar:', error);
-                showStatus(deleteStatus, error.message || 'Error al eliminar el archivo', true);
-                
-                // Intento de diagnóstico adicional
-                try {
-                    const cloudinaryResponse = await fetch(`https://res.cloudinary.com/dbl0vo8t4/raw/upload/${publicId}`);
-                    if (cloudinaryResponse.ok) {
-                        console.warn('El archivo todavía existe en Cloudinary');
-                    }
-                } catch (cloudinaryError) {
-                    console.log('El archivo no existe en Cloudinary o hay otro problema');
-                }
-                
+                showStatus(document.getElementById('deleteStatus'), error.message, true);
             } finally {
                 showLoading(false);
             }
@@ -502,10 +460,7 @@
                         body: formData
                     });
                     
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.message || 'Error al subir el archivo');
-                    }
+                    if (!response.ok) throw new Error('Error al subir');
                     
                     showStatus(uploadStatus, 'Archivo subido correctamente');
                     await cargarListaArchivos();
