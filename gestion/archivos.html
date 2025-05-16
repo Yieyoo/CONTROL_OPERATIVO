@@ -227,11 +227,6 @@
 
         <!-- Eliminar archivo -->
         <div class="delete-file">
-            <h3>Eliminar archivo</h3>
-            <select id="fileSelect">
-                <option value="">Selecciona un archivo para eliminar</option>
-            </select>
-            <button id="deleteFileButton">Eliminar</button>
             <p id="deleteStatus"></p>
         </div>
     </div>
@@ -428,7 +423,7 @@
                 
                 if (!response.ok) throw new Error('Error al eliminar');
                 
-                showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado y caché invalidado');
+                showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado y caché Vacio');
                 await cargarListaArchivos();
                 mostrarPdf('');
                 
