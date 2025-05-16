@@ -6,6 +6,8 @@
     <title>PLANTILLA DE PERSONAL</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <!-- Agregamos axios para las peticiones HTTP -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <!-- Fondo oscuro para el menú -->
@@ -84,33 +86,76 @@
     </div>
     
     <div class="header-container qna">
-        <h1></h1>
+        <h1>Plantilla de Personal - Aguascalientes</h1>
     </div>
     
-    
-
-    <!-- Contenedor del PDF -->
+    <!-- Contenedor del PDF desde Cloudinary -->
     <div class="pdf-container">
-        <!-- Usando solo el iframe para mostrar el PDF -->
-        <iframe 
-    src="../../../documentacion/plantillas_personal/aguascp/AC1.pdf" 
-    class="pdf-embed"
-    frameborder="0"
-></iframe>
-
+        <iframe id="cloudinary-pdf-viewer" class="pdf-embed" frameborder="0"></iframe>
     </div>
 
-    <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
-    <div class="mobile-images">
-        <img src="../../../documentacion/plantillas_personal/aguascp/AC1_page-0001.jpg" alt="Imagen 1">
-        <img src="../../../documentacion/plantillas_personal/aguascp/AC1_page-0002.jpg" alt="Imagen 2">
+    <!-- Mensaje de estado -->
+    <div id="pdf-status-message" class="status-message"></div>
 
+    <!-- Contenedor de imágenes solo visible en dispositivos móviles (opcional) -->
+    <div class="mobile-images" id="mobile-images-container">
+        <!-- Las imágenes se cargarán dinámicamente -->
     </div>
 
     <button class="regresar-btn">Regresar</button>
 
     <!-- Scripts -->
     <script>
+        // Configuración de Cloudinary
+        const CLOUDINARY_BASE_URL = 'https://res.cloudinary.com';
+        const CLOUD_NAME = 'tu_cloud_name'; // Reemplaza con tu cloud name de Cloudinary
+        const API_KEY = 'tu_api_key'; // Reemplaza con tu API key
+        const FOLDER_PATH = 'aguascalientes/plantilla_personal';
+
+        // Función para cargar el PDF desde Cloudinary
+        async function loadPdfFromCloudinary() {
+            const statusElement = document.getElementById('pdf-status-message');
+            const pdfViewer = document.getElementById('cloudinary-pdf-viewer');
+            const mobileContainer = document.getElementById('mobile-images-container');
+            
+            try {
+                statusElement.textContent = 'Cargando documento...';
+                
+                // 1. Obtener lista de archivos de la carpeta en Cloudinary
+                const response = await axios.get(`/api/archivos/${FOLDER_PATH.split('/')[0]}/${FOLDER_PATH.split('/')[1]}`, {
+                    headers: {
+                        'x-api-key': API_KEY
+                    }
+                });
+                
+                if (response.data.data && response.data.data.length > 0) {
+                    // 2. Tomar el primer PDF encontrado
+                    const pdfFile = response.data.data[0];
+                    const pdfUrl = pdfFile.url;
+                    
+                    // 3. Cargar el PDF en el visor
+                    pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+                    statusElement.textContent = '';
+                    
+                    // 4. Para móviles: cargar imágenes (opcional)
+                    if (window.innerWidth <= 768) {
+                        mobileContainer.innerHTML = `
+                            <img src="${pdfUrl.replace('/upload/', '/upload/w_500/')}_page-0001.jpg" alt="Página 1">
+                            <img src="${pdfUrl.replace('/upload/', '/upload/w_500/')}_page-0002.jpg" alt="Página 2">
+                        `;
+                    }
+                } else {
+                    statusElement.textContent = 'No se encontraron archivos PDF en la carpeta.';
+                }
+            } catch (error) {
+                console.error('Error al cargar el PDF:', error);
+                statusElement.textContent = 'Error al cargar el documento. Por favor intenta más tarde.';
+                
+                // Mostrar PDF local como respaldo
+                pdfViewer.src = "../../../documentacion/plantillas_personal/aguascp/AC1.pdf";
+            }
+        }
+
         // Función para abrir y cerrar el menú lateral
         function toggleMenu() {
             const menu = document.querySelector('.menu');
@@ -162,6 +207,9 @@
         document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
+
+        // Cargar el PDF cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', loadPdfFromCloudinary);
     </script>
 </body>
 </html>
