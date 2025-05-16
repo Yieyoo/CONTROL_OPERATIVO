@@ -97,11 +97,6 @@
     <!-- Mensaje de estado -->
     <div id="pdf-status-message" class="status-message"></div>
 
-    <!-- Contenedor de imágenes solo visible en dispositivos móviles (opcional) -->
-    <div class="mobile-images" id="mobile-images-container">
-        <!-- Las imágenes se cargarán dinámicamente -->
-    </div>
-
     <button class="regresar-btn">Regresar</button>
 
     <!-- Scripts -->
@@ -109,6 +104,7 @@
         // Configuración de la aplicación
         const API_BASE_URL = 'https://control-operativo-1.onrender.com/api';
         const LOCAL_PDF_PATH = '../../../documentacion/plantillas_personal/aguascp/AC1.pdf';
+        const TIPO_DOCUMENTO = 'plantilla_personal'; // Tipo de documento específico
 
         async function loadPDF() {
             const statusElement = document.getElementById('pdf-status-message');
@@ -118,15 +114,28 @@
                 statusElement.textContent = 'Cargando documento...';
                 statusElement.style.color = '#333';
                 
-                // Intento 1: Cargar desde la API
-                const response = await axios.get(`${API_BASE_URL}/archivos/aguascalientes`, {
-                    timeout: 5000 // 5 segundos de timeout
+                // Intento 1: Cargar desde la API con tipo de documento
+                const response = await axios.get(`${API_BASE_URL}/archivos/aguascalientes/${TIPO_DOCUMENTO}`, {
+                    timeout: 5000, // 5 segundos de timeout
+                    headers: {
+                        'Cache-Control': 'no-cache', // Evitar caché
+                        'Pragma': 'no-cache'
+                    }
                 });
 
                 if (response.data && response.data.url) {
-                    // Si la API devuelve una URL directa al PDF
-                    pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(response.data.url)}&embedded=true`;
+                    // Usar el visor de Google o mostrar directamente
+                    const pdfUrl = response.data.url;
+                    
+                    // Opción 1: Usar visor de Google
+                    // pdfViewer.src = `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
+                    
+                    // Opción 2: Mostrar directamente (mejor para móviles)
+                    pdfViewer.src = pdfUrl;
+                    
                     statusElement.textContent = '';
+                } else if (response.data && response.data.error) {
+                    throw new Error(response.data.error);
                 } else {
                     throw new Error('La API no devolvió un PDF válido');
                 }
@@ -141,16 +150,37 @@
                         errorMessage = 'Documento no encontrado en el servidor';
                     } else if (error.response.status === 401) {
                         errorMessage = 'No autorizado para acceder al documento';
+                    } else if (error.response.data && error.response.data.message) {
+                        errorMessage = error.response.data.message;
                     }
                 } else if (error.code === 'ECONNABORTED') {
                     errorMessage = 'Tiempo de espera agotado al conectar con el servidor';
+                } else if (error.message) {
+                    errorMessage = error.message;
                 }
                 
                 statusElement.textContent = `${errorMessage}. Cargando versión local...`;
                 statusElement.style.color = '#d9534f';
                 
                 // Cargar PDF local como respaldo
-                pdfViewer.src = LOCAL_PDF_PATH;
+                try {
+                    pdfViewer.src = LOCAL_PDF_PATH;
+                    // Verificar si el PDF local se carga correctamente
+                    pdfViewer.onload = function() {
+                        statusElement.textContent = 'Documento local cargado correctamente';
+                        statusElement.style.color = '#28a745';
+                        setTimeout(() => {
+                            statusElement.textContent = '';
+                        }, 3000);
+                    };
+                    pdfViewer.onerror = function() {
+                        statusElement.textContent = 'Error al cargar el documento local';
+                        statusElement.style.color = '#dc3545';
+                    };
+                } catch (localError) {
+                    console.error('Error al cargar PDF local:', localError);
+                    statusElement.textContent = 'Error al cargar ambas versiones del documento';
+                }
             }
         }
 
@@ -208,6 +238,9 @@
 
         // Cargar el PDF cuando la página esté lista
         document.addEventListener('DOMContentLoaded', loadPDF);
+
+        // Recargar cada 5 minutos para mantener actualizado
+        setInterval(loadPDF, 300000);
     </script>
 </body>
 </html>
