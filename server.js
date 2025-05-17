@@ -381,7 +381,7 @@ router.post('/upload', authenticate, (req, res, next) => {
         }
         throw new AppError(err.message, 400, 'upload_error');
       }
-
+ñ
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
       const result = await processUpload(req.file, estado, tipoDocumento);
