@@ -52,25 +52,33 @@ app.use(morgan('combined', {
 
 app.set('trust proxy', 1);
 
-// 2. Configuración CORS Mejorada
+// 2. Configuración CORS Mejorada - Versión Final
 const allowedOrigins = [
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
   'http://localhost:3000',
-  'http://localhost'
+  'http://localhost',
+  'https://control-operativo-1.onrender.com'
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Permitir solicitudes sin origen (como curl, Postman) en desarrollo
     if (!origin && process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
     
-    if (allowedOrigins.includes(origin) || (process.env.NODE_ENV === 'development' && !origin)) {
+    // Permitir solicitudes del mismo dominio (Render)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.includes(origin) || 
+        (process.env.NODE_ENV === 'development' && !origin)) {
       callback(null, true);
     } else {
-      console.error('Origen no permitido por CORS:', origin);
-      callback(new Error('Acceso no permitido por CORS'));
+      console.log('Origen bloqueado:', origin);
+      callback(new Error('Not allowed by CORS'), false);
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -80,23 +88,22 @@ const corsOptions = {
   maxAge: 86400
 };
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-
-// 3. Middleware para manejar preflight requests
-app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400');
-    return res.status(200).json({});
-  }
-  next();
+// 3. Configuración especial para el endpoint raíz
+app.get('/', cors({ origin: '*' }), (req, res) => {
+  res.json({
+    status: 'success',
+    message: 'API de Gestión de Archivos PDF - INM',
+    version: '1.1.0'
+  });
 });
 
-// 4. Middlewares para parsear el cuerpo de las peticiones
+// 4. Aplicar CORS configurado a todas las rutas /api
+app.use('/api', cors(corsOptions));
+
+// 5. Middleware para manejar preflight requests globalmente
+app.options('*', cors(corsOptions));
+
+// 6. Middlewares para parsear el cuerpo de las peticiones
 app.use(express.json({
   limit: '10mb',
   inflate: true,
@@ -111,7 +118,7 @@ app.use(express.urlencoded({
   inflate: true
 }));
 
-// 5. Configuración de Cloudinary (igual que antes)
+// 7. Configuración de Cloudinary
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
@@ -144,7 +151,7 @@ const validateCloudinaryConfig = () => {
 
 validateCloudinaryConfig();
 
-// 6. Rate Limiting (igual que antes)
+// 8. Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: process.env.NODE_ENV === 'production' ? 100 : 1000,
@@ -163,7 +170,7 @@ const apiLimiter = rateLimit({
   }
 });
 
-// 7. Configuración de Multer para PDFs (igual que antes)
+// 9. Configuración de Multer para PDFs
 const memoryStorage = multer.memoryStorage();
 const pdfUpload = multer({
   storage: memoryStorage,
@@ -186,7 +193,7 @@ const pdfUpload = multer({
   }
 }).single('file');
 
-// 8. Compresión GZIP (igual que antes)
+// 10. Compresión GZIP
 const shouldCompress = (req, res) => {
   if (req.headers['x-no-compression']) return false;
   return /json|text|javascript|pdf/.test(res.getHeader('Content-Type'));
@@ -198,7 +205,7 @@ app.use(require('compression')({
   filter: shouldCompress
 }));
 
-// 9. Cache-Control (igual que antes)
+// 11. Cache-Control
 const setCacheControl = (req, res, next) => {
   const cacheTime = 86400;
   if (req.method === 'GET') {
@@ -211,7 +218,7 @@ const setCacheControl = (req, res, next) => {
 
 app.use(setCacheControl);
 
-// 10. Middleware de autenticación (igual que antes)
+// 12. Middleware de autenticación
 const authenticate = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
   
@@ -240,7 +247,7 @@ const authenticate = (req, res, next) => {
   next();
 };
 
-// 11. Manejo de errores (igual que antes)
+// 13. Manejo de errores
 class AppError extends Error {
   constructor(message, statusCode, errorCode) {
     super(message);
@@ -271,7 +278,7 @@ const handleError = (error, req, res, next) => {
   });
 };
 
-// 12. Rutas API
+// 14. Rutas API
 const router = express.Router();
 
 // Ruta de salud
@@ -283,7 +290,15 @@ router.get('/health', async (req, res) => {
     checks: {
       memoryUsage: process.memoryUsage(),
       cloudinary: 'active',
-      database: 'n/a'
+      database: 'n/a',
+      diskSpace: {
+        free: promisify(fs.statfs || (() => {}))('/')
+          .then(stats => stats.bfree * stats.bsize)
+          .catch(() => 'n/a'),
+        total: promisify(fs.statfs || (() => {}))('/')
+          .then(stats => stats.blocks * stats.bsize)
+          .catch(() => 'n/a')
+      }
     }
   };
 
@@ -317,6 +332,7 @@ const processUpload = async (file, estado, tipoDocumento) => {
     format: 'pdf',
     type: 'upload',
     access_mode: 'public',
+    transformation: [{ quality: 'auto', fetch_format: 'auto' }],
     filename_override: originalName,
     unique_filename: false,
     overwrite: true,
@@ -328,6 +344,13 @@ const processUpload = async (file, estado, tipoDocumento) => {
         tipo_documento: tipoDocumento,
         uploaded_by: 'api'
       }
+    },
+    responsive_breakpoints: {
+      create_derived: false,
+      bytes_step: 20000,
+      min_width: 200,
+      max_width: 1000,
+      transformation: { crop: 'limit' }
     }
   };
 
@@ -371,8 +394,13 @@ router.post('/upload', authenticate, (req, res, next) => {
           filename: result.original_filename,
           estado: estado,
           tipo_documento: tipoDocumento,
+          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
+          download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
           uploaded_at: result.created_at,
-          size: result.bytes
+          size: result.bytes,
+          pages: result.pages,
+          format: result.format,
+          etag: result.etag
         }
       });
     } catch (error) {
@@ -381,51 +409,29 @@ router.post('/upload', authenticate, (req, res, next) => {
   });
 });
 
-// Ruta para listar archivos
-router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
-  try {
-    const estado = req.params.estado;
-    const tipoDocumento = req.params.tipoDocumento;
-
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: `${estado}/${tipoDocumento}/`,
-      resource_type: 'raw',
-      max_results: 500
-    });
-
-    const archivos = result.resources.map(resource => ({
-      url: resource.secure_url,
-      public_id: resource.public_id,
-      filename: path.parse(resource.public_id).name + '.pdf',
-      estado: estado,
-      tipo_documento: tipoDocumento,
-      uploaded_at: resource.created_at,
-      size: resource.bytes
-    }));
-
-    // Añadir headers CORS manualmente
-    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    
-    res.json({
-      status: 'success',
-      data: archivos,
-      count: archivos.length
-    });
-
-  } catch (error) {
-    next(error);
-  }
-});
-
 // Ruta para eliminar archivos
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
-    const { public_id } = req.body;
+    const { public_id, estado, tipo_documento } = req.body;
     
     if (!public_id) {
       throw new AppError('public_id es requerido', 400, 'missing_public_id');
+    }
+
+    // Verificación de la estructura del public_id
+    const expectedPrefix = `${estado}/${tipo_documento}/`;
+    if (estado && tipo_documento && !public_id.startsWith(expectedPrefix)) {
+      throw new AppError('No tienes permiso para eliminar este archivo', 403, 'forbidden');
+    }
+
+    // Verificar que el archivo existe
+    try {
+      await cloudinary.api.resource(public_id, { resource_type: 'raw' });
+    } catch (error) {
+      if (error.http_code === 404) {
+        throw new AppError('Archivo no encontrado', 404, 'not_found');
+      }
+      throw error;
     }
 
     const result = await cloudinary.uploader.destroy(public_id, {
@@ -442,9 +448,70 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       message: 'Archivo eliminado',
       data: {
         public_id: public_id,
-        deleted_at: new Date().toISOString()
+        estado: estado,
+        tipo_documento: tipo_documento,
+        deleted_at: new Date().toISOString(),
+        deletion_result: result
       }
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Ruta para listar archivos
+router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
+  try {
+    const estado = req.params.estado || 'aguascalientes';
+    const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
+    const cacheKey = `${estado}:${tipoDocumento}`;
+
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: `${estado}/${tipoDocumento}/`,
+      resource_type: 'raw',
+      max_results: 500,
+      context: true,
+      tags: true,
+      moderations: true
+    });
+
+    const archivos = result.resources.map(resource => {
+      const originalName = resource.context?.custom?.original_filename || 
+                         path.parse(resource.public_id).name + '.pdf';
+      return {
+        url: resource.secure_url,
+        public_id: resource.public_id,
+        filename: originalName,
+        estado: estado,
+        tipo_documento: tipoDocumento,
+        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
+        download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
+        uploaded_at: resource.created_at,
+        size: resource.bytes,
+        format: resource.format,
+        width: resource.width,
+        height: resource.height,
+        etag: resource.etag,
+        tags: resource.tags,
+        moderation: resource.moderation
+      };
+    });
+
+    const responseData = {
+      status: 'success',
+      data: archivos,
+      count: archivos.length,
+      estado: estado,
+      tipo_documento: tipoDocumento,
+      timestamp: new Date().toISOString()
+    };
+
+    // Añadir headers CORS manualmente
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
+    res.json(responseData);
   } catch (error) {
     next(error);
   }
@@ -465,6 +532,7 @@ app.use(handleError);
 const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`🌍 Modo: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✅ CORS configurado para los siguientes orígenes:`, allowedOrigins);
 });
 
 // Manejo de cierre
