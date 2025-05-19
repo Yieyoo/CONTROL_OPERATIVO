@@ -93,27 +93,34 @@
         const TIPO_DOCUMENTO = 'plantilla_personal';
         
         // Función para obtener el título personalizado
-        async function cargarTituloPersonalizado() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-                
-                if (!response.ok) throw new Error('Error al obtener título');
-                
-                const data = await response.json();
-                const tituloContainer = document.getElementById('tituloContainer');
-                
-                if (data.titulo) {
-                    tituloContainer.textContent = data.titulo;
-                } else {
-                    tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
-                }
-            } catch (error) {
-                console.error('Error al cargar título:', error);
-                document.getElementById('tituloContainer').textContent = 'Plantilla de Personal - Aguascalientes';
-            }
+    async function cargarTituloPersonalizado() {
+    const tituloContainer = document.getElementById('tituloContainer');
+    tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes'; // Valor por defecto
+    
+    try {
+        const response = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
+            method: 'GET',
+            headers: { 
+                'x-api-key': API_KEY,
+                'Content-Type': 'application/json'
+            },
+            mode: 'cors'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
+        
+        const data = await response.json();
+        
+        if (data.titulo) {
+            tituloContainer.textContent = data.titulo;
+        }
+    } catch (error) {
+        console.error('Error al cargar título (no crítico):', error);
+        // Mantenemos el valor por defecto si hay error
+    }
+}
 
         // Mostrar/ocultar loading
         function showLoading(show) {
