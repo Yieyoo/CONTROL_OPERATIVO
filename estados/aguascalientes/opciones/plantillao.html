@@ -6,7 +6,6 @@
     <title>PLANTILLA DE PERSONAL - AGUASCALIENTES</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-   
 </head>
 <body>
     <div class="header-container qna">
@@ -206,6 +205,11 @@
                 });
             });
         });
+        const response = await fetch(`${BACKEND_URL}/metadata/${publicId}`, {
+  headers: { 'x-api-key': API_KEY }
+});
+const { metadata } = await response.json();
+console.log(metadata.titulo); // Título descriptivo o null
     </script>
 </body>
 </html>
