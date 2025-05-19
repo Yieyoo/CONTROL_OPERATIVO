@@ -372,6 +372,7 @@ const processUpload = async (file, estado, tipoDocumento) => {
 };
 
 // Ruta para subir archivos
+// Ruta para subir archivos
 router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
     try {
@@ -384,22 +385,60 @@ router.post('/upload', authenticate, (req, res, next) => {
 
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
-      const result = await processUpload(req.file, estado, tipoDocumento);
-      // ... resto del código
+      const titulo = req.body.titulo || 'Plantilla de Personal'; // Nuevo campo
+
+      // Usar el título en el nombre del archivo si es plantilla_personal
+      const nombreArchivo = tipoDocumento === 'plantilla_personal' 
+        ? `${titulo.replace(/ /g, '_')}_${Date.now()}.pdf`
+        : path.parse(req.file.originalname).name.replace(/[^\w- ]/gi, '') + '.pdf';
+
+      const uploadOptions = {
+        resource_type: 'raw',
+        folder: `${estado}/${tipoDocumento}`,
+        filename_override: nombreArchivo,
+        format: 'pdf',
+        type: 'upload',
+        access_mode: 'public',
+        transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+        unique_filename: false,
+        overwrite: true,
+        context: {
+          original_filename: nombreArchivo,
+          uploaded_at: new Date().toISOString(),
+          custom: {
+            estado: estado,
+            tipo_documento: tipoDocumento,
+            titulo: titulo,
+            uploaded_by: 'api'
+          }
+        }
+      };
+
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          uploadOptions,
+          (error, result) => error ? reject(error) : resolve(result)
+        );
+        
+        pipeline(
+          stream.Readable.from(req.file.buffer),
+          uploadStream
+        ).catch(reject);
+      });
 
       res.status(201).json({
         status: 'success',
         data: {
           url: result.secure_url,
           public_id: result.public_id,
-          filename: result.original_filename,
+          filename: nombreArchivo,
           estado: estado,
           tipo_documento: tipoDocumento,
+          titulo: titulo,
           view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
           download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
           uploaded_at: result.created_at,
           size: result.bytes,
-          pages: result.pages,
           format: result.format,
           etag: result.etag
         }
