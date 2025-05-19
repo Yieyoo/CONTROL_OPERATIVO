@@ -95,30 +95,34 @@
         // Función para obtener el título personalizado
     async function cargarTituloPersonalizado() {
     const tituloContainer = document.getElementById('tituloContainer');
-    tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes'; // Valor por defecto
     
     try {
+        console.log('Iniciando solicitud de título...');
         const response = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
-            method: 'GET',
-            headers: { 
-                'x-api-key': API_KEY,
-                'Content-Type': 'application/json'
-            },
-            mode: 'cors'
+            headers: { 'x-api-key': API_KEY }
         });
         
+        console.log('Respuesta recibida:', response);
+        
         if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
+            const errorText = await response.text();
+            throw new Error(`Error ${response.status}: ${errorText}`);
         }
         
         const data = await response.json();
+        console.log('Datos recibidos:', data);
         
         if (data.titulo) {
+            console.log('Título encontrado:', data.titulo);
             tituloContainer.textContent = data.titulo;
+        } else {
+            console.log('No se encontró título personalizado, usando valor por defecto');
+            tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
         }
     } catch (error) {
-        console.error('Error al cargar título (no crítico):', error);
-        // Mantenemos el valor por defecto si hay error
+        console.error('Error al cargar título:', error);
+        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+        tituloContainer.style.color = 'red'; // Para hacer visible que hubo un error
     }
 }
 
