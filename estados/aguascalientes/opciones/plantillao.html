@@ -6,24 +6,37 @@
     <title>PLANTILLA DE PERSONAL - AGUASCALIENTES</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <style>
+        .titulo-personalizado {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 5px solid #1a3e72;
+            font-size: 1.2em;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
     <div class="header-container qna">
         <h1>PLANTILLA DE PERSONAL - AGUASCALIENTES</h1>
     </div>
-    <!-- Fondo oscuro para el menú -->
-    <div class="menu-overlay"></div>
     
-    <!-- Loading spinner -->
+    <!-- Contenedor para el título personalizado -->
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
+    </div>
+    
+    <!-- Resto de tu HTML permanece igual -->
+    <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
 
     <header>
-        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
@@ -32,33 +45,30 @@
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
                         <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="../../../construccion.html">Inmuebles</a></li>
-                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
+                        <li><a href="../../../construccion.html">Padron Vehicular</a></li>
+                        <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
                         <li><a href="../aguascalientesindex.html">Aguascalientes</a></li>
-                        <!-- Otros estados... -->
                     </ul>
                 </li>
             </ul>
         </nav>
     </header>
 
-    <!-- Contenedor de logos -->
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
-    <!-- Contenedor del PDF -->
     <div class="pdf-container">
         <iframe 
             id="pdf-viewer" 
@@ -69,14 +79,12 @@
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Contenedor de imágenes para móviles -->
     <div class="mobile-images">
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
-    <!-- Scripts -->
     <script>
         // Configuración
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
@@ -84,6 +92,29 @@
         const ESTADO_FIJO = 'aguascalientes';
         const TIPO_DOCUMENTO = 'plantilla_personal';
         
+        // Función para obtener el título personalizado
+        async function cargarTituloPersonalizado() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (!response.ok) throw new Error('Error al obtener título');
+                
+                const data = await response.json();
+                const tituloContainer = document.getElementById('tituloContainer');
+                
+                if (data.titulo) {
+                    tituloContainer.textContent = data.titulo;
+                } else {
+                    tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+                }
+            } catch (error) {
+                console.error('Error al cargar título:', error);
+                document.getElementById('tituloContainer').textContent = 'Plantilla de Personal - Aguascalientes';
+            }
+        }
+
         // Mostrar/ocultar loading
         function showLoading(show) {
             document.getElementById('loading').style.display = show ? 'flex' : 'none';
@@ -191,6 +222,9 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
+            // Cargar título personalizado
+            cargarTituloPersonalizado();
+            
             // Cargar PDF al iniciar
             if (document.getElementById('pdf-viewer')) {
                 loadPlantillaPersonal();
@@ -205,11 +239,6 @@
                 });
             });
         });
-        const response = await fetch(`${BACKEND_URL}/metadata/${publicId}`, {
-  headers: { 'x-api-key': API_KEY }
-});
-const { metadata } = await response.json();
-console.log(metadata.titulo); // Título descriptivo o null
     </script>
 </body>
 </html>
