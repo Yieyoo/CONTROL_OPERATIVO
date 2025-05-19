@@ -79,7 +79,7 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'), false);
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Asegúrate de incluir OPTIONS
   allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
   credentials: true,
   optionsSuccessStatus: 200,
