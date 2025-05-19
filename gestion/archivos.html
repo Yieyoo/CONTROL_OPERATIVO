@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+	<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -50,7 +51,7 @@
             height: 600px;
             border: 1px solid #ddd;
             margin-top: 20px;
-            display: none;
+            display: none; /* Oculto inicialmente */
         }
 
         .pdf-iframe {
@@ -75,24 +76,6 @@
         .error-message {
             color: #dc3545;
             font-weight: bold;
-        }
-        
-        /* Estilos para el campo de título */
-        #tituloContainer {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        #tituloDocumento {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-top: 5px;
         }
     </style>
 </head>
@@ -168,7 +151,7 @@
     <div class="header-container">
         <h1>GESTOR DE ARCHIVOS</h1>
     </div>
-    
+    <!-- Panel de gestión de archivos -->
     <div class="gestion-archivos">
         <h2>Gestión de Archivos PDF</h2>
         
@@ -225,11 +208,6 @@
                             <option value="inmuebles">Inmuebles</option>
                             <option value="unidad_canina">Unidad Canina</option>
                         </select>
-                        
-                        <div id="tituloContainer">
-                            <label for="tituloDocumento">Título descriptivo (aparecerá en listados):</label>
-                            <input type="text" id="tituloDocumento" name="tituloDocumento" placeholder="Ej: Personal Enero 2024">
-                        </div>
                     </div>
                     
                     <button type="submit" id="uploadButton">Subir</button>
@@ -259,7 +237,7 @@
         </div>
     </div>
 
-    <!-- Contenedor del visor PDF -->
+    <!-- Contenedor del visor PDF simplificado con iframe (ahora abajo del panel de gestión) -->
     <div class="pdf-viewer-container">
         <div class="pdf-title" id="pdf-title">Visualizador de PDF</div>
         <div id="pdf-viewer-container">
@@ -294,7 +272,7 @@
             }
         }
 
-        // Función para mostrar PDF con iframe
+        // Función para mostrar PDF con iframe (con cache buster)
         function mostrarPdf(url, filename = '') {
             const pdfContainer = document.getElementById('pdf-viewer-container');
             const pdfTitle = document.getElementById('pdf-title');
@@ -306,6 +284,7 @@
                 return;
             }
 
+            // Añadir parámetro de versión para evitar caché del navegador
             const cacheBuster = `?v=${Date.now()}`;
             const finalUrl = url.includes('?') ? `${url}&${cacheBuster.slice(1)}` : url + cacheBuster;
             
@@ -335,40 +314,25 @@
             });
         }
 
-        // Función para obtener metadatos de un archivo
-        async function obtenerMetadatosArchivo(publicId) {
-            try {
-                const response = await fetch(`${BACKEND_URL}/metadata/${publicId}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-                
-                if (!response.ok) throw new Error(`Error ${response.status}`);
-                
-                const { metadata } = await response.json();
-                return metadata || {};
-            } catch (error) {
-                console.error('Error al obtener metadatos:', error);
-                return {};
-            }
-        }
-
         // Cargar lista de archivos
         async function cargarListaArchivos() {
             showLoading(true);
             try {
+                // Añadir parámetro de versión para evitar caché del navegador
                 const cacheBuster = `?v=${Date.now()}`;
                 const url = `${BACKEND_URL}/archivos/${currentCarpeta}/${currentTipoDocumento}${cacheBuster}`;
                 
                 const response = await fetch(url, {
                     headers: { 'x-api-key': API_KEY },
-                    cache: 'no-store'
+                    cache: 'no-store' // Evitar caché del navegador
                 });
                 
                 if (!response.ok) throw new Error(`Error ${response.status}`);
                 
                 const { data } = await response.json();
-                await renderizarListaArchivos(data || []);
+                renderizarListaArchivos(data || []);
                 
+                // Actualizar los textos de filtros actuales
                 const currentEstadoSpan = document.getElementById('currentEstado');
                 const currentTipoSpan = document.getElementById('currentTipo');
                 const carpetaSelect = document.getElementById('carpetaSelect');
@@ -388,7 +352,7 @@
         }
 
         // Renderizar lista de archivos
-        async function renderizarListaArchivos(files) {
+        function renderizarListaArchivos(files) {
             const fileListContainer = document.getElementById('fileList');
             const fileSelect = document.getElementById('fileSelect');
             
@@ -404,19 +368,15 @@
 
             files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
 
-            for (const file of files) {
-                // Obtener metadatos del archivo
-                const metadatos = await obtenerMetadatosArchivo(file.public_id);
-                const tituloMostrar = metadatos.titulo || file.filename;
-                
+            files.forEach(file => {
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div class="file-info">
-                        <span class="filename">${tituloMostrar}</span>
+                        <span class="filename">${file.filename}</span>
                         <span class="file-meta">${formatFileSize(file.size)} • ${formatDate(file.uploaded_at)}</span>
                     </div>
                     <div class="file-actions">
-                        <button class="btn-view" data-url="${file.url}" data-publicid="${file.public_id}">Ver</button>
+                        <button class="btn-view" data-url="${file.url}">Ver</button>
                         <button class="btn-delete" data-id="${file.public_id}">Eliminar</button>
                     </div>
                 `;
@@ -426,31 +386,16 @@
                 option.value = JSON.stringify({
                     public_id: file.public_id,
                     estado: currentCarpeta,
-                    tipo_documento: currentTipoDocumento,
-                    titulo: tituloMostrar
+                    tipo_documento: currentTipoDocumento
                 });
-                option.textContent = tituloMostrar;
+                option.textContent = file.filename;
                 fileSelect.appendChild(option);
-            }
+            });
 
-            // Configurar eventos para los botones de vista
+            // Eventos para los botones
             document.querySelectorAll('.btn-view').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const publicId = btn.dataset.publicid;
-                    const metadatos = await obtenerMetadatosArchivo(publicId);
-                    const titulo = metadatos.titulo || 'Documento PDF';
-                    
-                    mostrarPdf(btn.dataset.url, titulo);
-                    
-                    // Almacenar metadatos para uso en otras pantallas
-                    localStorage.setItem('currentPdfMetadata', JSON.stringify({
-                        url: btn.dataset.url,
-                        titulo: titulo,
-                        publicId: publicId,
-                        estado: currentCarpeta,
-                        tipoDocumento: currentTipoDocumento,
-                        metadatos: metadatos
-                    }));
+                btn.addEventListener('click', () => {
+                    mostrarPdf(btn.dataset.url, btn.closest('li').querySelector('.filename').textContent);
                 });
             });
 
@@ -464,7 +409,7 @@
             });
         }
 
-        // Eliminar archivo
+        // Eliminar archivo con invalidación de caché
         async function eliminarArchivo(publicId, estado, tipoDocumento) {
             showLoading(true);
             try {
@@ -478,7 +423,7 @@
                         public_id: publicId,
                         estado: estado,
                         tipo_documento: tipoDocumento,
-                        invalidate_cache: true
+                        invalidate_cache: true // Asegurar que se invalide el caché
                     })
                 });
                 
@@ -498,16 +443,6 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', async () => {
-            // Mostrar/ocultar campo de título según selección
-            document.getElementById('tipoDocumentoSelect').addEventListener('change', function() {
-                const tituloContainer = document.getElementById('tituloContainer');
-                tituloContainer.style.display = this.value === 'plantilla_personal' ? 'block' : 'none';
-                
-                if (this.value !== 'plantilla_personal') {
-                    document.getElementById('tituloDocumento').value = '';
-                }
-            });
-
             // Configurar eventos de los filtros
             document.getElementById('carpetaSelect')?.addEventListener('change', function() {
                 currentCarpeta = this.value;
@@ -537,13 +472,7 @@
                     formData.append('file', file);
                     formData.append('estado', currentCarpeta);
                     formData.append('tipo_documento', currentTipoDocumento);
-                    formData.append('invalidate_cache', 'true');
-                    
-                    // Añadir título solo para plantilla_personal
-                    if (currentTipoDocumento === 'plantilla_personal') {
-                        const titulo = document.getElementById('tituloDocumento').value || 'Plantilla de Personal';
-                        formData.append('titulo', titulo);
-                    }
+                    formData.append('invalidate_cache', 'true'); // Forzar invalidación de caché
                     
                     const response = await fetch(`${BACKEND_URL}/upload`, {
                         method: 'POST',
@@ -585,11 +514,6 @@
             // Cargar archivos iniciales
             await cargarListaArchivos();
         });
-
-        // Función global para obtener metadatos desde otras pantallas
-        window.obtenerMetadatosPdf = async function(publicId) {
-            return await obtenerMetadatosArchivo(publicId);
-        };
 
         // Funciones para el menú
         function toggleMenu() {
