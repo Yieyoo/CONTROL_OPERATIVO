@@ -663,3 +663,40 @@ h1 {
 #deleteFileButton:hover, .delete-file button:hover {
   background-color: #c9302c; /* Rojo más oscuro al hacer hover */
 }
+.titulo-personalizado {
+  background: white;
+  padding: 20px 30px;
+  margin: 55px auto 25px auto; /* Aumenta el margen superior */
+  text-align: center;
+  font-size: 1.4em;
+  color: #691932;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(26, 62, 114, 0.1);
+  max-width: 80%;
+  position: relative;
+  border-top: 4px solid #A5852E;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  transform-style: preserve-3d;
+  transition: all 0.3s ease;
+}
+
+.titulo-personalizado:hover {
+  transform: translateY(-3px) rotateX(5deg);
+  box-shadow: 0 8px 25px rgba(26, 62, 114, 0.15);
+}
+
+.titulo-personalizado::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: -10px;
+  background: rgba(26, 62, 114, 0.05);
+  border-radius: 12px;
+  z-index: -1;
+  transform: translateZ(-10px);
+}
