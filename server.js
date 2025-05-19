@@ -52,7 +52,7 @@ app.use(morgan('combined', {
 
 app.set('trust proxy', 1);
 
-// 2. Configuración CORS Mejorada - Versión Final
+// 2. Configuración CORS Mejorada
 const allowedOrigins = [
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
@@ -63,12 +63,10 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permitir solicitudes sin origen (como curl, Postman) en desarrollo
     if (!origin && process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
     
-    // Permitir solicitudes del mismo dominio (Render)
     if (!origin) {
       return callback(null, true);
     }
@@ -88,22 +86,19 @@ const corsOptions = {
   maxAge: 86400
 };
 
-// 3. Configuración especial para el endpoint raíz
+// Configuración especial para el endpoint raíz
 app.get('/', cors({ origin: '*' }), (req, res) => {
   res.json({
     status: 'success',
     message: 'API de Gestión de Archivos PDF - INM',
-    version: '1.1.0'
+    version: '1.2.0' // Versión actualizada
   });
 });
 
-// 4. Aplicar CORS configurado a todas las rutas /api
 app.use('/api', cors(corsOptions));
-
-// 5. Middleware para manejar preflight requests globalmente
 app.options('*', cors(corsOptions));
 
-// 6. Middlewares para parsear el cuerpo de las peticiones
+// Middlewares para parsear el cuerpo de las peticiones
 app.use(express.json({
   limit: '10mb',
   inflate: true,
@@ -118,7 +113,7 @@ app.use(express.urlencoded({
   inflate: true
 }));
 
-// 7. Configuración de Cloudinary
+// Configuración de Cloudinary
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
@@ -151,7 +146,7 @@ const validateCloudinaryConfig = () => {
 
 validateCloudinaryConfig();
 
-// 8. Rate Limiting
+// Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: process.env.NODE_ENV === 'production' ? 100 : 1000,
@@ -170,7 +165,7 @@ const apiLimiter = rateLimit({
   }
 });
 
-// 9. Configuración de Multer para PDFs
+// Configuración de Multer para PDFs
 const memoryStorage = multer.memoryStorage();
 const pdfUpload = multer({
   storage: memoryStorage,
@@ -193,7 +188,7 @@ const pdfUpload = multer({
   }
 }).single('file');
 
-// 10. Compresión GZIP
+// Compresión GZIP
 const shouldCompress = (req, res) => {
   if (req.headers['x-no-compression']) return false;
   return /json|text|javascript|pdf/.test(res.getHeader('Content-Type'));
@@ -205,7 +200,7 @@ app.use(require('compression')({
   filter: shouldCompress
 }));
 
-// 11. Cache-Control
+// Cache-Control
 const setCacheControl = (req, res, next) => {
   const cacheTime = 86400;
   if (req.method === 'GET') {
@@ -218,7 +213,7 @@ const setCacheControl = (req, res, next) => {
 
 app.use(setCacheControl);
 
-// 12. Middleware de autenticación
+// Middleware de autenticación
 const authenticate = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
   
@@ -247,7 +242,7 @@ const authenticate = (req, res, next) => {
   next();
 };
 
-// 13. Manejo de errores
+// Manejo de errores
 class AppError extends Error {
   constructor(message, statusCode, errorCode) {
     super(message);
@@ -278,7 +273,7 @@ const handleError = (error, req, res, next) => {
   });
 };
 
-// 14. Rutas API
+// Rutas API
 const router = express.Router();
 
 // Ruta de salud
@@ -286,7 +281,7 @@ router.get('/health', async (req, res) => {
   const healthcheck = {
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    version: '1.1.0',
+    version: '1.2.0',
     checks: {
       memoryUsage: process.memoryUsage(),
       cloudinary: 'active',
@@ -318,7 +313,7 @@ router.get('/health', async (req, res) => {
 });
 
 // Función para subir archivos
-const processUpload = async (file, estado, tipoDocumento) => {
+const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null) => {
   if (!file) throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
   
   const originalName = path.parse(file.originalname).name.replace(/[^\w- ]/gi, '') + '.pdf';
@@ -342,7 +337,8 @@ const processUpload = async (file, estado, tipoDocumento) => {
       custom: {
         estado: estado,
         tipo_documento: tipoDocumento,
-        uploaded_by: 'api'
+        uploaded_by: 'api',
+        ...(tituloDocumento && { titulo_documento: tituloDocumento })
       }
     },
     responsive_breakpoints: {
@@ -384,7 +380,9 @@ router.post('/upload', authenticate, (req, res, next) => {
 
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
-      const result = await processUpload(req.file, estado, tipoDocumento);
+      const tituloDocumento = req.body.titulo_documento || null;
+      
+      const result = await processUpload(req.file, estado, tipoDocumento, tituloDocumento);
 
       res.status(201).json({
         status: 'success',
@@ -400,10 +398,10 @@ router.post('/upload', authenticate, (req, res, next) => {
           size: result.bytes,
           pages: result.pages,
           format: result.format,
-          etag: result.etag
+          etag: result.etag,
+          ...(tituloDocumento && { titulo_documento: tituloDocumento })
         }
       });
-      const titulo = req.body.tituloDocumento || 'Plantilla de Personal'; // Valor por defecto
     } catch (error) {
       next(error);
     }
@@ -419,13 +417,11 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       throw new AppError('public_id es requerido', 400, 'missing_public_id');
     }
 
-    // Verificación de la estructura del public_id
     const expectedPrefix = `${estado}/${tipo_documento}/`;
     if (estado && tipo_documento && !public_id.startsWith(expectedPrefix)) {
       throw new AppError('No tienes permiso para eliminar este archivo', 403, 'forbidden');
     }
 
-    // Verificar que el archivo existe
     try {
       await cloudinary.api.resource(public_id, { resource_type: 'raw' });
     } catch (error) {
@@ -465,7 +461,6 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
   try {
     const estado = req.params.estado || 'aguascalientes';
     const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
-    const cacheKey = `${estado}:${tipoDocumento}`;
 
     const result = await cloudinary.api.resources({
       type: 'upload',
@@ -495,24 +490,129 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
         height: resource.height,
         etag: resource.etag,
         tags: resource.tags,
-        moderation: resource.moderation
+        moderation: resource.moderation,
+        ...(resource.context?.custom?.titulo_documento && { 
+          titulo_documento: resource.context.custom.titulo_documento 
+        })
       };
     });
 
-    const responseData = {
+    res.json({
       status: 'success',
       data: archivos,
       count: archivos.length,
       estado: estado,
       tipo_documento: tipoDocumento,
       timestamp: new Date().toISOString()
-    };
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
-    // Añadir headers CORS manualmente
-    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-    res.header('Access-Control-Allow-Credentials', 'true');
+// ************ NUEVAS RUTAS PARA TÍTULOS PERSONALIZADOS ************
+
+// Almacenamiento de títulos (en memoria para este ejemplo)
+// En producción deberías usar una base de datos
+let titulosPersonalizados = {};
+
+// Ruta para guardar título personalizado
+router.post('/guardar-titulo', authenticate, async (req, res, next) => {
+  try {
+    const { estado, titulo } = req.body;
     
-    res.json(responseData);
+    if (!estado || !titulo) {
+      throw new AppError('Estado y título son requeridos', 400, 'missing_fields');
+    }
+
+    // Guardar en memoria (en producción usa una base de datos)
+    titulosPersonalizados[estado] = titulo;
+
+    // También puedes guardar en Cloudinary como metadata si lo prefieres
+    // Esta es una alternativa más persistente
+    try {
+      // Buscar si ya existe un archivo de plantilla para este estado
+      const recursos = await cloudinary.api.resources({
+        type: 'upload',
+        prefix: `${estado}/plantilla_personal/`,
+        resource_type: 'raw',
+        max_results: 1
+      });
+
+      if (recursos.resources.length > 0) {
+        const public_id = recursos.resources[0].public_id;
+        await cloudinary.uploader.explicit(public_id, {
+          type: 'upload',
+          resource_type: 'raw',
+          context: `titulo_documento=${titulo}|original_filename=${recursos.resources[0].context?.custom?.original_filename || 'plantilla.pdf'}`
+        });
+      }
+    } catch (cloudinaryError) {
+      console.warn('No se pudo actualizar metadata en Cloudinary:', cloudinaryError.message);
+    }
+
+    res.json({
+      status: 'success',
+      message: 'Título guardado correctamente',
+      data: {
+        estado: estado,
+        titulo: titulo,
+        updated_at: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Ruta para obtener título personalizado
+router.get('/obtener-titulo/:estado', authenticate, async (req, res, next) => {
+  try {
+    const { estado } = req.params;
+    
+    if (!estado) {
+      throw new AppError('Estado es requerido', 400, 'missing_estado');
+    }
+
+    // Primero intenta obtener de Cloudinary (metadata del archivo)
+    try {
+      const recursos = await cloudinary.api.resources({
+        type: 'upload',
+        prefix: `${estado}/plantilla_personal/`,
+        resource_type: 'raw',
+        max_results: 1,
+        context: true
+      });
+
+      if (recursos.resources.length > 0 && recursos.resources[0].context?.custom?.titulo_documento) {
+        return res.json({
+          status: 'success',
+          titulo: recursos.resources[0].context.custom.titulo_documento,
+          source: 'cloudinary',
+          estado: estado
+        });
+      }
+    } catch (cloudinaryError) {
+      console.warn('Error al buscar en Cloudinary:', cloudinaryError.message);
+    }
+
+    // Si no está en Cloudinary, busca en memoria
+    if (titulosPersonalizados[estado]) {
+      return res.json({
+        status: 'success',
+        titulo: titulosPersonalizados[estado],
+        source: 'memory',
+        estado: estado
+      });
+    }
+
+    // Si no se encuentra en ningún lado
+    res.json({
+      status: 'success',
+      titulo: null,
+      message: 'No se encontró título personalizado para este estado',
+      estado: estado
+    });
   } catch (error) {
     next(error);
   }
@@ -560,4 +660,3 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = { app, server };
-
