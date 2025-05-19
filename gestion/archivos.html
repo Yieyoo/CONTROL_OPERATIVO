@@ -1,5 +1,4 @@
-
-	<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -76,6 +75,42 @@
         .error-message {
             color: #dc3545;
             font-weight: bold;
+        }
+        
+        /* Estilos para el título personalizado */
+        .titulo-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .titulo-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .titulo-container input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .titulo-container button {
+            background-color: #1a3e72;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .titulo-container button:hover {
+            background-color: #0d2b57;
         }
     </style>
 </head>
@@ -208,6 +243,15 @@
                             <option value="inmuebles">Inmuebles</option>
                             <option value="unidad_canina">Unidad Canina</option>
                         </select>
+                    </div>
+                    
+                    <!-- Contenedor para el título personalizado -->
+                    <div class="titulo-container" id="tituloContainer" style="display: none;">
+                        <label for="tituloDocumento">Título para pantallas:</label>
+                        <input type="text" id="tituloDocumento" name="tituloDocumento" 
+                               placeholder="Ej: Plantilla Oficial 2024 - INM">
+                        <button type="button" id="guardarTituloBtn">Guardar Título</button>
+                        <p id="tituloStatus"></p>
                     </div>
                     
                     <button type="submit" id="uploadButton">Subir</button>
@@ -441,18 +485,97 @@
             }
         }
 
+        // Guardar título personalizado
+        async function guardarTituloPersonalizado() {
+            const titulo = document.getElementById('tituloDocumento').value.trim();
+            const tituloStatus = document.getElementById('tituloStatus');
+            
+            if (!titulo) {
+                showStatus(tituloStatus, 'Por favor ingresa un título', true);
+                return;
+            }
+            
+            try {
+                showLoading(true);
+                const response = await fetch(`${BACKEND_URL}/guardar-titulo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        estado: currentCarpeta,
+                        titulo: titulo
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Error al guardar');
+                
+                // Guardar también en localStorage para acceso rápido
+                localStorage.setItem(`titulo_${currentCarpeta}`, titulo);
+                showStatus(tituloStatus, 'Título guardado correctamente');
+                
+            } catch (error) {
+                console.error('Error al guardar título:', error);
+                showStatus(tituloStatus, error.message, true);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Cargar título personalizado guardado
+        async function cargarTituloPersonalizado() {
+            try {
+                // Intentar primero con localStorage para velocidad
+                const cachedTitulo = localStorage.getItem(`titulo_${currentCarpeta}`);
+                if (cachedTitulo) {
+                    document.getElementById('tituloDocumento').value = cachedTitulo;
+                }
+                
+                // Luego verificar con el backend
+                const response = await fetch(`${BACKEND_URL}/obtener-titulo/${currentCarpeta}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.titulo) {
+                        document.getElementById('tituloDocumento').value = data.titulo;
+                        localStorage.setItem(`titulo_${currentCarpeta}`, data.titulo);
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar título:', error);
+            }
+        }
+
         // Inicialización
         document.addEventListener('DOMContentLoaded', async () => {
             // Configurar eventos de los filtros
             document.getElementById('carpetaSelect')?.addEventListener('change', function() {
                 currentCarpeta = this.value;
                 cargarListaArchivos();
+                if (currentTipoDocumento === 'plantilla_personal') {
+                    cargarTituloPersonalizado();
+                }
             });
 
             document.getElementById('tipoDocumentoSelect')?.addEventListener('change', function() {
                 currentTipoDocumento = this.value;
+                const tituloContainer = document.getElementById('tituloContainer');
+                
+                // Mostrar solo para plantilla de personal
+                tituloContainer.style.display = currentTipoDocumento === 'plantilla_personal' ? 'block' : 'none';
+                
+                if (currentTipoDocumento === 'plantilla_personal') {
+                    cargarTituloPersonalizado();
+                }
+                
                 cargarListaArchivos();
             });
+
+            // Evento para guardar título personalizado
+            document.getElementById('guardarTituloBtn')?.addEventListener('click', guardarTituloPersonalizado);
 
             // Evento para subir archivo
             document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
@@ -472,6 +595,15 @@
                     formData.append('file', file);
                     formData.append('estado', currentCarpeta);
                     formData.append('tipo_documento', currentTipoDocumento);
+                    
+                    // Si es plantilla de personal, agregar el título
+                    if (currentTipoDocumento === 'plantilla_personal') {
+                        const titulo = document.getElementById('tituloDocumento').value.trim();
+                        if (titulo) {
+                            formData.append('titulo_documento', titulo);
+                        }
+                    }
+                    
                     formData.append('invalidate_cache', 'true'); // Forzar invalidación de caché
                     
                     const response = await fetch(`${BACKEND_URL}/upload`, {
@@ -513,6 +645,12 @@
 
             // Cargar archivos iniciales
             await cargarListaArchivos();
+            
+            // Verificar si estamos viendo plantilla de personal al cargar
+            if (currentTipoDocumento === 'plantilla_personal') {
+                document.getElementById('tituloContainer').style.display = 'block';
+                await cargarTituloPersonalizado();
+            }
         });
 
         // Funciones para el menú
@@ -556,6 +694,32 @@
                 closeAllSubmenus();
             }
         });
+        
+        // Función para obtener el título personalizado (puede ser llamada desde otras páginas)
+        window.obtenerTituloPlantilla = async function(estado) {
+            try {
+                // Primero verificar localStorage
+                const cachedTitulo = localStorage.getItem(`titulo_${estado}`);
+                if (cachedTitulo) return cachedTitulo;
+                
+                // Luego consultar al backend
+                const response = await fetch(`${BACKEND_URL}/obtener-titulo/${estado}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.titulo) {
+                        localStorage.setItem(`titulo_${estado}`, data.titulo);
+                        return data.titulo;
+                    }
+                }
+                return null;
+            } catch (error) {
+                console.error('Error al obtener título:', error);
+                return null;
+            }
+        };
     </script>
 </body>
 </html>
