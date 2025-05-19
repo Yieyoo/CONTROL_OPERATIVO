@@ -50,7 +50,7 @@
             height: 600px;
             border: 1px solid #ddd;
             margin-top: 20px;
-            display: none; /* Oculto inicialmente */
+            display: none;
         }
 
         .pdf-iframe {
@@ -227,8 +227,8 @@
                         </select>
                         
                         <div id="tituloContainer">
-                            <label for="tituloDocumento">Título del documento:</label>
-                            <input type="text" id="tituloDocumento" name="tituloDocumento" placeholder="Ej: Plantilla Enero 2024">
+                            <label for="tituloDocumento">Título descriptivo (aparecerá en listados):</label>
+                            <input type="text" id="tituloDocumento" name="tituloDocumento" placeholder="Ej: Personal Enero 2024">
                         </div>
                     </div>
                     
@@ -335,6 +335,23 @@
             });
         }
 
+        // Función para obtener metadatos de un archivo
+        async function obtenerMetadatosArchivo(publicId) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/metadata/${publicId}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (!response.ok) throw new Error(`Error ${response.status}`);
+                
+                const { metadata } = await response.json();
+                return metadata || {};
+            } catch (error) {
+                console.error('Error al obtener metadatos:', error);
+                return {};
+            }
+        }
+
         // Cargar lista de archivos
         async function cargarListaArchivos() {
             showLoading(true);
@@ -350,7 +367,7 @@
                 if (!response.ok) throw new Error(`Error ${response.status}`);
                 
                 const { data } = await response.json();
-                renderizarListaArchivos(data || []);
+                await renderizarListaArchivos(data || []);
                 
                 const currentEstadoSpan = document.getElementById('currentEstado');
                 const currentTipoSpan = document.getElementById('currentTipo');
@@ -371,7 +388,7 @@
         }
 
         // Renderizar lista de archivos
-        function renderizarListaArchivos(files) {
+        async function renderizarListaArchivos(files) {
             const fileListContainer = document.getElementById('fileList');
             const fileSelect = document.getElementById('fileSelect');
             
@@ -387,15 +404,19 @@
 
             files.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
 
-            files.forEach(file => {
+            for (const file of files) {
+                // Obtener metadatos del archivo
+                const metadatos = await obtenerMetadatosArchivo(file.public_id);
+                const tituloMostrar = metadatos.titulo || file.filename;
+                
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div class="file-info">
-                        <span class="filename">${file.filename}</span>
+                        <span class="filename">${tituloMostrar}</span>
                         <span class="file-meta">${formatFileSize(file.size)} • ${formatDate(file.uploaded_at)}</span>
                     </div>
                     <div class="file-actions">
-                        <button class="btn-view" data-url="${file.url}">Ver</button>
+                        <button class="btn-view" data-url="${file.url}" data-publicid="${file.public_id}">Ver</button>
                         <button class="btn-delete" data-id="${file.public_id}">Eliminar</button>
                     </div>
                 `;
@@ -405,15 +426,31 @@
                 option.value = JSON.stringify({
                     public_id: file.public_id,
                     estado: currentCarpeta,
-                    tipo_documento: currentTipoDocumento
+                    tipo_documento: currentTipoDocumento,
+                    titulo: tituloMostrar
                 });
-                option.textContent = file.filename;
+                option.textContent = tituloMostrar;
                 fileSelect.appendChild(option);
-            });
+            }
 
+            // Configurar eventos para los botones de vista
             document.querySelectorAll('.btn-view').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    mostrarPdf(btn.dataset.url, btn.closest('li').querySelector('.filename').textContent);
+                btn.addEventListener('click', async () => {
+                    const publicId = btn.dataset.publicid;
+                    const metadatos = await obtenerMetadatosArchivo(publicId);
+                    const titulo = metadatos.titulo || 'Documento PDF';
+                    
+                    mostrarPdf(btn.dataset.url, titulo);
+                    
+                    // Almacenar metadatos para uso en otras pantallas
+                    localStorage.setItem('currentPdfMetadata', JSON.stringify({
+                        url: btn.dataset.url,
+                        titulo: titulo,
+                        publicId: publicId,
+                        estado: currentCarpeta,
+                        tipoDocumento: currentTipoDocumento,
+                        metadatos: metadatos
+                    }));
                 });
             });
 
@@ -548,6 +585,11 @@
             // Cargar archivos iniciales
             await cargarListaArchivos();
         });
+
+        // Función global para obtener metadatos desde otras pantallas
+        window.obtenerMetadatosPdf = async function(publicId) {
+            return await obtenerMetadatosArchivo(publicId);
+        };
 
         // Funciones para el menú
         function toggleMenu() {
