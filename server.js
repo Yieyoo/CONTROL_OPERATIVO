@@ -317,6 +317,60 @@ router.get('/health', async (req, res) => {
   }
 });
 
+// Función para subir archivos
+const processUpload = async (file, estado, tipoDocumento) => {
+  if (!file) throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
+  
+  const originalName = path.parse(file.originalname).name.replace(/[^\w- ]/gi, '') + '.pdf';
+  if (!/^[\w- ]+\.pdf$/i.test(originalName)) {
+    throw new AppError('El nombre del archivo contiene caracteres no permitidos', 400, 'invalid_filename');
+  }
+
+  const uploadOptions = {
+    resource_type: 'raw',
+    folder: `${estado}/${tipoDocumento}`,
+    format: 'pdf',
+    type: 'upload',
+    access_mode: 'public',
+    transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    filename_override: originalName,
+    unique_filename: false,
+    overwrite: true,
+    context: {
+      original_filename: originalName,
+      uploaded_at: new Date().toISOString(),
+      custom: {
+        estado: estado,
+        tipo_documento: tipoDocumento,
+        uploaded_by: 'api'
+      }
+    },
+    responsive_breakpoints: {
+      create_derived: false,
+      bytes_step: 20000,
+      min_width: 200,
+      max_width: 1000,
+      transformation: { crop: 'limit' }
+    }
+  };
+
+  try {
+    return await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        uploadOptions,
+        (error, result) => error ? reject(error) : resolve(result)
+      );
+      
+      pipeline(
+        stream.Readable.from(file.buffer),
+        uploadStream
+      ).catch(reject);
+    });
+  } catch (error) {
+    throw new AppError(`Error al subir a Cloudinary: ${error.message}`, 502, 'cloudinary_error');
+  }
+};
+
 // Ruta para subir archivos
 router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
@@ -330,69 +384,26 @@ router.post('/upload', authenticate, (req, res, next) => {
 
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
-      const titulo = req.body.titulo || null; // Título solo para plantilla_personal
-
-      // Validar que el título se proporcione solo para plantilla_personal
-      if (tipoDocumento === 'plantilla_personal' && !titulo) {
-        throw new AppError('Se requiere un título descriptivo para Plantilla de Personal', 400, 'missing_title');
-      }
-
-      // Usar el título en el nombre del archivo si es plantilla_personal, de lo contrario usar el nombre original
-      const nombreArchivo = tipoDocumento === 'plantilla_personal' 
-        ? `${titulo.replace(/[^\w- ]/gi, '_')}_${Date.now()}.pdf`
-        : path.parse(req.file.originalname).name.replace(/[^\w- ]/gi, '') + '.pdf';
-
-      const uploadOptions = {
-        resource_type: 'raw',
-        folder: `${estado}/${tipoDocumento}`,
-        filename_override: nombreArchivo,
-        format: 'pdf',
-        type: 'upload',
-        access_mode: 'public',
-        transformation: [{ quality: 'auto', fetch_format: 'auto' }],
-        unique_filename: false,
-        overwrite: true,
-        context: {
-          original_filename: nombreArchivo,
-          uploaded_at: new Date().toISOString(),
-          custom: {
-            estado: estado,
-            tipo_documento: tipoDocumento,
-            titulo: tipoDocumento === 'plantilla_personal' ? titulo : undefined,
-            uploaded_by: 'api'
-          }
-        }
-      };
-
-      const result = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          uploadOptions,
-          (error, result) => error ? reject(error) : resolve(result)
-        );
-        
-        pipeline(
-          stream.Readable.from(req.file.buffer),
-          uploadStream
-        ).catch(reject);
-      });
+      const result = await processUpload(req.file, estado, tipoDocumento);
 
       res.status(201).json({
         status: 'success',
         data: {
           url: result.secure_url,
           public_id: result.public_id,
-          filename: nombreArchivo,
+          filename: result.original_filename,
           estado: estado,
           tipo_documento: tipoDocumento,
-          titulo: tipoDocumento === 'plantilla_personal' ? titulo : null,
           view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
           download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
           uploaded_at: result.created_at,
           size: result.bytes,
+          pages: result.pages,
           format: result.format,
           etag: result.etag
         }
       });
+      const titulo = req.body.tituloDocumento || 'Plantilla de Personal'; // Valor por defecto
     } catch (error) {
       next(error);
     }
@@ -469,13 +480,10 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
     const archivos = result.resources.map(resource => {
       const originalName = resource.context?.custom?.original_filename || 
                          path.parse(resource.public_id).name + '.pdf';
-      const titulo = resource.context?.custom?.titulo || null;
-      
       return {
         url: resource.secure_url,
         public_id: resource.public_id,
         filename: originalName,
-        titulo: titulo, // Incluir título si existe
         estado: estado,
         tipo_documento: tipoDocumento,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
@@ -506,40 +514,6 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
     
     res.json(responseData);
   } catch (error) {
-    next(error);
-  }
-});
-
-// Ruta para obtener metadatos de un archivo específico
-router.get('/metadata/:publicId', authenticate, async (req, res, next) => {
-  try {
-    const { publicId } = req.params;
-    
-    if (!publicId) {
-      throw new AppError('publicId es requerido', 400, 'missing_public_id');
-    }
-
-    const resource = await cloudinary.api.resource(publicId, {
-      resource_type: 'raw',
-      context: true
-    });
-
-    const metadata = {
-      titulo: resource.context?.custom?.titulo || null,
-      estado: resource.context?.custom?.estado || null,
-      tipo_documento: resource.context?.custom?.tipo_documento || null,
-      uploaded_at: resource.context?.custom?.uploaded_at || resource.created_at,
-      original_filename: resource.context?.custom?.original_filename || path.parse(resource.public_id).name + '.pdf'
-    };
-
-    res.json({
-      status: 'success',
-      metadata: metadata
-    });
-  } catch (error) {
-    if (error.http_code === 404) {
-      return next(new AppError('Archivo no encontrado', 404, 'not_found'));
-    }
     next(error);
   }
 });
@@ -586,3 +560,4 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = { app, server };
+
