@@ -80,8 +80,8 @@
         // Función para obtener el título personalizado
    // Modifica tu función cargarTituloPersonalizado() así:
 // Modifica tu función cargarTituloPersonalizado() así:
-async function cargarTituloPersonalizado() {
-    const tituloContainer = document.getElementById('tituloContainer');
+const titulo = await obtenerTituloPlantilla();
+document.getElementById('tituloContainer').textContent = titulo;
     
     try {
         // 1. Primero intenta obtener el título del PDF más reciente
@@ -126,7 +126,7 @@ async function cargarTituloPersonalizado() {
         tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
         tituloContainer.style.color = 'red';
     }
-}
+
 
         // Mostrar/ocultar loading
         function showLoading(show) {
