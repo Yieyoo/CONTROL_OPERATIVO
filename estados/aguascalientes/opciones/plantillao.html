@@ -69,189 +69,179 @@
     </div>
 
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
+<script>
+    // Configuración
+    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+    const API_KEY = 'Xhy2md57';
+    const ESTADO_FIJO = 'aguascalientes';
+    const TIPO_DOCUMENTO = 'plantilla_personal';
 
-    <script>
-        // Configuración
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-        const API_KEY = 'Xhy2md57';
-        const ESTADO_FIJO = 'aguascalientes';
-        const TIPO_DOCUMENTO = 'plantilla_personal';
-        
-        // Función para obtener el título personalizado
-   // Modifica tu función cargarTituloPersonalizado() así:
-// Modifica tu función cargarTituloPersonalizado() así:
-const titulo = await obtenerTituloPlantilla();
-document.getElementById('tituloContainer').textContent = titulo;
-    
-    try {
-        // 1. Primero intenta obtener el título del PDF más reciente
-        const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-            headers: { 'x-api-key': API_KEY }
-        });
-        
-        if (archivosResponse.ok) {
-            const { data: archivos } = await archivosResponse.json();
-            if (archivos.length > 0) {
-                // Ordenar por fecha y obtener el más reciente
-                const ultimoArchivo = archivos.sort((a, b) => 
-                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                )[0];
-                
-                // Verificar si tiene título en los metadatos
-                if (ultimoArchivo.titulo_documento) {
-                    tituloContainer.textContent = ultimoArchivo.titulo_documento;
+    // Función para obtener y cargar el título personalizado
+    async function cargarTituloPersonalizado() {
+        const tituloContainer = document.getElementById('tituloContainer');
+
+        try {
+            // 1. Obtener el archivo más reciente con título
+            const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (archivosResponse.ok) {
+                const { data: archivos } = await archivosResponse.json();
+                if (archivos.length > 0) {
+                    const ultimoArchivo = archivos.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+
+                    if (ultimoArchivo.titulo_documento) {
+                        tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                        return;
+                    }
+                }
+            }
+
+            // 2. Obtener desde endpoint de títulos
+            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (tituloResponse.ok) {
+                const data = await tituloResponse.json();
+                if (data.titulo) {
+                    tituloContainer.textContent = data.titulo;
                     return;
                 }
             }
-        }
 
-        // 2. Si no encontró en los archivos, intenta con el endpoint de títulos
-        const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
-            headers: { 'x-api-key': API_KEY }
-        });
-        
-        if (tituloResponse.ok) {
-            const data = await tituloResponse.json();
-            if (data.titulo) {
-                tituloContainer.textContent = data.titulo;
-                return;
-            }
-        }
+            // 3. Título por defecto
+            tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
 
-        // 3. Si todo falla, usar valor por defecto
-        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
-        
-    } catch (error) {
-        console.error('Error:', error);
-        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
-        tituloContainer.style.color = 'red';
+        } catch (error) {
+            console.error('Error:', error);
+            tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+            tituloContainer.style.color = 'red';
+        }
     }
 
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
 
-        // Mostrar/ocultar loading
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
         }
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
 
-        // Mostrar mensaje de error
-        function showError(message, target = 'both') {
-            if (target === 'both' || target === 'pdf') {
-                const pdfError = document.getElementById('pdf-error');
-                pdfError.textContent = message;
-                pdfError.style.display = 'block';
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
+
+    // Función para abrir/cerrar el menú
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const overlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
             }
-            if (target === 'both' || target === 'mobile') {
-                const mobileError = document.getElementById('mobile-error');
-                mobileError.textContent = message;
-                mobileError.style.display = 'block';
-            }
-        }
+        });
+        event.target.closest('.submenu').classList.toggle('active');
+    }
 
-        // Ocultar errores
-        function hideErrors() {
-            document.getElementById('pdf-error').style.display = 'none';
-            document.getElementById('mobile-error').style.display = 'none';
-        }
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
 
-        // Función para abrir/cerrar el menú
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const overlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
+    // Cargar PDF de Plantilla de Personal de Aguascalientes
+    async function loadPlantillaPersonal() {
+        showLoading(true);
+        hideErrors();
 
-        // Cerrar menú al hacer clic fuera
-        document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-        // Función para submenús
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            document.querySelectorAll('.submenu.active').forEach(sub => {
-                if (sub !== event.target.closest('.submenu')) {
-                    sub.classList.remove('active');
-                }
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
             });
-            event.target.closest('.submenu').classList.toggle('active');
-        }
 
-        // Formatear fecha legible
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('es-MX', options);
-        }
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
-        // Cargar PDF de Plantilla de Personal de Aguascalientes
-        async function loadPlantillaPersonal() {
-            showLoading(true);
-            hideErrors();
+            const result = await response.json();
+            console.log('Respuesta API:', result);
 
-            try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-                
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-                
-                const result = await response.json();
-                console.log('Respuesta API:', result);
-                
-                if (!result?.data) throw new Error('Formato de respuesta inválido');
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
 
-                const pdfViewer = document.getElementById('pdf-viewer');
-                const mobileContainer = document.querySelector('.mobile-images');
-                
-                if (result.data.length > 0) {
-                    // Ordenar por fecha y obtener el más reciente
-                    const latestPDF = result.data.sort((a, b) => 
-                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                    )[0];
-                    
-                    // Cargar PDF en el visor
-                    pdfViewer.src = latestPDF.url;
-                    
-                    // Para móviles, mostrar información y opción de descarga
-                    mobileContainer.innerHTML = `
-                        <div class="file-info">
-                            <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
-                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                            <a href="${latestPDF.url}" class="download-btn" download>
-                                Descargar Plantilla
-                            </a>
-                        </div>
-                    `;
-                } else {
-                    showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-            } finally {
-                showLoading(false);
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                pdfViewer.src = latestPDF.url;
+
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                        <a href="${latestPDF.url}" class="download-btn" download>
+                            Descargar Plantilla
+                        </a>
+                    </div>
+                `;
+            } else {
+                showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
             }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarTituloPersonalizado();
+        if (document.getElementById('pdf-viewer')) {
+            loadPlantillaPersonal();
         }
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            // Cargar título personalizado
-            cargarTituloPersonalizado();
-            
-            // Cargar PDF al iniciar
-            if (document.getElementById('pdf-viewer')) {
-                loadPlantillaPersonal();
-            }
-            
-            // Cerrar menús al hacer clic en opción
-            document.querySelectorAll('.submenu-list a').forEach(link => {
-                link.addEventListener('click', () => {
-                    document.querySelectorAll('.submenu').forEach(sub => {
-                        sub.classList.remove('active');
-                    });
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
                 });
             });
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>
