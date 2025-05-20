@@ -6,87 +6,26 @@
     <title>PLANTILLA DE PERSONAL - BAJA CALIFORNIA SUR</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-    <style>
-        .error-message {
-            color: red;
-            padding: 10px;
-            background-color: #ffeeee;
-            border: 1px solid #ffcccc;
-            margin: 10px 0;
-            text-align: center;
-        }
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .pdf-container {
-            width: 100%;
-            height: 80vh;
-            margin: 20px 0;
-        }
-        .pdf-embed {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .mobile-images {
-            display: none;
-        }
-        @media (max-width: 768px) {
-            .pdf-container {
-                display: block;
-                height: 60vh;
-            }
-            .mobile-images {
-                display: block;
-                text-align: center;
-            }
-            .mobile-images img {
-                max-width: 100%;
-                margin: 10px 0;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- Fondo oscuro para el menú -->
-    <div class="menu-overlay"></div>
     
-    <!-- Loading spinner -->
+    <!-- Contenedor para el título personalizado -->
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
+    </div>
+    
+    <!-- Resto de tu HTML permanece igual -->
+    <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
 
     <header>
-        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-                <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
@@ -101,28 +40,51 @@
                         <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
                     </ul>
                 </li>
-
-                <!-- Submenú Información de ORs -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                        <li><a href="../aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                         <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../baja_california_surindex.html">Baja California Sur</a></li>
-                        <!-- Otros estados... -->
+                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
+                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
+                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
+                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
+                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
+                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
+                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
+                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
+                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
+                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
+                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
+                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
+                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
+                        <li><a href="../../nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
+                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
+                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
+                        <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
+                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
+                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
+                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
+                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
+                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
+                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
+                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
+                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
+                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
+                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
                     </ul>
                 </li>
             </ul>
         </nav>
     </header>
 
-    <!-- Contenedor de logos -->
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
-    
-    <!-- Contenedor del PDF -->
     <div class="pdf-container">
         <iframe 
             id="pdf-viewer" 
@@ -132,132 +94,189 @@
         ></iframe>
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
-    <!-- Contenedor de imágenes para móviles -->
+
     <div class="mobile-images">
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
+<script>
+    // Configuración
+    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+    const API_KEY = 'Xhy2md57';
+    const ESTADO_FIJO = 'baja-california-sur';
+    const TIPO_DOCUMENTO = 'plantilla_personal';
 
-    <!-- Scripts -->
-    <script>
-        // Configuración
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-        const API_KEY = 'Xhy2md57';
-        const ESTADO_FIJO = 'baja-california-sur'; // Cambiado para Baja California Sur
-        
-        // Mostrar/ocultar loading
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
-        }
+    // Función para obtener y cargar el título personalizado
+    async function cargarTituloPersonalizado() {
+        const tituloContainer = document.getElementById('tituloContainer');
 
-        // Mostrar mensaje de error
-        function showError(message, target = 'both') {
-            if (target === 'both' || target === 'pdf') {
-                const pdfError = document.getElementById('pdf-error');
-                pdfError.textContent = message;
-                pdfError.style.display = 'block';
-            }
-            if (target === 'both' || target === 'mobile') {
-                const mobileError = document.getElementById('mobile-error');
-                mobileError.textContent = message;
-                mobileError.style.display = 'block';
-            }
-        }
-
-        // Ocultar errores
-        function hideErrors() {
-            document.getElementById('pdf-error').style.display = 'none';
-            document.getElementById('mobile-error').style.display = 'none';
-        }
-
-        // Función para abrir/cerrar el menú
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const overlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-
-        // Cerrar menú al hacer clic fuera
-        document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-        // Función para submenús
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            document.querySelectorAll('.submenu.active').forEach(sub => {
-                if (sub !== event.target.closest('.submenu')) {
-                    sub.classList.remove('active');
-                }
+        try {
+            // 1. Obtener el archivo más reciente con título
+            const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
             });
-            event.target.closest('.submenu').classList.toggle('active');
-        }
 
-        // Cargar PDF de Baja California Sur
-        async function loadStatePDF() {
-            showLoading(true);
-            hideErrors();
-
-            try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-                
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-                
-                const result = await response.json();
-                console.log('Respuesta API:', result);
-                
-                if (!result?.data) throw new Error('Formato de respuesta inválido');
-
-                const pdfViewer = document.getElementById('pdf-viewer');
-                const mobileContainer = document.querySelector('.mobile-images');
-                
-                if (result.data.length > 0) {
-                    const latestPDF = result.data.sort((a, b) => 
+            if (archivosResponse.ok) {
+                const { data: archivos } = await archivosResponse.json();
+                if (archivos.length > 0) {
+                    const ultimoArchivo = archivos.sort((a, b) => 
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
-                    
-                    // Mostrar PDF
-                    pdfViewer.src = latestPDF.url;
-                    
-                    // Mostrar imágenes alternativas (opcional)
-                    mobileContainer.innerHTML = `
-                        <img src="${latestPDF.url.replace('.pdf', '_page-0001.jpg')}" alt="Página 1">
-                        <img src="${latestPDF.url.replace('.pdf', '_page-0002.jpg')}" alt="Página 2">
-                    `;
-                } else {
-                    showError('No se encontraron documentos para Baja California Sur', 'both');
-                    // Mostrar PDF local como respaldo
-                    pdfViewer.src = "../../../documentacion/plantillas_personal/bajacsp/BCS1.pdf";
+
+                    if (ultimoArchivo.titulo_documento) {
+                        tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                        return;
+                    }
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                showError(`Error al cargar: ${error.message}`, 'both');
-                // Respuesta de emergencia - mostrar PDF local
-                document.getElementById('pdf-viewer').src = "../../../documentacion/plantillas_personal/bajacsp/BCS1.pdf";
-            } finally {
-                showLoading(false);
             }
+
+            // 2. Obtener desde endpoint de títulos
+            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (tituloResponse.ok) {
+                const data = await tituloResponse.json();
+                if (data.titulo) {
+                    tituloContainer.textContent = data.titulo;
+                    return;
+                }
+            }
+
+            // 3. Título por defecto
+            tituloContainer.textContent = 'Plantilla de Personal - Baja California Sur';
+
+        } catch (error) {
+            console.error('Error:', error);
+            tituloContainer.textContent = 'Plantilla de Personal - Baja California Sur';
+            tituloContainer.style.color = 'red';
+        }
+    }
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
+        }
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
+
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
+
+    // Función para abrir/cerrar el menú
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const overlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
+            }
+        });
+        event.target.closest('.submenu').classList.toggle('active');
+    }
+
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
+
+    // Cargar PDF de Plantilla de Personal de Baja California Sur
+    async function loadPlantillaPersonal() {
+        showLoading(true);
+        hideErrors();
+
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            console.log('Respuesta API:', result);
+
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                pdfViewer.src = latestPDF.url;
+
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                        <a href="${latestPDF.url}" class="download-btn" download>
+                            Descargar Plantilla
+                        </a>
+                    </div>
+                `;
+            } else {
+                showError('No se encontraron documentos de plantilla de personal para Baja California Sur', 'both');
+                // Mostrar PDF local como respaldo
+                pdfViewer.src = "../../../documentacion/plantillas_personal/bajacsp/BCS1.pdf";
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+            // Respuesta de emergencia - mostrar PDF local
+            document.getElementById('pdf-viewer').src = "../../../documentacion/plantillas_personal/bajacsp/BCS1.pdf";
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarTituloPersonalizado();
+        if (document.getElementById('pdf-viewer')) {
+            loadPlantillaPersonal();
         }
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            // Cargar PDF al iniciar
-            if (document.getElementById('pdf-viewer')) {
-                loadStatePDF();
-            }
-            
-            // Cerrar menús al hacer clic en opción
-            document.querySelectorAll('.submenu-list a').forEach(link => {
-                link.addEventListener('click', () => {
-                    document.querySelectorAll('.submenu').forEach(sub => {
-                        sub.classList.remove('active');
-                    });
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
                 });
             });
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>
