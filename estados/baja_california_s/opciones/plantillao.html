@@ -103,7 +103,7 @@
     // Configuración
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO_FIJO = 'baja-california-sur';
+    const ESTADO_FIJO = 'aguascalientes';
     const TIPO_DOCUMENTO = 'plantilla_personal';
 
     // Función para obtener y cargar el título personalizado
@@ -144,11 +144,11 @@
             }
 
             // 3. Título por defecto
-            tituloContainer.textContent = 'Plantilla de Personal - Baja California Sur';
+            tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
 
         } catch (error) {
             console.error('Error:', error);
-            tituloContainer.textContent = 'Plantilla de Personal - Baja California Sur';
+            tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
             tituloContainer.style.color = 'red';
         }
     }
@@ -206,7 +206,7 @@
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
-    // Cargar PDF de Plantilla de Personal de Baja California Sur
+    // Cargar PDF de Plantilla de Personal de Aguascalientes
     async function loadPlantillaPersonal() {
         showLoading(true);
         hideErrors();
@@ -245,15 +245,11 @@
                     </div>
                 `;
             } else {
-                showError('No se encontraron documentos de plantilla de personal para Baja California Sur', 'both');
-                // Mostrar PDF local como respaldo
-                pdfViewer.src = "../../../documentacion/plantillas_personal/bajacsp/BCS1.pdf";
+                showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
             }
         } catch (error) {
             console.error('Error:', error);
             showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-            // Respuesta de emergencia - mostrar PDF local
-            document.getElementById('pdf-viewer').src = "../../../documentacion/plantillas_personal/bajacsp/BCS1.pdf";
         } finally {
             showLoading(false);
         }
@@ -276,6 +272,5 @@
         });
     });
 </script>
-
 </body>
 </html>
