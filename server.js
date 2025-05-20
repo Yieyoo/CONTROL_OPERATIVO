@@ -16,7 +16,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 1. Configuración Avanzada de Seguridad
+// Configuración de seguridad mejorada
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -52,7 +52,7 @@ app.use(morgan('combined', {
 
 app.set('trust proxy', 1);
 
-// 2. Configuración CORS Mejorada
+// Configuración CORS
 const allowedOrigins = [
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
@@ -79,19 +79,18 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'), false);
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Asegúrate de incluir OPTIONS
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
   credentials: true,
   optionsSuccessStatus: 200,
   maxAge: 86400
 };
 
-// Configuración especial para el endpoint raíz
 app.get('/', cors({ origin: '*' }), (req, res) => {
   res.json({
     status: 'success',
     message: 'API de Gestión de Archivos PDF - INM',
-    version: '1.2.0' // Versión actualizada
+    version: '1.2.0'
   });
 });
 
@@ -510,52 +509,54 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
   }
 });
 
-// ************ NUEVAS RUTAS PARA TÍTULOS PERSONALIZADOS ************
+// ************ RUTAS PARA TÍTULO GLOBAL ************
 
-// Almacenamiento de títulos (en memoria para este ejemplo)
-// En producción deberías usar una base de datos
-let titulosPersonalizados = {};
+// Variable para almacenar el título global (en producción usa una base de datos)
+let tituloGlobal = process.env.TITULO_GLOBAL_INICIAL || 'Plantilla de Personal - INM';
 
-// Ruta para guardar título personalizado
-router.post('/guardar-titulo', authenticate, async (req, res, next) => {
+// Ruta para guardar título global
+router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
   try {
-    const { estado, titulo } = req.body;
+    const { titulo } = req.body;
     
-    if (!estado || !titulo) {
-      throw new AppError('Estado y título son requeridos', 400, 'missing_fields');
+    if (!titulo || typeof titulo !== 'string') {
+      throw new AppError('Título válido es requerido', 400, 'missing_titulo');
     }
 
-    // Guardar en memoria (en producción usa una base de datos)
-    titulosPersonalizados[estado] = titulo;
+    // Actualizar en memoria
+    tituloGlobal = titulo;
 
     // También puedes guardar en Cloudinary como metadata si lo prefieres
-    // Esta es una alternativa más persistente
+    // Buscar todos los archivos de plantilla de personal para actualizar su metadata
     try {
-      // Buscar si ya existe un archivo de plantilla para este estado
       const recursos = await cloudinary.api.resources({
         type: 'upload',
-        prefix: `${estado}/plantilla_personal/`,
         resource_type: 'raw',
-        max_results: 1
+        max_results: 500,
+        context: true
       });
 
-      if (recursos.resources.length > 0) {
-        const public_id = recursos.resources[0].public_id;
-        await cloudinary.uploader.explicit(public_id, {
+      const plantillas = recursos.resources.filter(
+        res => res.public_id.includes('/plantilla_personal/')
+      );
+
+      // Actualizar metadata en cada archivo encontrado
+      await Promise.all(plantillas.map(async (resource) => {
+        const originalName = resource.context?.custom?.original_filename || 'plantilla.pdf';
+        await cloudinary.uploader.explicit(resource.public_id, {
           type: 'upload',
           resource_type: 'raw',
-          context: `titulo_documento=${titulo}|original_filename=${recursos.resources[0].context?.custom?.original_filename || 'plantilla.pdf'}`
+          context: `titulo_documento=${titulo}|original_filename=${originalName}`
         });
-      }
+      }));
     } catch (cloudinaryError) {
       console.warn('No se pudo actualizar metadata en Cloudinary:', cloudinaryError.message);
     }
 
     res.json({
       status: 'success',
-      message: 'Título guardado correctamente',
+      message: 'Título global guardado correctamente',
       data: {
-        estado: estado,
         titulo: titulo,
         updated_at: new Date().toISOString()
       }
@@ -565,53 +566,30 @@ router.post('/guardar-titulo', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para obtener título personalizado
-router.get('/obtener-titulo/:estado', authenticate, async (req, res, next) => {
+// Ruta para obtener título global
+router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
   try {
-    const { estado } = req.params;
-    
-    if (!estado) {
-      throw new AppError('Estado es requerido', 400, 'missing_estado');
-    }
-
-    // Primero intenta obtener de Cloudinary (metadata del archivo)
+    // Primero intenta obtener de Cloudinary (metadata del primer archivo de plantilla encontrado)
     try {
       const recursos = await cloudinary.api.resources({
         type: 'upload',
-        prefix: `${estado}/plantilla_personal/`,
         resource_type: 'raw',
         max_results: 1,
         context: true
       });
 
       if (recursos.resources.length > 0 && recursos.resources[0].context?.custom?.titulo_documento) {
-        return res.json({
-          status: 'success',
-          titulo: recursos.resources[0].context.custom.titulo_documento,
-          source: 'cloudinary',
-          estado: estado
-        });
+        tituloGlobal = recursos.resources[0].context.custom.titulo_documento;
       }
     } catch (cloudinaryError) {
       console.warn('Error al buscar en Cloudinary:', cloudinaryError.message);
     }
 
-    // Si no está en Cloudinary, busca en memoria
-    if (titulosPersonalizados[estado]) {
-      return res.json({
-        status: 'success',
-        titulo: titulosPersonalizados[estado],
-        source: 'memory',
-        estado: estado
-      });
-    }
-
-    // Si no se encuentra en ningún lado
     res.json({
       status: 'success',
-      titulo: null,
-      message: 'No se encontró título personalizado para este estado',
-      estado: estado
+      titulo: tituloGlobal,
+      source: 'memory',
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
     next(error);
