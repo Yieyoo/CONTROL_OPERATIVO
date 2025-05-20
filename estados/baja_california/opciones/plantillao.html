@@ -6,84 +6,22 @@
     <title>PLANTILLA DE PERSONAL - BAJA CALIFORNIA</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-    <style>
-        .error-message {
-            color: red;
-            padding: 10px;
-            background-color: #ffeeee;
-            border: 1px solid #ffcccc;
-            margin: 10px 0;
-            text-align: center;
-        }
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .pdf-container {
-            width: 100%;
-            height: 80vh;
-            margin: 20px 0;
-        }
-        .pdf-embed {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .mobile-images {
-            display: none;
-        }
-        @media (max-width: 768px) {
-            .pdf-container {
-                display: none;
-            }
-            .mobile-images {
-                display: block;
-                text-align: center;
-            }
-            .mobile-images img {
-                max-width: 100%;
-                margin: 10px 0;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="header-container qna">
-        <h1></h1>
-    </div>
-    <!-- Fondo oscuro para el menú -->
-    <div class="menu-overlay"></div>
     
-    <!-- Loading spinner -->
+    <!-- Contenedor para el título personalizado -->
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
+    </div>
+    
+    <!-- Resto de tu HTML permanece igual -->
+    <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
 
     <header>
-        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
@@ -106,21 +44,16 @@
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
                         <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <!-- Otros estados... -->
                     </ul>
                 </li>
             </ul>
         </nav>
     </header>
 
-    <!-- Contenedor de logos -->
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
-   
-    
-    <!-- Contenedor del PDF -->
     <div class="pdf-container">
         <iframe 
             id="pdf-viewer" 
@@ -131,20 +64,68 @@
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Contenedor de imágenes para móviles -->
     <div class="mobile-images">
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
-    <!-- Scripts -->
     <script>
         // Configuración
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
-        const ESTADO_FIJO = 'baja-california';  // Cambiado a Baja California
+        const ESTADO_FIJO = 'baja-california'; // Cambiado a Baja California
+        const TIPO_DOCUMENTO = 'plantilla_personal';
         
+        // Función para obtener el título personalizado
+        async function cargarTituloPersonalizado() {
+            const tituloContainer = document.getElementById('tituloContainer');
+            
+            try {
+                // 1. Primero intenta obtener el título del PDF más reciente
+                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (archivosResponse.ok) {
+                    const { data: archivos } = await archivosResponse.json();
+                    if (archivos.length > 0) {
+                        // Ordenar por fecha y obtener el más reciente
+                        const ultimoArchivo = archivos.sort((a, b) => 
+                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                        )[0];
+                        
+                        // Verificar si tiene título en los metadatos
+                        if (ultimoArchivo.titulo_documento) {
+                            tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                            return;
+                        }
+                    }
+                }
+
+                // 2. Si no encontró en los archivos, intenta con el endpoint de títulos
+                const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+                
+                if (tituloResponse.ok) {
+                    const data = await tituloResponse.json();
+                    if (data.titulo) {
+                        tituloContainer.textContent = data.titulo;
+                        return;
+                    }
+                }
+
+                // 3. Si todo falla, usar valor por defecto
+                tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+                tituloContainer.style.color = 'red';
+            }
+        }
+
         // Mostrar/ocultar loading
         function showLoading(show) {
             document.getElementById('loading').style.display = show ? 'flex' : 'none';
@@ -192,14 +173,20 @@
             event.target.closest('.submenu').classList.toggle('active');
         }
 
-        // Cargar PDF de Baja California
-        async function loadStatePDF() {
+        // Formatear fecha legible
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-MX', options);
+        }
+
+        // Cargar PDF de Plantilla de Personal de Baja California
+        async function loadPlantillaPersonal() {
             showLoading(true);
             hideErrors();
 
             try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}`, {
+                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
                 
@@ -214,21 +201,31 @@
                 const mobileContainer = document.querySelector('.mobile-images');
                 
                 if (result.data.length > 0) {
+                    // Ordenar por fecha y obtener el más reciente
                     const latestPDF = result.data.sort((a, b) => 
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
                     
+                    // Cargar PDF en el visor
                     pdfViewer.src = latestPDF.url;
+                    
+                    // Para móviles, mostrar información y opción de descarga
                     mobileContainer.innerHTML = `
-                        <img src="${latestPDF.url.replace('.pdf', '_page-0001.jpg')}" alt="Página 1">
-                        <img src="${latestPDF.url.replace('.pdf', '_page-0002.jpg')}" alt="Página 2">
+                        <div class="file-info">
+                            <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar Plantilla
+                            </a>
+                        </div>
                     `;
                 } else {
-                    showError('No se encontraron documentos para Baja California', 'both');
+                    showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError(`Error al cargar: ${error.message}`, 'both');
+                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
             } finally {
                 showLoading(false);
             }
@@ -236,9 +233,12 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
+            // Cargar título personalizado
+            cargarTituloPersonalizado();
+            
             // Cargar PDF al iniciar
             if (document.getElementById('pdf-viewer')) {
-                loadStatePDF();
+                loadPlantillaPersonal();
             }
             
             // Cerrar menús al hacer clic en opción
