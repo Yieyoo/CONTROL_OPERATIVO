@@ -700,26 +700,3 @@ h1 {
   z-index: -1;
   transform: translateZ(-10px);
 }
-/* Añade esto a tu CSS */
-@media (max-width: 768px) {
-    .pdf-container {
-        display: none; /* Oculta el iframe en móviles */
-    }
-    
-    .mobile-images {
-        display: block !important;
-        width: 100%;
-        padding: 15px;
-    }
-    
-    .pdf-viewer-link {
-        display: block;
-        background: #0066cc;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        border-radius: 5px;
-        margin: 10px 0;
-        text-decoration: none;
-    }
-}
