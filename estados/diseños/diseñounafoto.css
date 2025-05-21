@@ -700,3 +700,45 @@ h1 {
   z-index: -1;
   transform: translateZ(-10px);
 }
+/* Estilos específicos para móviles iOS - Solo mostrar en móviles iOS */
+.ios-only {
+    display: none; /* Oculto por defecto en todos los dispositivos */
+}
+
+/* Solo mostrar en iOS y en ancho móvil */
+@media only screen and (max-width: 768px) {
+    @supports (-webkit-touch-callout: none) {
+        .ios-only {
+            display: block; /* Solo visible en iOS móvil */
+            text-align: center;
+            margin: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        .ios-pdf-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+        
+        .ios-pdf-link img {
+            width: 30px;
+            height: 30px;
+        }
+        
+        .ios-instructions {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+    }
+}
