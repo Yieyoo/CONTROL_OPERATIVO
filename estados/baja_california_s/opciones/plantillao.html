@@ -103,7 +103,7 @@
     // Configuración
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO_FIJO = 'aguascalientes';
+    const ESTADO_FIJO = 'baja-california-sur';
     const TIPO_DOCUMENTO = 'plantilla_personal';
 
     // Función para obtener y cargar el título personalizado
@@ -144,11 +144,11 @@
             }
 
             // 3. Título por defecto
-            tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+            tituloContainer.textContent = 'Plantilla de Personal - Baja California Sur';
 
         } catch (error) {
             console.error('Error:', error);
-            tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+            tituloContainer.textContent = 'Plantilla de Personal - Baja California Sur';
             tituloContainer.style.color = 'red';
         }
     }
