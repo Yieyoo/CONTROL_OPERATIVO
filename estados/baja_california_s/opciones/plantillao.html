@@ -131,9 +131,9 @@
             }
 
             // 2. Obtener desde endpoint de títulos
-            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo/${ESTADO_FIJO}`, {
-                headers: { 'x-api-key': API_KEY }
-            });
+            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
+            headers: { 'x-api-key': API_KEY }
+          });
 
             if (tituloResponse.ok) {
                 const data = await tituloResponse.json();
