@@ -49,25 +49,13 @@
                 }
             }
         }
-        
-        /* Estilos específicos para CDMX */
-        .cdmx-header {
-            background-color: #f8f8f8;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 5px solid #8B0000; /* Rojo oscuro característico de CDMX */
-            text-align: center;
-        }
-        
     </style>
 </head>
 <body>
     
     <!-- Contenedor para el título personalizado -->
-    <div id="tituloContainer" class="titulo-personalizado cdmx-header">
-        
-        <h1>Cargando título...</h1>
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
     </div>
     
     <div class="menu-overlay"></div>
@@ -170,9 +158,8 @@
     // Configuración
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO_FIJO = 'ciudad-de-mexico'; // Nombre de carpeta en Cloudinary
+    const ESTADO_FIJO = 'ciudad-de-mexico';
     const TIPO_DOCUMENTO = 'plantilla_personal';
-    const PDF_LOCAL = "../../../documentacion/plantillas_personal/cdmxp/CDMX1.pdf";
 
     // Detectar iOS
     function isIOS() {
@@ -198,7 +185,7 @@
                     )[0];
 
                     if (ultimoArchivo.titulo_documento) {
-                        tituloContainer.querySelector('h1').textContent = ultimoArchivo.titulo_documento;
+                        tituloContainer.textContent = ultimoArchivo.titulo_documento;
                         return;
                     }
                 }
@@ -212,17 +199,17 @@
             if (tituloResponse.ok) {
                 const data = await tituloResponse.json();
                 if (data.titulo) {
-                    tituloContainer.querySelector('h1').textContent = data.titulo;
+                    tituloContainer.textContent = data.titulo;
                     return;
                 }
             }
 
             // 3. Título por defecto
-            tituloContainer.querySelector('h1').textContent = 'Plantilla de Personal - Ciudad de México';
+            tituloContainer.textContent = 'Plantilla de Personal - Ciudad de México';
 
         } catch (error) {
             console.error('Error:', error);
-            tituloContainer.querySelector('h1').textContent = 'Plantilla de Personal - Ciudad de México';
+            tituloContainer.textContent = 'Plantilla de Personal - Ciudad de México';
             tituloContainer.style.color = 'red';
         }
     }
@@ -280,7 +267,7 @@
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
-    // Cargar PDF de Plantilla de Personal de CDMX
+    // Cargar PDF de Plantilla de Personal de Ciudad de México
     async function loadPlantillaPersonal() {
         showLoading(true);
         hideErrors();
@@ -296,11 +283,13 @@
             const result = await response.json();
             console.log('Respuesta API:', result);
 
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
             const pdfViewer = document.getElementById('pdf-viewer');
             const mobileContainer = document.querySelector('.mobile-images');
             const iosLink = document.getElementById('ios-pdf-link');
 
-            if (result?.data?.length > 0) {
+            if (result.data.length > 0) {
                 const latestPDF = result.data.sort((a, b) => 
                     new Date(b.uploaded_at) - new Date(a.uploaded_at)
                 )[0];
@@ -311,7 +300,7 @@
                 // Configuración para móviles (no iOS)
                 mobileContainer.innerHTML = `
                     <div class="file-info">
-                        <h3>${latestPDF.filename || 'Plantilla de Personal CDMX'}</h3>
+                        <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
                         <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
                         <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
                         <a href="${latestPDF.url}" class="download-btn" download>
@@ -336,31 +325,11 @@
                     `;
                 }
             } else {
-                showError('No se encontraron documentos en la nube. Mostrando versión local.', 'both');
-                // Mostrar PDF local como respaldo
-                pdfViewer.src = PDF_LOCAL;
-                mobileContainer.innerHTML = `
-                    <div class="file-info">
-                        <h3>Plantilla de Personal CDMX (Versión Local)</h3>
-                        <a href="${PDF_LOCAL}" class="download-btn" download>
-                            Descargar Plantilla Local
-                        </a>
-                    </div>
-                `;
+                showError('No se encontraron documentos de plantilla de personal para Ciudad de México', 'both');
             }
         } catch (error) {
             console.error('Error:', error);
-            showError(`Error de conexión: Mostrando versión local. ${error.message}`, 'both');
-            // Respuesta de emergencia - mostrar PDF local
-            document.getElementById('pdf-viewer').src = PDF_LOCAL;
-            document.querySelector('.mobile-images').innerHTML = `
-                <div class="file-info">
-                    <h3>Plantilla de Personal CDMX (Versión Local)</h3>
-                    <a href="${PDF_LOCAL}" class="download-btn" download>
-                        Descargar Plantilla Local
-                    </a>
-                </div>
-            `;
+            showError(`Error al cargar la plantilla: ${error.message}`, 'both');
         } finally {
             showLoading(false);
         }
