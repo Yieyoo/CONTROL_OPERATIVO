@@ -3,68 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL</title>
+    <title>PLANTILLA DE PERSONAL - quererato</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <style>
+        /* Estilos específicos para móviles iOS */
+        .ios-only {
+            display: none; /* Oculto por defecto en todos los dispositivos */
+        }
+
+        /* Solo mostrar en iOS y en ancho móvil */
+        @media only screen and (max-width: 768px) {
+            @supports (-webkit-touch-callout: none) {
+                .ios-only {
+                    display: block;
+                    text-align: center;
+                    margin: 20px;
+                    padding: 15px;
+                    background: #f8f8f8;
+                    border-radius: 10px;
+                    border: 1px solid #ddd;
+                }
+                
+                .ios-pdf-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    background: #e74c3c;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    margin-top: 15px;
+                }
+                
+                .ios-pdf-link img {
+                    width: 30px;
+                    height: 30px;
+                }
+                
+                .ios-instructions {
+                    font-size: 14px;
+                    color: #666;
+                    margin-top: 10px;
+                }
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Fondo oscuro para el menú -->
+    
+    <!-- Contenedor para el título personalizado -->
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
+    </div>
+    
     <div class="menu-overlay"></div>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
 
     <header>
-        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
-
-            
             <ul>
-                
                 <li><a href="../../../index.html">Inicio</a></li>
-                <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
-                   <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="../../../construccion.html">Inmuebles</a></li>
-                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
+                        <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
+                        <li><a href="../../../construccion.html">Padron Vehicular</a></li>
+                        <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
                     </ul>
                 </li>
-
-                <!-- Submenú Información de ORs -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
                         <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                         <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
+                        <li><a href="../../baja_california_sur/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
                         <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
                         <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
                         <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
                         <li><a href="../../colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../../durangoindex.html">Durango</a></li>
+                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
                         <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
                         <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
                         <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
                         <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
                         <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
                         <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
                         <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
                         <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../nuevo_leon/nuevolindex.html">Nuevo León</a></li>
+                        <li><a href="../../nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
                         <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
                         <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../queretaroindex.html">Querétaro</a></li>
+                        <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
                         <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
                         <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
                         <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
@@ -81,89 +124,260 @@
         </nav>
     </header>
 
-    <!-- Contenedor de logos -->
     <div class="logo-container">
-        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
-    </div>
-    <div class="header-container qna">
-        <h1></h1>
+        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
-
-    <!-- Contenedor del PDF -->
     <div class="pdf-container">
-        <!-- Usando solo el iframe para mostrar el PDF -->
         <iframe 
-    src="../../../documentacion/plantillas_personal/queretarop/QUTRO1.pdf" 
-    class="pdf-embed"
-    frameborder="0"
-></iframe>
-
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+            title="Visualizador de PDF"
+            src="../../../documentacion/plantillas_personal/queretarop/QUTRO1.pdf"
+        ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Contenedor de imágenes solo visible en dispositivos móviles -->
+    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
+    <div id="ios-container" class="ios-only">
+        <p>Para una mejor experiencia en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
+            <img src="../../../imagenes/pdf-icon.png" alt="PDF">
+            <span>Abrir Plantilla</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
+    </div>
+
     <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
         <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0001.jpg" alt="Imagen 1">
         <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0002.jpg" alt="Imagen 2">
         <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0003.jpg" alt="Imagen 3">
 
     </div>
 
-    <button class="regresar-btn">Regresar</button>
+    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
-    <!-- Scripts -->
     <script>
-        // Función para abrir y cerrar el menú lateral
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const menuOverlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        }
+    // Configuración
+    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+    const API_KEY = 'Xhy2md57';
+    const ESTADO_FIJO = 'queretaro';
+    const TIPO_DOCUMENTO = 'plantilla_personal';
 
-        // Cerrar el menú al hacer clic fuera de él
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menuOverlay.addEventListener('click', () => {
-            const menu = document.querySelector('.menu');
-            menu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
+    // Detectar iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
 
-        // Función para cerrar todos los submenús
-        function closeAllSubmenus() {
-            const submenus = document.querySelectorAll('.submenu.active');
-            submenus.forEach(submenu => {
-                submenu.classList.remove('active');
+    // Función para obtener y cargar el título personalizado
+    async function cargarTituloPersonalizado() {
+        const tituloContainer = document.getElementById('tituloContainer');
+
+        try {
+            // 1. Obtener el archivo más reciente con título
+            const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
             });
-        }
 
-        // Función para mostrar/ocultar el submenú
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            closeAllSubmenus();
-            const submenu = event.target.closest('.submenu');
-            submenu.classList.toggle('active');
-        }
+            if (archivosResponse.ok) {
+                const { data: archivos } = await archivosResponse.json();
+                if (archivos.length > 0) {
+                    const ultimoArchivo = archivos.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
 
-        // Cerrar el submenú al hacer clic fuera de él
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                closeAllSubmenus();
+                    if (ultimoArchivo.titulo_documento) {
+                        tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                        return;
+                    }
+                }
+            }
+
+            // 2. Obtener desde endpoint de títulos
+            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (tituloResponse.ok) {
+                const data = await tituloResponse.json();
+                if (data.titulo) {
+                    tituloContainer.textContent = data.titulo;
+                    return;
+                }
+            }
+
+            // 3. Título por defecto
+            tituloContainer.textContent = 'Plantilla de Personal - Queretaro';
+
+        } catch (error) {
+            console.error('Error:', error);
+            tituloContainer.textContent = 'Plantilla de Personal - Queretaro';
+            tituloContainer.style.color = 'red';
+        }
+    }
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
+        }
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
+
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
+
+    // Función para abrir/cerrar el menú
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const overlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
             }
         });
+        event.target.closest('.submenu').classList.toggle('active');
+    }
 
-        // Cerrar el submenú al hacer clic en una opción
-        const submenuLinks = document.querySelectorAll('.submenu-list a');
-        submenuLinks.forEach(link => {
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
+
+    // Cargar PDF de Plantilla de Personal
+    async function loadPlantillaPersonal() {
+        showLoading(true);
+        hideErrors();
+
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            console.log('Respuesta API:', result);
+
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const iosLink = document.getElementById('ios-pdf-link');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                // Configuración normal para PC
+                pdfViewer.src = latestPDF.url;
+                
+                // Configuración para móviles (no iOS)
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                        <a href="${latestPDF.url}" class="download-btn" download>
+                            Descargar Plantilla
+                        </a>
+                    </div>
+                `;
+                
+                // Configuración específica para iOS
+                if (isIOS()) {
+                    // Usamos Google Viewer como alternativa para iOS
+                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
+                    iosLink.href = googleViewerUrl;
+                    
+                    // También agregamos opción de descarga directa
+                    mobileContainer.innerHTML += `
+                        <div class="ios-download-option">
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar directamente
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                // Fallback a PDF local si no hay datos en la API
+                pdfViewer.src = "../../../documentacion/plantillas_personal/queretarop/QUTRO1.pdf";
+                mobileContainer.innerHTML = `
+                 <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0001.jpg" alt="Imagen 1">
+                <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0002.jpg" alt="Imagen 2">
+                <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0003.jpg" alt="Imagen 3">
+                `;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            // Fallback a PDF local si hay error
+            document.getElementById('pdf-viewer').src = "../../../documentacion/plantillas_personal/queretarop/QUTRO1.pdf";
+            document.querySelector('.mobile-images').innerHTML = `
+            <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0001.jpg" alt="Imagen 1">
+            <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0002.jpg" alt="Imagen 2">
+            <img src="../../../documentacion/plantillas_personal/queretarop/QUTRO1_page-0003.jpg" alt="Imagen 3">
+            `;
+            showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarTituloPersonalizado();
+        if (document.getElementById('pdf-viewer')) {
+            loadPlantillaPersonal();
+        }
+
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
             link.addEventListener('click', () => {
-                closeAllSubmenus();
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
+                });
             });
         });
-
-        // Regresar al historial
-        document.querySelector('.regresar-btn').addEventListener('click', function() {
-            window.history.back();
+        
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
         });
+    });
     </script>
 </body>
 </html>
