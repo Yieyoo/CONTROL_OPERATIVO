@@ -435,11 +435,12 @@ header {
 
 .header-container {
     text-align: center;
+    margin-top: 1%;
     margin-bottom: 20px;
 }
 
 .header-container h1 {
-    color: #2c3e50;
+    color: black;
     margin: 0;
     font-size: 1.8em;
 }
