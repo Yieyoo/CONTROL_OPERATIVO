@@ -269,16 +269,6 @@
                 <ul id="fileList"></ul>
             </div>
         </div>
-
-        <!-- Eliminar archivo -->
-        <div class="delete-file">
-            <h3>Eliminar archivo</h3>
-            <select id="fileSelect">
-                <option value="">Selecciona un archivo para eliminar</option>
-            </select>
-            <button id="deleteFileButton">Eliminar</button>
-            <p id="deleteStatus"></p>
-        </div>
     </div>
 
     <!-- Contenedor del visor PDF simplificado con iframe (ahora abajo del panel de gestión) -->
@@ -398,12 +388,10 @@
         // Renderizar lista de archivos
         function renderizarListaArchivos(files) {
             const fileListContainer = document.getElementById('fileList');
-            const fileSelect = document.getElementById('fileSelect');
             
-            if (!fileListContainer || !fileSelect) return;
+            if (!fileListContainer) return;
             
             fileListContainer.innerHTML = '';
-            fileSelect.innerHTML = '<option value="">Selecciona un archivo para eliminar</option>';
 
             if (!files || files.length === 0) {
                 fileListContainer.innerHTML = '<li>No hay archivos disponibles</li>';
@@ -425,15 +413,6 @@
                     </div>
                 `;
                 fileListContainer.appendChild(li);
-
-                const option = document.createElement('option');
-                option.value = JSON.stringify({
-                    public_id: file.public_id,
-                    estado: currentCarpeta,
-                    tipo_documento: currentTipoDocumento
-                });
-                option.textContent = file.filename;
-                fileSelect.appendChild(option);
             });
 
             // Eventos para los botones
@@ -473,13 +452,13 @@
                 
                 if (!response.ok) throw new Error('Error al eliminar');
                 
-                showStatus(document.getElementById('deleteStatus'), 'Archivo eliminado y caché invalidado');
+                showStatus(document.getElementById('uploadStatus'), 'Archivo eliminado y caché invalidado');
                 await cargarListaArchivos();
                 mostrarPdf('');
                 
             } catch (error) {
                 console.error('Error al eliminar:', error);
-                showStatus(document.getElementById('deleteStatus'), error.message, true);
+                showStatus(document.getElementById('uploadStatus'), error.message, true);
             } finally {
                 showLoading(false);
             }
@@ -620,22 +599,6 @@
                 } finally {
                     showLoading(false);
                     uploadButton.disabled = false;
-                }
-            });
-
-            // Evento para eliminar archivo desde el select
-            document.getElementById('deleteFileButton')?.addEventListener('click', async () => {
-                const selected = document.getElementById('fileSelect').value ? 
-                    JSON.parse(document.getElementById('fileSelect').value) : null;
-                const deleteStatus = document.getElementById('deleteStatus');
-                
-                if (!selected?.public_id) {
-                    showStatus(deleteStatus, 'Selecciona un archivo', true);
-                    return;
-                }
-                
-                if (confirm('¿Estás seguro de eliminar este archivo?')) {
-                    await eliminarArchivo(selected.public_id, selected.estado, selected.tipo_documento);
                 }
             });
 
