@@ -51,11 +51,12 @@
         }
         
         /* Estilo para el título principal */
-        .header-container h1 {
+        .titulo-personalizado {
             color: #2c3e50;
             text-align: center;
             margin: 20px 0;
             font-size: 24px;
+            padding: 0 15px;
         }
         
         /* Estilo para la información del archivo */
@@ -88,6 +89,11 @@
     </style>
 </head>
 <body>
+    
+    <!-- Contenedor para el título personalizado -->
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
+    </div>
     
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
@@ -159,15 +165,10 @@
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
-    <div class="header-container">
-        <h1>Padrón Vehicular - Aguascalientes</h1>
-    </div>
-    
     <div class="pdf-container">
         <iframe 
             id="pdf-viewer" 
             class="pdf-embed"
-            src="../../../documentacion/vehiculos/aguascv/Vehiculos_AC.pdf"
             frameborder="0"
             title="Visualizador de PDF"
         ></iframe>
@@ -177,7 +178,7 @@
     <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
     <div id="ios-container" class="ios-only">
         <p>Para una mejor experiencia en tu dispositivo iOS:</p>
-        <a href="../../../documentacion/vehiculos/aguascv/Vehiculos_AC.pdf" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
             <img src="../../../imagenes/pdf-icon.png" alt="PDF">
             <span>Abrir Padrón Vehicular</span>
         </a>
@@ -185,13 +186,6 @@
     </div>
 
     <div class="mobile-images">
-        <div class="file-info">
-            <h3>Padrón Vehicular Aguascalientes</h3>
-            <p>Documento local</p>
-            <a href="../../../documentacion/vehiculos/aguascv/Vehiculos_AC.pdf" class="download-btn" download>
-                Descargar Padrón
-            </a>
-        </div>
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
@@ -208,6 +202,53 @@
     function isIOS() {
         return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    // Función para obtener y cargar el título personalizado
+    async function cargarTituloPersonalizado() {
+        const tituloContainer = document.getElementById('tituloContainer');
+
+        try {
+            // 1. Obtener el archivo más reciente con título
+            const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (archivosResponse.ok) {
+                const { data: archivos } = await archivosResponse.json();
+                if (archivos.length > 0) {
+                    const ultimoArchivo = archivos.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+
+                    if (ultimoArchivo.titulo_documento) {
+                        tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                        return;
+                    }
+                }
+            }
+
+            // 2. Obtener desde endpoint de títulos
+            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (tituloResponse.ok) {
+                const data = await tituloResponse.json();
+                if (data.titulo) {
+                    tituloContainer.textContent = data.titulo;
+                    return;
+                }
+            }
+
+            // 3. Título por defecto
+            tituloContainer.textContent = 'Padrón Vehicular - Aguascalientes';
+
+        } catch (error) {
+            console.error('Error:', error);
+            tituloContainer.textContent = 'Padrón Vehicular - Aguascalientes';
+            tituloContainer.style.color = 'red';
+        }
     }
 
     // Mostrar/ocultar loading
@@ -263,8 +304,81 @@
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
+    // Cargar PDF de Padrón Vehicular de Aguascalientes desde Cloudinary
+    async function loadPadronVehicular() {
+        showLoading(true);
+        hideErrors();
+
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            console.log('Respuesta API:', result);
+
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const iosLink = document.getElementById('ios-pdf-link');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                // Configuración normal para PC
+                pdfViewer.src = latestPDF.url;
+                
+                // Configuración para móviles (no iOS)
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${latestPDF.filename || 'Padrón Vehicular'}</h3>
+                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                        <a href="${latestPDF.url}" class="download-btn" download>
+                            Descargar Padrón
+                        </a>
+                    </div>
+                `;
+                
+                // Configuración específica para iOS
+                if (isIOS()) {
+                    // Usamos Google Viewer como alternativa para iOS
+                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
+                    iosLink.href = googleViewerUrl;
+                    
+                    // También agregamos opción de descarga directa
+                    mobileContainer.innerHTML += `
+                        <div class="ios-download-option">
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar directamente
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                showError('No se encontraron documentos de padrón vehicular para Aguascalientes', 'both');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar el padrón vehicular: ${error.message}`, 'both');
+        } finally {
+            showLoading(false);
+        }
+    }
+
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
+        cargarTituloPersonalizado();
+        if (document.getElementById('pdf-viewer')) {
+            loadPadronVehicular();
+        }
+
         // Cerrar submenús al hacer clic en opción
         document.querySelectorAll('.submenu-list a').forEach(link => {
             link.addEventListener('click', () => {
