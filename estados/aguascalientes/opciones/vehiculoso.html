@@ -89,12 +89,7 @@
     </style>
 </head>
 <body>
-    
-    <!-- Contenedor para el título personalizado -->
-    <div id="tituloContainer" class="titulo-personalizado">
-        Cargando título...
-    </div>
-    
+        
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -196,59 +191,12 @@
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
     const ESTADO_FIJO = 'aguascalientes';
-    const TIPO_DOCUMENTO = 'padron_vehicular';
+    const TIPO_DOCUMENTO = 'vehiculos';
 
     // Detectar iOS
     function isIOS() {
         return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    }
-
-    // Función para obtener y cargar el título personalizado
-    async function cargarTituloPersonalizado() {
-        const tituloContainer = document.getElementById('tituloContainer');
-
-        try {
-            // 1. Obtener el archivo más reciente con título
-            const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                headers: { 'x-api-key': API_KEY }
-            });
-
-            if (archivosResponse.ok) {
-                const { data: archivos } = await archivosResponse.json();
-                if (archivos.length > 0) {
-                    const ultimoArchivo = archivos.sort((a, b) => 
-                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                    )[0];
-
-                    if (ultimoArchivo.titulo_documento) {
-                        tituloContainer.textContent = ultimoArchivo.titulo_documento;
-                        return;
-                    }
-                }
-            }
-
-            // 2. Obtener desde endpoint de títulos
-            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                headers: { 'x-api-key': API_KEY }
-            });
-
-            if (tituloResponse.ok) {
-                const data = await tituloResponse.json();
-                if (data.titulo) {
-                    tituloContainer.textContent = data.titulo;
-                    return;
-                }
-            }
-
-            // 3. Título por defecto
-            tituloContainer.textContent = 'Padrón Vehicular - Aguascalientes';
-
-        } catch (error) {
-            console.error('Error:', error);
-            tituloContainer.textContent = 'Padrón Vehicular - Aguascalientes';
-            tituloContainer.style.color = 'red';
-        }
     }
 
     // Mostrar/ocultar loading
