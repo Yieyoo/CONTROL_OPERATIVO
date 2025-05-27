@@ -3,50 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Organigrama</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/organigrama.png">
+    <title>ORGANIGRAMA</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/huella.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <style>
+        /* Estilos específicos para móviles iOS */
+        @media only screen and (max-width: 768px) {
+            .ios-only {
+                display: none; /* Oculto por defecto */
+            }
+            
+            /* Solo mostrar en iOS */
+            @supports (-webkit-touch-callout: none) {
+                .ios-only {
+                    display: block;
+                    text-align: center;
+                    margin: 20px;
+                    padding: 15px;
+                    background: #f8f8f8;
+                    border-radius: 10px;
+                    border: 1px solid #ddd;
+                }
+                
+                .ios-pdf-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    background: #e74c3c;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    margin-top: 15px;
+                }
+                
+                .ios-pdf-link img {
+                    width: 30px;
+                    height: 30px;
+                }
+                
+                .ios-instructions {
+                    font-size: 14px;
+                    color: #666;
+                    margin-top: 10px;
+                }
+            }
+        }
+        
+        /* Estilo para el título principal */
+        .titulo-personalizado {
+            color: #2c3e50;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            padding: 0 15px;
+        }
+        
+        /* Estilo para la información del archivo */
+        .file-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        
+        .file-info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        
+        .download-btn:hover {
+            background: #2980b9;
+        }
+    </style>
 </head>
 <body>
-    <!-- Fondo oscuro para el menú -->
+    <h1 id="titulo-documento">ORGANIGRAMA</h1>        
     <div class="menu-overlay"></div>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
 
     <header>
-        <!-- Botón para abrir el menú en móviles -->
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
         <nav class="menu">
             <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
             <ul>
                 <li><a href="../../../index.html">Inicio</a></li>
-                <!-- Submenú Datos Nacionales -->
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                     <ul class="submenu-list">
-                    <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="../../../construccion.html">Inmuebles</a></li>
-                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
+                        <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../../construccion.html">Inmuebles</a></li>
+                        <li><a href="../../../construccion.html">Padron Vehicular</a></li>
+                        <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
                     </ul>
-                </li> 
-                <!-- Submenú Información de ORs -->
+                </li>
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
                         <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../campecheindex.html">Campeche</a></li>
+                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
                         <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
                         <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
                         <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
                         <li><a href="../../colima/colimaindex.html">Colima</a></li>
+                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
                         <li><a href="../../durango/durangoindex.html">Durango</a></li>
                         <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
                         <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
@@ -70,93 +150,217 @@
                         <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
                         <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
                         <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
                     </ul>
                 </li>
             </ul>
         </nav>
     </header>
 
-    <!-- Contenedor de logos -->
     <div class="logo-container">
-        <img src="../../../imagenes/inm logo.png" alt="Logo 1">
+        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
-    <div class="header-container">
-        <h1>Organigrama</h1>
-    </div>
-
-    <!-- Contenedor del PDF -->
     <div class="pdf-container">
-        <!-- Usando solo el iframe para mostrar el PDF -->
         <iframe 
-    src="../../../documentacion/organigramas/campecheo/CAM.pdf" 
-    class="pdf-embed"
-    frameborder="0"
-></iframe>
-
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+            title="Visualizador de PDF"
+        ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Contenedor de imágenes solo visible en dispositivos móviles    -->
+    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
+    <div id="ios-container" class="ios-only">
+        <p>Para una mejor experiencia en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
+            <img src="../../../imagenes/pdf-icon.png" alt="PDF">
+            <span>Abrir Documento</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
+    </div>
+
     <div class="mobile-images">
-        <img src="../../../documentacion/organigramas/campecheo/CAM_page-0001.jpg" alt="Imagen 1">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <button class="regresar-btn">Regresar</button>
+    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
-    <!-- Scripts -->
-    <script>
-        // Función para abrir y cerrar el menú lateral
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const menuOverlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
+<script>
+    // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
+    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+    const API_KEY = 'Xhy2md57';
+    const ESTADO = 'campeche';       // Cambia por el estado que necesites
+    const TIPO_DOCUMENTO = 'organigrama'; // Cambia por el tipo de documento que necesites
+    const TITULO_DOCUMENTO = 'ORGANIGRAMA'; // Cambia por el título que quieras mostrar
+
+    // Configuración dinámica desde URL (opcional)
+    const params = new URLSearchParams(window.location.search);
+    const estadoFromURL = params.get('estado');
+    const tipoFromURL = params.get('tipo');
+    const tituloFromURL = params.get('titulo');
+
+    // Valores finales (usa los de URL si existen, sino los definidos arriba)
+    const ESTADO_FIJO = estadoFromURL || ESTADO;
+    const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+    const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+
+    // Detectar iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
         }
-
-        // Cerrar el menú al hacer clic fuera de él
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menuOverlay.addEventListener('click', () => {
-            const menu = document.querySelector('.menu');
-            menu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-
-        // Función para cerrar todos los submenús
-        function closeAllSubmenus() {
-            const submenus = document.querySelectorAll('.submenu.active');
-            submenus.forEach(submenu => {
-                submenu.classList.remove('active');
-            });
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
         }
+    }
 
-        // Función para mostrar/ocultar el submenú
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            closeAllSubmenus();
-            const submenu = event.target.closest('.submenu');
-            submenu.classList.toggle('active');
-        }
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
 
-        // Cerrar el submenú al hacer clic fuera de él
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                closeAllSubmenus();
+    // Función para abrir/cerrar el menú
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const overlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
             }
         });
+        event.target.closest('.submenu').classList.toggle('active');
+    }
 
-        // Cerrar el submenú al hacer clic en una opción
-        const submenuLinks = document.querySelectorAll('.submenu-list a');
-        submenuLinks.forEach(link => {
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
+
+    // Cargar PDF desde Cloudinary (función genérica)
+    async function cargarDocumentoPDF() {
+        showLoading(true);
+        hideErrors();
+
+        // Actualizar título de la página
+        document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+        document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            console.log('Respuesta API:', result);
+
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const iosLink = document.getElementById('ios-pdf-link');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                // Configuración normal para PC
+                pdfViewer.src = latestPDF.url;
+                
+                // Configuración para móviles (no iOS)
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                        <a href="${latestPDF.url}" class="download-btn" download>
+                            Descargar Documento
+                        </a>
+                    </div>
+                `;
+                
+                // Configuración específica para iOS
+                if (isIOS()) {
+                    // Usamos Google Viewer como alternativa para iOS
+                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
+                    iosLink.href = googleViewerUrl;
+                    
+                    // También agregamos opción de descarga directa
+                    mobileContainer.innerHTML += `
+                        <div class="ios-download-option">
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar directamente
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar el documento: ${error.message}`, 'both');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cargar el documento PDF
+        if (document.getElementById('pdf-viewer')) {
+            cargarDocumentoPDF();
+        }
+
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
             link.addEventListener('click', () => {
-                closeAllSubmenus();
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
+                });
             });
         });
-
-        // Regresar al historial
-        document.querySelector('.regresar-btn').addEventListener('click', function() {
-            window.history.back();
+        
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>
