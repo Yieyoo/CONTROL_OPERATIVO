@@ -322,7 +322,7 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        cargarTituloPersonalizado();
+        // Eliminé la llamada a cargarTituloPersonalizado() que causaba el error
         if (document.getElementById('pdf-viewer')) {
             loadPadronVehicular();
         }
