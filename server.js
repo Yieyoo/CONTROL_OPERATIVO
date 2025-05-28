@@ -595,6 +595,17 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
     next(error);
   }
 });
+router.get('/render-ping', (req, res) => {
+  const clientIP = req.headers['x-forwarded-for'] || req.ip;
+  console.log(`📡 Ping recibido desde IP: ${clientIP} - ${new Date().toLocaleString()}`);
+  
+  res.status(200).json({
+    status: "active",
+    timestamp: new Date().toISOString(),
+    clientIP: clientIP,
+    uptime: process.uptime()
+  });
+});
 
 // Montar rutas
 app.use('/api', apiLimiter, router);
