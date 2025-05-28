@@ -120,8 +120,13 @@
     </main>
 
     <!-- Scripts -->
+
     <script src="mapa/html5countrymapv4.5/mapdata.js"></script>
     <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
+      <script type="module">
+  import { initKeepAlive } from './keep-alive.js';
+  initKeepAlive('https://control-operativo-1.onrender.com');
+</script>
 
     <script>
         function toggleMenu() {
@@ -195,9 +200,6 @@ submenuLinks.forEach(link => {
             }, 1000);
         });
     </script>
-    <script type="module">
-  import { initKeepAlive } from './keep-alive.js';
-  initKeepAlive('https://control-operativo-1.onrender.com');
-</script>
+  
 </body>
 </html>
