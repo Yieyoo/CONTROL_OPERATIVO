@@ -125,7 +125,7 @@
     <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
     
     <script type="module">
-        import { initKeepAlive } from './keep-alive.js';
+        import { initKeepAlive } from './keep-alive-simple.js';
         initKeepAlive('https://control-operativo-1.onrender.com');
     </script>
 
@@ -184,7 +184,7 @@ submenuLinks.forEach(link => {
 });
 
         // Mostrar fecha actual
-        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
+        document.getElementById("fechaactual").innerHTML = new Date().toLocaleDateString('es-MX', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -201,6 +201,7 @@ submenuLinks.forEach(link => {
             }, 1000);
         });
     </script>
+    <script type="module" src="./common.js"></script>
   
 </body>
 </html>
