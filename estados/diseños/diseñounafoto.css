@@ -47,15 +47,6 @@ header {
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
-/* --- Logos mejorados --- */
-.logo-arriba-img {
-  width: 300px;  /* Aumenta aún más el tamaño del logo */
-  margin-left: 18px;
-
-  height: auto;  /* Mantiene la proporción de la imagen sin deformarla */
-  position: relative; /* Asegura que el logo se pueda posicionar */
-  top: -195px; /* Ajusta este valor para subir el logo */
-}
 
 
 /* --- Logos en la esquina superior derecha --- */
@@ -146,7 +137,7 @@ nav.menu {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
+    width: 200px;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
   }
   

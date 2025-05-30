@@ -188,7 +188,15 @@ nav.menu {
   nav.menu.active {
     left: 0;
   }
-  
+      /* Ajuste para pantallas muy pequeñas (≤ 480px) */
+    @media screen and (max-width: 480px) {
+        body {
+            padding-top: 15px;
+        }
+        .header-container h1 {
+            font-size: 1.5rem; /* Tamaño legible */
+        }
+    }
   /* Fondo overlay con efecto de difuminado */
   .menu-overlay {
     display: none;
@@ -216,6 +224,7 @@ nav.menu {
     width: 120px;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
   }
+  
   
   /* Lista del menú - Diseño premium */
   nav.menu ul {
@@ -382,8 +391,9 @@ nav.menu {
     }
     
     .menu-toggle {
-      width: 50px;
-      height: 50px;
+      width: 40px;
+      height: 40px;
+      top: 8%;
       font-size: 20px;
     }
   }
@@ -468,23 +478,24 @@ nav.menu {
 
     .logo-container {
         top: 10px;
-        right: 10px;
+        right: -10px;
         gap: 15px;
+        height: 30px;
     }
 
     .fecha-actual {
         top: 10px;
         left: 50%;
         transform: translateX(-50%);
-        font-size: 15px;
-        padding: 4px 5px;
+        font-size: 14px;
+        padding: 3px 4px;
         background-color: rgba(255, 255, 255, 0.8);
         z-index: 1000;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     }
 
     .regresar-btn {
-        font-size: 14px;
+        font-size: 10px;
         padding: 10px 14px;
     }
 
@@ -552,25 +563,26 @@ nav.menu {
 /* --- Estilos Responsivos para Móviles --- */
 @media screen and (max-width: 768px) {
     .instituto-info h1 {
-        font-size: 1rem; /* Ajusta el tamaño de h1 en móviles */
-        font-weight: bold; /* Mantiene la negrita */
+        font-size: 1rem;
+        font-weight: bold;
     }
+
     .instituto-info h1,
     .instituto-info h2,
     .instituto-info h3 {
-        margin: 5px 0; /* Reduce el espacio vertical entre los textos */
-        padding: 0; /* Asegura que no haya padding extra */
+        margin: 5px 0;
+        padding: 0;
     }
 
-    /* Ajustes generales para compactar el contenedor */
     .instituto-info {
-        padding: 5px 1px; /* Reduce el padding interno */
-        margin-top: -200px; /* Mantiene el ajuste de altura */
+        padding: 5px 1px;
+        margin-top: 50px; /* Ahora se baja más en móviles */
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
     }
 }
+
 
 /* Estilo mejorado para integrar con tu diseño existente */
 .instituto-info {
