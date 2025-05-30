@@ -1,29 +1,55 @@
-/* --- Fondo de la página --- */
-body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    color: #333;
-    background-image: url('../../imagenes/fondo.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    flex-direction: column;
-    padding: 20px;
-    font-size: 14px;
-    overflow-x: hidden;
+/* ==================== */
+/* VARIABLES Y RESET */
+/* ==================== */
+:root {
+  --color-primario: #691932;
+  --color-secundario: #A5852E;
+  --color-terciario: #285c4d;
+  --color-texto: #333;
+  --color-blanco: #fff;
+  --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  zoom: 1;
+}
+
+/* ==================== */
+/* ESTRUCTURA BASE */
+/* ==================== */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  color: var(--color-texto);
+  background-image: url('../../imagenes/fondo.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  padding: 20px;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
 body::before {
   content: '';
   position: fixed;
   top: 0;
   right: 0;
-  width: 45%; /* Ajusta según el ancho de tu imagen */
+  width: 45%;
   height: 100vh;
   background-image: url('../../imagenes/fondoderecha.jpg');
   background-size: cover;
@@ -33,7 +59,6 @@ body::before {
   pointer-events: none;
 }
 
-/* --- Header mejorado --- */
 header {
     background-color: #691932;
     color: white;
@@ -49,559 +74,393 @@ header {
 }
 
 
-/* --- Logos en la esquina superior derecha --- */
+/* ==================== */
+/* ESTRUCTURA PRINCIPAL */
+/* ==================== */
+.contenedor-principal {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 5px;
+  background-color: var(--color-blanco);
+  border-radius: 8px;
+  box-shadow: var(--sombra);
+  margin-top: 20px;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ==================== */
+/* COMPONENTES DE CABECERA */
+/* ==================== */
+/* Información del instituto */
+.instituto-info {
+  background: linear-gradient(to right, #6b1e3f, #320d1c);
+  color: var(--color-blanco);
+  text-align: center;
+  padding: 20px 0;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  width: 100vw;
+  position: relative;
+  left: 0%;
+  right: 0%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
+}
+
+.instituto-info h1 {
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.instituto-info h2 {
+  font-size: 17px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.instituto-info h3 {
+  font-size: 17px;
+  font-weight: 400;
+}
+
+/* Estado info */
+.estado-info {
+  background-color: var(--color-secundario);
+  color: var(--color-blanco);
+  text-align: center;
+  padding: 0.8rem 0;
+  margin: 0;
+  width: 100vw;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  top: -1rem;
+  left: 0;
+}
+
+.estado-info h4 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  position: relative;
+}
+
+/* Logos en esquina superior derecha */
 .logo-container {
-    position: fixed;
-    top: 40px;
-    right: 20px;
-    display: flex;
-    gap: 20px;
-    z-index: 100;
+  position: fixed;
+  top: 50px;
+  right: 20px;
+  display: flex;
+  gap: 20px;
+  z-index: 5;
 }
 
 .logo-container img {
-    width: 120px;
-    height: auto;
-    object-fit: contain;
-    cursor: pointer;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  cursor: pointer;
 }
 
-/* --- Fecha debajo del logo --- */
+/* Fecha actual */
 .fecha-actual {
-    position: fixed;
-    top: 90px;
-    right: 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #691932;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 8px 12px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-primario);
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  z-index: 5;
 }
 
-/* --- Menú lateral estilizado --- *//* Menú principal - Diseño mejorado */
+/* ==================== */
+/* COMPONENTES DE NAVEGACIÓN */
+/* ==================== */
+/* Menú lateral */
 nav.menu {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 300px;
-    height: 100%;
-    background: linear-gradient(135deg, #691932 0%, #4d1224 100%);
-    padding-top: 100px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
-    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
-    border-top-right-radius: 25px;
-    border-bottom-right-radius: 25px;
-    overflow: hidden;
-  }
-  
-  /* Efecto de borde sutil */
-  nav.menu::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(to bottom, #A5852E, #c49d3a);
-  }
-  
-  nav.menu.active {
-    left: 0;
-  }
-  
-  /* Fondo overlay con efecto de difuminado */
-  .menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-    z-index: 999;
-    animation: fadeIn 0.3s ease;
-  }
-  
-  .menu-overlay.active {
-    display: block;
-  }
-  
-  /* Logo del menú */
-  .logo-arriba-img {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-  }
-  
-  /* Lista del menú - Diseño premium */
-  
-/* Lista del menú - Diseño premium */
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 300px;
+  height: 100%;
+  background: linear-gradient(135deg, var(--color-primario) 0%, #4d1224 100%);
+  padding-top: 100px;
+  transition: var(--transicion);
+  z-index: 1000;
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  overflow: hidden;
+}
+
+/* Efecto de borde sutil */
+nav.menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--color-secundario), #c49d3a);
+}
+
+nav.menu.active {
+  left: 0;
+}
+
+/* Logo del menú */
+.logo-arriba-img {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Lista del menú */
 nav.menu ul {
   list-style-type: none;
   padding: 0 20px;
-  margin-top: 70px;
+  margin: 0;
 }
 
 nav.menu > ul {
-  margin-top: 70px; /* Solo afecta a las ideas principales */
+  margin-top: 90px;
 }
 
-nav.menu ul ul {
-  margin-top: 5%; /* Ajusta el margen para evitar que se baje demasiado */
+nav.menu ul li {
+  margin-bottom: 15px;
+  position: relative;
 }
 
-  
-  nav.menu ul li {
-    margin-bottom: 15px;
-    position: relative;
-  }
-  
-  nav.menu ul li a {
-    text-decoration: none;
-    color: white;
-    font-size: 16px;
-    font-weight: 500;
-    display: block;
-    padding: 14px 20px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-left: 3px solid transparent;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 8px;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  nav.menu ul li a:hover {
-    background-color: rgba(255, 255, 255, 0.12);
-    transform: translateX(8px);
-    border-left: 3px solid #A5852E;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Submenú - Diseño acordeón mejorado */
-  .submenu-list {
-    display: none;
-    padding-left: 10px;
-    animation: slideDown 0.3s ease;
-    margin-top: 10px;
-    border-left: 2px dashed rgba(255, 255, 255, 0.1);
-  }
-  
-  .submenu.active .submenu-list {
-    display: block;
-  }
-  
-  .submenu-list li a {
-    padding: 12px 18px;
-    font-size: 14px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    margin-bottom: 8px;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-  
-  .submenu-list li a:hover {
-    background-color: rgba(165, 133, 46, 0.2);
-    transform: translateX(5px);
-  }
-  
-  /* Indicador de submenú */
-  .submenu > a::after {
-    content: '›';
-    position: absolute;
-    right: 20px;
-    transform: rotate(90deg);
-    transition: transform 0.3s ease;
-  }
-  
-  .submenu.active > a::after {
-    transform: rotate(270deg);
-  }
-  
-  /* Botón de menú - Diseño premium */
-  .menu-toggle {
-    background: linear-gradient(135deg, #A5852E 0%, #c49d3a 100%);
-    color: white;
-    border: none;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-    cursor: pointer;
-    position: fixed;
-    top: 100px;
-    left: 20px;
-    border-radius: 50%;
-    z-index: 100000;
-    box-shadow: 0 8px 25px rgba(165, 133, 46, 0.4);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .menu-toggle:hover {
-    transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
-  }
-  
-  /* Scroll del submenú - Estilo mejorado */
-  .submenu {
-    max-height: 400px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #A5852E transparent;
-    padding-right: 5px;
-  }
-  
-  .submenu::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .submenu::-webkit-scrollbar-thumb {
-    background-color: #A5852E;
-    border-radius: 4px;
-    background-clip: padding-box;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .submenu::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  /* Animaciones */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes slideDown {
-    from { 
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to { 
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Efecto de iluminación para items activos */
-  nav.menu ul li a.active {
-    background-color: rgba(165, 133, 46, 0.3);
-    border-left: 3px solid #A5852E;
-    font-weight: 600;
-  }
-  
-  /* Responsive para móviles */
-  @media (max-width: 768px) {
-    nav.menu {
-      width: 260px;
-      left: -260px;
-    }
-    
-    .menu-toggle {
-      width: 30px;
-      top: 11%;
-      height: 30px;
-      font-size: 20px;
-    }
-  }
-  
-/* --- Estilos Responsivos (Móviles) --- */
-@media screen and (max-width: 1024px) {
-
-    .logo-container {
-        margin-top: 10px; /* o el valor que necesites */
-        right: 10px;
-        gap: 15px;
-    }
-    
-    .fecha-actual {
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 15px;
-        padding: 4px 5px;
-    }
-
-    .logo-arriba-img {
-        width: 100px;
-    }
-
-    /* Ajuste específico para PDF en móviles */
-    .pdf-viewer {
-        height: 60vh;
-        min-height: 300px;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    @supports (-webkit-touch-callout: none) {
-        .pdf-viewer {
-            height: calc(100vh - 150px);
-        }
-    }
-
-    /* Ajuste contenedor PDF en dispositivos pequeños */
-    .pdf-container {
-        width: 95%;
-        max-width: 100%;
-        margin: 10px auto;
-        display: none;
-    }
-
-    .pdf-viewer iframe {
-        height: 100%;
-        width: 100%;
-    }
+nav.menu ul li a {
+  text-decoration: none;
+  color: var(--color-blanco);
+  font-size: 16px;
+  font-weight: 500;
+  display: block;
+  padding: 14px 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid transparent;
+  transition: var(--transicion);
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Logo en la parte superior --- */
-
-/* --- Estilo para los botones --- */
-form button, #deleteButton, .file-button, .upload-button {
-    background-color: #691932;
-    color: #fff;
-    padding: 12px 25px;
-    font-size: 16px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+nav.menu ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(8px);
+  border-left: 3px solid var(--color-secundario);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-form button:hover, #deleteButton:hover, .file-button:hover, .upload-button:hover {
-    background-color: #8e5c71;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+/* Submenú */
+.submenu-list {
+  display: none;
+  padding-left: 10px;
+  animation: slideDown 0.3s ease;
+  margin-top: 10px;
+  border-left: 2px dashed rgba(255, 255, 255, 0.1);
 }
 
-/* --- Estilo para el selector de archivo --- */
-#pdfInput {
-    background-color: #691932;
-    color: #fff;
-    padding: 10px 20px;
-    font-size: 14px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    display: block;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 300px;
+.submenu.active .submenu-list {
+  display: block;
 }
 
-#pdfInput:hover {
-    background-color: #8e5c71;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+.submenu-list li a {
+  padding: 12px 18px;
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: var(--transicion);
 }
 
-#pdfInput::file-selector-button {
-    display: none;
+.submenu-list li a:hover {
+  background-color: rgba(165, 133, 46, 0.2);
+  transform: translateX(5px);
 }
 
-/* --- Estilos generales --- */
-html, body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+/* Indicador de submenú */
+.submenu > a::after {
+  content: '›';
+  position: absolute;
+  right: 20px;
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
 }
 
-/* --- Contenedor principal del PDF (con márgenes) --- */
-.pdf-container {
-    width: 95%;
-    max-width: 1200px;
-    margin: 20px auto;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.submenu.active > a::after {
+  transform: rotate(270deg);
 }
 
-/* --- Visor del PDF (estético y responsive) --- */
-.pdf-viewer {
-    width: 100%;
-    height: 75vh;
-    min-height: 500px;
-    border: none;
-    display: block;
-}
-.pdf-embed {
-    width: 100%;
-    height: 80vh;
-    min-height: 600px;
-    border: 1px solid #691932;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Iframe del PDF (ajuste perfecto) */
-.pdf-viewer iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
+/* Botón de menú */
+.menu-toggle {
+  background: linear-gradient(135deg, var(--color-secundario) 0%, #c49d3a 100%);
+  color: var(--color-blanco);
+  border: none;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  cursor: pointer;
+  position: fixed;
+  top: 100px;
+  left: 20px;
+  border-radius: 50%;
+  z-index: 100000;
+  box-shadow: 0 8px 25px rgba(165, 133, 46, 0.4);
+  transition: var(--transicion);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* --- Estilo del botón de eliminar --- */
-#deleteButton {
-    width: 200px;
-    background-color: #691932;
+.menu-toggle:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
 }
 
-/* --- Estilo para el contenedor de los botones de subir --- */
-.upload-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    width: 100%;
+/* Scroll del submenú */
+.submenu {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-secundario) transparent;
+  padding-right: 5px;
 }
 
-/* --- Botón de regresar --- */
+.submenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+  background-color: var(--color-secundario);
+  border-radius: 4px;
+  background-clip: padding-box;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.submenu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Overlay del menú */
+.menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+.menu-overlay.active {
+  display: block;
+}
+
+/* Botón de regresar */
 .regresar-btn {
-    background-color: #691932;
-    color: white;
-    border: none;
-    padding: 12px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    position: fixed;
-    top: 40px;         /* Posición desde la parte superior */
-    left: 20px;        /* Posición desde la parte izquierda */
-    border-radius: 5px;
-    z-index: 10;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease;
-}
-@media (max-width: 768px) {
-  .regresar-btn {
-    padding: 5px 8px;
-    font-size: 8px;
-    top: 40px;
-    left: 10px;
-  }
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  position: fixed;
+  top: 50px;
+  left: 20px;
+  border-radius: 5px;
+  z-index: 900;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
 }
 
 .regresar-btn:hover {
-    background-color: #8e5c71;
-}
-
-/* --- Header con título --- */
-/* Estilo general para el título */
-.header-container h1 {
-    text-align: center; /* Centra el título */
-    padding-top: 50px; /* Agrega espacio arriba del encabezado */
-    padding-bottom: 20px; /* Espacio debajo del encabezado */
-    font-size: 2rem; /* Tamaño de fuente normal para pantallas grandes */
-}
-
-/* Estilos específicos para dispositivos móviles */
-@media screen and (max-width: 768px) {
-    .header-container h1 {
-        padding-top: 80px; /* Aumenta el espacio superior en móviles */
-        font-size: 1rem; /* Tamaño de fuente más pequeño en móviles */
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .header-container h1 {
-        font-size: 1rem; /* Tamaño de fuente aún más pequeño en pantallas muy pequeñas */
-    }
+  background-color: #8e5c71;
 }
 
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
+
+/* ==================== */
+/* BOTONES */
+/* ==================== */
+.opciones-grid button {
+  font-size: 16px;
+  font-weight: 200;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.4;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: var(--transicion);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  color: var(--color-blanco);
+  flex: 1;
+  max-width: 100%;
 }
 
-/* Estilos para las imágenes dentro del contenedor */
-.mobile-images img {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.opciones-grid button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-/* Estilos para ocultar las imágenes en pantallas grandes */
-.mobile-images {
-    display: none;  /* Ocultar el contenedor en pantallas grandes */
+/* Colores específicos para los botones */
+.btn-1 {
+  background-color: black;
 }
 
-@media screen and (max-width: 768px) {
-    /* Desactiva el centrado flex en móviles */
-    body {
-        display: block !important;
-        padding: 20px 10px 0; /* Arriba | Laterales | Abajo */
-        text-align: center; /* Centra el texto (h1, botones, etc.) */
-    }
-
-    /* Asegura que el título esté pegado arriba */
-    .header-container {
-        margin-top: 0;
-        padding-top: 10px; /* Espacio mínimo arriba */
-    }
-
-    /* Espacio entre título e imágenes */
-    .mobile-images {
-        display: block !important;
-        margin-top: 20px;
-        position: relative;
-        z-index: 100;
-    }
-
-    /* Ajuste para pantallas muy pequeñas (≤ 480px) */
-    @media screen and (max-width: 480px) {
-        body {
-            padding-top: 15px;
-        }
-        .header-container h1 {
-            font-size: 1.5rem; /* Tamaño legible */
-        }
-    }
-}
-.mobile-images img {
-    width: 90%;
-    max-width: 350px;
-    height: auto;
-    border-radius: 12px; /* Bordes redondeados */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra suave */
-    border: 3px solid #691932; /* Borde color principal */
-    transition: all 0.3s ease; /* Transición suave */
-    margin: 15px auto;
-    display: block;
-    object-fit: cover; /* Ajuste de imagen sin distorsión */
+.btn-1:hover {
+  background-color: grey;
 }
 
-.mobile-images img:hover {
-    transform: scale(1.02); /* Efecto zoom al pasar el mouse */
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
-}
-/* Definir la variable con el texto completo en CSS */
-.qna {
-  --header-text: "Plantilla de Personal QNA 9";  /* Cambia aquí el texto cuando lo necesites */
+.btn-2,
+.btn-3,
+.btn-6,
+.btn-7,
+.btn-8 {
+  background-color: var(--color-primario);
 }
 
-/* Insertamos el texto en el h1 usando el pseudoelemento ::before */
-.qna h1::before {
-  content: var(--header-text);
+.btn-2:hover,
+.btn-3:hover,
+.btn-6:hover,
+.btn-7:hover,
+.btn-8:hover {
+  background-color: #8e5c71;
 }
+
+.btn-4,
+.btn-5 {
+  background-color: var(--color-terciario);
+}
+
+.btn-4:hover,
+.btn-5:hover {
+  background-color: #3a7d60;
+}
+
+/* ==================== */
+/* COMPONENTES DE GESTIÓN DE ARCHIVOS */
+/* ==================== */
 .gestion-archivos {
   padding: 20px;
   max-width: 1000px;
@@ -637,35 +496,58 @@ h1 {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-#deleteFileButton, .delete-file button {
-  background-color: #d9534f; /* Rojo */
-  color: #fff;
-  padding: 12px 25px;
-  font-size: 16px;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+/* ==================== */
+/* VISOR PDF */
+/* ==================== */
+.pdf-container {
+  width: 95%;
+  max-width: 1200px;
+  margin: 20px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-#deleteFileButton:hover, .delete-file button:hover {
-  background-color: #c9302c; /* Rojo más oscuro al hacer hover */
+.pdf-viewer {
+  width: 100%;
+  height: 75vh;
+  min-height: 500px;
+  border: none;
+  display: block;
 }
+
+.pdf-embed {
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  border: 1px solid var(--color-primario);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.pdf-viewer iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* ==================== */
+/* TÍTULOS PERSONALIZADOS */
+/* ==================== */
 .titulo-personalizado {
   background: white;
   padding: 20px 30px;
-  margin: 55px auto 25px auto; /* Aumenta el margen superior */
+  margin: 55px auto 25px auto;
   text-align: center;
   font-size: 1.4em;
-  color: #691932;
+  color: var(--color-primario);
   border-radius: 12px;
   box-shadow: 0 5px 15px rgba(26, 62, 114, 0.1);
   max-width: 80%;
   position: relative;
-  border-top: 4px solid #A5852E;
+  border-top: 4px solid var(--color-secundario);
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -691,48 +573,229 @@ h1 {
   z-index: -1;
   transform: translateZ(-10px);
 }
-/* Estilos específicos para móviles iOS - Solo mostrar en móviles iOS */
-.ios-only {
-    display: none; /* Oculto por defecto en todos los dispositivos */
+
+/* Definir la variable con el texto completo en CSS */
+.qna {
+  --header-text: "Plantilla de Personal QNA 9";
 }
 
-/* Solo mostrar en iOS y en ancho móvil */
-@media only screen and (max-width: 768px) {
-    @supports (-webkit-touch-callout: none) {
-        .ios-only {
-            display: block; /* Solo visible en iOS móvil */
-            text-align: center;
-            margin: 20px;
-            padding: 15px;
-            background: #f8f8f8;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
-        
-        .ios-pdf-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #e74c3c;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            margin-top: 15px;
-        }
-        
-        .ios-pdf-link img {
-            width: 30px;
-            height: 30px;
-        }
-        
-        .ios-instructions {
-            font-size: 14px;
-            color: #666;
-            margin-top: 10px;
-        }
-    }
+/* Insertamos el texto en el h1 usando el pseudoelemento ::before */
+.qna h1::before {
+  content: var(--header-text);
 }
+
+/* ==================== */
+/* IMÁGENES MÓVILES */
+/* ==================== */
+.mobile-images {
+  display: none;
+}
+
+.mobile-images img {
+  width: 90%;
+  max-width: 350px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border: 3px solid var(--color-primario);
+  transition: all 0.3s ease;
+  margin: 15px auto;
+  display: block;
+  object-fit: cover;
+}
+
+.mobile-images img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== */
+/* ESTILOS PARA iOS */
+/* ==================== */
+.ios-only {
+  display: none;
+}
+
+/* ==================== */
+/* ANIMACIONES */
+/* ==================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== */
+/* MEDIA QUERIES */
+/* ==================== */
+@media screen and (max-width: 768px) {
+  /* Estilos generales */
+  body {
+    padding: 10px;
+    overflow-x: hidden;
+  }
+  
+  /* Contenedores */
+  .contenedor-principal,
+  .opciones-container {
+    padding: 15px;
+    width: 100%;
+  }
+  
+  /* Opciones grid */
+  .opciones-grid {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .opciones-grid button {
+    padding: 12px 16px;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  /* Menú */
+  nav.menu {
+    width: 260px;
+    left: -260px;
+  }
+  
+  /* Botón de menú */
+  .menu-toggle {
+    width: 30px;
+    height: 30px;
+    top: 10%;
+    font-size: 20px;
+  }
+  
+  /* Logos */
+  .logo-container {
+    top: 40px;
+    right: 10px;
+    gap: 15px;
+  }
+  
+  /* Fecha actual */
+  .fecha-actual {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 15px;
+    padding: 4px 5px;
+  }
+  
+  /* Botón regresar */
+  .regresar-btn {
+    font-size: 7px;
+    padding: 8px 10px;
+    margin-top: -10px;
+  }
+  
+  /* Estado info */
+  .estado-info {
+    font-size: 20px;
+    margin-top: -30px;
+  }
+  
+  /* Instituto info */
+  .instituto-info {
+    padding: 25px 15px;
+  }
+  
+  .instituto-info h1 {
+    font-size: 1rem;
+  }
+  
+  .instituto-info h1,
+  .instituto-info h2,
+  .instituto-info h3 {
+    margin: 5px 0;
+    padding: 0;
+  }
+  
+  .instituto-info {
+    padding: 5px 1px;
+    margin-top: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .estado-info {
+    top: -0.5rem;
+    padding: 0.6rem 0;
+  }
+  
+  .estado-info h4 {
+    font-size: 1rem;
+  }
+
+  /* Mostrar imágenes en móviles */
+  .mobile-images {
+    display: block !important;
+    margin-top: 20px;
+    position: relative;
+    z-index: 100;
+  }
+
+  /* Ajuste para pantallas muy pequeñas (≤ 480px) */
+  @media screen and (max-width: 480px) {
+    body {
+      padding-top: 15px;
+    }
+    .header-container h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Solo mostrar en iOS y en ancho móvil */
+  @supports (-webkit-touch-callout: none) {
+    .ios-only {
+      display: block;
+      text-align: center;
+      margin: 20px;
+      padding: 15px;
+      background: #f8f8f8;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+    
+    .ios-pdf-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #e74c3c;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-top: 15px;
+    }
+    
+    .ios-pdf-link img {
+      width: 30px;
+      height: 30px;
+    }
+    
+    .ios-instructions {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+    }
+  }
+}
+
+/* Ajuste específico para h1 */
 h1 {
   margin-top: 80px;
 }
