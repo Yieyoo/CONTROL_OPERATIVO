@@ -500,61 +500,62 @@ nav.menu ul li a:hover {
 /* ==================== */
 /* VISOR PDF */
 /* ==================== */
-/* Contenedor principal - Elimina todo espacio innecesario */
 .pdf-container {
-  width: 100vw; /* Ocupa todo el ancho visible */
-  height: 100vh; /* Ocupa toda la altura visible */
-  margin: 0;
-  padding: 0;
-  position: fixed;
-  top: 0;
-  left: 0;
+  width: 95%;
+  max-width: 1200px;
+  margin: 15px auto;
+  border-radius: 12px;
   overflow: hidden;
-  background: #f0f0f0; /* Color de fondo temporal */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: #fff;
 }
 
-/* Visor de PDF - Ajuste perfecto a pantalla */
+/* Estilos para el visor de PDF */
 .pdf-embed {
   width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: transparent;
+  height: 80vh;
+  min-height: 400px; /* Reducido para móviles */
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background: #f8f8f8;
 }
 
-/* Corrección específica para iOS */
-@supports (-webkit-touch-callout: none) {
+/* Media queries para diferentes tamaños de pantalla */
+
+
+/* Media queries para ajustes específicos */
+@media only screen and (max-width: 768px) {
   .pdf-embed {
-    height: 100vh !important;
-    max-height: -webkit-fill-available; /* Corrige altura en Safari iOS */
+    height: calc(100vh - 50px); /* Altura completa menos espacio del header */
   }
 }
 
-/* Ajustes para dispositivos móviles */
-@media only screen and (max-width: 768px) {
-  .pdf-container {
-    background: white; /* Fondo blanco para que no se note el margen */
+@media only screen and (max-width: 480px) {
+  .pdf-embed {
+    height: calc(100vh - 40px); /* Ajuste para móviles pequeños */
   }
   
-  .pdf-embed {
-    transform-origin: top left;
-    transform: scale(0.98); /* Pequeño ajuste para evitar bordes blancos */
-    width: 102%; /* Compensa el scale */
-    height: 102%;
+  /* Opcional: Ocultar otros elementos cuando se ve el PDF */
+  .logo-container, .regresar-btn {
+    display: none;
   }
 }
 
-/* Orientación horizontal */
-@media only screen and (orientation: landscape) {
+/* Orientación horizontal en móviles */
+@media only screen and (max-width: 768px) and (orientation: landscape) {
   .pdf-embed {
-    width: 100%;
-    height: 100vh;
-    transform: none;
+    height: calc(100vh - 30px); /* Menos espacio en horizontal */
   }
 }
+
+/* Dispositivos muy pequeños */
+@media only screen and (max-height: 600px) {
+  .pdf-embed {
+    height: 100vh; /* Ocupa toda la pantalla */
+  }
+}
+
 /* ==================== */
 /* TÍTULOS PERSONALIZADOS */
 /* ==================== */
