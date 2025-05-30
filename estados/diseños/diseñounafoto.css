@@ -503,34 +503,75 @@ nav.menu ul li a:hover {
 .pdf-container {
   width: 95%;
   max-width: 1200px;
-  margin: 20px auto;
+  margin: 15px auto;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: #fff;
 }
 
-.pdf-viewer {
-  width: 100%;
-  height: 75vh;
-  min-height: 500px;
-  border: none;
-  display: block;
-}
-
+/* Estilos para el visor de PDF */
 .pdf-embed {
   width: 100%;
   height: 80vh;
-  min-height: 600px;
-  border: 1px solid var(--color-primario);
+  min-height: 400px; /* Reducido para móviles */
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background: #f8f8f8;
 }
 
-.pdf-viewer iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
+/* Media queries para diferentes tamaños de pantalla */
+@media only screen and (max-width: 768px) {
+  .pdf-container {
+    width: 92%;
+    margin: 10px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  
+  .pdf-embed {
+    height: 70vh;
+    min-height: 300px;
+    border-radius: 6px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .pdf-container {
+    width: 90%;
+    margin: 8px auto;
+    border-radius: 6px;
+  }
+  
+  .pdf-embed {
+    height: 65vh;
+    min-height: 250px;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  /* Añadir un poco de padding en móviles muy pequeños */
+  body {
+    padding: 0 5px;
+  }
+}
+
+/* Estilo para cuando el PDF está cargando */
+.pdf-container.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: #f5f5f5;
+}
+
+/* Mejoras para tablets en orientación vertical */
+@media only screen and (min-width: 481px) and (max-width: 768px) and (orientation: portrait) {
+  .pdf-embed {
+    height: 75vh;
+    min-height: 500px;
+  }
 }
 
 /* ==================== */
