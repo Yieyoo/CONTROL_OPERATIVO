@@ -29,7 +29,6 @@
                     display: inline-flex;
                     align-items: center;
                     gap: 10px;
-                    background: #e74c3c;
                     color: white;
                     padding: 12px 20px;
                     border-radius: 8px;
@@ -174,235 +173,211 @@
     const API_KEY = 'Xhy2md57';
     const ESTADO_FIJO = 'quintana-roo';
     const TIPO_DOCUMENTO = 'plantilla_personal';
+// Detectar iOS
+function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
 
-    // Detectar iOS
-    function isIOS() {
-        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    }
+// Función para obtener y cargar el título personalizado
+async function cargarTituloPersonalizado() {
+    const tituloContainer = document.getElementById('tituloContainer');
 
-    // Función para obtener y cargar el título personalizado
-    async function cargarTituloPersonalizado() {
-        const tituloContainer = document.getElementById('tituloContainer');
-
-        try {
-            // 1. Obtener el archivo más reciente con título
-            const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                headers: { 'x-api-key': API_KEY }
-            });
-
-            if (archivosResponse.ok) {
-                const { data: archivos } = await archivosResponse.json();
-                if (archivos.length > 0) {
-                    const ultimoArchivo = archivos.sort((a, b) => 
-                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                    )[0];
-
-                    if (ultimoArchivo.titulo_documento) {
-                        tituloContainer.textContent = ultimoArchivo.titulo_documento;
-                        return;
-                    }
-                }
-            }
-
-            // 2. Obtener desde endpoint de títulos
-            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                headers: { 'x-api-key': API_KEY }
-            });
-
-            if (tituloResponse.ok) {
-                const data = await tituloResponse.json();
-                if (data.titulo) {
-                    tituloContainer.textContent = data.titulo;
-                    return;
-                }
-            }
-
-            // 3. Título por defecto
-            tituloContainer.textContent = 'Plantilla de Personal - Quintana Roo';
-
-        } catch (error) {
-            console.error('Error:', error);
-            tituloContainer.textContent = 'Plantilla de Personal - Quintana Roo';   
-            tituloContainer.style.color = 'red';
-        }
-    }
-
-    // Mostrar/ocultar loading
-    function showLoading(show) {
-        document.getElementById('loading').style.display = show ? 'flex' : 'none';
-    }
-
-    // Mostrar mensaje de error
-    function showError(message, target = 'both') {
-        if (target === 'both' || target === 'pdf') {
-            const pdfError = document.getElementById('pdf-error');
-            pdfError.textContent = message;
-            pdfError.style.display = 'block';
-        }
-        if (target === 'both' || target === 'mobile') {
-            const mobileError = document.getElementById('mobile-error');
-            mobileError.textContent = message;
-            mobileError.style.display = 'block';
-        }
-    }
-
-    // Ocultar errores
-    function hideErrors() {
-        document.getElementById('pdf-error').style.display = 'none';
-        document.getElementById('mobile-error').style.display = 'none';
-    }
-
-    // Función para abrir/cerrar el menú
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const overlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        overlay.classList.toggle('active');
-    }
-
-    // Cerrar menú al hacer clic fuera
-    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-    // Función para submenús
-    function toggleSubmenu(event) {
-        event.preventDefault();
-        document.querySelectorAll('.submenu.active').forEach(sub => {
-            if (sub !== event.target.closest('.submenu')) {
-                sub.classList.remove('active');
-            }
+    try {
+        // 1. Obtener el archivo más reciente con título
+        const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+            headers: { 'x-api-key': API_KEY }
         });
-        event.target.closest('.submenu').classList.toggle('active');
-    }
 
-    // Formatear fecha legible
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('es-MX', options);
-    }
-
-    // Cargar PDF de Plantilla de Personal
-    async function loadPlantillaPersonal() {
-        showLoading(true);
-        hideErrors();
-
-        try {
-            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
-            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                headers: { 'x-api-key': API_KEY }
-            });
-
-            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-
-            const result = await response.json();
-            console.log('Respuesta API:', result);
-
-            if (!result?.data) throw new Error('Formato de respuesta inválido');
-
-            const pdfViewer = document.getElementById('pdf-viewer');
-            const mobileContainer = document.querySelector('.mobile-images');
-            const iosLink = document.getElementById('ios-pdf-link');
-
-            if (result.data.length > 0) {
-                const latestPDF = result.data.sort((a, b) => 
+        if (archivosResponse.ok) {
+            const { data: archivos } = await archivosResponse.json();
+            if (archivos.length > 0) {
+                const ultimoArchivo = archivos.sort((a, b) => 
                     new Date(b.uploaded_at) - new Date(a.uploaded_at)
                 )[0];
 
-                // Configuración normal para PC
-                pdfViewer.src = latestPDF.url;
+                if (ultimoArchivo.titulo_documento) {
+                    tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                    return;
+                }
+            }
+        }
+
+        // 2. Obtener desde endpoint de títulos
+        const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
+            headers: { 'x-api-key': API_KEY }
+        });
+
+        if (tituloResponse.ok) {
+            const data = await tituloResponse.json();
+            if (data.titulo) {
+                tituloContainer.textContent = data.titulo;
+                return;
+            }
+        }
+
+        // 3. Título por defecto
+        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+
+    } catch (error) {
+        console.error('Error:', error);
+        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+        tituloContainer.style.color = 'red';
+    }
+}
+
+// Mostrar/ocultar loading
+function showLoading(show) {
+    document.getElementById('loading').style.display = show ? 'flex' : 'none';
+}
+
+// Mostrar mensaje de error
+function showError(message, target = 'both') {
+    if (target === 'both' || target === 'pdf') {
+        const pdfError = document.getElementById('pdf-error');
+        pdfError.textContent = message;
+        pdfError.style.display = 'block';
+    }
+    if (target === 'both' || target === 'mobile') {
+        const mobileError = document.getElementById('mobile-error');
+        mobileError.textContent = message;
+        mobileError.style.display = 'block';
+    }
+}
+
+// Ocultar errores
+function hideErrors() {
+    document.getElementById('pdf-error').style.display = 'none';
+    document.getElementById('mobile-error').style.display = 'none';
+}
+
+// Función para abrir/cerrar el menú
+function toggleMenu() {
+    const menu = document.querySelector('.menu');
+    const overlay = document.querySelector('.menu-overlay');
+    menu.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+// Cerrar menú al hacer clic fuera
+document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+// Función para submenús
+function toggleSubmenu(event) {
+    event.preventDefault();
+    document.querySelectorAll('.submenu.active').forEach(sub => {
+        if (sub !== event.target.closest('.submenu')) {
+            sub.classList.remove('active');
+        }
+    });
+    event.target.closest('.submenu').classList.toggle('active');
+}
+
+// Formatear fecha legible
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('es-MX', options);
+}
+
+// Cargar PDF de Plantilla de Personal de Baja California
+async function loadPlantillaPersonal() {
+    showLoading(true);
+    hideErrors();
+    const fechaElement = document.getElementById('fecha-texto'); // Movida al inicio de la función
+
+    try {
+        console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+        const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+            headers: { 'x-api-key': API_KEY }
+        });
+
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+        const result = await response.json();
+        console.log('Respuesta API:', result);
+
+        if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const mobileContainer = document.querySelector('.mobile-images');
+        const iosLink = document.getElementById('ios-pdf-link');
+
+        if (result.data.length > 0) {
+            const latestPDF = result.data.sort((a, b) => 
+                new Date(b.uploaded_at) - new Date(a.uploaded_at)
+            )[0];
+
+            // Mostrar fecha de actualización
+            fechaElement.textContent = formatDate(latestPDF.uploaded_at);
+            
+            // Configuración normal para PC
+            pdfViewer.src = latestPDF.url;
+            
+            // Configuración para móviles (no iOS)
+            mobileContainer.innerHTML = `
+                <div class="file-info">
+                    <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                    <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                    <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                    <a href="${latestPDF.url}" class="download-btn" download>
+                        Descargar Plantilla
+                    </a>
+                </div>
+            `;
+            
+            // Configuración específica para iOS
+            if (isIOS()) {
+                // Usamos Google Viewer como alternativa para iOS
+                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
+                iosLink.href = googleViewerUrl;
                 
-                // Configuración para móviles (no iOS)
-                mobileContainer.innerHTML = `
-                    <div class="file-info">
-                        <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
-                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                // También agregamos opción de descarga directa
+                mobileContainer.innerHTML += `
+                    <div class="ios-download-option">
                         <a href="${latestPDF.url}" class="download-btn" download>
-                            Descargar Plantilla
+                            Descargar directamente
                         </a>
                     </div>
                 `;
-                
-                // Configuración específica para iOS
-                if (isIOS()) {
-                    // Usamos Google Viewer como alternativa para iOS
-                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                    iosLink.href = googleViewerUrl;
-                    
-                    // También agregamos opción de descarga directa
-                    mobileContainer.innerHTML += `
-                        <div class="ios-download-option">
-                            <a href="${latestPDF.url}" class="download-btn" download>
-                                Descargar directamente
-                            </a>
-                        </div>
-                    `;
-                }
-            } else {
-                // Fallback a PDF local si no hay datos en la API
-                pdfViewer.src = "../../../documentacion/plantillas_personal/quintanaroop/QROO1.pdf";
-                mobileContainer.innerHTML = `
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0001.jpg" alt="Imagen 1">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0002.jpg" alt="Imagen 2">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0003.jpg" alt="Imagen 3">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0004.jpg" alt="Imagen 4">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0005.jpg" alt="Imagen 5">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0006.jpg" alt="Imagen 6">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0007.jpg" alt="Imagen 7">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0008.jpg" alt="Imagen 8">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0009.jpg" alt="Imagen 9">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0010.jpg" alt="Imagen 10">
-                <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0011.jpg" alt="Imagen 11">
-                `;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            // Fallback a PDF local si hay error
-            document.getElementById('pdf-viewer').src = "../../../documentacion/plantillas_personal/quintanaroop/QROO1.pdf";
-            document.querySelector('.mobile-images').innerHTML = `
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0001.jpg" alt="Imagen 1">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0002.jpg" alt="Imagen 2">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0003.jpg" alt="Imagen 3">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0004.jpg" alt="Imagen 4">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0005.jpg" alt="Imagen 5">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0006.jpg" alt="Imagen 6">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0007.jpg" alt="Imagen 7">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0008.jpg" alt="Imagen 8">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0009.jpg" alt="Imagen 9">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0010.jpg" alt="Imagen 10">
-        <img src="../../../documentacion/plantillas_personal/quintanaroop/QROO1_page-0011.jpg" alt="Imagen 11">
-            `;
-            showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-        } finally {
-            showLoading(false);
+        } else {
+            showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
+            fechaElement.textContent = 'No disponible';
         }
+    } catch (error) {
+        console.error('Error:', error);
+        showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+        fechaElement.textContent = 'Error al cargar';
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+    cargarTituloPersonalizado();
+    if (document.getElementById('pdf-viewer')) {
+        loadPlantillaPersonal();
     }
 
-    // Inicialización
-    document.addEventListener('DOMContentLoaded', () => {
-        cargarTituloPersonalizado();
-        if (document.getElementById('pdf-viewer')) {
-            loadPlantillaPersonal();
-        }
-
-        // Cerrar submenús al hacer clic en opción
-        document.querySelectorAll('.submenu-list a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.querySelectorAll('.submenu').forEach(sub => {
-                    sub.classList.remove('active');
-                });
+    // Cerrar submenús al hacer clic en opción
+    document.querySelectorAll('.submenu-list a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.querySelectorAll('.submenu').forEach(sub => {
+                sub.classList.remove('active');
             });
         });
-        
-        // Manejar clic en el enlace de iOS
-        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
-            if (isIOS()) {
-                // Abrir en nueva pestaña sin restricciones
-                window.open(this.href, '_blank');
-                e.preventDefault();
-            }
-        });
     });
+    
+    // Manejar clic en el enlace de iOS
+    document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+        if (isIOS()) {
+            // Abrir en nueva pestaña sin restricciones
+            window.open(this.href, '_blank');
+            e.preventDefault();
+        }
+    });
+});
     </script>
 </body>
 </html>
