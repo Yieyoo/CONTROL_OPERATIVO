@@ -48,6 +48,26 @@
                 }
             }
         }
+
+        /* Estilo para la fecha de actualización */
+        #fecha-subida {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            #fecha-subida {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -151,6 +171,11 @@
 
     <div class="mobile-images">
         <div id="mobile-error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <!-- Elemento para mostrar la fecha de actualización -->
+    <div id="fecha-subida">
+        Actualizado: <span id="fecha-texto">Cargando...</span>
     </div>
 
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
@@ -263,7 +288,7 @@
 
     // Formatear fecha legible
     function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
@@ -288,12 +313,16 @@
             const pdfViewer = document.getElementById('pdf-viewer');
             const mobileContainer = document.querySelector('.mobile-images');
             const iosLink = document.getElementById('ios-pdf-link');
+            const fechaElement = document.getElementById('fecha-texto');
 
             if (result.data.length > 0) {
                 const latestPDF = result.data.sort((a, b) => 
                     new Date(b.uploaded_at) - new Date(a.uploaded_at)
                 )[0];
 
+                // Mostrar fecha de actualización
+                fechaElement.textContent = formatDate(latestPDF.uploaded_at);
+                
                 // Configuración normal para PC
                 pdfViewer.src = latestPDF.url;
                 
@@ -326,10 +355,12 @@
                 }
             } else {
                 showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
+                document.getElementById('fecha-texto').textContent = 'No disponible';
             }
         } catch (error) {
             console.error('Error:', error);
             showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+            document.getElementById('fecha-texto').textContent = 'Error al cargar';
         } finally {
             showLoading(false);
         }
