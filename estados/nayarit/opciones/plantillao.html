@@ -308,7 +308,7 @@ async function loadPlantillaPersonal() {
             if (isIOS()) {
                 // Usamos Google Viewer como alternativa para iOS
                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                iosLink.href = googleViewerUrl;            }
+                iosLink.href = googleViewerUrl;s            }
         } else {
             showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
             fechaElement.textContent = 'No disponible';
