@@ -309,17 +309,17 @@ async function loadPlantillaPersonal() {
                 // Usamos Google Viewer como alternativa para iOS
                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
                 iosLink.href = googleViewerUrl;            }
-        } else {
-            showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
-            fechaElement.textContent = 'No disponible';
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-        fechaElement.textContent = 'Error al cargar';
-    } finally {
-        showLoading(false);
-    }
+            } else {
+                showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
+                fechaElement.textContent = 'No disponible';
+            }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+                fechaElement.textContent = 'Error al cargar';
+            } finally {
+                showLoading(false);
+            }
 }
 
 // Inicialización
