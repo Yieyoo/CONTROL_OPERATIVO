@@ -301,33 +301,12 @@ async function loadPlantillaPersonal() {
             
             // Configuración normal para PC
             pdfViewer.src = latestPDF.url;
-            
-            // Configuración para móviles (no iOS)
-            mobileContainer.innerHTML = `
-                <div class="file-info">
-                    <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
-                    <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                    <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                    <a href="${latestPDF.url}" class="download-btn" download>
-                        Descargar Plantilla
-                    </a>
-                </div>
-            `;
-            
+                       
             // Configuración específica para iOS
             if (isIOS()) {
                 // Usamos Google Viewer como alternativa para iOS
                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
                 iosLink.href = googleViewerUrl;
-                
-                // También agregamos opción de descarga directa
-                mobileContainer.innerHTML += `
-                    <div class="ios-download-option">
-                        <a href="${latestPDF.url}" class="download-btn" download>
-                            Descargar directamente
-                        </a>
-                    </div>
-                `;
             }
         } else {
             showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
