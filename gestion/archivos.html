@@ -178,7 +178,7 @@
             </ul>
         </nav>
     </header>
-
+<button class="regresar-btn">Regresar</button>
     <div class="logo-container">
         <img src="../imagenes/inm logo.png" alt="Logo INM">
     </div>
@@ -679,6 +679,10 @@
                 return 'Plantilla de Personal'; // Valor por defecto
             }
         };
+        // Regresar al historial
+document.querySelector('.regresar-btn').addEventListener('click', function() {
+    window.history.back();
+});
     </script>
 </body>
 </html>
