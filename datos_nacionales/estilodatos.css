@@ -157,6 +157,11 @@ body::before {
     background-color: rgb(8, 8, 8);
 }
 
+.btn-9
+{
+    background-color: rgb(20, 12, 92);;
+}
+
 /* --- Menú lateral estilizado --- *//* Menú principal - Diseño mejorado */
 nav.menu {
     position: fixed;
