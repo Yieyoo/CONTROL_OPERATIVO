@@ -123,6 +123,7 @@ app.use(express.urlencoded({
   inflate: true
 }));
 
+
 // Configuración de Cloudinary
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
