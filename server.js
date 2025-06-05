@@ -17,6 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuración de seguridad mejorada
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
