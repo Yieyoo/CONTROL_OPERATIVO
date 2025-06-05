@@ -17,7 +17,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuración de seguridad mejorada
-
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -87,16 +86,6 @@ const corsOptions = {
   maxAge: 86400
 };
 
-// Middleware para deshabilitar caché globalmente
-app.use((req, res, next) => {
-  // Headers para evitar caché en TODAS las respuestas
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.setHeader('Surrogate-Control', 'no-store');
-  next();
-});
-
 app.get('/', cors({ origin: '*' }), (req, res) => {
   res.json({
     status: 'success',
@@ -122,7 +111,6 @@ app.use(express.urlencoded({
   parameterLimit: 1000,
   inflate: true
 }));
-
 
 // Configuración de Cloudinary
 const validateCloudinaryConfig = () => {
@@ -210,6 +198,19 @@ app.use(require('compression')({
   threshold: 1024,
   filter: shouldCompress
 }));
+
+// Cache-Control
+const setCacheControl = (req, res, next) => {
+  const cacheTime = 86400;
+  if (req.method === 'GET') {
+    res.set('Cache-Control', `public, max-age=${cacheTime}`);
+  } else {
+    res.set('Cache-Control', 'no-store');
+  }
+  next();
+};
+
+app.use(setCacheControl);
 
 // Middleware de autenticación
 const authenticate = (req, res, next) => {
@@ -454,13 +455,12 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para listar archivos con cache busting
+// Ruta para listar archivos
 router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
     const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
 
-    // Agregar timestamp para evitar caché
     const result = await cloudinary.api.resources({
       type: 'upload',
       prefix: `${estado}/${tipoDocumento}/`,
@@ -468,21 +468,20 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
       max_results: 500,
       context: true,
       tags: true,
-      moderations: true,
-      timestamp: Date.now() // Cache busting
+      moderations: true
     });
 
     const archivos = result.resources.map(resource => {
       const originalName = resource.context?.custom?.original_filename || 
                          path.parse(resource.public_id).name + '.pdf';
       return {
-        url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
+        url: resource.secure_url,
         public_id: resource.public_id,
         filename: originalName,
         estado: estado,
         tipo_documento: tipoDocumento,
-        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true&_=${Date.now()}`,
-        download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
+        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true`,
+        download_url: resource.secure_url.replace('/upload/', '/upload/fl_attachment/'),
         uploaded_at: resource.created_at,
         size: resource.bytes,
         format: resource.format,
@@ -576,8 +575,7 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
         type: 'upload',
         resource_type: 'raw',
         max_results: 1,
-        context: true,
-        timestamp: Date.now() // Cache busting
+        context: true
       });
 
       if (recursos.resources.length > 0 && recursos.resources[0].context?.custom?.titulo_documento) {
@@ -597,7 +595,6 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
     next(error);
   }
 });
-
 router.get('/render-ping', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.ip;
   console.log(`📡 Ping recibido desde IP: ${clientIP} - ${new Date().toLocaleString()}`);
@@ -652,3 +649,4 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = { app, server };
+
