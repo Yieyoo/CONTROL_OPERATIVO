@@ -424,7 +424,7 @@ nav.menu ul li a:hover {
 }
 
 .btn-1:hover {
-  background-color: grey;
+  background-color: rgb(128, 128, 128);
 }
 
 .btn-2,
@@ -473,7 +473,7 @@ nav.menu ul li a:hover {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  background: #f8f8f8;
+  background: #ffffff;
 }
 
 .pdf-container.loading {
@@ -604,4 +604,55 @@ nav.menu ul li a:hover {
 
 h1 {
   margin-top: 80px;
+}
+/* ==================== */
+/* MENSAJE iOS - SOLO MOVILES */
+/* ==================== */
+.ios-message {
+  display: none; /* Oculto por defecto */
+  text-align: center;
+  margin: 20px;
+  padding: 15px;
+  background: #f8f8f8;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Mostrar solo en móviles iOS */
+@media only screen and (max-width: 768px) {
+  @supports (-webkit-touch-callout: none) {
+    .ios-message {
+      display: block;
+    }
+  }
+}
+
+/* Estilos para el botón de iOS */
+.ios-pdf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-primario);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin: 15px auto;
+  transition: var(--transicion);
+}
+
+.ios-pdf-link:hover {
+  background: #8e5c71;
+  transform: translateY(-2px);
+}
+
+/* Estilos para la info del documento */
+.document-info {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.document-info p {
+  margin: 5px 0;
 }
