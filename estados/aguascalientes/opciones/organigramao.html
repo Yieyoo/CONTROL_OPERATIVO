@@ -6,6 +6,7 @@
     <title>ORGANIGRAMA</title>
     <link rel="icon" type="image/png" href="../../../imagenes/organigrama.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+
 </head>
 <body>
     <script type="module" src="../../../common.js"></script>
@@ -217,6 +218,20 @@ async function cargarDocumentoPDF() {
 
             // Configuración normal para PC
             pdfViewer.src = latestPDF.url;
+            
+            // Configuración para móviles (no iOS)
+            if (!isIOS()) {
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                        <a href="${latestPDF.url}" class="download-btn" download>
+                            Descargar Documento
+                        </a>
+                    </div>
+                `;
+            }
             
             // Configuración específica para iOS
             if (isIOS()) {
