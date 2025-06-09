@@ -656,3 +656,66 @@ h1 {
 .document-info p {
   margin: 5px 0;
 }
+/* ==================== */
+/* ESTILOS iOS ESPECÍFICOS */
+/* ==================== */
+.ios-only {
+  display: none;
+  text-align: center;
+  margin: 20px;
+  padding: 15px;
+  background: #f8f8f8;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.ios-pdf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-primario);
+  color: var(--color-blanco);
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-top: 15px;
+  transition: var(--transicion);
+}
+
+.ios-pdf-link:hover {
+  background: #8e5c71;
+  transform: translateY(-2px);
+}
+
+.ios-pdf-link img {
+  width: 30px;
+  height: 30px;
+}
+
+.ios-instructions {
+  font-size: 14px;
+  color: #666;
+  margin-top: 10px;
+}
+
+.file-info {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #ddd;
+}
+
+.file-info h3 {
+  margin-top: 0;
+  color: var(--color-primario);
+}
+
+/* Mostrar solo en móviles iOS */
+@media only screen and (max-width: 768px) {
+  @supports (-webkit-touch-callout: none) {
+    .ios-only {
+      display: block;
+    }
+  }
+}
