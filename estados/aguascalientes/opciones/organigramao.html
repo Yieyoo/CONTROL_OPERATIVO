@@ -6,6 +6,86 @@
     <title>ORGANIGRAMA</title>
     <link rel="icon" type="image/png" href="../../../imagenes/organigrama.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+       <style>
+        /* Estilos específicos para móviles iOS */
+        @media only screen and (max-width: 768px) {
+            .ios-only {
+                display: none; /* Oculto por defecto */
+            }
+            
+            /* Solo mostrar en iOS */
+            @supports (-webkit-touch-callout: none) {
+                .ios-only {
+                    display: block;
+                    text-align: center;
+                    margin: 20px;
+                    padding: 15px;
+                    background: #f8f8f8;
+                    border-radius: 10px;
+                    border: 1px solid #ddd;
+                }
+                
+                .ios-pdf-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10p;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    margin-top: 15px;
+                }
+                
+                .ios-pdf-link img {
+                    width: 30px;
+                    height: 30px;
+                }
+                
+                .ios-instructions {
+                    font-size: 14px;
+                    color: #666;
+                    margin-top: 10px;
+                }
+            }
+        }
+        
+        /* Estilo para el título principal */
+        .titulo-personalizado {
+            color: #2c3e50;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            padding: 0 15px;
+        }
+        
+        /* Estilo para la información del archivo */
+        .file-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        
+        .file-info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        
+        .download-btn:hover {
+            background: #2980b9;
+        }
+    </style>
 
 </head>
 <body>
