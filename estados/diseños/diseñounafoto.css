@@ -59,42 +59,23 @@ body::before {
   pointer-events: none;
 }
 
-header {
-    background-color: #691932;
-    color: white;
-    text-align: center;
-    padding: 15px 0;
-    font-weight: bold;
-    border-bottom: 4px solid #A5852E;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-
-/* ==================== */
-/* ESTRUCTURA PRINCIPAL */
-/* ==================== */
-.contenedor-principal {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 30px 5px;
-  background-color: var(--color-blanco);
-  border-radius: 8px;
-  box-shadow: var(--sombra);
-  margin-top: 20px;
-  margin-bottom: 40px;
-  position: relative;
-  z-index: 1;
-}
-
 /* ==================== */
 /* COMPONENTES DE CABECERA */
 /* ==================== */
-/* Información del instituto */
+header {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  text-align: center;
+  padding: 15px 0;
+  font-weight: bold;
+  border-bottom: 4px solid var(--color-secundario);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
 .instituto-info {
   background: linear-gradient(to right, #6b1e3f, #320d1c);
   color: var(--color-blanco);
@@ -104,11 +85,10 @@ header {
   margin: 0;
   width: 100vw;
   position: relative;
-  left: 0%;
-  right: 0%;
+  left: 0;
+  right: 0;
   margin-left: -50vw;
   margin-right: -50vw;
-  box-sizing: border-box;
 }
 
 .instituto-info h1 {
@@ -118,18 +98,20 @@ header {
   text-transform: uppercase;
 }
 
-.instituto-info h2 {
+.instituto-info h2, 
+.instituto-info h3 {
   font-size: 17px;
-  font-weight: 500;
   margin-bottom: 8px;
 }
 
+.instituto-info h2 {
+  font-weight: 500;
+}
+
 .instituto-info h3 {
-  font-size: 17px;
   font-weight: 400;
 }
 
-/* Estado info */
 .estado-info {
   background-color: var(--color-secundario);
   color: var(--color-blanco);
@@ -140,7 +122,6 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
   top: -1rem;
-  left: 0;
 }
 
 .estado-info h4 {
@@ -149,10 +130,11 @@ header {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0;
-  position: relative;
 }
 
-/* Logos en esquina superior derecha */
+/* ==================== */
+/* ELEMENTOS FIJOS */
+/* ==================== */
 .logo-container {
   position: fixed;
   top: 50px;
@@ -169,7 +151,6 @@ header {
   cursor: pointer;
 }
 
-/* Fecha actual */
 .fecha-actual {
   position: fixed;
   top: 90px;
@@ -180,14 +161,33 @@ header {
   background-color: rgba(255, 255, 255, 0.8);
   padding: 8px 12px;
   border-radius: 5px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   z-index: 5;
 }
 
+.regresar-btn {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  position: fixed;
+  top: 50px;
+  left: 20px;
+  border-radius: 5px;
+  z-index: 900;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+.regresar-btn:hover {
+  background-color: #8e5c71;
+}
+
 /* ==================== */
-/* COMPONENTES DE NAVEGACIÓN */
+/* MENÚ LATERAL */
 /* ==================== */
-/* Menú lateral */
 nav.menu {
   position: fixed;
   top: 0;
@@ -199,12 +199,10 @@ nav.menu {
   transition: var(--transicion);
   z-index: 1000;
   box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
-  border-top-right-radius: 25px;
-  border-bottom-right-radius: 25px;
+  border-radius: 0 25px 25px 0;
   overflow: hidden;
 }
 
-/* Efecto de borde sutil */
 nav.menu::before {
   content: '';
   position: absolute;
@@ -219,7 +217,6 @@ nav.menu.active {
   left: 0;
 }
 
-/* Logo del menú */
 .logo-arriba-img {
   position: absolute;
   top: 20px;
@@ -229,15 +226,10 @@ nav.menu.active {
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-/* Lista del menú */
 nav.menu ul {
   list-style-type: none;
   padding: 0 20px;
-  margin: 0;
-}
-
-nav.menu > ul {
-  margin-top: 90px;
+  margin: 90px 0 0;
 }
 
 nav.menu ul li {
@@ -267,7 +259,6 @@ nav.menu ul li a:hover {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Submenú */
 .submenu-list {
   display: none;
   padding-left: 10px;
@@ -286,7 +277,6 @@ nav.menu ul li a:hover {
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   margin-bottom: 8px;
-  transition: var(--transicion);
 }
 
 .submenu-list li a:hover {
@@ -294,7 +284,6 @@ nav.menu ul li a:hover {
   transform: translateX(5px);
 }
 
-/* Indicador de submenú */
 .submenu > a::after {
   content: '›';
   position: absolute;
@@ -307,7 +296,6 @@ nav.menu ul li a:hover {
   transform: rotate(270deg);
 }
 
-/* Botón de menú */
 .menu-toggle {
   background: linear-gradient(135deg, var(--color-secundario) 0%, #c49d3a 100%);
   color: var(--color-blanco);
@@ -333,31 +321,6 @@ nav.menu ul li a:hover {
   box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
 }
 
-/* Scroll del submenú */
-.submenu {
-  max-height: 400px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-secundario) transparent;
-  padding-right: 5px;
-}
-
-.submenu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.submenu::-webkit-scrollbar-thumb {
-  background-color: var(--color-secundario);
-  border-radius: 4px;
-  background-clip: padding-box;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.submenu::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Overlay del menú */
 .menu-overlay {
   display: none;
   position: fixed;
@@ -375,28 +338,61 @@ nav.menu ul li a:hover {
   display: block;
 }
 
-/* Botón de regresar */
-.regresar-btn {
-  background-color: var(--color-primario);
-  color: var(--color-blanco);
-  border: none;
-  padding: 12px 16px;
-  font-size: 16px;
-  cursor: pointer;
-  position: fixed;
-  top: 50px;
-  left: 20px;
-  border-radius: 5px;
-  z-index: 900;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.3s ease;
+/* ==================== */
+/* ESTRUCTURAS PRINCIPALES */
+/* ==================== */
+.contenedor-principal {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto 40px;
+  padding: 30px 5px;
+  background-color: var(--color-blanco);
+  border-radius: 8px;
+  box-shadow: var(--sombra);
+  position: relative;
+  z-index: 1;
 }
 
-.regresar-btn:hover {
-  background-color: #8e5c71;
+/* ==================== */
+/* COMPONENTES */
+/* ==================== */
+.titulo-personalizado {
+  background: white;
+  padding: 20px 30px;
+  margin: 55px auto 25px;
+  text-align: center;
+  font-size: 1.4em;
+  color: var(--color-primario);
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(26, 62, 114, 0.1);
+  max-width: 80%;
+  position: relative;
+  border-top: 4px solid var(--color-secundario);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  transform-style: preserve-3d;
+  transition: all 0.3s ease;
 }
 
+.titulo-personalizado:hover {
+  transform: translateY(-3px) rotateX(5deg);
+  box-shadow: 0 8px 25px rgba(26, 62, 114, 0.15);
+}
 
+.titulo-personalizado::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: -10px;
+  background: rgba(26, 62, 114, 0.05);
+  border-radius: 12px;
+  z-index: -1;
+  transform: translateZ(-10px);
+}
 
 /* ==================== */
 /* BOTONES */
@@ -423,7 +419,6 @@ nav.menu ul li a:hover {
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-/* Colores específicos para los botones */
 .btn-1 {
   background-color: black;
 }
@@ -459,44 +454,6 @@ nav.menu ul li a:hover {
 }
 
 /* ==================== */
-/* COMPONENTES DE GESTIÓN DE ARCHIVOS */
-/* ==================== */
-.gestion-archivos {
-  padding: 20px;
-  max-width: 1000px;
-  margin: auto;
-  text-align: center;
-}
-
-.fila-superior {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.upload-form,
-.file-list,
-.view-file {
-  flex: 1;
-  min-width: 250px;
-  background-color: #f5f5f5;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.delete-file {
-  margin-top: 30px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: #fcebea;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-/* ==================== */
 /* VISOR PDF */
 /* ==================== */
 .pdf-container {
@@ -505,8 +462,8 @@ nav.menu ul li a:hover {
   margin: 15px auto;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  background: #fff;
+  box-shadow: var(--sombra);
+  background: var(--color-blanco);
 }
 
 .pdf-embed {
@@ -519,10 +476,80 @@ nav.menu ul li a:hover {
   background: #f8f8f8;
 }
 
-@media only screen and (max-width: 768px) {
+.pdf-container.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: #f5f5f5;
+}
+
+/* ==================== */
+/* MEDIA QUERIES */
+/* ==================== */
+@media screen and (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+  
+  .contenedor-principal {
+    padding: 15px;
+    width: 100%;
+  }
+  
+  nav.menu {
+    width: 260px;
+    left: -260px;
+  }
+  
+  .menu-toggle {
+    width: 30px;
+    height: 30px;
+    top: 10%;
+    font-size: 20px;
+  }
+  
+  .logo-container {
+    top: 40px;
+    right: 10px;
+    gap: 15px;
+  }
+  
+  .fecha-actual {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 15px;
+    padding: 4px 5px;
+  }
+  
+  .regresar-btn {
+    font-size: 7px;
+    padding: 8px 10px;
+    margin-top: -10px;
+  }
+  
+  .instituto-info {
+    padding: 5px 1px;
+    margin-top: 0;
+    flex-direction: column;
+  }
+  
+  .instituto-info h1 {
+    font-size: 1rem;
+  }
+  
+  .estado-info {
+    top: -0.5rem;
+    padding: 0.6rem 0;
+  }
+  
+  .estado-info h4 {
+    font-size: 1rem;
+  }
+
   .pdf-container {
     width: 92%;
-    margin: 10px auto;
     border-radius: 8px;
   }
   
@@ -532,10 +559,9 @@ nav.menu ul li a:hover {
   }
 }
 
-@media only screen and (max-width: 480px) {
+@media screen and (max-width: 480px) {
   .pdf-container {
     width: 90%;
-    margin: 8px auto;
     border-radius: 6px;
   }
   
@@ -544,96 +570,6 @@ nav.menu ul li a:hover {
     min-height: 250px;
     border: none;
   }
-}
-
-.pdf-container.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  background: #f5f5f5;
-}
-/* ==================== */
-/* TÍTULOS PERSONALIZADOS */
-/* ==================== */
-.titulo-personalizado {
-  background: white;
-  padding: 20px 30px;
-  margin: 55px auto 25px auto;
-  text-align: center;
-  font-size: 1.4em;
-  color: var(--color-primario);
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(26, 62, 114, 0.1);
-  max-width: 80%;
-  position: relative;
-  border-top: 4px solid var(--color-secundario);
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  display: inline-block;
-  transform-style: preserve-3d;
-  transition: all 0.3s ease;
-}
-
-.titulo-personalizado:hover {
-  transform: translateY(-3px) rotateX(5deg);
-  box-shadow: 0 8px 25px rgba(26, 62, 114, 0.15);
-}
-
-.titulo-personalizado::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: -10px;
-  background: rgba(26, 62, 114, 0.05);
-  border-radius: 12px;
-  z-index: -1;
-  transform: translateZ(-10px);
-}
-
-/* Definir la variable con el texto completo en CSS */
-.qna {
-  --header-text: "Plantilla de Personal QNA 9";
-}
-
-/* Insertamos el texto en el h1 usando el pseudoelemento ::before */
-.qna h1::before {
-  content: var(--header-text);
-}
-
-/* ==================== */
-/* IMÁGENES MÓVILES */
-/* ==================== */
-.mobile-images {
-  display: none;
-}
-
-.mobile-images img {
-  width: 90%;
-  max-width: 350px;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border: 3px solid var(--color-primario);
-  transition: all 0.3s ease;
-  margin: 15px auto;
-  display: block;
-  object-fit: cover;
-}
-
-.mobile-images img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-}
-
-/* ==================== */
-/* ESTILOS PARA iOS */
-/* ==================== */
-.ios-only {
-  display: none;
 }
 
 /* ==================== */
@@ -656,166 +592,16 @@ nav.menu ul li a:hover {
 }
 
 /* ==================== */
-/* MEDIA QUERIES */
+/* ELEMENTOS ESPECÍFICOS */
 /* ==================== */
-@media screen and (max-width: 768px) {
-  /* Estilos generales */
-  body {
-    padding: 10px;
-    overflow-x: hidden;
-  }
-  
-  /* Contenedores */
-  .contenedor-principal,
-  .opciones-container {
-    padding: 15px;
-    width: 100%;
-  }
-  
-  /* Opciones grid */
-  .opciones-grid {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .opciones-grid button {
-    padding: 12px 16px;
-    font-size: 14px;
-    width: 100%;
-  }
-  
-  /* Menú */
-  nav.menu {
-    width: 260px;
-    left: -260px;
-  }
-  
-  /* Botón de menú */
-  .menu-toggle {
-    width: 30px;
-    height: 30px;
-    top: 10%;
-    font-size: 20px;
-  }
-  
-  /* Logos */
-  .logo-container {
-    top: 40px;
-    right: 10px;
-    gap: 15px;
-  }
-  
-  /* Fecha actual */
-  .fecha-actual {
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 15px;
-    padding: 4px 5px;
-  }
-  
-  /* Botón regresar */
-  .regresar-btn {
-    font-size: 7px;
-    padding: 8px 10px;
-    margin-top: -10px;
-  }
-  
-  /* Estado info */
-  .estado-info {
-    font-size: 20px;
-    margin-top: -30px;
-  }
-  
-  /* Instituto info */
-  .instituto-info {
-    padding: 25px 15px;
-  }
-  
-  .instituto-info h1 {
-    font-size: 1rem;
-  }
-  
-  .instituto-info h1,
-  .instituto-info h2,
-  .instituto-info h3 {
-    margin: 5px 0;
-    padding: 0;
-  }
-  
-  .instituto-info {
-    padding: 5px 1px;
-    margin-top: 0px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-  
-  .estado-info {
-    top: -0.5rem;
-    padding: 0.6rem 0;
-  }
-  
-  .estado-info h4 {
-    font-size: 1rem;
-  }
-
-  /* Mostrar imágenes en móviles */
-  .mobile-images {
-    display: block !important;
-    margin-top: 20px;
-    position: relative;
-    z-index: 100;
-  }
-
-  /* Ajuste para pantallas muy pequeñas (≤ 480px) */
-  @media screen and (max-width: 480px) {
-    body {
-      padding-top: 15px;
-    }
-    .header-container h1 {
-      font-size: 1.5rem;
-    }
-  }
-
-  /* Solo mostrar en iOS y en ancho móvil */
-  @supports (-webkit-touch-callout: none) {
-    .ios-only {
-      display: block;
-      text-align: center;
-      margin: 20px;
-      padding: 15px;
-      background: #f8f8f8;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-    }
-    
-    .ios-pdf-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background:  #691932;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      margin-top: 15px;
-    }
-    
-    .ios-pdf-link img {
-      width: 30px;
-      height: 30px;
-    }
-    
-    .ios-instructions {
-      font-size: 14px;
-      color: #666;
-      margin-top: 10px;
-    }
-  }
+.qna {
+  --header-text: "Plantilla de Personal QNA 9";
 }
 
-/* Ajuste específico para h1 */
+.qna h1::before {
+  content: var(--header-text);
+}
+
 h1 {
   margin-top: 80px;
 }
