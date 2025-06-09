@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VEHÍCULOS</title>
+    <title>VEHICULOS</title>
     <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
     <style>
@@ -23,6 +23,17 @@
                     background: #f8f8f8;
                     border-radius: 10px;
                     border: 1px solid #ddd;
+                }
+                
+                .ios-pdf-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    margin-top: 15px;
                 }
                 
                 .ios-pdf-link img {
@@ -60,11 +71,25 @@
             margin-top: 0;
             color: #2c3e50;
         }
+        
+        .download-btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        
+        .download-btn:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
 <body>
-    <script type="module" src="../../../common.js"></script>
-    <h1 id="titulo-documento">VEHÍCULOS</h1>        
+    <script type="module" src="../../../common.js"></script>    
+    <h1 id="titulo-documento">VEHICULOS</h1>        
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -93,8 +118,8 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                        <li><a href="../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
                         <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
@@ -149,7 +174,6 @@
     <div id="ios-container" class="ios-only">
         <p>Para una mejor experiencia en tu dispositivo iOS:</p>
         <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
-
             <span>Abrir Documento</span>
         </a>
         <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
@@ -162,12 +186,12 @@
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
 <script>
-// Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
-const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-const API_KEY = 'Xhy2md57';
-const ESTADO = 'aguascalientes';       // Cambia por el estado que necesites
-const TIPO_DOCUMENTO = 'vehiculos'; // Cambia por el tipo de documento que necesites
-const TITULO_DOCUMENTO = 'VEHÍCULOS'; // Cambia por el título que quieras mostrar
+    // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
+    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+    const API_KEY = 'Xhy2md57';
+    const ESTADO = 'aguascalientes';       // Cambia por el estado que necesites
+    const TIPO_DOCUMENTO = 'vehiculos'; // Cambia por el tipo de documento que necesites
+    const TITULO_DOCUMENTO = 'VEHICULOS'; // Cambia por el título que quieras mostrar
 
 // Configuración dinámica desde URL (opcional)
 const params = new URLSearchParams(window.location.search);
