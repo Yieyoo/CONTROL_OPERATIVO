@@ -156,6 +156,15 @@
         document.querySelector('.regresar-btn').addEventListener('click', function() {
             window.history.back();
         });
+        
+    // Cerrar submenús al hacer clic en opción
+    document.querySelectorAll('.submenu-list a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.querySelectorAll('.submenu').forEach(sub => {
+                sub.classList.remove('active');
+            });
+        });
+    });
     </script>
 </body>
 </html>
