@@ -496,7 +496,6 @@ nav.menu ul li a:hover {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
 /* ==================== */
 /* VISOR PDF */
 /* ==================== */
@@ -510,30 +509,26 @@ nav.menu ul li a:hover {
   background: #fff;
 }
 
-/* Estilos para el visor de PDF */
 .pdf-embed {
   width: 100%;
   height: 80vh;
-  min-height: 400px; /* Reducido para móviles */
+  min-height: 400px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   background: #f8f8f8;
 }
 
-/* Media queries para diferentes tamaños de pantalla */
 @media only screen and (max-width: 768px) {
   .pdf-container {
     width: 92%;
     margin: 10px auto;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
   
   .pdf-embed {
     height: 70vh;
     min-height: 300px;
-    border-radius: 6px;
   }
 }
 
@@ -548,16 +543,9 @@ nav.menu ul li a:hover {
     height: 65vh;
     min-height: 250px;
     border: none;
-    border-radius: 4px;
-  }
-  
-  /* Añadir un poco de padding en móviles muy pequeños */
-  body {
-    padding: 0 5px;
   }
 }
 
-/* Estilo para cuando el PDF está cargando */
 .pdf-container.loading {
   display: flex;
   align-items: center;
@@ -565,15 +553,6 @@ nav.menu ul li a:hover {
   min-height: 300px;
   background: #f5f5f5;
 }
-
-/* Mejoras para tablets en orientación vertical */
-@media only screen and (min-width: 481px) and (max-width: 768px) and (orientation: portrait) {
-  .pdf-embed {
-    height: 75vh;
-    min-height: 500px;
-  }
-}
-
 /* ==================== */
 /* TÍTULOS PERSONALIZADOS */
 /* ==================== */
