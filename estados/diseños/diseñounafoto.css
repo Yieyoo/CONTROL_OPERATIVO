@@ -719,3 +719,27 @@ h1 {
     }
   }
 }
+/* ============ SCROLLBAR PARA SUBMENÚS ============ */
+.submenu {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #A5852E transparent;
+  padding-right: 5px;
+}
+
+/* Estilo para navegadores WebKit (Chrome, Edge, Safari) */
+.submenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+  background-color: #A5852E;
+  border-radius: 4px;
+  background-clip: padding-box;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.submenu::-webkit-scrollbar-track {
+  background: transparent;
+}
