@@ -79,7 +79,6 @@ var simplemaps_countrymap_mapdata={
       name: "Aguascalientes",
       url: "estados/aguascalientes/aguascalientesindex.html",
       hover_label: "Aguascalientes", // Nombre que aparecerá en el hover
-      state_image_url: "../../fotos/titularagu.png"  // Imagen que aparece en hover
     },
     MXBCN: {
       name: "Baja California",
