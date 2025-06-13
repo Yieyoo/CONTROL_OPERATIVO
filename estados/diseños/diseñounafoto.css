@@ -727,6 +727,9 @@ h1 {
   scrollbar-color: #A5852E transparent;
   padding-right: 5px;
 }
+.submenu-list {
+  margin-top: 5px !important; /* Ajusta este valor (antes era 10px) */
+}
 
 /* Estilo para navegadores WebKit (Chrome, Edge, Safari) */
 .submenu::-webkit-scrollbar {
@@ -738,6 +741,7 @@ h1 {
   border-radius: 4px;
   background-clip: padding-box;
   border: 1px solid rgba(255, 255, 255, 0.1);
+
 }
 
 .submenu::-webkit-scrollbar-track {
