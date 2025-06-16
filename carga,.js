@@ -19,7 +19,7 @@ class ServerStatusIndicator {
     this.indicator.innerHTML = `
       <div class="spinner"></div>
       <span class="status-text">Verificando estado del servidor...</span>
-      <span class="status-time" style="font-size: 10px; opacity: 0.7;"></span>
+      <span class="status-time" style="font-size: 5px; opacity: 0.7;"></span>
     `;
     this.indicator.style.cssText = `
       position: fixed;
@@ -54,7 +54,7 @@ class ServerStatusIndicator {
         transition: border-color 0.3s ease;
       }
       .status-text {
-        font-size: 14px;
+        font-size: 10px;
       }
       #server-status-indicator:hover {
         transform: scale(1.05);
