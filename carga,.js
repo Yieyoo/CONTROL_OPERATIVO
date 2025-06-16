@@ -3,7 +3,11 @@ class ServerStatusIndicator {
   constructor() {
     this.createIndicator();
     this.checkInterval = 5000; // 5 segundos
-    this.apiUrl = 'https://tu-api.com/api/health'; // Asegúrate de cambiar esto
+  // Para desarrollo local (cuando trabajas en tu computadora):
+this.apiUrl = 'http://localhost:3000/api';
+
+// Para producción (cuando está en GitHub Pages):
+this.apiUrl = 'https://control-operativo-1.onrender.com/api';
     this.intervalId = null;
   }
 
