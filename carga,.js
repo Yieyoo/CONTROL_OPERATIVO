@@ -11,41 +11,26 @@ class ServerStatusIndicator {
 
   createIndicator() {
     this.indicator = document.createElement('div');
-    this.indicator.id = 'server-status-spinner';
-    this.indicator.innerHTML = `<div class="spinner"></div>`;
+    this.indicator.id = 'server-status-indicator';
     
-    // Contenedor más grande para acomodar la línea gruesa
     this.indicator.style.cssText = `
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 32px;  /* Aumentado para línea gruesa */
-      height: 32px;
+      width: 24px;
+      height: 24px;
       z-index: 10000;
       border-radius: 50%;
-      background: rgba(0,0,0,0.2);
-      backdrop-filter: blur(3px);
+      background: rgba(252, 165, 165, 0.3); /* Color inicial (offline) */
+      border: 3px solid rgba(252, 165, 165, 0.7);
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
       transition: all 0.5s ease;
+      cursor: pointer;
     `;
     
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      .spinner {
-        width: 100%;
-        height: 100%;
-        border: 4px solid transparent;  /* Línea más gruesa (4px) */
-        border-radius: 50%;
-        animation: spin 1.5s linear infinite;
-        transition: all 0.5s ease;
-        box-sizing: border-box;
-      }
-    `;
+    // Tooltip para mostrar estado al hacer hover
+    this.indicator.title = 'Verificando estado del servidor...';
     
-    document.head.appendChild(style);
     document.body.appendChild(this.indicator);
   }
 
@@ -69,36 +54,45 @@ class ServerStatusIndicator {
   }
 
   updateStatus(status) {
-    const spinner = this.indicator.querySelector('.spinner');
-    
-    // Colores con línea más gruesa y visible
     switch(status) {
       case 'online':
-        spinner.style.borderTopColor = 'rgba(100, 221, 123, 0.9)';
-        spinner.style.borderRightColor = 'rgba(100, 221, 123, 0.5)';
-        spinner.style.borderBottomColor = 'rgba(100, 221, 123, 0.2)';
-        spinner.style.borderLeftColor = 'rgba(100, 221, 123, 0.2)';
-        spinner.style.borderWidth = '4px';  // Grosor consistente
+        this.indicator.style.background = 'rgba(100, 221, 123, 0.3)';
+        this.indicator.style.borderColor = 'rgba(100, 221, 123, 0.8)';
+        this.indicator.style.boxShadow = '0 0 15px rgba(100, 221, 123, 0.3)';
+        this.indicator.title = 'Servidor en línea ✓';
         break;
         
       case 'degraded':
-        spinner.style.borderTopColor = 'rgba(253, 230, 138, 0.9)';
-        spinner.style.borderRightColor = 'rgba(253, 230, 138, 0.5)';
-        spinner.style.borderWidth = '4px';
+        this.indicator.style.background = 'rgba(253, 230, 138, 0.3)';
+        this.indicator.style.borderColor = 'rgba(253, 230, 138, 0.8)';
+        this.indicator.style.boxShadow = '0 0 15px rgba(253, 230, 138, 0.3)';
+        this.indicator.title = 'Servidor con problemas !';
         break;
         
       case 'offline':
-        spinner.style.borderTopColor = 'rgba(252, 165, 165, 0.9)';  // Más opaco
-        spinner.style.borderRightColor = 'rgba(252, 165, 165, 0.6)';
-        spinner.style.borderWidth = '4px';
-        this.indicator.style.boxShadow = '0 0 12px rgba(252, 165, 165, 0.4)';  // Sombra más visible
+        this.indicator.style.background = 'rgba(252, 165, 165, 0.3)';
+        this.indicator.style.borderColor = 'rgba(252, 165, 165, 0.8)';
+        this.indicator.style.boxShadow = '0 0 15px rgba(252, 165, 165, 0.3)';
+        this.indicator.title = 'Servidor no disponible ✗';
         break;
     }
+    
+    // Efecto de parpadeo al cambiar de estado
+    this.indicator.style.transform = 'scale(1.2)';
+    setTimeout(() => {
+      this.indicator.style.transform = 'scale(1)';
+    }, 300);
   }
 
   startMonitoring() {
     this.checkServerStatus();
     this.intervalId = setInterval(() => this.checkServerStatus(), this.checkInterval);
+    
+    // Opcional: Verificación manual al hacer click
+    this.indicator.addEventListener('click', () => {
+      this.indicator.title = 'Verificando...';
+      this.checkServerStatus();
+    });
   }
 }
 
