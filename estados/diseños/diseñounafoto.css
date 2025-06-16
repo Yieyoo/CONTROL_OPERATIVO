@@ -68,7 +68,7 @@ header {
   text-align: center;
   padding: 15px 0;
   font-weight: bold;
-  border-bottom: 4px solid var(--color-secundario);
+  border-bottom: 10px solid var(--color-secundario);
   position: fixed;
   top: 0;
   width: 100%;
