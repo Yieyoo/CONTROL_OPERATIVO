@@ -1,30 +1,33 @@
-// carga.js
-class EstadoServidor {
+// carga.js - Versión final para frontend
+class ServerStatusIndicator {
   constructor() {
-    this.spinner = this.crearSpinner();
-    this.intervalo = null;
-    this.verificarCada = 5000; // 5 segundos
+    this.createIndicator();
+    this.checkInterval = 5000; // 5 segundos
+    this.apiUrl = 'https://tu-api.com/api/health'; // Asegúrate de cambiar esto
+    this.intervalId = null;
   }
 
-  crearSpinner() {
-    const spinner = document.createElement('div');
-    spinner.id = 'server-status-spinner';
-    spinner.innerHTML = `
+  createIndicator() {
+    this.indicator = document.createElement('div');
+    this.indicator.id = 'server-status-indicator';
+    this.indicator.innerHTML = `
       <div class="spinner"></div>
-      <span class="status-text">Verificando servidor...</span>
+      <span class="status-text">Verificando estado del servidor...</span>
     `;
-    spinner.style.cssText = `
+    this.indicator.style.cssText = `
       position: fixed;
       bottom: 20px;
       right: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.8);
       color: white;
       padding: 10px 15px;
       border-radius: 20px;
-      z-index: 1000;
+      z-index: 10000;
+      font-family: Arial, sans-serif;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     `;
     
     const style = document.createElement('style');
@@ -38,56 +41,61 @@ class EstadoServidor {
         height: 20px;
         border: 3px solid rgba(255,255,255,0.3);
         border-radius: 50%;
-        border-top-color: white;
+        border-top-color: #ffffff;
         animation: spin 1s ease-in-out infinite;
       }
       .status-text {
-        font-family: Arial, sans-serif;
         font-size: 14px;
       }
     `;
     
     document.head.appendChild(style);
-    document.body.appendChild(spinner);
-    return spinner;
+    document.body.appendChild(this.indicator);
   }
 
-  async verificarEstado() {
+  async checkServerStatus() {
     try {
-      const response = await fetch('https://tu-api.com/api/health');
-      if (!response.ok) throw new Error('Servidor no disponible');
+      const response = await fetch(this.apiUrl);
+      if (!response.ok) throw new Error('Error en la respuesta');
       
       const data = await response.json();
-      if (data.status === 'healthy') {
-        this.mostrarEstado('Servidor activo', '#4CAF50');
-      } else {
-        throw new Error('Servidor con problemas');
-      }
+      this.updateStatus(data.status === 'healthy' ? 'online' : 'degraded');
     } catch (error) {
-      this.mostrarEstado('Servidor inactivo. Espere...', '#F44336');
-      // Reintentar después del intervalo
+      this.updateStatus('offline');
     }
   }
 
-  mostrarEstado(mensaje, color) {
-    const textElement = this.spinner.querySelector('.status-text');
-    textElement.textContent = mensaje;
-    textElement.style.color = color;
+  updateStatus(status) {
+    const spinner = this.indicator.querySelector('.spinner');
+    const text = this.indicator.querySelector('.status-text');
     
-    // Cambiar color del spinner
-    const spinnerElement = this.spinner.querySelector('.spinner');
-    spinnerElement.style.borderTopColor = color;
+    switch(status) {
+      case 'online':
+        spinner.style.borderTopColor = '#4CAF50';
+        text.textContent = 'Servidor en línea';
+        break;
+      case 'degraded':
+        spinner.style.borderTopColor = '#FFC107';
+        text.textContent = 'Servidor con problemas';
+        break;
+      case 'offline':
+        spinner.style.borderTopColor = '#F44336';
+        text.textContent = 'Servidor no disponible - Espere...';
+        break;
+    }
   }
 
-  iniciarMonitoreo() {
-    this.verificarEstado(); // Verificar inmediatamente
-    this.intervalo = setInterval(() => this.verificarEstado(), this.verificarCada);
+  startMonitoring() {
+    this.checkServerStatus(); // Verificación inmediata
+    this.intervalId = setInterval(() => this.checkServerStatus(), this.checkInterval);
   }
 }
 
-// Iniciar automáticamente al cargar
+// Iniciar automáticamente cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
-  const monitor = new EstadoServidor();
-  monitor.iniciarMonitoreo();
-  window.monitorServidor = monitor; // Opcional: hacerlo global
+  const statusMonitor = new ServerStatusIndicator();
+  statusMonitor.startMonitoring();
+  
+  // Opcional: Hacerlo accesible globalmente
+  window.serverStatus = statusMonitor;
 });
