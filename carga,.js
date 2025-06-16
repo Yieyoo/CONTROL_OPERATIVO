@@ -1,4 +1,3 @@
-// carga.js - Versión final y corregida para frontend
 class ServerStatusIndicator {
   constructor() {
     this.createIndicator();
@@ -6,11 +5,11 @@ class ServerStatusIndicator {
     
     // Configuración automática del API URL según el entorno
     this.apiUrl = window.location.hostname.includes('github.io') 
-      ? 'https://control-operativo-1.onrender.com/api/health'  // Producción
-      : 'http://localhost:3000/api/health';  // Desarrollo local
+      ? 'https://control-operativo-1.onrender.com/api/health'
+      : 'http://localhost:3000/api/health';
     
     this.intervalId = null;
-    this.apiKey = 'tu_api_key_secreta'; // ¡REEMPLAZA ESTO CON TU API KEY REAL!
+    this.apiKey = 'Xhy2md57';
   }
 
   createIndicator() {
@@ -28,7 +27,7 @@ class ServerStatusIndicator {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.7);
       color: white;
       padding: 10px 15px;
       border-radius: 20px;
@@ -36,6 +35,7 @@ class ServerStatusIndicator {
       font-family: Arial, sans-serif;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
     `;
     
     const style = document.createElement('style');
@@ -47,18 +47,21 @@ class ServerStatusIndicator {
       .spinner {
         width: 20px;
         height: 20px;
-        border: 3px solid rgba(255,255,255,0.3);
+        border: 3px solid rgba(255,255,255,0.1);
         border-radius: 50%;
-        border-top-color: #ffffff;
-        animation: spin 1s ease-in-out infinite;
-        transition: border-color 0.3s ease;
+        border-top-color: rgba(255,255,255,0.6);
+        animation: spin 1.2s ease-in-out infinite;
+        transition: all 0.5s ease;
       }
       .status-text {
         font-size: 10px;
+        font-weight: 300;
+        letter-spacing: 0.5px;
       }
       #server-status-indicator:hover {
         transform: scale(1.05);
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        background: rgba(0,0,0,0.8);
       }
     `;
     
@@ -77,17 +80,14 @@ class ServerStatusIndicator {
           'x-api-key': this.apiKey,
           'Content-Type': 'application/json'
         },
-        cache: 'no-store' // Evitar caché
+        cache: 'no-store'
       });
       
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
       
       const data = await response.json();
       this.updateStatus(data.status === 'healthy' ? 'online' : 'degraded');
       
-      // Mostrar versión del servidor si está disponible
       if (data.version) {
         const textElement = this.indicator.querySelector('.status-text');
         textElement.innerHTML = `Servidor en línea <small>(v${data.version})</small>`;
@@ -103,30 +103,36 @@ class ServerStatusIndicator {
     const text = this.indicator.querySelector('.status-text');
     const timeElement = this.indicator.querySelector('.status-time');
     
-    // Detener animación cuando está offline
+    // Ajustes de animación
     if (status === 'offline') {
-      spinner.style.animation = 'none';
+      spinner.style.animation = 'spin 1.5s linear infinite';
     } else {
-      spinner.style.animation = 'spin 1s ease-in-out infinite';
+      spinner.style.animation = 'spin 1.2s ease-in-out infinite';
     }
     
+    // Colores elegantes
     switch(status) {
       case 'online':
-        spinner.style.borderTopColor = '#4CAF50';
-        spinner.style.borderColor = 'rgba(76, 175, 80, 0.3)';
-        this.indicator.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        spinner.style.borderTopColor = 'rgba(100, 221, 123, 0.9)'; // Verde suave
+        spinner.style.borderColor = 'rgba(100, 221, 123, 0.2)';
+        this.indicator.style.backgroundColor = 'rgba(30, 41, 59, 0.7)'; // Azul oscuro
+        text.style.color = 'rgba(200, 250, 210, 0.9)';
         break;
+        
       case 'degraded':
-        spinner.style.borderTopColor = '#FFC107';
-        spinner.style.borderColor = 'rgba(255, 193, 7, 0.3)';
-        this.indicator.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        spinner.style.borderTopColor = 'rgba(253, 230, 138, 0.9)'; // Amarillo suave
+        spinner.style.borderColor = 'rgba(253, 230, 138, 0.2)';
+        this.indicator.style.backgroundColor = 'rgba(59, 46, 30, 0.7)'; // Marrón oscuro
         text.textContent = 'Servidor con problemas';
+        text.style.color = 'rgba(255, 242, 200, 0.9)';
         break;
+        
       case 'offline':
-        spinner.style.borderTopColor = '#F44336';
-        spinner.style.borderColor = 'rgba(244, 67, 54, 0.3)';
-        this.indicator.style.backgroundColor = 'rgba(139, 0, 0, 0.8)';
+        spinner.style.borderTopColor = 'rgba(252, 165, 165, 0.8)'; // Rojo suave
+        spinner.style.borderColor = 'rgba(252, 165, 165, 0.1)';
+        this.indicator.style.backgroundColor = 'rgba(59, 30, 30, 0.7)'; // Rojo oscuro
         text.textContent = 'Servidor no disponible';
+        text.style.color = 'rgba(255, 200, 200, 0.9)';
         timeElement.textContent = 'Intentando reconectar...';
         break;
     }
@@ -134,34 +140,25 @@ class ServerStatusIndicator {
 
   startMonitoring() {
     console.log(`Iniciando monitorización del servidor en: ${this.apiUrl}`);
-    this.checkServerStatus(); // Verificación inmediata
+    this.checkServerStatus();
     this.intervalId = setInterval(() => this.checkServerStatus(), this.checkInterval);
   }
 
   stopMonitoring() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
+    if (this.intervalId) clearInterval(this.intervalId);
   }
 }
 
-// Iniciar automáticamente cuando se carga la página
+// Iniciar automáticamente
 document.addEventListener('DOMContentLoaded', () => {
   const statusMonitor = new ServerStatusIndicator();
   statusMonitor.startMonitoring();
   
-  // Hacerlo accesible globalmente para control manual
   window.serverStatus = {
     instance: statusMonitor,
     restart: () => {
       statusMonitor.stopMonitoring();
       statusMonitor.startMonitoring();
-    },
-    getStatus: () => {
-      const text = statusMonitor.indicator.querySelector('.status-text').textContent;
-      const color = statusMonitor.indicator.querySelector('.spinner').style.borderTopColor;
-      return { text, color };
     }
   };
 });
