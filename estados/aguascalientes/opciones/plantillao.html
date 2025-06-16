@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - AGUASCALIENTES</title>
+    <title>PLANTILLA DE PERSONAL - BAJA CALIFORNIA</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
     <style>
@@ -29,6 +29,7 @@
                     display: inline-flex;
                     align-items: center;
                     gap: 10px;
+                    background: #691932;
                     color: white;
                     padding: 12px 20px;
                     border-radius: 8px;
@@ -48,129 +49,34 @@
                 }
             }
         }
-
         /* Estilo para la fecha de actualización */
-        #fecha-subida {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 1000;
-        }
+                #fecha-subida {
+                    position: fixed;
+                    bottom: 10px;
+                    right: 10px;
+                    background-color: rgba(0,0,0,0.7);
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    font-size: 12px;
+                    z-index: 1000;
+                }
 
-        @media (max-width: 768px) {
-            #fecha-subida {
-                font-size: 10px;
-                padding: 3px 6px;
-            }
-        }
-         /* Estilos para el indicador de servidor iniciando */
-    .server-starting {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-        flex-direction: column;
-        color: white;
-        text-align: center;
-        padding: 20px;
-    }
-    
-    .server-spinner {
-        border: 5px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top: 5px solid #691932;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
-    }
-    
-    .server-message {
-        font-size: 20px;
-        margin-bottom: 10px;
-    }
-    
-    .server-details {
-        font-size: 14px;
-        opacity: 0.8;
-        margin-bottom: 20px;
-    }
-    
-    .retry-button {
-        background: #691932;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-    
-    /* Mejoras al loading existente */
-    .loading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        flex-direction: column;
-    }
-    
-    .spinner {
-        border: 5px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top: 5px solid #3498db;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 15px;
-    }
-    
-    .loading-text {
-        color: white;
-        margin-top: 15px;
-        font-size: 18px;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+                @media (max-width: 768px) {
+                    #fecha-subida {
+                        font-size: 10px;
+                        padding: 3px 6px;
+                    }
+                }
     </style>
 </head>
 <body>
-    <!-- Indicador de servidor iniciando (nuevo) -->
-<div id="serverStarting" class="server-starting">
-    <div class="server-spinner"></div>
-    <div class="server-message">El servidor se está iniciando</div>
-    <div class="server-details">Por favor espera, esto puede tomar unos segundos...</div>
-    <div id="serverProgress"></div>
-    <button id="retryButton" class="retry-button">Reintentar conexión</button>
-</div>
-    <script type="module" src="../../../common.js"></script>
-    
+    <script type="module" src="../../../common.js"></script>    
     <!-- Contenedor para el título personalizado -->
     <div id="tituloContainer" class="titulo-personalizado">
         Cargando título...
     </div>
     
-    <!-- Resto de tu HTML permanece igual -->
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -199,8 +105,8 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                        <li><a href="../aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
                         <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
@@ -264,92 +170,22 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Elemento para mostrar la fecha de actualización -->
     <div id="fecha-subida">
-        Actualizado: <span id="fecha-texto">Cargando....</span>
+    Actualizado: <span id="fecha-texto">Cargando...</span>
     </div>
 
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
-<script>
+
+    <script>
     // Configuración
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
     const ESTADO_FIJO = 'aguascalientes';
     const TIPO_DOCUMENTO = 'plantilla_personal';
-
 // Detectar iOS
 function isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-// Función para mostrar/ocultar el indicador de servidor iniciando
-function showServerStarting(show, message = 'El servidor se está iniciando') {
-    const serverStarting = document.getElementById('serverStarting');
-    if (serverStarting) {
-        if (show) {
-            serverStarting.style.display = 'flex';
-            serverStarting.querySelector('.server-message').textContent = message;
-        } else {
-            serverStarting.style.display = 'none';
-        }
-    }
-}
-
-// Función mejorada para mostrar loading
-function showLoading(show, message = 'Cargando...') {
-    const loadingElement = document.getElementById('loading');
-    if (loadingElement) {
-        if (show) {
-            loadingElement.style.display = 'flex';
-            loadingElement.innerHTML = `
-                <div class="spinner"></div>
-                <div class="loading-text">${message}</div>
-            `;
-        } else {
-            loadingElement.style.display = 'none';
-            loadingElement.innerHTML = '<div class="spinner"></div>';
-        }
-    }
-}
-
-// Función para verificar el estado del servidor
-async function checkServerStatus() {
-    showServerStarting(true);
-    
-    const maxAttempts = 5;
-    let attempts = 0;
-    
-    async function attemptConnection() {
-        attempts++;
-        try {
-            const response = await fetch(`${BACKEND_URL}/health`, {
-                headers: { 'x-api-key': API_KEY },
-                signal: AbortSignal.timeout(5000) // Timeout de 5 segundos
-            });
-            
-            if (response.ok) {
-                showServerStarting(false);
-                return true;
-            }
-            throw new Error('Servidor no listo');
-        } catch (error) {
-            if (attempts < maxAttempts) {
-                document.getElementById('serverProgress').textContent = 
-                    `Intento ${attempts} de ${maxAttempts}`;
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                return attemptConnection();
-            }
-            throw error;
-        }
-    }
-    
-    try {
-        return await attemptConnection();
-    } catch (error) {
-        showServerStarting(true, 'No se pudo conectar con el servidor');
-        return false;
-    }
 }
 
 // Función para obtener y cargar el título personalizado
@@ -390,13 +226,18 @@ async function cargarTituloPersonalizado() {
         }
 
         // 3. Título por defecto
-        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
 
     } catch (error) {
         console.error('Error:', error);
-        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
         tituloContainer.style.color = 'red';
     }
+}
+
+// Mostrar/ocultar loading
+function showLoading(show) {
+    document.getElementById('loading').style.display = show ? 'flex' : 'none';
 }
 
 // Mostrar mensaje de error
@@ -447,20 +288,16 @@ function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString('es-MX', options);
 }
 
-// Cargar PDF de Plantilla de Personal de Aguascalientes
+// Cargar PDF de Plantilla de Personal de Baja California
 async function loadPlantillaPersonal() {
-    // Primero verificar estado del servidor
-    const serverReady = await checkServerStatus();
-    if (!serverReady) return;
-    
-    showLoading(true, 'Cargando plantilla de personal...');
+    showLoading(true);
     hideErrors();
+    const fechaElement = document.getElementById('fecha-texto'); // Movida al inicio de la función
 
     try {
         console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
         const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-            headers: { 'x-api-key': API_KEY },
-            signal: AbortSignal.timeout(15000) // Timeout de 15 segundos
+            headers: { 'x-api-key': API_KEY }
         });
 
         if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -473,7 +310,6 @@ async function loadPlantillaPersonal() {
         const pdfViewer = document.getElementById('pdf-viewer');
         const mobileContainer = document.querySelector('.mobile-images');
         const iosLink = document.getElementById('ios-pdf-link');
-        const fechaElement = document.getElementById('fecha-texto');
 
         if (result.data.length > 0) {
             const latestPDF = result.data.sort((a, b) => 
@@ -493,22 +329,17 @@ async function loadPlantillaPersonal() {
                 iosLink.href = googleViewerUrl;
             }
         } else {
-            showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
-            document.getElementById('fecha-texto').textContent = 'No disponible';
+            showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
+            fechaElement.textContent = 'No disponible';
         }
     } catch (error) {
         console.error('Error:', error);
         showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-        document.getElementById('fecha-texto').textContent = 'Error al cargar';
+        fechaElement.textContent = 'Error al cargar';
     } finally {
         showLoading(false);
     }
 }
-
-// Configura el botón de reintento
-document.getElementById('retryButton')?.addEventListener('click', () => {
-    loadPlantillaPersonal();
-});
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
@@ -535,7 +366,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-</script>
-
+    </script>
 </body>
 </html>
