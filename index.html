@@ -5,16 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="imagenes/iconom.png">
-    <!-- Preload de recursos críticos -->
-    <link rel="preload" href="imagenes/MujerBandera.png" as="image">
-    <link rel="preload" href="imagenes/unnamed.png" as="image">
-    <link rel="preconnect" href="https://control-operativo-1.onrender.com">
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Estilos críticos para renderizado inicial */
-        .menu, .menu-overlay { display: none; }
-        .logo-container, .portada { opacity: 1; transition: opacity 0.3s; }
-        
         /* Estilos adicionales para garantizar el funcionamiento del menú */
         nav.menu {
             z-index: 10000 !important;
@@ -96,7 +88,7 @@
     <header>
         <!-- Contenido del header sin el menú -->
         <div class="logo-container">
-            <img src="imagenes/unnamed.png" alt="Gobernación" class="logo" id="logo-gobernacion" loading="lazy">
+            <img src="imagenes/unnamed.png" alt="Gobernación" class="logo" id="logo-gobernacion">
         </div>
     </header>
 
@@ -105,7 +97,7 @@
         <!-- SECCIÓN PORTADA -->
         <section class="portada">
             <div class="imagen-container">
-                <img src="imagenes/MujerBandera.png" alt="Imagen representativa" loading="lazy">
+                <img src="imagenes/MujerBandera.png" alt="Imagen representativa">
             </div>
             <div class="texto-container">
                 <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
@@ -118,6 +110,7 @@
         </section>
         <div class="contra-header"></div>     
        
+        
         <!-- SECCIÓN MAPA -->
         <section class="mapa-container">
             <h2 class="titulo-mapa">Mapa Interactivo de México</h2>
@@ -126,9 +119,10 @@
         </section>
     </main>
 
-    <!-- Scripts optimizados -->
-    <script src="mapa/html5countrymapv4.5/mapdata.js" defer></script>
-    <script src="mapa/html5countrymapv4.5/countrymap.js" defer></script>
+    <!-- Scripts -->
+
+    <script src="mapa/html5countrymapv4.5/mapdata.js"></script>
+    <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
     
     <script type="module">
         import { initKeepAlive } from './keep-alive.js';
@@ -139,84 +133,75 @@
     </script>
 
     <script>
-        // Función optimizada para el menú
         function toggleMenu() {
             const menu = document.querySelector('.menu');
             const menuOverlay = document.querySelector('.menu-overlay');
             menu.classList.toggle('active');
             menuOverlay.classList.toggle('active');
         }
+    // Función para cerrar todos los submenús
+function closeAllSubmenus() {
+    const submenus = document.querySelectorAll('.submenu.active');
+    submenus.forEach(submenu => {
+        submenu.classList.remove('active');
+    });
+}
 
-        // Función para cerrar todos los submenús
-        function closeAllSubmenus() {
-            document.querySelectorAll('.submenu.active').forEach(submenu => {
-                submenu.classList.remove('active');
-            });
-        }
+// Función para mostrar/ocultar el submenú
+function toggleSubmenu(event) {
+    event.preventDefault(); // Evita que el enlace recargue la página
 
-        // Delegación de eventos para mejor performance
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fecha actual
-            const fechaElement = document.getElementById("fechaActual");
-            if(fechaElement) {
-                fechaElement.textContent = new Date().toLocaleDateString('es-MX', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
+    // Identificar el submenú al que pertenece el enlace
+    const submenu = event.target.closest('.submenu');
 
-            // Verificación de carga del mapa con retardo optimizado
-            let mapCheckTimeout;
-            
-            function checkMapLoaded() {
-                if (typeof simplemaps_countrymap === 'undefined') {
-                    const errorElement = document.getElementById('mapa-error');
-                    if(errorElement) {
-                        errorElement.textContent = 'Error: No se cargó countrymap.js. Verifica la ruta.';
-                        errorElement.style.display = 'block';
-                    }
-                }
-            }
-            
-            // Verificar después de que todo lo demás haya cargado
-            window.addEventListener('load', function() {
-                mapCheckTimeout = setTimeout(checkMapLoaded, 1000);
-            });
-            
-            // Limpiar timeout si el mapa carga antes
-            document.addEventListener('simplemaps_countrymap_loaded', function() {
-                clearTimeout(mapCheckTimeout);
-            });
+    // Si el submenú está abierto, lo cerramos; si está cerrado, lo abrimos
+    if (submenu.classList.contains('active')) {
+        submenu.classList.remove('active');
+    } else {
+        // Cerrar todos los submenús antes de abrir uno nuevo
+        closeAllSubmenus();
+        submenu.classList.add('active');
+    }
+}
+  // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
+  const menuOverlay = document.querySelector('.menu-overlay');
+    menuOverlay.addEventListener('click', () => {
+        const menu = document.querySelector('.menu');
+        menu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+
+// Cerrar el submenú al hacer clic fuera de él
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.submenu')) {
+        closeAllSubmenus();
+    }
+});
+
+// Cerrar el submenú al hacer clic en una opción de submenú
+const submenuLinks = document.querySelectorAll('.submenu-list a');
+submenuLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        closeAllSubmenus(); // Cierra todos los submenús
+    });
+});
+
+        // Mostrar fecha actual
+        document.getElementById("fechaactual").innerHTML = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
 
-        // Manejo de eventos del menú con delegación
-        document.addEventListener('click', function(e) {
-            // Menú principal
-            if(e.target.matches('.menu-toggle')) {
-                toggleMenu();
-                return;
-            }
-            
-            // Submenús
-            if(e.target.closest('.submenu > a')) {
-                e.preventDefault();
-                const submenu = e.target.closest('.submenu');
-                submenu.classList.toggle('active');
-                return;
-            }
-            
-            // Cerrar menús al hacer clic fuera
-            if(!e.target.closest('.menu') && document.querySelector('.menu').classList.contains('active')) {
-                closeAllSubmenus();
-                document.querySelector('.menu').classList.remove('active');
-                document.querySelector('.menu-overlay').classList.remove('active');
-            }
-            
-            // Cerrar submenús al hacer clic en una opción
-            if(e.target.closest('.submenu-list a')) {
-                closeAllSubmenus();
-            }
+        // Verificación de carga del mapa
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof simplemaps_countrymap === 'undefined') {
+                    document.getElementById('mapa-error').textContent = 
+                        'Error: No se cargó countrymap.js. Verifica la ruta.';
+                    document.getElementById('mapa-error').style.display = 'block';
+                }
+            }, 1000);
         });
     </script>  
 </body>
