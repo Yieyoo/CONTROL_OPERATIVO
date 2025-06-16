@@ -19,7 +19,7 @@ class ServerStatusIndicator {
     this.indicator.innerHTML = `
       <div class="spinner"></div>
       <span class="status-text">Verificando estado del servidor...</span>
-      <span class="status-time" style="font-size: 5px; opacity: 0.7;"></span>
+      <span class="status-time" style="font-size: 10px; opacity: 0.7;"></span>
     `;
     this.indicator.style.cssText = `
       position: fixed;
