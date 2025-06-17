@@ -8,7 +8,7 @@ class ServerStatusIndicator {
     this.intervalId = null;
     this.apiKey = 'Xhy2md57';
     this.isChecking = false;
-    this.currentStatus = null; // Para guardar el último estado conocido
+    this.currentStatus = null;
   }
 
   createIndicator() {
@@ -19,15 +19,16 @@ class ServerStatusIndicator {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       z-index: 10000;
       border-radius: 50%;
-      background: rgba(252, 165, 165, 0.3); /* Color inicial (offline) */
-      border: 3px solid rgba(252, 165, 165, 0.7);
+      background: rgba(252, 165, 165, 0.3);
+      border: 2px solid rgba(252, 165, 165, 0.7);
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       transition: all 0.3s ease;
       cursor: pointer;
+      box-sizing: border-box;
     `;
     
     this.indicator.title = 'Verificando estado del servidor...';
@@ -63,22 +64,21 @@ class ServerStatusIndicator {
   }
 
   startLoadingAnimation() {
-    // Solo mostrar animación si no tenemos un estado actual
     if (this.currentStatus === null) {
-      this.indicator.style.borderTop = '3px solid transparent';
+      // Crear un borde completo temporal para la animación
+      this.indicator.style.border = '2px solid rgba(200, 200, 200, 0.7)';
+      this.indicator.style.borderTop = '2px solid rgba(252, 165, 165, 0.7)';
       this.indicator.style.animation = 'spin 1s linear infinite';
     }
     this.indicator.title = 'Verificando estado del servidor...';
     
-    // Agregar la regla de animación al estilo si no existe
     if (!document.getElementById('spin-animation')) {
       const style = document.createElement('style');
       style.id = 'spin-animation';
       style.innerHTML = `
         @keyframes spin {
-          0% { transform: rotate(0deg) scale(1); }
-          50% { transform: rotate(180deg) scale(1.1); }
-          100% { transform: rotate(360deg) scale(1); }
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `;
       document.head.appendChild(style);
@@ -86,9 +86,8 @@ class ServerStatusIndicator {
   }
 
   updateStatus(status) {
-    // Detener la animación cuando se actualiza el estado
+    // Detener y resetear completamente la animación
     this.indicator.style.animation = 'none';
-    this.indicator.style.borderTop = ''; // Quitar el borde transparente
     
     let bgColor, borderColor, shadowColor, title;
     
@@ -115,12 +114,13 @@ class ServerStatusIndicator {
         break;
     }
     
+    // Restablecer el borde completo
+    this.indicator.style.border = `2px solid ${borderColor}`;
     this.indicator.style.background = bgColor;
-    this.indicator.style.borderColor = borderColor;
     this.indicator.style.boxShadow = `0 0 15px ${shadowColor}`;
     this.indicator.title = title;
     
-    // Efecto de confirmación al cambiar de estado
+    // Efecto de confirmación
     this.indicator.style.transform = 'scale(1.2)';
     setTimeout(() => {
       this.indicator.style.transform = 'scale(1)';
