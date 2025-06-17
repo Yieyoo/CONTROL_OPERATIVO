@@ -1,7 +1,6 @@
 class ServerStatusIndicator {
   constructor() {
     this.createIndicator();
-    this.checkInterval = 5000;
     this.apiUrl = window.location.hostname.includes('github.io') 
       ? 'https://control-operativo-1.onrender.com/api/health'
       : 'http://localhost:3000/api/health';
@@ -9,6 +8,13 @@ class ServerStatusIndicator {
     this.apiKey = 'Xhy2md57';
     this.isChecking = false;
     this.currentStatus = null;
+    
+    // Intervalos personalizados por estado
+    this.intervals = {
+      online: 10000,    // 10 segundos si está online
+      degraded: 5000,   // 5 segundos si está degradado
+      offline: 5000     // 5 segundos si está offline
+    };
   }
 
   createIndicator() {
@@ -39,7 +45,11 @@ class ServerStatusIndicator {
     if (this.isChecking) return;
     
     this.isChecking = true;
-    this.startLoadingAnimation();
+    
+    // Mostrar animación SOLO si no está online
+    if (this.currentStatus !== 'online') {
+      this.startLoadingAnimation();
+    }
     
     try {
       const response = await fetch(this.apiUrl, {
@@ -60,16 +70,22 @@ class ServerStatusIndicator {
       this.updateStatus('offline');
     } finally {
       this.isChecking = false;
+      
+      // Reiniciar el intervalo con el tiempo correspondiente al estado actual
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+      this.intervalId = setInterval(
+        () => this.checkServerStatus(), 
+        this.intervals[this.currentStatus || 'offline']
+      );
     }
   }
 
   startLoadingAnimation() {
-    if (this.currentStatus === null) {
-      // Crear un borde completo temporal para la animación
-      this.indicator.style.border = '2px solid rgba(200, 200, 200, 0.7)';
-      this.indicator.style.borderTop = '2px solid rgba(252, 165, 165, 0.7)';
-      this.indicator.style.animation = 'spin 1s linear infinite';
-    }
+    this.indicator.style.border = '2px solid rgba(200, 200, 200, 0.7)';
+    this.indicator.style.borderTop = '2px solid rgba(252, 165, 165, 0.7)';
+    this.indicator.style.animation = 'spin 1s linear infinite';
     this.indicator.title = 'Verificando estado del servidor...';
     
     if (!document.getElementById('spin-animation')) {
@@ -86,8 +102,10 @@ class ServerStatusIndicator {
   }
 
   updateStatus(status) {
-    // Detener y resetear completamente la animación
-    this.indicator.style.animation = 'none';
+    // Detener animación si está online
+    if (status === 'online') {
+      this.indicator.style.animation = 'none';
+    }
     
     let bgColor, borderColor, shadowColor, title;
     
@@ -114,7 +132,6 @@ class ServerStatusIndicator {
         break;
     }
     
-    // Restablecer el borde completo
     this.indicator.style.border = `2px solid ${borderColor}`;
     this.indicator.style.background = bgColor;
     this.indicator.style.boxShadow = `0 0 15px ${shadowColor}`;
@@ -129,7 +146,6 @@ class ServerStatusIndicator {
 
   startMonitoring() {
     this.checkServerStatus();
-    this.intervalId = setInterval(() => this.checkServerStatus(), this.checkInterval);
     
     this.indicator.addEventListener('click', () => {
       if (!this.isChecking) {
