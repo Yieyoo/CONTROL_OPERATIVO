@@ -8,6 +8,7 @@ class ServerStatusIndicator {
     this.intervalId = null;
     this.apiKey = 'Xhy2md57';
     this.isChecking = false;
+    this.currentStatus = null; // Para guardar el último estado conocido
   }
 
   createIndicator() {
@@ -24,15 +25,12 @@ class ServerStatusIndicator {
       border-radius: 50%;
       background: rgba(252, 165, 165, 0.3); /* Color inicial (offline) */
       border: 3px solid rgba(252, 165, 165, 0.7);
-      border-top: 3px solid transparent;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      transition: all 0.5s ease;
+      transition: all 0.3s ease;
       cursor: pointer;
     `;
     
-    // Tooltip para mostrar estado al hacer hover
     this.indicator.title = 'Verificando estado del servidor...';
-    
     document.body.appendChild(this.indicator);
   }
 
@@ -54,18 +52,22 @@ class ServerStatusIndicator {
       if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
       
       const data = await response.json();
-      this.updateStatus(data.status === 'healthy' ? 'online' : 'degraded');
+      this.currentStatus = data.status === 'healthy' ? 'online' : 'degraded';
+      this.updateStatus(this.currentStatus);
     } catch (error) {
+      this.currentStatus = 'offline';
       this.updateStatus('offline');
     } finally {
       this.isChecking = false;
-      this.stopLoadingAnimation();
     }
   }
 
   startLoadingAnimation() {
-    this.indicator.style.animation = 'spin 1s linear infinite';
-    this.indicator.style.borderTop = '3px solid transparent';
+    // Solo mostrar animación si no tenemos un estado actual
+    if (this.currentStatus === null) {
+      this.indicator.style.borderTop = '3px solid transparent';
+      this.indicator.style.animation = 'spin 1s linear infinite';
+    }
     this.indicator.title = 'Verificando estado del servidor...';
     
     // Agregar la regla de animación al estilo si no existe
@@ -74,48 +76,51 @@ class ServerStatusIndicator {
       style.id = 'spin-animation';
       style.innerHTML = `
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% { transform: rotate(0deg) scale(1); }
+          50% { transform: rotate(180deg) scale(1.1); }
+          100% { transform: rotate(360deg) scale(1); }
         }
       `;
       document.head.appendChild(style);
     }
   }
 
-  stopLoadingAnimation() {
-    this.indicator.style.animation = 'none';
-  }
-
   updateStatus(status) {
-    this.stopLoadingAnimation();
+    // Detener la animación cuando se actualiza el estado
+    this.indicator.style.animation = 'none';
+    this.indicator.style.borderTop = ''; // Quitar el borde transparente
+    
+    let bgColor, borderColor, shadowColor, title;
     
     switch(status) {
       case 'online':
-        this.indicator.style.background = 'rgba(100, 221, 123, 0.3)';
-        this.indicator.style.borderColor = 'rgba(100, 221, 123, 0.8)';
-        this.indicator.style.borderTop = '3px solid rgba(100, 221, 123, 0.8)';
-        this.indicator.style.boxShadow = '0 0 15px rgba(100, 221, 123, 0.3)';
-        this.indicator.title = 'Servidor en línea ✓';
+        bgColor = 'rgba(100, 221, 123, 0.3)';
+        borderColor = 'rgba(100, 221, 123, 0.8)';
+        shadowColor = 'rgba(100, 221, 123, 0.3)';
+        title = 'Servidor en línea ✓';
         break;
         
       case 'degraded':
-        this.indicator.style.background = 'rgba(253, 230, 138, 0.3)';
-        this.indicator.style.borderColor = 'rgba(253, 230, 138, 0.8)';
-        this.indicator.style.borderTop = '3px solid rgba(253, 230, 138, 0.8)';
-        this.indicator.style.boxShadow = '0 0 15px rgba(253, 230, 138, 0.3)';
-        this.indicator.title = 'Servidor con problemas !';
+        bgColor = 'rgba(253, 230, 138, 0.3)';
+        borderColor = 'rgba(253, 230, 138, 0.8)';
+        shadowColor = 'rgba(253, 230, 138, 0.3)';
+        title = 'Servidor con problemas !';
         break;
         
       case 'offline':
-        this.indicator.style.background = 'rgba(252, 165, 165, 0.3)';
-        this.indicator.style.borderColor = 'rgba(252, 165, 165, 0.8)';
-        this.indicator.style.borderTop = '3px solid rgba(252, 165, 165, 0.8)';
-        this.indicator.style.boxShadow = '0 0 15px rgba(252, 165, 165, 0.3)';
-        this.indicator.title = 'Servidor no disponible ✗';
+        bgColor = 'rgba(252, 165, 165, 0.3)';
+        borderColor = 'rgba(252, 165, 165, 0.8)';
+        shadowColor = 'rgba(252, 165, 165, 0.3)';
+        title = 'Servidor no disponible ✗';
         break;
     }
     
-    // Efecto de parpadeo al cambiar de estado
+    this.indicator.style.background = bgColor;
+    this.indicator.style.borderColor = borderColor;
+    this.indicator.style.boxShadow = `0 0 15px ${shadowColor}`;
+    this.indicator.title = title;
+    
+    // Efecto de confirmación al cambiar de estado
     this.indicator.style.transform = 'scale(1.2)';
     setTimeout(() => {
       this.indicator.style.transform = 'scale(1)';
@@ -126,7 +131,6 @@ class ServerStatusIndicator {
     this.checkServerStatus();
     this.intervalId = setInterval(() => this.checkServerStatus(), this.checkInterval);
     
-    // Opcional: Verificación manual al hacer click
     this.indicator.addEventListener('click', () => {
       if (!this.isChecking) {
         this.indicator.title = 'Verificando...';
