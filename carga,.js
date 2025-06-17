@@ -7,6 +7,7 @@ class ServerStatusIndicator {
       : 'http://localhost:3000/api/health';
     this.intervalId = null;
     this.apiKey = 'Xhy2md57';
+    this.isChecking = false;
   }
 
   createIndicator() {
@@ -23,6 +24,7 @@ class ServerStatusIndicator {
       border-radius: 50%;
       background: rgba(252, 165, 165, 0.3); /* Color inicial (offline) */
       border: 3px solid rgba(252, 165, 165, 0.7);
+      border-top: 3px solid transparent;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       transition: all 0.5s ease;
       cursor: pointer;
@@ -35,6 +37,11 @@ class ServerStatusIndicator {
   }
 
   async checkServerStatus() {
+    if (this.isChecking) return;
+    
+    this.isChecking = true;
+    this.startLoadingAnimation();
+    
     try {
       const response = await fetch(this.apiUrl, {
         headers: {
@@ -50,14 +57,43 @@ class ServerStatusIndicator {
       this.updateStatus(data.status === 'healthy' ? 'online' : 'degraded');
     } catch (error) {
       this.updateStatus('offline');
+    } finally {
+      this.isChecking = false;
+      this.stopLoadingAnimation();
     }
   }
 
+  startLoadingAnimation() {
+    this.indicator.style.animation = 'spin 1s linear infinite';
+    this.indicator.style.borderTop = '3px solid transparent';
+    this.indicator.title = 'Verificando estado del servidor...';
+    
+    // Agregar la regla de animación al estilo si no existe
+    if (!document.getElementById('spin-animation')) {
+      const style = document.createElement('style');
+      style.id = 'spin-animation';
+      style.innerHTML = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  stopLoadingAnimation() {
+    this.indicator.style.animation = 'none';
+  }
+
   updateStatus(status) {
+    this.stopLoadingAnimation();
+    
     switch(status) {
       case 'online':
         this.indicator.style.background = 'rgba(100, 221, 123, 0.3)';
         this.indicator.style.borderColor = 'rgba(100, 221, 123, 0.8)';
+        this.indicator.style.borderTop = '3px solid rgba(100, 221, 123, 0.8)';
         this.indicator.style.boxShadow = '0 0 15px rgba(100, 221, 123, 0.3)';
         this.indicator.title = 'Servidor en línea ✓';
         break;
@@ -65,6 +101,7 @@ class ServerStatusIndicator {
       case 'degraded':
         this.indicator.style.background = 'rgba(253, 230, 138, 0.3)';
         this.indicator.style.borderColor = 'rgba(253, 230, 138, 0.8)';
+        this.indicator.style.borderTop = '3px solid rgba(253, 230, 138, 0.8)';
         this.indicator.style.boxShadow = '0 0 15px rgba(253, 230, 138, 0.3)';
         this.indicator.title = 'Servidor con problemas !';
         break;
@@ -72,6 +109,7 @@ class ServerStatusIndicator {
       case 'offline':
         this.indicator.style.background = 'rgba(252, 165, 165, 0.3)';
         this.indicator.style.borderColor = 'rgba(252, 165, 165, 0.8)';
+        this.indicator.style.borderTop = '3px solid rgba(252, 165, 165, 0.8)';
         this.indicator.style.boxShadow = '0 0 15px rgba(252, 165, 165, 0.3)';
         this.indicator.title = 'Servidor no disponible ✗';
         break;
@@ -90,8 +128,10 @@ class ServerStatusIndicator {
     
     // Opcional: Verificación manual al hacer click
     this.indicator.addEventListener('click', () => {
-      this.indicator.title = 'Verificando...';
-      this.checkServerStatus();
+      if (!this.isChecking) {
+        this.indicator.title = 'Verificando...';
+        this.checkServerStatus();
+      }
     });
   }
 }
