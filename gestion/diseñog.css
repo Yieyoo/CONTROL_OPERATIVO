@@ -1127,154 +1127,168 @@ button:disabled {
         padding: 10px 14px;
     }
     }
-    /* Estilos para móviles (hasta 768px) */
+    /* Estilos móviles mejorados (hasta 768px) */
 @media screen and (max-width: 768px) {
     /* Ajustes generales */
     body {
         font-size: 14px;
+        padding: 0;
+        background-attachment: scroll;
+        background-size: auto;
     }
     
-    .header-container h1 {
-        font-size: 1.5rem;
-        padding: 0 10px;
+    body::before {
+        display: none; /* Eliminamos el fondo lateral en móvil */
     }
     
-    /* Menú */
-    .menu {
-        width: 80%;
+    /* Header y menú */
+    header {
+        padding: 10px 15px;
+        position: relative;
     }
     
-    /* Panel de gestión */
-    .gestion-archivos {
-        padding: 10px;
+    .menu-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        top: 15px;
+        left: 10px;
     }
     
-    .gestion-archivos h2 {
-        font-size: 1.3rem;
+    nav.menu {
+        width: 280px;
+        padding-top: 80px;
     }
     
-    .fila-superior {
-        flex-direction: column;
+    .logo-arriba-img {
+        width: 150px;
+        top: 15px;
     }
     
-    .upload-form, .file-list {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-    
-    /* Formulario de subida */
-    .upload-form h3, .file-list h3 {
-        font-size: 1.1rem;
-    }
-    
-    .filters {
-        flex-direction: column;
-    }
-    
-    .filters select {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-    
-    /* Lista de archivos */
-    .file-list ul {
-        max-height: 300px;
-    }
-    
-    .file-info {
-        flex-direction: column;
-    }
-    
-    .file-meta {
-        font-size: 0.8rem;
-        margin-top: 3px;
-    }
-    
-    .file-actions {
-        margin-top: 8px;
-    }
-    
-    /* Visor de PDF */
-    #pdf-viewer-container {
-        height: 400px;
-    }
-    
-    .pdf-title {
-        font-size: 0.9rem;
-    }
-    
-    /* Título personalizado */
-    .titulo-container {
-        padding: 10px;
-    }
-    
-    .titulo-container button {
-        width: 100%;
-    }
-    
-    /* Botones */
-    button, .btn-view, .btn-delete {
-        padding: 8px 12px;
-    }
-    
-    /* Current filter */
-    .current-filter {
-        font-size: 0.9rem;
-        padding: 6px 10px;
-    }
-    
-    /* Logo */
-    .logo-container img {
-        max-width: 120px;
-    }
-    
-    /* Botón de regresar */
-    .regresar-btn {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
-}
-
-/* Estilos para tablets pequeñas (769px a 992px) */
-@media screen and (min-width: 769px) and (max-width: 992px) {
-    .fila-superior {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    
-    .upload-form, .file-list {
-        width: 48%;
-    }
-    
-    #pdf-viewer-container {
-        height: 500px;
-    }
-}
-
-/* Ajustes para pantallas muy pequeñas (hasta 480px) */
-@media screen and (max-width: 480px) {
-    body {
-        font-size: 13px;
-    }
-    
-    .header-container h1 {
-        font-size: 1.3rem;
-    }
-    
-    #pdf-viewer-container {
-        height: 300px;
-    }
-    
-    .file-actions {
+    /* Logos superiores */
+    .logo-container {
+        top: 20px;
+        right: 10px;
         flex-direction: column;
         gap: 5px;
     }
     
-    .btn-view, .btn-delete {
+    .logo-container img {
+        width: 80px;
+    }
+    
+    .fecha-actual {
+        top: 110px;
+        right: 10px;
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+    
+    /* Contenido principal */
+    .gestion-archivos, 
+    .pdf-viewer-container {
+        width: 95%;
+        margin: 80px auto 20px;
+        padding: 15px;
+    }
+    
+    /* Grid de archivos */
+    .fila-superior {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Formulario de subida */
+    .upload-form {
+        padding: 15px;
+    }
+    
+    /* Lista de archivos */
+    #fileList {
+        max-height: 250px;
+    }
+    
+    #fileList li {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px;
+    }
+    
+    .file-actions {
+        margin-top: 8px;
+        align-self: flex-end;
+    }
+    
+    /* Visor PDF */
+    .pdf-viewer-container {
+        height: 60vh;
+    }
+    
+    .pdf-toolbar {
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 8px;
+    }
+    
+    #pdf-title {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+    }
+    
+    .pdf-toolbar-actions {
+        justify-content: center;
         width: 100%;
     }
     
-    .menu {
-        width: 90%;
+    /* Botones */
+    .regresar-btn {
+        top: 15px;
+        left: 60px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    button, 
+    .btn-view, 
+    .btn-delete,
+    #uploadForm button,
+    #deleteFileButton {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    /* Zoom controls */
+    .zoom-controls {
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .zoom-controls button {
+        padding: 6px 10px;
+    }
+}
+
+/* Estilos para tablets (769px a 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    body::before {
+        width: 30%;
+    }
+    
+    .gestion-archivos {
+        padding: 25px;
+    }
+    
+    .pdf-viewer-container {
+        height: 70vh;
+    }
+    
+    .fila-superior {
+        gap: 20px;
+    }
+    
+    .logo-container img {
+        width: 100px;
     }
 }
