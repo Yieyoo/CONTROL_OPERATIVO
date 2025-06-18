@@ -1127,4 +1127,154 @@ button:disabled {
         padding: 10px 14px;
     }
     }
+    /* Estilos para móviles (hasta 768px) */
+@media screen and (max-width: 768px) {
+    /* Ajustes generales */
+    body {
+        font-size: 14px;
+    }
     
+    .header-container h1 {
+        font-size: 1.5rem;
+        padding: 0 10px;
+    }
+    
+    /* Menú */
+    .menu {
+        width: 80%;
+    }
+    
+    /* Panel de gestión */
+    .gestion-archivos {
+        padding: 10px;
+    }
+    
+    .gestion-archivos h2 {
+        font-size: 1.3rem;
+    }
+    
+    .fila-superior {
+        flex-direction: column;
+    }
+    
+    .upload-form, .file-list {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    /* Formulario de subida */
+    .upload-form h3, .file-list h3 {
+        font-size: 1.1rem;
+    }
+    
+    .filters {
+        flex-direction: column;
+    }
+    
+    .filters select {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Lista de archivos */
+    .file-list ul {
+        max-height: 300px;
+    }
+    
+    .file-info {
+        flex-direction: column;
+    }
+    
+    .file-meta {
+        font-size: 0.8rem;
+        margin-top: 3px;
+    }
+    
+    .file-actions {
+        margin-top: 8px;
+    }
+    
+    /* Visor de PDF */
+    #pdf-viewer-container {
+        height: 400px;
+    }
+    
+    .pdf-title {
+        font-size: 0.9rem;
+    }
+    
+    /* Título personalizado */
+    .titulo-container {
+        padding: 10px;
+    }
+    
+    .titulo-container button {
+        width: 100%;
+    }
+    
+    /* Botones */
+    button, .btn-view, .btn-delete {
+        padding: 8px 12px;
+    }
+    
+    /* Current filter */
+    .current-filter {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+    
+    /* Logo */
+    .logo-container img {
+        max-width: 120px;
+    }
+    
+    /* Botón de regresar */
+    .regresar-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Estilos para tablets pequeñas (769px a 992px) */
+@media screen and (min-width: 769px) and (max-width: 992px) {
+    .fila-superior {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .upload-form, .file-list {
+        width: 48%;
+    }
+    
+    #pdf-viewer-container {
+        height: 500px;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas (hasta 480px) */
+@media screen and (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+    
+    .header-container h1 {
+        font-size: 1.3rem;
+    }
+    
+    #pdf-viewer-container {
+        height: 300px;
+    }
+    
+    .file-actions {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .btn-view, .btn-delete {
+        width: 100%;
+    }
+    
+    .menu {
+        width: 90%;
+    }
+}
