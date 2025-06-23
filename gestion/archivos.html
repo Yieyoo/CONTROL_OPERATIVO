@@ -117,6 +117,11 @@
         .datos-nacionales-option {
             display: none;
         }
+        
+        /* Estilo para la opción placeholder */
+        select option[value=""][disabled] {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -203,7 +208,8 @@
                     <input type="file" id="file" name="file" accept="application/pdf" required>
                     
                     <div class="filters">
-                        <select id="carpetaSelect">
+                        <select id="carpetaSelect" required>
+                            <option value="" disabled selected>Selecciona una ubicación</option>
                             <!-- Nueva opción de Datos Nacionales -->
                             <option value="datos-nacionales">Datos Nacionales</option>
                             <!-- Estados existentes -->
@@ -241,7 +247,8 @@
                             <option value="zacatecas">Zacatecas</option>
                         </select>
                         
-                        <select id="tipoDocumentoSelect">
+                        <select id="tipoDocumentoSelect" required>
+                            <option value="" disabled selected>Selecciona un tipo de documento</option>
                             <!-- Opciones normales -->
                             <option value="ficha_curricular">Ficha Curricular</option>
                             <option value="organigrama">Organigrama</option>
@@ -271,7 +278,7 @@
                         <p id="tituloStatus"></p>
                     </div>
                     
-                    <button type="submit" id="uploadButton">Subir</button>
+                    <button type="submit" id="uploadButton" disabled>Subir</button>
                     <p id="uploadStatus"></p>
                 </form>
             </div>
@@ -280,10 +287,11 @@
             <div class="file-list">
                 <h3>Archivos disponibles</h3>
                 <div class="current-filter">
-                    Mostrando: <span id="currentEstado">Aguascalientes</span> / 
-                    <span id="currentTipo">Ficha Curricular</span>
+                    Mostrando: <span id="currentEstado">Selecciona ubicación y tipo de documento</span>
                 </div>
-                <ul id="fileList"></ul>
+                <ul id="fileList">
+                    <li>Por favor selecciona una ubicación y un tipo de documento para ver los archivos disponibles</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -300,8 +308,8 @@
         // Configuración global
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
-        let currentCarpeta = 'aguascalientes';
-        let currentTipoDocumento = 'ficha_curricular';
+        let currentCarpeta = '';
+        let currentTipoDocumento = '';
 
         // Mostrar/ocultar loading
         function showLoading(show) {
@@ -367,6 +375,11 @@
 
         // Cargar lista de archivos
         async function cargarListaArchivos() {
+            if (!currentCarpeta || !currentTipoDocumento) {
+                document.getElementById('fileList').innerHTML = '<li>Por favor selecciona una ubicación y un tipo de documento para ver los archivos disponibles</li>';
+                return;
+            }
+            
             showLoading(true);
             try {
                 // Añadir parámetro de versión para evitar caché del navegador
@@ -385,18 +398,18 @@
                 
                 // Actualizar los textos de filtros actuales
                 const currentEstadoSpan = document.getElementById('currentEstado');
-                const currentTipoSpan = document.getElementById('currentTipo');
                 const carpetaSelect = document.getElementById('carpetaSelect');
                 const tipoDocumentoSelect = document.getElementById('tipoDocumentoSelect');
                 
-                if (currentEstadoSpan && currentTipoSpan) {
-                    currentEstadoSpan.textContent = carpetaSelect.options[carpetaSelect.selectedIndex].text;
-                    currentTipoSpan.textContent = tipoDocumentoSelect.options[tipoDocumentoSelect.selectedIndex].text;
+                if (currentEstadoSpan) {
+                    currentEstadoSpan.textContent = 
+                        `${carpetaSelect.options[carpetaSelect.selectedIndex].text} / ${tipoDocumentoSelect.options[tipoDocumentoSelect.selectedIndex].text}`;
                 }
                 
             } catch (error) {
                 console.error('Error al cargar archivos:', error);
                 showStatus(document.getElementById('uploadStatus'), 'Error al cargar archivos', true);
+                document.getElementById('fileList').innerHTML = '<li>Error al cargar archivos. Intenta nuevamente.</li>';
             } finally {
                 showLoading(false);
             }
@@ -411,7 +424,7 @@
             fileListContainer.innerHTML = '';
 
             if (!files || files.length === 0) {
-                fileListContainer.innerHTML = '<li>No hay archivos disponibles</li>';
+                fileListContainer.innerHTML = '<li>No hay archivos disponibles para esta selección</li>';
                 return;
             }
 
@@ -548,6 +561,7 @@
         function manejarCambioCarpeta() {
             const isDatosNacionales = this.value === 'datos-nacionales';
             const tipoSelect = document.getElementById('tipoDocumentoSelect');
+            const uploadButton = document.getElementById('uploadButton');
             
             // Mostrar todas las opciones primero
             document.querySelectorAll('#tipoDocumentoSelect option').forEach(opt => {
@@ -560,39 +574,61 @@
                     opt.style.display = 'none';
                 });
                 // Seleccionar la primera opción de Datos Nacionales
-                tipoSelect.value = 'estado_fuerza';
+                tipoSelect.value = '';
+                tipoSelect.querySelector('option[value=""][disabled]').selected = true;
             } else {
                 // Ocultar opciones de Datos Nacionales, mostrar las normales
                 document.querySelectorAll('.datos-nacionales-option').forEach(opt => {
                     opt.style.display = 'none';
                 });
-                // Seleccionar la primera opción normal
-                tipoSelect.value = 'ficha_curricular';
+                // Seleccionar la opción placeholder
+                tipoSelect.value = '';
+                tipoSelect.querySelector('option[value=""][disabled]').selected = true;
             }
             
             currentCarpeta = this.value;
-            currentTipoDocumento = tipoSelect.value;
-            cargarListaArchivos();
+            currentTipoDocumento = '';
+            
+            // Habilitar/deshabilitar botón de subir según selección
+            uploadButton.disabled = !currentCarpeta || !currentTipoDocumento;
+            
+            // Mostrar mensaje inicial si no hay tipo de documento seleccionado
+            if (!currentTipoDocumento) {
+                document.getElementById('fileList').innerHTML = '<li>Por favor selecciona un tipo de documento para ver los archivos disponibles</li>';
+            } else {
+                cargarListaArchivos();
+            }
+        }
+
+        // Manejar cambio en el selector de tipo de documento
+        function manejarCambioTipoDocumento() {
+            currentTipoDocumento = this.value;
+            const tituloContainer = document.getElementById('tituloContainer');
+            const uploadButton = document.getElementById('uploadButton');
+            
+            // Mostrar solo para plantilla de personal
+            tituloContainer.style.display = currentTipoDocumento === 'plantilla_personal' ? 'block' : 'none';
+            
+            if (currentTipoDocumento === 'plantilla_personal') {
+                cargarTituloPersonalizado();
+            }
+            
+            // Habilitar/deshabilitar botón de subir según selección
+            uploadButton.disabled = !currentCarpeta || !currentTipoDocumento;
+            
+            // Cargar archivos si ambos selectores tienen valores
+            if (currentCarpeta && currentTipoDocumento) {
+                cargarListaArchivos();
+            } else if (currentCarpeta && !currentTipoDocumento) {
+                document.getElementById('fileList').innerHTML = '<li>Por favor selecciona un tipo de documento para ver los archivos disponibles</li>';
+            }
         }
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', async () => {
             // Configurar eventos de los filtros
             document.getElementById('carpetaSelect')?.addEventListener('change', manejarCambioCarpeta);
-
-            document.getElementById('tipoDocumentoSelect')?.addEventListener('change', function() {
-                currentTipoDocumento = this.value;
-                const tituloContainer = document.getElementById('tituloContainer');
-                
-                // Mostrar solo para plantilla de personal
-                tituloContainer.style.display = currentTipoDocumento === 'plantilla_personal' ? 'block' : 'none';
-                
-                if (currentTipoDocumento === 'plantilla_personal') {
-                    cargarTituloPersonalizado();
-                }
-                
-                cargarListaArchivos();
-            });
+            document.getElementById('tipoDocumentoSelect')?.addEventListener('change', manejarCambioTipoDocumento);
 
             // Evento para guardar título personalizado GLOBAL
             document.getElementById('guardarTituloBtn')?.addEventListener('click', guardarTituloPersonalizado);
@@ -607,6 +643,7 @@
                 try {
                     if (!file) throw new Error('Selecciona un archivo');
                     if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
+                    if (!currentCarpeta || !currentTipoDocumento) throw new Error('Selecciona ubicación y tipo de documento');
                     
                     showLoading(true);
                     uploadButton.disabled = true;
@@ -643,7 +680,7 @@
                     showStatus(uploadStatus, error.message, true);
                 } finally {
                     showLoading(false);
-                    uploadButton.disabled = false;
+                    uploadButton.disabled = !currentCarpeta || !currentTipoDocumento;
                 }
             });
 
@@ -652,14 +689,12 @@
                 opt.style.display = 'none';
             });
 
-            // Cargar archivos iniciales
-            await cargarListaArchivos();
+            // Deshabilitar botón de subir inicialmente
+            document.getElementById('uploadButton').disabled = true;
             
-            // Verificar si estamos viendo plantilla de personal al cargar
-            if (currentTipoDocumento === 'plantilla_personal') {
-                document.getElementById('tituloContainer').style.display = 'block';
-                await cargarTituloPersonalizado();
-            }
+            // Mostrar mensaje inicial
+            document.getElementById('currentEstado').textContent = 'Selecciona ubicación y tipo de documento';
+            document.getElementById('fileList').innerHTML = '<li>Por favor selecciona una ubicación y un tipo de documento para ver los archivos disponibles</li>';
         });
 
         // Funciones para el menú
