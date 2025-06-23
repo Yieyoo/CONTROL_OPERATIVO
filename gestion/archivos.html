@@ -112,6 +112,11 @@
         .titulo-container button:hover {
             background-color: #0d2b57;
         }
+        
+        /* Estilos para opciones condicionales */
+        .datos-nacionales-option {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -178,7 +183,7 @@
             </ul>
         </nav>
     </header>
-<button class="regresar-btn">Regresar</button>
+    <button class="regresar-btn">Regresar</button>
     <div class="logo-container">
         <img src="../imagenes/inm logo.png" alt="Logo INM">
     </div>
@@ -199,6 +204,9 @@
                     
                     <div class="filters">
                         <select id="carpetaSelect">
+                            <!-- Nueva opción de Datos Nacionales -->
+                            <option value="datos-nacionales">Datos Nacionales</option>
+                            <!-- Estados existentes -->
                             <option value="aguascalientes">Aguascalientes</option>
                             <option value="baja-california">Baja California</option>
                             <option value="baja-california-sur">Baja California Sur</option>
@@ -234,6 +242,7 @@
                         </select>
                         
                         <select id="tipoDocumentoSelect">
+                            <!-- Opciones normales -->
                             <option value="ficha_curricular">Ficha Curricular</option>
                             <option value="organigrama">Organigrama</option>
                             <option value="plantilla_personal">Plantilla de Personal</option>
@@ -242,6 +251,14 @@
                             <option value="vehiculos">Vehículos</option>
                             <option value="inmuebles">Inmuebles</option>
                             <option value="unidad_canina">Unidad Canina</option>
+                            
+                            <!-- Nuevas opciones para Datos Nacionales (ocultas por defecto) -->
+                            <option value="estado_fuerza" class="datos-nacionales-option">Estado de Fuerza</option>
+                            <option value="padron_vehicular" class="datos-nacionales-option">Padrón Vehicular</option>
+                            <option value="personal_comisionado" class="datos-nacionales-option">Personal Comisionado</option>
+                            <option value="plantilla" class="datos-nacionales-option">Plantilla</option>
+                            <option value="tabulador" class="datos-nacionales-option">Tabulador</option>
+                            <option value="unidad_canina_nacional" class="datos-nacionales-option">Unidad Canina</option>
                         </select>
                     </div>
                     
@@ -527,13 +544,41 @@
             }
         }
 
+        // Manejar cambio en el selector de carpeta
+        function manejarCambioCarpeta() {
+            const isDatosNacionales = this.value === 'datos-nacionales';
+            const tipoSelect = document.getElementById('tipoDocumentoSelect');
+            
+            // Mostrar todas las opciones primero
+            document.querySelectorAll('#tipoDocumentoSelect option').forEach(opt => {
+                opt.style.display = 'block';
+            });
+            
+            if (isDatosNacionales) {
+                // Ocultar opciones normales, mostrar solo las de Datos Nacionales
+                document.querySelectorAll('#tipoDocumentoSelect option:not(.datos-nacionales-option)').forEach(opt => {
+                    opt.style.display = 'none';
+                });
+                // Seleccionar la primera opción de Datos Nacionales
+                tipoSelect.value = 'estado_fuerza';
+            } else {
+                // Ocultar opciones de Datos Nacionales, mostrar las normales
+                document.querySelectorAll('.datos-nacionales-option').forEach(opt => {
+                    opt.style.display = 'none';
+                });
+                // Seleccionar la primera opción normal
+                tipoSelect.value = 'ficha_curricular';
+            }
+            
+            currentCarpeta = this.value;
+            currentTipoDocumento = tipoSelect.value;
+            cargarListaArchivos();
+        }
+
         // Inicialización
         document.addEventListener('DOMContentLoaded', async () => {
             // Configurar eventos de los filtros
-            document.getElementById('carpetaSelect')?.addEventListener('change', function() {
-                currentCarpeta = this.value;
-                cargarListaArchivos();
-            });
+            document.getElementById('carpetaSelect')?.addEventListener('change', manejarCambioCarpeta);
 
             document.getElementById('tipoDocumentoSelect')?.addEventListener('change', function() {
                 currentTipoDocumento = this.value;
@@ -600,6 +645,11 @@
                     showLoading(false);
                     uploadButton.disabled = false;
                 }
+            });
+
+            // Ocultar opciones de Datos Nacionales al inicio
+            document.querySelectorAll('.datos-nacionales-option').forEach(opt => {
+                opt.style.display = 'none';
             });
 
             // Cargar archivos iniciales
@@ -679,10 +729,11 @@
                 return 'Plantilla de Personal'; // Valor por defecto
             }
         };
+        
         // Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
+        document.querySelector('.regresar-btn').addEventListener('click', function() {
+            window.history.back();
+        });
     </script>
     <script src="../carga,.js"></script>
 </body>
