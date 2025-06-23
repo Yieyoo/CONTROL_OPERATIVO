@@ -376,7 +376,7 @@
         // Cargar lista de archivos
         async function cargarListaArchivos() {
             if (!currentCarpeta || !currentTipoDocumento) {
-                document.getElementById('fileList').innerHTML = '<li>Por favor selecciona una ubicación y un tipo de documento para ver los archivos disponibles</li>';
+                document.getElementById('fileList').innerHTML = '<li>Por favor selecciona una opción y un tipo de documento para ver los archivos disponibles</li>';
                 return;
             }
             
@@ -643,7 +643,7 @@
                 try {
                     if (!file) throw new Error('Selecciona un archivo');
                     if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
-                    if (!currentCarpeta || !currentTipoDocumento) throw new Error('Selecciona ubicación y tipo de documento');
+                    if (!currentCarpeta || !currentTipoDocumento) throw new Error('Selecciona una opción y un tipo de documento');
                     
                     showLoading(true);
                     uploadButton.disabled = true;
@@ -693,8 +693,8 @@
             document.getElementById('uploadButton').disabled = true;
             
             // Mostrar mensaje inicial
-            document.getElementById('currentEstado').textContent = 'Selecciona ubicación y tipo de documento';
-            document.getElementById('fileList').innerHTML = '<li>Por favor selecciona una ubicación y un tipo de documento para ver los archivos disponibles</li>';
+            document.getElementById('currentEstado').textContent = 'Selecciona opción y tipo de documento';
+            document.getElementById('fileList').innerHTML = '<li>Por favor selecciona una opción y un tipo de documento para ver los archivos disponibles</li>';
         });
 
         // Funciones para el menú
