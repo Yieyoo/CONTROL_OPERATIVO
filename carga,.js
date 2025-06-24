@@ -8,12 +8,12 @@ class ServerStatusIndicator {
     this.apiKey = 'Xhy2md57';
     this.isChecking = false;
     this.currentStatus = null;
+    this.lastCheckTime = null;
     
-    // Intervalos personalizados por estado
     this.intervals = {
-      online: 10000,    // 10 segundos si está online
-      degraded: 5000,   // 5 segundos si está degradado
-      offline: 5000     // 5 segundos si está offline
+      online: 10000,
+      degraded: 5000,
+      offline: 5000
     };
   }
 
@@ -37,16 +37,84 @@ class ServerStatusIndicator {
       box-sizing: border-box;
     `;
     
-    this.indicator.title = 'Verificando estado del servidor...';
+    // Crear tooltip
+    this.tooltip = document.createElement('div');
+    this.tooltip.id = 'server-status-tooltip';
+    this.tooltip.style.cssText = `
+      position: absolute;
+      bottom: 30px;
+      right: 0;
+      background: #2d3748;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      pointer-events: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    `;
+    
+    this.indicator.appendChild(this.tooltip);
+    
+    // Eventos hover
+    this.indicator.addEventListener('mouseenter', () => this.showTooltip());
+    this.indicator.addEventListener('mouseleave', () => this.hideTooltip());
+    
     document.body.appendChild(this.indicator);
+  }
+
+  showTooltip() {
+    let statusText = '';
+    let details = '';
+    
+    switch(this.currentStatus) {
+      case 'online':
+        statusText = '🟢 Servidor en línea';
+        details = 'Todo funciona correctamente';
+        break;
+      case 'degraded':
+        statusText = '🟡 Servidor con problemas';
+        details = 'Algunas funciones pueden no estar disponibles';
+        break;
+      case 'offline':
+        statusText = '🔴 Servidor no disponible';
+        details = 'No se puede conectar al servidor';
+        break;
+      default:
+        statusText = '⚪ Estado desconocido';
+        details = 'Aún no se ha verificado el estado';
+    }
+    
+    const timeText = this.lastCheckTime 
+      ? `Última verificación: ${new Date(this.lastCheckTime).toLocaleTimeString()}`
+      : 'No se ha verificado aún';
+    
+    const checkingText = this.isChecking ? '\n🔃 Verificando estado...' : '';
+    
+    this.tooltip.innerHTML = `
+      <div style="font-weight: bold; margin-bottom: 5px;">${statusText}</div>
+      <div style="margin-bottom: 5px;">${details}</div>
+      <div style="font-size: 12px; color: #a0aec0;">${timeText}${checkingText}</div>
+    `;
+    
+    this.tooltip.style.opacity = '1';
+    this.tooltip.style.visibility = 'visible';
+  }
+
+  hideTooltip() {
+    this.tooltip.style.opacity = '0';
+    this.tooltip.style.visibility = 'hidden';
   }
 
   async checkServerStatus() {
     if (this.isChecking) return;
     
     this.isChecking = true;
+    this.lastCheckTime = new Date();
     
-    // Mostrar animación SOLO si no está online
     if (this.currentStatus !== 'online') {
       this.startLoadingAnimation();
     }
@@ -71,7 +139,6 @@ class ServerStatusIndicator {
     } finally {
       this.isChecking = false;
       
-      // Reiniciar el intervalo con el tiempo correspondiente al estado actual
       if (this.intervalId) {
         clearInterval(this.intervalId);
       }
@@ -79,6 +146,11 @@ class ServerStatusIndicator {
         () => this.checkServerStatus(), 
         this.intervals[this.currentStatus || 'offline']
       );
+      
+      // Actualizar tooltip si está visible
+      if (this.tooltip.style.visibility === 'visible') {
+        this.showTooltip();
+      }
     }
   }
 
@@ -86,7 +158,6 @@ class ServerStatusIndicator {
     this.indicator.style.border = '2px solid rgba(200, 200, 200, 0.7)';
     this.indicator.style.borderTop = '2px solid rgba(252, 165, 165, 0.7)';
     this.indicator.style.animation = 'spin 1s linear infinite';
-    this.indicator.title = 'Verificando estado del servidor...';
     
     if (!document.getElementById('spin-animation')) {
       const style = document.createElement('style');
@@ -102,42 +173,34 @@ class ServerStatusIndicator {
   }
 
   updateStatus(status) {
-    // Detener animación si está online
     if (status === 'online') {
       this.indicator.style.animation = 'none';
     }
     
-    let bgColor, borderColor, shadowColor, title;
+    let bgColor, borderColor, shadowColor;
     
     switch(status) {
       case 'online':
         bgColor = 'rgba(100, 221, 123, 0.3)';
         borderColor = 'rgba(100, 221, 123, 0.8)';
         shadowColor = 'rgba(100, 221, 123, 0.3)';
-        title = 'Servidor en línea ✓';
         break;
-        
       case 'degraded':
         bgColor = 'rgba(253, 230, 138, 0.3)';
         borderColor = 'rgba(253, 230, 138, 0.8)';
         shadowColor = 'rgba(253, 230, 138, 0.3)';
-        title = 'Servidor con problemas !';
         break;
-        
       case 'offline':
         bgColor = 'rgba(252, 165, 165, 0.3)';
         borderColor = 'rgba(252, 165, 165, 0.8)';
         shadowColor = 'rgba(252, 165, 165, 0.3)';
-        title = 'Servidor no disponible ✗';
         break;
     }
     
     this.indicator.style.border = `2px solid ${borderColor}`;
     this.indicator.style.background = bgColor;
     this.indicator.style.boxShadow = `0 0 15px ${shadowColor}`;
-    this.indicator.title = title;
     
-    // Efecto de confirmación
     this.indicator.style.transform = 'scale(1.2)';
     setTimeout(() => {
       this.indicator.style.transform = 'scale(1)';
@@ -149,7 +212,6 @@ class ServerStatusIndicator {
     
     this.indicator.addEventListener('click', () => {
       if (!this.isChecking) {
-        this.indicator.title = 'Verificando...';
         this.checkServerStatus();
       }
     });
