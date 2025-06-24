@@ -510,9 +510,17 @@ nav.menu ul li a:hover {
   }
   
   .logo-container {
-    top: 40px;
-    right: 10px;
-    gap: 15px;
+    top: 50px;
+    right: 2px;
+    gap: 4px;
+    position: fixed;
+    display: flex;
+    z-index: 5;
+  }
+  .logo-container img {
+    width: 60px;
+    height: auto;
+    object-fit: contain;
   }
   
   .fecha-actual {
