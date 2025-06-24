@@ -18,16 +18,22 @@ class ServerStatusIndicator {
   }
 
   createIndicator() {
-    this.indicator = document.createElement('div');
-    this.indicator.id = 'server-status-indicator';
-    
-    this.indicator.style.cssText = `
+    // Crear contenedor principal
+    this.container = document.createElement('div');
+    this.container.id = 'server-status-container';
+    this.container.style.cssText = `
       position: fixed;
       bottom: 20px;
       right: 20px;
+      z-index: 10000;
+    `;
+    
+    // Crear indicador (círculo)
+    this.indicator = document.createElement('div');
+    this.indicator.id = 'server-status-indicator';
+    this.indicator.style.cssText = `
       width: 20px;
       height: 20px;
-      z-index: 10000;
       border-radius: 50%;
       background: rgba(252, 165, 165, 0.3);
       border: 2px solid rgba(252, 165, 165, 0.7);
@@ -35,9 +41,10 @@ class ServerStatusIndicator {
       transition: all 0.3s ease;
       cursor: pointer;
       box-sizing: border-box;
+      position: relative;
     `;
     
-    // Crear tooltip
+    // Crear tooltip (ahora hermano del indicador)
     this.tooltip = document.createElement('div');
     this.tooltip.id = 'server-status-tooltip';
     this.tooltip.style.cssText = `
@@ -55,15 +62,17 @@ class ServerStatusIndicator {
       transition: opacity 0.3s, visibility 0.3s;
       pointer-events: none;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transform-origin: bottom right;
     `;
     
-    this.indicator.appendChild(this.tooltip);
+    // Agregar elementos al DOM
+    this.container.appendChild(this.indicator);
+    this.container.appendChild(this.tooltip);
+    document.body.appendChild(this.container);
     
     // Eventos hover
     this.indicator.addEventListener('mouseenter', () => this.showTooltip());
     this.indicator.addEventListener('mouseleave', () => this.hideTooltip());
-    
-    document.body.appendChild(this.indicator);
   }
 
   showTooltip() {
@@ -218,6 +227,7 @@ class ServerStatusIndicator {
   }
 }
 
+// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
   new ServerStatusIndicator().startMonitoring();
 });
