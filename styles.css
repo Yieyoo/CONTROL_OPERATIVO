@@ -451,55 +451,114 @@ nav.menu ul li a.active {
     border: none;
   }
   
-  /* ============ MAPA ============ */
-  .mapa-container {
+ /* ============ MAPA ============ */
+.mapa-container {
     background-color: #fff;
-    padding: 1rem; /* Reducir padding para ganar espacio */
+    padding: 2rem;
     border-radius: 10px;
-    width: 80%; /* Aumentar ancho */
-    max-width: 1300px; /* Aumentar tamaño máximo */
-    margin: 2rem auto;
-    box-shadow: var(--sombra);
-    overflow: hidden; /* Evitar que el mapa sobresalga */
+    width: 90%;
+    max-width: 1400px;
+    margin: 3rem auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #e0e0e0;
+}
+
+.mapa-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(to right, #691932, #A5852E);
 }
 
 .mapa-container #map {
     width: 100%;
-    height: 750px; /* Altura ajustada */
-    background-color: #e6e6e6;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    transform: scale(1); /* Asegurar que no haya reducción */
-    box-sizing: border-box; /* Asegura que el padding y border se incluyan en el tamaño total */
+    height: 750px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
 }
 
-/* Ajustar el mapa para que ocupe todo el espacio disponible */
 #map svg {
     width: 100% !important;
     height: 100% !important;
-    max-width: 100%; /* Asegura que no se estire más allá de su contenedor */
+    max-width: 100%;
 }
 
-  
-  .mapa-container .titulo-mapa {
-      font-size: 1.8rem;
-      color: var(--color-secundario);
-      margin-bottom: 1.5rem;
-      text-align: center;
-      position: relative;
-      padding-bottom: 0.5rem;
-  }
-  
-  .mapa-container .titulo-mapa::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 3px;
-      background-color: var(--color-secundario);
-  }
+/* Estilos para los elementos del SVG - versión estática */
+#map path {
+    stroke: #fff;
+    stroke-width: 1px;
+    fill: #691932;
+    cursor: pointer;
+    transition: fill 0.2s ease; /* Solo transición de color */
+}
+
+#map path:hover {
+    fill: #235B4E;
+    stroke-width: 1.5px;
+}
+
+#map text {
+    font-family: 'Arial', sans-serif;
+    font-size: 10px;
+    fill: #fff;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.mapa-container .titulo-mapa {
+    font-size: 2rem;
+    color: #691932;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+    padding-bottom: 0.8rem;
+    font-weight: 600;
+}
+
+.mapa-container .titulo-mapa::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 3px;
+    background: #A5852E;
+    border-radius: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mapa-container {
+        width: 95%;
+        padding: 1.5rem;
+    }
+    
+    .mapa-container #map {
+        height: 500px;
+    }
+    
+    .mapa-container .titulo-mapa {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .mapa-container #map {
+        height: 300px;
+    }
+    
+    .mapa-container {
+        padding: 1rem;
+    }
+}
   
  
 /* ============ LÍNEA SEPARADORA ============ */
