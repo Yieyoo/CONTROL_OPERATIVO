@@ -1,39 +1,122 @@
-const PING_INTERVAL = 5 * 60 * 1000; // 5 minutos
+const PING_INTERVAL = 4.5 * 60 * 1000; // 4.5 minutos (más frecuente)
 let pingInterval;
+let sessionId = Math.random().toString(36).substring(2, 15);
 
 export function initKeepAlive(serverUrl, options = {}) {
-    // 1. Desactivar en desarrollo
-    if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+    // 1. Optimización para desarrollo
+    if (process.env.NODE_ENV === 'development') {
         console.log('[KeepAlive] Modo desarrollo - Desactivado');
         return;
     }
 
-    // 2. Ping inmediato (solo si se solicita)
-    if (options.immediatePing) {
-        fetch(`${serverUrl}/api/render-ping`, {
-            cache: 'no-store',
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(() => console.log('[KeepAlive] Ping INMEDIATO exitoso'))
-        .catch(console.error);
-    }
+    // 2. Ping inteligente con reintentos
+    const sendPing = async (attempt = 1) => {
+        try {
+            const startTime = performance.now();
+            const response = await fetch(`${serverUrl}/api/health-check`, {
+                method: 'POST',
+                cache: 'no-store',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Session-ID': sessionId,
+                    'X-Ping-Attempt': attempt
+                },
+                body: JSON.stringify({
+                    origin: window.location.href,
+                    lastPing: localStorage.getItem('lastPingSuccess')
+                })
+            });
 
-    // 3. Pings periódicos (en TODAS las páginas)
-    const sendPing = () => {
-        fetch(`${serverUrl}/api/render-ping`, {
-            cache: 'no-store',
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(() => console.log(`[KeepAlive] Ping periódico (${new Date().toLocaleTimeString()})`))
-        .catch(console.error);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const pingTime = (performance.now() - startTime).toFixed(2);
+            localStorage.setItem('lastPingSuccess', new Date().toISOString());
+            console.log(`[KeepAlive] Ping exitoso (${pingTime}ms)`);
+            
+            // Ajuste dinámico del intervalo
+            if (attempt > 1) {
+                clearInterval(pingInterval);
+                pingInterval = setInterval(sendPing, PING_INTERVAL);
+            }
+            
+            return true;
+        } catch (error) {
+            console.error(`[KeepAlive] Intento ${attempt} fallido:`, error);
+            
+            // Reintento agresivo
+            if (attempt < 3) {
+                setTimeout(() => sendPing(attempt + 1), 30000); // 30 segundos
+            } else {
+                // Notificar al usuario solo después de múltiples fallos
+                if (attempt === 3) {
+                    showDegradedWarning();
+                }
+                // Reducir intervalo temporalmente
+                clearInterval(pingInterval);
+                pingInterval = setInterval(sendPing, 60000); // 1 minuto
+            }
+            return false;
+        }
     };
 
-    // Iniciar intervalos (sin coordinación entre pestañas)
-    pingInterval = setInterval(sendPing, PING_INTERVAL);
-    sendPing(); // Primer ping inmediato
+    // 3. Sistema de notificación al usuario
+    const showDegradedWarning = () => {
+        if (document.getElementById('connection-warning')) return;
+        
+        const warning = document.createElement('div');
+        warning.id = 'connection-warning';
+        warning.innerHTML = `
+            <style>
+                #connection-warning {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #ff9800;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    z-index: 9999;
+                    animation: pulse 2s infinite;
+                }
+                @keyframes pulse {
+                    0% { opacity: 0.8; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.8; }
+                }
+            </style>
+            ⚠️ Conexión inestable - Intentando reconectar...
+        `;
+        document.body.appendChild(warning);
+    };
 
-    // Limpieza
+    // 4. Iniciar el sistema
+    if (options.immediatePing) {
+        sendPing().then(success => {
+            if (!success) {
+                pingInterval = setInterval(sendPing, 30000); // 30 segundos si falla
+            }
+        });
+    }
+
+    pingInterval = setInterval(sendPing, PING_INTERVAL);
+    
+    // 5. Mejor manejo de pestañas/ventanas
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            sendPing();
+        }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', () => {
         clearInterval(pingInterval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
     });
+
+    // 6. Pings estratégicos durante actividad
+    document.addEventListener('mousemove', sendPing, { once: true });
+    document.addEventListener('scroll', sendPing, { once: true });
+    window.addEventListener('focus', sendPing);
 }
