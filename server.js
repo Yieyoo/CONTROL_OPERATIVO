@@ -1,4 +1,4 @@
-// server.js - VERSIÓN COMPLETA CON TODO Y MÁS
+// server.js - VERSIÓN COMPLETA Y CORREGIDA
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -60,7 +60,7 @@ app.use(morgan(isProduction ? 'combined' : 'dev', {
   stream: logStream
 }));
 
-// 4. CORS Config (Arreglado el problema del x-ping-attempt)
+// 4. CORS Config (Corregido el problema del x-ping-attempt)
 const allowedOrigins = [
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
@@ -84,7 +84,7 @@ const corsOptions = {
     'Content-Type', 
     'Authorization', 
     'x-api-key',
-    'x-ping-attempt',  // ¡Aquí está el cabrón que faltaba!
+    'x-ping-attempt',
     'x-requested-with'
   ],
   exposedHeaders: ['x-ping-attempt', 'x-api-version'],
@@ -99,7 +99,7 @@ app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
-// 6. Cloudinary Config (con validación hardcore)
+// 6. Cloudinary Config (con validación mejorada)
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
   const missingVars = requiredVars.filter(v => !process.env[v]);
@@ -116,24 +116,24 @@ const validateCloudinaryConfig = () => {
     secure: true
   });
 
-  console.log('☁️ Cloudinary listo para la batalla');
+  console.log('☁️ Cloudinary configurado correctamente');
 };
 
 validateCloudinaryConfig();
 
-// 7. Rate Limiter (más inteligente)
+// 7. Rate Limiter (optimizado)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: isProduction ? 150 : 9999,
   message: {
     status: 'error',
     error: 'rate_limit_exceeded',
-    message: '¡Frena, cowboy! Demasiadas peticiones'
+    message: 'Demasiadas peticiones desde esta IP'
   },
   skip: (req) => req.ip === '::1' || req.ip === '127.0.0.1'
 });
 
-// 8. Upload de archivos (con más validaciones)
+// 8. Upload de archivos (con mejor manejo de errores)
 const pdfUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
@@ -144,12 +144,12 @@ const pdfUpload = multer({
     if (validTypes.includes(file.mimetype) && validExt) {
       cb(null, true);
     } else {
-      cb(new Error('Solo PDFs, mi rey'), false);
+      cb(new Error('Solo se permiten archivos PDF'), false);
     }
   }
 }).single('file');
 
-// 9. Autenticación (más robusta)
+// 9. Autenticación (mejorada)
 const authenticate = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
   
@@ -157,29 +157,32 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({
       status: 'error',
       error: 'missing_api_key',
-      message: '¿Y la API key, papá?'
+      message: 'API Key no proporcionada'
     });
   }
 
   if (apiKey !== process.env.API_KEY) {
-    console.warn(`⚠️ Intento de acceso con key inválida desde IP: ${req.ip}`);
+    console.warn(`⚠️ Intento de acceso no autorizado desde IP: ${req.ip}`);
     return res.status(401).json({
       status: 'error',
       error: 'invalid_api_key',
-      message: 'API key equivocada, compa'
+      message: 'API Key inválida'
     });
   }
   
   next();
 };
 
-// 10. Health Check Mejorado (con ping-attempt)
+// 10. Creación del router
+const router = express.Router();
+
+// 11. Health Check Endpoint (mejorado)
 router.get('/health-check', (req, res) => {
   const pingAttempt = req.headers['x-ping-attempt'] || 'N/A';
   
   res.header('x-ping-attempt', pingAttempt);
   res.json({
-    status: '🔥 ON FIRE 🔥',
+    status: 'active',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
@@ -187,32 +190,58 @@ router.get('/health-check', (req, res) => {
   });
 });
 
-// 11. Upload Endpoint (con todo y la cocina)
+// 12. Upload Endpoint (con mejor manejo de archivos)
 router.post('/upload', apiLimiter, authenticate, (req, res) => {
   pdfUpload(req, res, async (err) => {
     try {
-      if (err) throw err;
-      if (!req.file) throw new Error('No file uploaded');
+      if (err) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          throw new Error('El archivo excede el límite de 20MB');
+        }
+        throw err;
+      }
 
-      const { estado = 'default', tipo_documento = 'general' } = req.body;
-      const result = await cloudinary.uploader.upload_stream({
+      if (!req.file) {
+        throw new Error('No se ha subido ningún archivo');
+      }
+
+      const { estado = 'default', tipo_documento = 'general', titulo_documento } = req.body;
+      
+      const uploadOptions = {
         resource_type: 'raw',
         folder: `${estado}/${tipo_documento}`,
         format: 'pdf',
-        public_id: req.file.originalname.replace('.pdf', '')
-      });
+        public_id: path.parse(req.file.originalname).name,
+        overwrite: true,
+        context: {
+          estado: estado,
+          tipo_documento: tipo_documento,
+          ...(titulo_documento && { titulo_documento: titulo_documento })
+        }
+      };
 
-      pipeline(
-        stream.Readable.from(req.file.buffer),
-        result
-      );
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          uploadOptions,
+          (error, result) => error ? reject(error) : resolve(result)
+        );
+        
+        pipeline(
+          stream.Readable.from(req.file.buffer),
+          uploadStream
+        ).catch(reject);
+      });
 
       res.status(201).json({
         status: 'success',
         data: {
           url: result.secure_url,
           public_id: result.public_id,
-          size: result.bytes
+          size: result.bytes,
+          format: result.format,
+          estado: estado,
+          tipo_documento: tipo_documento,
+          ...(titulo_documento && { titulo_documento: titulo_documento })
         }
       });
     } catch (error) {
@@ -225,7 +254,56 @@ router.post('/upload', apiLimiter, authenticate, (req, res) => {
   });
 });
 
-// 12. Error Handling (bien chingón)
+// 13. Listar archivos
+router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res) => {
+  try {
+    const { estado, tipoDocumento } = req.params;
+    
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: `${estado}/${tipoDocumento}/`,
+      resource_type: 'raw',
+      max_results: 500
+    });
+
+    const archivos = result.resources.map(resource => ({
+      url: resource.secure_url,
+      public_id: resource.public_id,
+      filename: resource.context?.custom?.original_filename || resource.public_id,
+      size: resource.bytes,
+      uploaded_at: resource.created_at,
+      ...(resource.context?.custom?.titulo_documento && {
+        titulo_documento: resource.context.custom.titulo_documento
+      })
+    }));
+
+    res.json({
+      status: 'success',
+      data: archivos,
+      count: archivos.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      error: 'list_error',
+      message: error.message
+    });
+  }
+});
+
+// 14. Montar rutas
+app.use('/api', apiLimiter, router);
+
+// 15. Manejo de rutas no encontradas
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: 'error',
+    error: 'not_found',
+    message: `Ruta no encontrada: ${req.method} ${req.path}`
+  });
+});
+
+// 16. Manejo de errores centralizado
 app.use((err, req, res, next) => {
   console.error('💥 ERROR:', err.stack);
   
@@ -233,26 +311,29 @@ app.use((err, req, res, next) => {
   const response = {
     status: 'error',
     error: err.code || 'server_error',
-    message: err.message || 'Algo explotó'
+    message: err.message || 'Error interno del servidor'
   };
 
-  if (!isProduction) response.stack = err.stack;
+  if (!isProduction) {
+    response.stack = err.stack;
+  }
   
   res.status(status).json(response);
 });
 
-// 13. Server Start (con estilo)
+// 17. Iniciar servidor
 const server = app.listen(PORT, () => {
-  console.log(`\n🚀 Servidor ON en puerto ${PORT}`);
-  console.log(`🌎 Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🛡️  CORS permitiendo: ${allowedOrigins.join(', ')}\n`);
+  console.log(`\n🚀 Servidor iniciado en puerto ${PORT}`);
+  console.log(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🛡️  Orígenes permitidos: ${allowedOrigins.join(', ')}`);
+  console.log(`⏱️  Hora de inicio: ${new Date().toLocaleString()}\n`);
 });
 
-// 14. Graceful Shutdown (para cuando la cosa se pone fea)
+// 18. Apagado controlado
 const shutdown = (signal) => {
-  console.log(`\n🛑 Recibido ${signal}, cerrando con estilo...`);
+  console.log(`\n🛑 Recibido ${signal}, cerrando servidor...`);
   server.close(() => {
-    console.log('✅ Servidor OFF');
+    console.log('✅ Servidor cerrado correctamente');
     process.exit(0);
   });
 };
@@ -267,4 +348,4 @@ process.on('uncaughtException', (err) => {
   shutdown('uncaughtException');
 });
 
-module.exports = server;
+module.exports = { app, server };
