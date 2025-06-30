@@ -1,17 +1,11 @@
 const PING_INTERVAL = 4.5 * 60 * 1000; // 4.5 minutos (más frecuente)
 let pingInterval;
-let sessionId = typeof window !== 'undefined' ? Math.random().toString(36).substring(2, 15) : 'server-session';
+let sessionId = Math.random().toString(36).substring(2, 15);
 
 export function initKeepAlive(serverUrl, options = {}) {
-    // 1. Optimización para desarrollo (versión compatible con navegador)
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    // 1. Optimización para desarrollo
+    if (process.env.NODE_ENV === 'development') {
         console.log('[KeepAlive] Modo desarrollo - Desactivado');
-        return;
-    }
-
-    // Verificar si estamos en un entorno con window (navegador)
-    if (typeof window === 'undefined') {
-        console.warn('[KeepAlive] No se ejecutará en entorno sin ventana (window)');
         return;
     }
 
@@ -67,7 +61,7 @@ export function initKeepAlive(serverUrl, options = {}) {
 
     // 3. Sistema de notificación al usuario
     const showDegradedWarning = () => {
-        if (!document || document.getElementById('connection-warning')) return;
+        if (document.getElementById('connection-warning')) return;
         
         const warning = document.createElement('div');
         warning.id = 'connection-warning';
