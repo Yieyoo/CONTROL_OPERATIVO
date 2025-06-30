@@ -1,196 +1,122 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Operativo</title>
-    <link rel="icon" type="image/png" sizes="48x48" href="imagenes/iconom.png">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Estilos adicionales para garantizar el funcionamiento del menú */
-        nav.menu {
-            z-index: 10000 !important;
-        }
-        .menu-overlay {
-            z-index: 9999 !important;
-        }
-        header::before, header::after {
-            z-index: 1 !important;
-            pointer-events: none !important;
-        }
-    </style>
-</head>
-<body>
+const PING_INTERVAL = 4.5 * 60 * 1000; // 4.5 minutos (más frecuente)
+let pingInterval;
+let sessionId = Math.random().toString(36).substring(2, 15);
 
-    <!-- Elementos de menú movidos fuera del header -->
-    <div class="menu-overlay"></div>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <nav class="menu">
-        <ul>
-            <li><a href="index.html">Inicio</a></li>
+export function initKeepAlive(serverUrl, options = {}) {
+    // 1. Optimización para desarrollo
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[KeepAlive] Modo desarrollo - Desactivado');
+        return;
+    }
 
-            <li class="submenu">
-                <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                <ul class="submenu-list">
-                    <li><a href="datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="construccion.html">Inmuebles</a></li>
-                    <li><a href="construccion.html">Padron Vehicular</a></li>
-                    <li><a href="gestion/archivos.html">Gestion de Archvios</a></li>
-                </ul>
-            </li>
-
-            <li class="submenu">
-                <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                <ul class="submenu-list">
-                    <!-- Lista de estados -->
-                    <li><a href="estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                    <li><a href="estados/baja_california/baja_californiaindex.html">Baja California</a></li>
-                    <li><a href="estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                    <li><a href="estados/campeche/campecheindex.html">Campeche</a></li>
-                    <li><a href="estados/chiapas/chiapasindex.html">Chiapas</a></li>
-                    <li><a href="estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                    <li><a href="estados/cdmx/cdmxindex.html">Ciudad de México</a></li>
-                    <li><a href="estados/coahuila/coahuilaindex.html">Coahuila</a></li>
-                    <li><a href="estados/colima/colimaindex.html">Colima</a></li>
-                    <li><a href="estados/durango/durangoindex.html">Durango</a></li>
-                    <li><a href="estados/guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                    <li><a href="estados/guerrero/guerreroindex.html">Guerrero</a></li>
-                    <li><a href="estados/hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                    <li><a href="estados/jalisco/jaliscoindex.html">Jalisco</a></li>
-                    <li><a href="estados/edomex/edomexindex.html">Estado de México</a></li>
-                    <li><a href="estados/michoacan/michoacanindex.html">Michoacán</a></li>
-                    <li><a href="estados/morelos/morelosindex.html">Morelos</a></li>
-                    <li><a href="estados/nayarit/nayaritindex.html">Nayarit</a></li>
-                    <li><a href="estados/nuevo_leon/nuevolindex.html">Nuevo León</a></li>
-                    <li><a href="estados/oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                    <li><a href="estados/puebla/pueblaindex.html">Puebla</a></li>
-                    <li><a href="estados/queretaro/queretaroindex.html">Querétaro</a></li>
-                    <li><a href="estados/quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                    <li><a href="estados/san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                    <li><a href="estados/sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                    <li><a href="estados/sonora/sonoraindex.html">Sonora</a></li>
-                    <li><a href="estados/tabasco/tabascoindex.html">Tabasco</a></li>
-                    <li><a href="estados/tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                    <li><a href="estados/tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                    <li><a href="estados/veracruz/veracruzindex.html">Veracruz</a></li>
-                    <li><a href="estados/yucatan/yucatanindex.html">Yucatán</a></li>
-                    <li><a href="estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-
-    <header>
-        <!-- Contenido del header sin el menú -->
-        <div class="logo-container">
-            <img src="imagenes/unnamed.png" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
-    </header>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main>
-        <!-- SECCIÓN PORTADA -->
-        <section class="portada">
-            <div class="imagen-container">
-                <img src="imagenes/MujerBandera.png" alt="Imagen representativa">
-            </div>
-            <div class="texto-container">
-                <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
-                <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
-                <h3>Dirección de Control Operativo</h3>
-                <div class="linea"></div>
-                <h2>Información de Control Operativo</h2>
-                <div class="fecha-actual" id="fechaActual"></div>
-            </div>
-        </section>
-        <div class="contra-header"></div>     
-       
-        
-        <!-- SECCIÓN MAPA -->
-        <section class="mapa-container">
-            <h2 class="titulo-mapa">Mapa Interactivo de México</h2>
-            <div id="map"></div>
-            <p id="mapa-error" style="color: red; display: none;"></p>
-        </section>
-    </main>
-
-    <!-- Scripts -->
-    <script src="mapa/html5countrymapv4.5/mapdata.js"></script>
-    <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
-    
-    <script type="module">
-        import { initKeepAlive } from './keep-alive.js';
-        // Versión simplificada para evitar CORS
-        initKeepAlive('https://control-operativo-1.onrender.com', {
-            immediatePing: true
-        });
-    </script>
-
-    <script>
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const menuOverlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        }
-
-        // Función para cerrar todos los submenús
-        function closeAllSubmenus() {
-            const submenus = document.querySelectorAll('.submenu.active');
-            submenus.forEach(submenu => {
-                submenu.classList.remove('active');
+    // 2. Ping inteligente con reintentos
+    const sendPing = async (attempt = 1) => {
+        try {
+            const startTime = performance.now();
+            const response = await fetch(`${serverUrl}/api/health-check`, {
+                method: 'POST',
+                cache: 'no-store',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Session-ID': sessionId,
+                    'X-Ping-Attempt': attempt
+                },
+                body: JSON.stringify({
+                    origin: window.location.href,
+                    lastPing: localStorage.getItem('lastPingSuccess')
+                })
             });
-        }
 
-        // Función para mostrar/ocultar el submenú
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            const submenu = event.target.closest('.submenu');
-            if (submenu.classList.contains('active')) {
-                submenu.classList.remove('active');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const pingTime = (performance.now() - startTime).toFixed(2);
+            localStorage.setItem('lastPingSuccess', new Date().toISOString());
+            console.log(`[KeepAlive] Ping exitoso (${pingTime}ms)`);
+            
+            // Ajuste dinámico del intervalo
+            if (attempt > 1) {
+                clearInterval(pingInterval);
+                pingInterval = setInterval(sendPing, PING_INTERVAL);
+            }
+            
+            return true;
+        } catch (error) {
+            console.error(`[KeepAlive] Intento ${attempt} fallido:`, error);
+            
+            // Reintento agresivo
+            if (attempt < 3) {
+                setTimeout(() => sendPing(attempt + 1), 30000); // 30 segundos
             } else {
-                closeAllSubmenus();
-                submenu.classList.add('active');
-            }
-        }
-
-        // Cerrar el menú al hacer clic fuera de él
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menuOverlay.addEventListener('click', () => {
-            const menu = document.querySelector('.menu');
-            menu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-
-        // Cerrar el submenú al hacer clic fuera de él
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                closeAllSubmenus();
-            }
-        });
-
-        // Mostrar fecha actual
-        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        // Verificación de carga del mapa
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (typeof simplemaps_countrymap === 'undefined') {
-                    document.getElementById('mapa-error').textContent = 
-                        'Error: No se cargó countrymap.js. Verifica la ruta.';
-                    document.getElementById('mapa-error').style.display = 'block';
+                // Notificar al usuario solo después de múltiples fallos
+                if (attempt === 3) {
+                    showDegradedWarning();
                 }
-            }, 1000);
+                // Reducir intervalo temporalmente
+                clearInterval(pingInterval);
+                pingInterval = setInterval(sendPing, 60000); // 1 minuto
+            }
+            return false;
+        }
+    };
+
+    // 3. Sistema de notificación al usuario
+    const showDegradedWarning = () => {
+        if (document.getElementById('connection-warning')) return;
+        
+        const warning = document.createElement('div');
+        warning.id = 'connection-warning';
+        warning.innerHTML = `
+            <style>
+                #connection-warning {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #ff9800;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    z-index: 9999;
+                    animation: pulse 2s infinite;
+                }
+                @keyframes pulse {
+                    0% { opacity: 0.8; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.8; }
+                }
+            </style>
+            ⚠️ Conexión inestable - Intentando reconectar...
+        `;
+        document.body.appendChild(warning);
+    };
+
+    // 4. Iniciar el sistema
+    if (options.immediatePing) {
+        sendPing().then(success => {
+            if (!success) {
+                pingInterval = setInterval(sendPing, 30000); // 30 segundos si falla
+            }
         });
-    </script>  
-</body>
-</html>
+    }
+
+    pingInterval = setInterval(sendPing, PING_INTERVAL);
+    
+    // 5. Mejor manejo de pestañas/ventanas
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            sendPing();
+        }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', () => {
+        clearInterval(pingInterval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+    });
+
+    // 6. Pings estratégicos durante actividad
+    document.addEventListener('mousemove', sendPing, { once: true });
+    document.addEventListener('scroll', sendPing, { once: true });
+    window.addEventListener('focus', sendPing);
+}
