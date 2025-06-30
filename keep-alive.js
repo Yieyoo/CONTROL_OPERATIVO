@@ -3,8 +3,12 @@ let pingInterval;
 let sessionId = Math.random().toString(36).substring(2, 15);
 
 export function initKeepAlive(serverUrl, options = {}) {
-    // 1. Optimización para desarrollo
-    if (process.env.NODE_ENV === 'development') {
+    // 1. Eliminada la verificación de NODE_ENV (no necesaria en navegador)
+    // Puedes usar esto si necesitas distinguir entornos:
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1';
+    
+    if (isDevelopment) {
         console.log('[KeepAlive] Modo desarrollo - Desactivado');
         return;
     }
