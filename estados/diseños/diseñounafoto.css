@@ -471,7 +471,7 @@ nav.menu ul li a:hover {
 .pdf-container iframe,
 .pdf-container embed {
   width: 100%;
-  height: 900px; /* Altura fija grande (ajústala a lo que necesites) */
+  height: 700px; /* Altura fija grande (ajústala a lo que necesites) */
   border: none;
   display: block;
 }
