@@ -465,7 +465,7 @@ nav.menu ul li a:hover {
   box-shadow: var(--sombra);
   background: var(--color-blanco);
   padding: 20px;      /* Añadí padding interno */
-  height: 100px; /* Altura fija en píxeles */
+  height: 1000px; /* Altura fija en píxeles */
   overflow-y: auto; /* Agrega scroll si el contenido es muy largo */
 }
 
