@@ -456,30 +456,25 @@ nav.menu ul li a:hover {
 /* ==================== */
 /* VISOR PDF */
 /* ==================== */
-/* Contenedor principal - Adaptado a tamaño A4 realista para pantallas */
 .pdf-container {
-  width: 90%; /* Ocupa el 90% del ancho disponible (responsive) */
-  max-width: 793px; /* 210mm en 96dpi (exacto para A4) */
-  min-height: 1122px; /* 297mm en 96dpi (altura A4) */
-  margin: 1rem auto;
-  border-radius: 0; /* Bordes rectos como hoja real */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  background: white;
-  overflow: hidden; /* Critico para evitar scrolls no deseados */
-  position: relative; /* Necesario para ajustes finos */
+  width: 100%;
+  max-width: 1400px;
+  margin: 20px auto;
+  border-radius: 12px;
+  overflow: hidden; /* ¡IMPORTANTE! */
+  box-shadow: var(--sombra);
+  background: var(--color-blanco);
+  padding: 0; /* Eliminamos el padding para que el PDF ocupe todo */
 }
 
-/* Iframe - Renderizado profesional de PDF */
-.pdf-container iframe {
+/* Estilo para el iframe/embed del PDF */
+.pdf-container iframe,
+.pdf-container embed {
   width: 100%;
-  height: 100%;
+  height: 1200px; /* Altura fija grande (ajústala a lo que necesites) */
   border: none;
   display: block;
-  position: absolute; /* Cubre todo el contenedor */
-  top: 0;
-  left: 0;
 }
-
 
 .pdf-embed {
   width: 100%;
