@@ -457,7 +457,7 @@ nav.menu ul li a:hover {
 /* VISOR PDF */
 /* ==================== */
 .pdf-container {
-  width: 95%;
+  width: 100%;
   max-width: 1200px;
   margin: 15px auto;
   border-radius: 12px;
