@@ -458,12 +458,13 @@ nav.menu ul li a:hover {
 /* ==================== */
 .pdf-container {
   width: 100%;
-  max-width: 1200px;
-  margin: 15px auto;
+  max-width: 1400px;  /* Aumenté de 1200px a 1400px */
+  margin: 20px auto;  /* Aumenté el margen vertical */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--sombra);
   background: var(--color-blanco);
+  padding: 20px;      /* Añadí padding interno */
 }
 
 .pdf-embed {
