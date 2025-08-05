@@ -49,14 +49,49 @@
             }
         }
         
+        /* Estilo para el contenedor del título y botón */
+        .titulo-contenedor {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 50px 0 20px 0;
+            flex-wrap: wrap;
+        }
+        
         /* Estilo para el título principal */
         .titulo-personalizado {
-        color: #2c3e50;
-        text-align: center;
-        margin: 50px 0 20px 0; /* 100px arriba, 0 derecha, 20px abajo, 0 izquierda */
-        font-size: 24px;
-        padding: 0 15px;
-    }
+            color: #2c3e50;
+            text-align: center;
+            font-size: 24px;
+            padding: 0 15px;
+            margin: 0;
+        }
+        
+        /* Estilo para el botón de alternar */
+        .alternar-btn {
+            background: #691932;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .alternar-btn:hover {
+            background: #2980b9;
+        }
+        
+        /* Estilo cuando está activo */
+        .alternar-btn.activo {
+            background: #e74c3c;
+        }
+        
+        .alternar-btn.activo:hover {
+            background: #c0392b;
+        }
         
         /* Estilo para la información del archivo */
         .file-info {
@@ -88,7 +123,11 @@
     </style>
 </head>
 <body>
-    <h1 id="titulo-documento" class="titulo-personalizado">UBICACIÓN DE OFICINAS DEL INM</h1>
+    <div class="titulo-contenedor">
+        <h1 id="titulo-documento" class="titulo-personalizado">UBICACIÓN DE OFICINAS DEL INM</h1>
+        <button id="alternar-documento" class="alternar-btn">Mostrar Distancias</button>
+    </div>
+    
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -191,167 +230,207 @@
     const ESTADO = 'chiapas';       // Cambia por el estado que necesites
     const TIPO_DOCUMENTO = 'ubicaciones_sedes'; // Cambia por el tipo de documento que necesites
     const TITULO_DOCUMENTO = 'Ubicación de oficinas del INM en Chiapas'; // Cambia por el título que quieras mostrar
+    const DOC_DISTANCIAS_URL = 'distancias_sedes'; // Agrega la URL del PDF de distancias
+    const TITULO_DISTANCIAS = 'Distancias entre oficinas del INM en Chiapas'; // Título para el documento de distancias
 
-// Configuración dinámica desde URL (opcional)
-const params = new URLSearchParams(window.location.search);
-const estadoFromURL = params.get('estado');
-const tipoFromURL = params.get('tipo');
-const tituloFromURL = params.get('titulo');
+    // Configuración dinámica desde URL (opcional)
+    const params = new URLSearchParams(window.location.search);
+    const estadoFromURL = params.get('estado');
+    const tipoFromURL = params.get('tipo');
+    const tituloFromURL = params.get('titulo');
 
-// Valores finales (usa los de URL si existen, sino los definidos arriba)
-const ESTADO_FIJO = estadoFromURL || ESTADO;
-const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
-const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+    // Valores finales (usa los de URL si existen, sino los definidos arriba)
+    const ESTADO_FIJO = estadoFromURL || ESTADO;
+    const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+    const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
 
-// Detectar iOS
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
+    // Variables para controlar el estado del documento
+    let documentoActual = 'principal';
+    let documentoPrincipalUrl = '';
+    let documentoDistanciasUrl = DOC_DISTANCIAS_URL;
 
-// Mostrar/ocultar loading
-function showLoading(show) {
-    document.getElementById('loading').style.display = show ? 'flex' : 'none';
-}
-
-// Mostrar mensaje de error
-function showError(message, target = 'both') {
-    if (target === 'both' || target === 'pdf') {
-        const pdfError = document.getElementById('pdf-error');
-        pdfError.textContent = message;
-        pdfError.style.display = 'block';
+    // Detectar iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
-    if (target === 'both' || target === 'mobile') {
-        const mobileError = document.getElementById('mobile-error');
-        mobileError.textContent = message;
-        mobileError.style.display = 'block';
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
     }
-}
 
-// Ocultar errores
-function hideErrors() {
-    document.getElementById('pdf-error').style.display = 'none';
-    document.getElementById('mobile-error').style.display = 'none';
-}
-
-// Función para abrir/cerrar el menú
-function toggleMenu() {
-    const menu = document.querySelector('.menu');
-    const overlay = document.querySelector('.menu-overlay');
-    menu.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-// Cerrar menú al hacer clic fuera
-document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-// Función para submenús
-function toggleSubmenu(event) {
-    event.preventDefault();
-    document.querySelectorAll('.submenu.active').forEach(sub => {
-        if (sub !== event.target.closest('.submenu')) {
-            sub.classList.remove('active');
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
         }
-    });
-    event.target.closest('.submenu').classList.toggle('active');
-}
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
 
-// Formatear fecha legible
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('es-MX', options);
-}
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
 
-// Cargar PDF desde Cloudinary (función genérica)
-async function cargarDocumentoPDF() {
-    showLoading(true);
-    hideErrors();
+    // Función para abrir/cerrar el menú
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const overlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
 
-    // Actualizar título de la página
-    document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
-    document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
 
-    try {
-        console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
-        const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
-            headers: { 'x-api-key': API_KEY }
-        });
-
-        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-
-        const result = await response.json();
-        console.log('Respuesta API:', result);
-
-        if (!result?.data) throw new Error('Formato de respuesta inválido');
-
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const mobileContainer = document.querySelector('.mobile-images');
-        const iosLink = document.getElementById('ios-pdf-link');
-
-        if (result.data.length > 0) {
-            const latestPDF = result.data.sort((a, b) => 
-                new Date(b.uploaded_at) - new Date(a.uploaded_at)
-            )[0];
-
-            // Configuración normal para PC
-            pdfViewer.src = latestPDF.url;
-            
-            // Configuración para móviles (no iOS)
-            if (!isIOS()) {
-                mobileContainer.innerHTML = `
-                    <div class="file-info">
-                        <h3>${latestPDF.filename || TITULO_FINAL}</h3>
-                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                        <a href="${latestPDF.url}" class="download-btn" download>
-                            Descargar Documento
-                        </a>
-                    </div>
-                `;
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
             }
-            
-            // Configuración específica para iOS
-            if (isIOS()) {
-                // Usamos Google Viewer como alternativa para iOS
-                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                iosLink.href = googleViewerUrl;
+        });
+        event.target.closest('.submenu').classList.toggle('active');
+    }
+
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
+
+    // Alternar entre documentos
+    function alternarDocumento() {
+        const boton = document.getElementById('alternar-documento');
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const titulo = document.getElementById('titulo-documento');
+        
+        if (documentoActual === 'principal') {
+            // Cambiar a documento de distancias
+            if (documentoDistanciasUrl) {
+                pdfViewer.src = documentoDistanciasUrl;
+                titulo.textContent = TITULO_DISTANCIAS;
+                boton.textContent = 'Mostrar Ubicaciones';
+                boton.classList.add('activo');
+                documentoActual = 'distancias';
+            } else {
+                showError('No se ha configurado el documento de distancias', 'both');
             }
         } else {
-            showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+            // Volver al documento principal
+            pdfViewer.src = documentoPrincipalUrl;
+            titulo.textContent = TITULO_FINAL;
+            boton.textContent = 'Mostrar Distancias';
+            boton.classList.remove('activo');
+            documentoActual = 'principal';
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showError(`Error al cargar el documento: ${error.message}`, 'both');
-    } finally {
-        showLoading(false);
-    }
-}
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-    // Cargar el documento PDF
-    if (document.getElementById('pdf-viewer')) {
-        cargarDocumentoPDF();
     }
 
-    // Cerrar submenús al hacer clic en opción
-    document.querySelectorAll('.submenu-list a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.querySelectorAll('.submenu').forEach(sub => {
-                sub.classList.remove('active');
+    // Cargar PDF desde Cloudinary (función genérica)
+    async function cargarDocumentoPDF() {
+        showLoading(true);
+        hideErrors();
+
+        // Actualizar título de la página
+        document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+        document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            console.log('Respuesta API:', result);
+
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const iosLink = document.getElementById('ios-pdf-link');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                // Guardar URL del documento principal
+                documentoPrincipalUrl = latestPDF.url;
+                
+                // Configuración normal para PC
+                pdfViewer.src = documentoPrincipalUrl;
+                
+                // Configuración para móviles (no iOS)
+                if (!isIOS()) {
+                    mobileContainer.innerHTML = `
+                        <div class="file-info">
+                            <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar Documento
+                            </a>
+                        </div>
+                    `;
+                }
+                
+                // Configuración específica para iOS
+                if (isIOS()) {
+                    // Usamos Google Viewer como alternativa para iOS
+                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
+                    iosLink.href = googleViewerUrl;
+                }
+            } else {
+                showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar el documento: ${error.message}`, 'both');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cargar el documento PDF
+        if (document.getElementById('pdf-viewer')) {
+            cargarDocumentoPDF();
+        }
+
+        // Configurar el botón de alternar
+        document.getElementById('alternar-documento').addEventListener('click', alternarDocumento);
+
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
+                });
             });
         });
+        
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
+        });
     });
-    
-    // Manejar clic en el enlace de iOS
-    document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
-        if (isIOS()) {
-            // Abrir en nueva pestaña sin restricciones
-            window.open(this.href, '_blank');
-            e.preventDefault();
-        }
-    });
-});
 </script>
 <script src="../../../carga,.js"></script>
 </body>
