@@ -228,26 +228,15 @@
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
     const ESTADO = 'chiapas';       // Cambia por el estado que necesites
-    const TIPO_DOCUMENTO = 'ubicaciones_sedes'; // Cambia por el tipo de documento que necesites
-    const TITULO_DOCUMENTO = 'Ubicación de oficinas del INM en Chiapas'; // Cambia por el título que quieras mostrar
-    const DOC_DISTANCIAS_URL = 'distancias_sedes'; // Agrega la URL del PDF de distancias
-    const TITULO_DISTANCIAS = 'Distancias entre oficinas del INM en Chiapas'; // Título para el documento de distancias
-
-    // Configuración dinámica desde URL (opcional)
-    const params = new URLSearchParams(window.location.search);
-    const estadoFromURL = params.get('estado');
-    const tipoFromURL = params.get('tipo');
-    const tituloFromURL = params.get('titulo');
-
-    // Valores finales (usa los de URL si existen, sino los definidos arriba)
-    const ESTADO_FIJO = estadoFromURL || ESTADO;
-    const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
-    const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+    const TIPO_UBICACIONES = 'ubicaciones_sedes'; // Tipo de documento para ubicaciones
+    const TIPO_DISTANCIAS = 'distancias_sedes'; // Tipo de documento para distancias
+    const TITULO_UBICACIONES = 'Ubicación de oficinas del INM en Chiapas'; 
+    const TITULO_DISTANCIAS = 'Distancias entre oficinas del INM en Chiapas';
 
     // Variables para controlar el estado del documento
-    let documentoActual = 'principal';
-    let documentoPrincipalUrl = '';
-    let documentoDistanciasUrl = DOC_DISTANCIAS_URL;
+    let documentoActual = 'ubicaciones';
+    let documentoUbicacionesUrl = '';
+    let documentoDistanciasUrl = '';
 
     // Detectar iOS
     function isIOS() {
@@ -308,107 +297,128 @@
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
-    // Alternar entre documentos
-    function alternarDocumento() {
-        const boton = document.getElementById('alternar-documento');
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const titulo = document.getElementById('titulo-documento');
-        
-        if (documentoActual === 'principal') {
-            // Cambiar a documento de distancias
-            if (documentoDistanciasUrl) {
-                pdfViewer.src = documentoDistanciasUrl;
-                titulo.textContent = TITULO_DISTANCIAS;
-                boton.textContent = 'Mostrar Ubicaciones';
-                boton.classList.add('activo');
-                documentoActual = 'distancias';
-            } else {
-                showError('No se ha configurado el documento de distancias', 'both');
-            }
-        } else {
-            // Volver al documento principal
-            pdfViewer.src = documentoPrincipalUrl;
-            titulo.textContent = TITULO_FINAL;
-            boton.textContent = 'Mostrar Distancias';
-            boton.classList.remove('activo');
-            documentoActual = 'principal';
-        }
-    }
-
-    // Cargar PDF desde Cloudinary (función genérica)
-    async function cargarDocumentoPDF() {
+    // Función para cargar un documento específico
+    async function cargarDocumento(tipoDocumento) {
         showLoading(true);
         hideErrors();
 
-        // Actualizar título de la página
-        document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
-        document.getElementById('titulo-documento').textContent = TITULO_FINAL;
-
         try {
-            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
-            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO}/${tipoDocumento}`, {
                 headers: { 'x-api-key': API_KEY }
             });
 
             if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
             const result = await response.json();
-            console.log('Respuesta API:', result);
-
-            if (!result?.data) throw new Error('Formato de respuesta inválido');
-
-            const pdfViewer = document.getElementById('pdf-viewer');
-            const mobileContainer = document.querySelector('.mobile-images');
-            const iosLink = document.getElementById('ios-pdf-link');
-
-            if (result.data.length > 0) {
-                const latestPDF = result.data.sort((a, b) => 
-                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                )[0];
-
-                // Guardar URL del documento principal
-                documentoPrincipalUrl = latestPDF.url;
-                
-                // Configuración normal para PC
-                pdfViewer.src = documentoPrincipalUrl;
-                
-                // Configuración para móviles (no iOS)
-                if (!isIOS()) {
-                    mobileContainer.innerHTML = `
-                        <div class="file-info">
-                            <h3>${latestPDF.filename || TITULO_FINAL}</h3>
-                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                            <a href="${latestPDF.url}" class="download-btn" download>
-                                Descargar Documento
-                            </a>
-                        </div>
-                    `;
-                }
-                
-                // Configuración específica para iOS
-                if (isIOS()) {
-                    // Usamos Google Viewer como alternativa para iOS
-                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                    iosLink.href = googleViewerUrl;
-                }
-            } else {
-                showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+            
+            if (!result?.data || result.data.length === 0) {
+                throw new Error(`No se encontraron documentos de ${tipoDocumento}`);
             }
+
+            const latestPDF = result.data.sort((a, b) => 
+                new Date(b.uploaded_at) - new Date(a.uploaded_at)
+            )[0];
+
+            return latestPDF.url;
+            
         } catch (error) {
             console.error('Error:', error);
             showError(`Error al cargar el documento: ${error.message}`, 'both');
+            return null;
         } finally {
             showLoading(false);
         }
     }
 
+    // Alternar entre documentos
+    async function alternarDocumento() {
+        const boton = document.getElementById('alternar-documento');
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const titulo = document.getElementById('titulo-documento');
+        
+        if (documentoActual === 'ubicaciones') {
+            // Cambiar a documento de distancias
+            if (!documentoDistanciasUrl) {
+                documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
+            }
+            
+            if (documentoDistanciasUrl) {
+                pdfViewer.src = documentoDistanciasUrl;
+                titulo.textContent = TITULO_DISTANCIAS;
+                boton.textContent = 'Mostrar Ubicaciones';
+                boton.classList.add('activo');
+                documentoActual = 'distancias';
+            }
+        } else {
+            // Volver al documento principal (ubicaciones)
+            if (!documentoUbicacionesUrl) {
+                documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
+            }
+            
+            if (documentoUbicacionesUrl) {
+                pdfViewer.src = documentoUbicacionesUrl;
+                titulo.textContent = TITULO_UBICACIONES;
+                boton.textContent = 'Mostrar Distancias';
+                boton.classList.remove('activo');
+                documentoActual = 'ubicaciones';
+            }
+        }
+    }
+
+    // Configurar el visor de PDF para un documento específico
+    async function configurarVisorPDF(url, titulo) {
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const mobileContainer = document.querySelector('.mobile-images');
+        const iosLink = document.getElementById('ios-pdf-link');
+        
+        if (!url) {
+            showError('No se pudo cargar el documento', 'both');
+            return;
+        }
+
+        // Configuración normal para PC
+        pdfViewer.src = url;
+        document.getElementById('titulo-documento').textContent = titulo;
+        
+        // Configuración para móviles (no iOS)
+        if (!isIOS()) {
+            mobileContainer.innerHTML = `
+                <div class="file-info">
+                    <h3>${titulo}</h3>
+                    <a href="${url}" class="download-btn" download>
+                        Descargar Documento
+                    </a>
+                </div>
+            `;
+        }
+        
+        // Configuración específica para iOS
+        if (isIOS()) {
+            // Usamos Google Viewer como alternativa para iOS
+            const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+            iosLink.href = googleViewerUrl;
+        }
+    }
+
+    // Cargar el documento inicial (ubicaciones)
+    async function cargarDocumentoInicial() {
+        showLoading(true);
+        
+        // Cargar ambos documentos pero mostrar primero el de ubicaciones
+        documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
+        documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
+        
+        if (documentoUbicacionesUrl) {
+            await configurarVisorPDF(documentoUbicacionesUrl, TITULO_UBICACIONES);
+        }
+        
+        showLoading(false);
+    }
+
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        // Cargar el documento PDF
-        if (document.getElementById('pdf-viewer')) {
-            cargarDocumentoPDF();
-        }
+        // Cargar el documento inicial
+        cargarDocumentoInicial();
 
         // Configurar el botón de alternar
         document.getElementById('alternar-documento').addEventListener('click', alternarDocumento);
