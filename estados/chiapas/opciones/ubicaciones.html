@@ -66,7 +66,6 @@
             font-size: 24px;
             padding: 0 15px;
             margin: 0;
-            transition: all 0.3s ease;
         }
         
         /* Estilo para el botón de alternar */
@@ -78,14 +77,11 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background 0.3s;
         }
         
         .alternar-btn:hover {
             background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
         /* Estilo cuando está activo */
@@ -104,7 +100,6 @@
             border-radius: 8px;
             margin: 15px 0;
             border: 1px solid #ddd;
-            transition: all 0.3s ease;
         }
         
         .file-info h3 {
@@ -120,154 +115,10 @@
             border-radius: 5px;
             text-decoration: none;
             margin-top: 10px;
-            transition: all 0.3s ease;
         }
         
         .download-btn:hover {
             background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* Contenedor del PDF con animaciones */
-        .pdf-container {
-            position: relative;
-            width: 100%;
-            height: 80vh;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: all 0.5s ease;
-            background: #f5f5f5;
-        }
-
-        /* Skeleton loader */
-        .skeleton-loader {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .skeleton-icon {
-            font-size: 50px;
-            color: #ccc;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-
-        .skeleton-text {
-            width: 60%;
-            height: 20px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-
-        /* Visor de PDF con animación de entrada */
-        .pdf-embed {
-            width: 100%;
-            height: 100%;
-            border: none;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .pdf-embed.loaded {
-            opacity: 1;
-        }
-
-        /* Efecto de carga */
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #691932;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Mensaje de error con animación */
-        .error-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #ffebee;
-            color: #c62828;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 80%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 20;
-        }
-
-        .error-message.show {
-            opacity: 1;
-        }
-
-        /* Botón de regresar con animación */
-        .regresar-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #691932;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 100;
-        }
-
-        .regresar-btn:hover {
-            background: #2980b9;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -348,19 +199,13 @@
     </div>
     
     <div class="pdf-container">
-        <div id="skeleton-loader" class="skeleton-loader">
-            <div class="skeleton-icon">📄</div>
-            <div class="skeleton-text"></div>
-            <div class="skeleton-text" style="width: 40%;"></div>
-        </div>
         <iframe 
             id="pdf-viewer" 
             class="pdf-embed"
             frameborder="0"
             title="Visualizador de PDF"
-            onload="pdfLoaded()"
         ></iframe>
-        <div id="pdf-error" class="error-message">Error al cargar el documento</div>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
     <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
@@ -404,17 +249,12 @@
         document.getElementById('loading').style.display = show ? 'flex' : 'none';
     }
 
-    // Mostrar skeleton loader
-    function showSkeleton(show) {
-        document.getElementById('skeleton-loader').style.display = show ? 'flex' : 'none';
-    }
-
     // Mostrar mensaje de error
     function showError(message, target = 'both') {
         if (target === 'both' || target === 'pdf') {
             const pdfError = document.getElementById('pdf-error');
             pdfError.textContent = message;
-            pdfError.classList.add('show');
+            pdfError.style.display = 'block';
         }
         if (target === 'both' || target === 'mobile') {
             const mobileError = document.getElementById('mobile-error');
@@ -425,15 +265,8 @@
 
     // Ocultar errores
     function hideErrors() {
-        document.getElementById('pdf-error').classList.remove('show');
+        document.getElementById('pdf-error').style.display = 'none';
         document.getElementById('mobile-error').style.display = 'none';
-    }
-
-    // Cuando el PDF termina de cargar
-    function pdfLoaded() {
-        const pdfViewer = document.getElementById('pdf-viewer');
-        pdfViewer.classList.add('loaded');
-        showSkeleton(false);
     }
 
     // Función para abrir/cerrar el menú
@@ -467,7 +300,6 @@
     // Función para cargar un documento específico
     async function cargarDocumento(tipoDocumento) {
         showLoading(true);
-        showSkeleton(true);
         hideErrors();
 
         try {
@@ -498,6 +330,41 @@
         }
     }
 
+    // Alternar entre documentos
+    async function alternarDocumento() {
+        const boton = document.getElementById('alternar-documento');
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const titulo = document.getElementById('titulo-documento');
+        
+        if (documentoActual === 'ubicaciones') {
+            // Cambiar a documento de distancias
+            if (!documentoDistanciasUrl) {
+                documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
+            }
+            
+            if (documentoDistanciasUrl) {
+                pdfViewer.src = documentoDistanciasUrl;
+                titulo.textContent = TITULO_DISTANCIAS;
+                boton.textContent = 'Mostrar Ubicaciones';
+                boton.classList.add('activo');
+                documentoActual = 'distancias';
+            }
+        } else {
+            // Volver al documento principal (ubicaciones)
+            if (!documentoUbicacionesUrl) {
+                documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
+            }
+            
+            if (documentoUbicacionesUrl) {
+                pdfViewer.src = documentoUbicacionesUrl;
+                titulo.textContent = TITULO_UBICACIONES;
+                boton.textContent = 'Mostrar Distancias';
+                boton.classList.remove('activo');
+                documentoActual = 'ubicaciones';
+            }
+        }
+    }
+
     // Configurar el visor de PDF para un documento específico
     async function configurarVisorPDF(url, titulo) {
         const pdfViewer = document.getElementById('pdf-viewer');
@@ -509,13 +376,9 @@
             return;
         }
 
-        // Mostrar skeleton mientras carga
-        showSkeleton(true);
-        pdfViewer.classList.remove('loaded');
-
         // Configuración normal para PC
-        document.getElementById('titulo-documento').textContent = titulo;
         pdfViewer.src = url;
+        document.getElementById('titulo-documento').textContent = titulo;
         
         // Configuración para móviles (no iOS)
         if (!isIOS()) {
@@ -537,48 +400,9 @@
         }
     }
 
-    // Alternar entre documentos
-    async function alternarDocumento() {
-        const boton = document.getElementById('alternar-documento');
-        const titulo = document.getElementById('titulo-documento');
-        
-        // Agregar animación al botón
-        boton.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            boton.style.transform = '';
-        }, 200);
-
-        if (documentoActual === 'ubicaciones') {
-            // Cambiar a documento de distancias
-            if (!documentoDistanciasUrl) {
-                documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
-            }
-            
-            if (documentoDistanciasUrl) {
-                await configurarVisorPDF(documentoDistanciasUrl, TITULO_DISTANCIAS);
-                boton.textContent = 'Mostrar Ubicaciones';
-                boton.classList.add('activo');
-                documentoActual = 'distancias';
-            }
-        } else {
-            // Volver al documento principal (ubicaciones)
-            if (!documentoUbicacionesUrl) {
-                documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
-            }
-            
-            if (documentoUbicacionesUrl) {
-                await configurarVisorPDF(documentoUbicacionesUrl, TITULO_UBICACIONES);
-                boton.textContent = 'Mostrar Distancias';
-                boton.classList.remove('activo');
-                documentoActual = 'ubicaciones';
-            }
-        }
-    }
-
     // Cargar el documento inicial (ubicaciones)
     async function cargarDocumentoInicial() {
         showLoading(true);
-        showSkeleton(true);
         
         // Cargar ambos documentos pero mostrar primero el de ubicaciones
         documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
