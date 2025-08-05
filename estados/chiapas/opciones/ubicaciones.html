@@ -120,9 +120,66 @@
         .download-btn:hover {
             background: #2980b9;
         }
+
+        /* Nuevos estilos para botones flotantes */
+        .botones-flotantes {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .boton-descarga {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .boton-descarga:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Ocultar botones según el documento activo */
+        .boton-ubicaciones { display: none; }
+        .boton-distancias { display: none; }
+
+        .mostrar-ubicaciones .boton-ubicaciones,
+        .mostrar-distancias .boton-distancias {
+            display: block;
+        }
+
+        .regresar-btn {
+            background: #691932;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .regresar-btn:hover {
+            background: #8a2a4a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
-<body>
+<body class="mostrar-ubicaciones">
     <div class="titulo-contenedor">
         <h1 id="titulo-documento" class="titulo-personalizado">UBICACIÓN DE OFICINAS DEL INM</h1>
         <button id="alternar-documento" class="alternar-btn">Mostrar Distancias</button>
@@ -221,7 +278,18 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
+    <!-- Botones flotantes -->
+    <div class="botones-flotantes">
+        <button class="boton-descarga boton-ubicaciones" id="descargar-ubicaciones">
+            Descargar Ubicaciones
+        </button>
+        <button class="boton-descarga boton-distancias" id="descargar-distancias">
+            Descargar Distancias
+        </button>
+        <button class="regresar-btn" onclick="window.history.back()">
+            Regresar
+        </button>
+    </div>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
@@ -330,6 +398,27 @@
         }
     }
 
+    // Actualizar visibilidad de botones
+    function actualizarBotones() {
+        document.body.className = documentoActual === 'ubicaciones' ? 
+            'mostrar-ubicaciones' : 'mostrar-distancias';
+    }
+
+    // Configurar eventos de descarga
+    function configurarDescargas() {
+        document.getElementById('descargar-ubicaciones').onclick = function() {
+            if (documentoUbicacionesUrl) {
+                window.open(documentoUbicacionesUrl, '_blank');
+            }
+        };
+        
+        document.getElementById('descargar-distancias').onclick = function() {
+            if (documentoDistanciasUrl) {
+                window.open(documentoDistanciasUrl, '_blank');
+            }
+        };
+    }
+
     // Alternar entre documentos
     async function alternarDocumento() {
         const boton = document.getElementById('alternar-documento');
@@ -348,6 +437,7 @@
                 boton.textContent = 'Mostrar Ubicaciones';
                 boton.classList.add('activo');
                 documentoActual = 'distancias';
+                actualizarBotones();
             }
         } else {
             // Volver al documento principal (ubicaciones)
@@ -361,6 +451,7 @@
                 boton.textContent = 'Mostrar Distancias';
                 boton.classList.remove('activo');
                 documentoActual = 'ubicaciones';
+                actualizarBotones();
             }
         }
     }
@@ -385,9 +476,6 @@
             mobileContainer.innerHTML = `
                 <div class="file-info">
                     <h3>${titulo}</h3>
-                    <a href="${url}" class="download-btn" download>
-                        Descargar Documento
-                    </a>
                 </div>
             `;
         }
@@ -412,6 +500,8 @@
             await configurarVisorPDF(documentoUbicacionesUrl, TITULO_UBICACIONES);
         }
         
+        actualizarBotones();
+        configurarDescargas();
         showLoading(false);
     }
 
