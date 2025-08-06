@@ -528,29 +528,6 @@ nav.menu {
 }
 
 /* ===============================
-    7. Fecha Actual
-================================== */
-.fecha-actual {
-    position: fixed;
-    top: 90px;
-    right: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    background-color: rgba(105, 25, 50, 0.9);
-    padding: 8px 15px;
-    border-radius: 20px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-    z-index: 500;
-    transition: all 0.3s ease;
-}
-
-.fecha-actual:hover {
-    background-color: rgba(142, 92, 113, 0.9);
-    transform: translateY(-2px);
-}
-
-/* ===============================
     8. Responsive (Pantallas pequeñas)
 ================================== */
 @media (max-width: 768px) {

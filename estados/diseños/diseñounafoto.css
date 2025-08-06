@@ -76,62 +76,6 @@ header {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.instituto-info {
-  background: linear-gradient(to right, #6b1e3f, #320d1c);
-  color: var(--color-blanco);
-  text-align: center;
-  padding: 20px 0;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-  margin: 0;
-  width: 100vw;
-  position: relative;
-  left: 0;
-  right: 0;
-  margin-left: -50vw;
-  margin-right: -50vw;
-}
-
-.instituto-info h1 {
-  font-size: 30px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.instituto-info h2, 
-.instituto-info h3 {
-  font-size: 17px;
-  margin-bottom: 8px;
-}
-
-.instituto-info h2 {
-  font-weight: 500;
-}
-
-.instituto-info h3 {
-  font-weight: 400;
-}
-
-.estado-info {
-  background-color: var(--color-secundario);
-  color: var(--color-blanco);
-  text-align: center;
-  padding: 0.8rem 0;
-  margin: 0;
-  width: 100vw;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  top: -1rem;
-}
-
-.estado-info h4 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0;
-}
-
 /* ==================== */
 /* ELEMENTOS FIJOS */
 /* ==================== */
@@ -142,6 +86,10 @@ header {
   display: flex;
   gap: 20px;
   z-index: 5;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  cursor: pointer;
 }
 
 .logo-container img {
@@ -151,19 +99,6 @@ header {
   cursor: pointer;
 }
 
-.fecha-actual {
-  position: fixed;
-  top: 90px;
-  right: 20px;
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--color-primario);
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 8px 12px;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  z-index: 5;
-}
 
 .regresar-btn {
   background-color: var(--color-primario);
@@ -337,22 +272,34 @@ nav.menu ul li a:hover {
 .menu-overlay.active {
   display: block;
 }
-
-/* ==================== */
-/* ESTRUCTURAS PRINCIPALES */
-/* ==================== */
-.contenedor-principal {
-  width: 100%;
-  max-width: 900px;
-  margin: 20px auto 40px;
-  padding: 30px 5px;
-  background-color: var(--color-blanco);
-  border-radius: 8px;
-  box-shadow: var(--sombra);
-  position: relative;
-  z-index: 1;
+/* ============ SCROLLBAR PARA SUBMENÚS ============ */
+.submenu {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #A5852E transparent;
+  padding-right: 5px;
+}
+.submenu-list {
+  margin-top: 5px !important; /* Ajusta este valor (antes era 10px) */
 }
 
+/* Estilo para navegadores WebKit (Chrome, Edge, Safari) */
+.submenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+  background-color: #A5852E;
+  border-radius: 4px;
+  background-clip: padding-box;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+.submenu::-webkit-scrollbar-track {
+  background: transparent;
+}
 /* ==================== */
 /* COMPONENTES */
 /* ==================== */
@@ -393,66 +340,6 @@ nav.menu ul li a:hover {
   z-index: -1;
   transform: translateZ(-10px);
 }
-
-/* ==================== */
-/* BOTONES */
-/* ==================== */
-.opciones-grid button {
-  font-size: 16px;
-  font-weight: 200;
-  letter-spacing: 0.5px;
-  text-align: center;
-  line-height: 1.4;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: var(--transicion);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  color: var(--color-blanco);
-  flex: 1;
-  max-width: 100%;
-}
-
-.opciones-grid button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-.btn-1 {
-  background-color: black;
-}
-
-.btn-1:hover {
-  background-color: rgb(128, 128, 128);
-}
-
-.btn-2,
-.btn-3,
-.btn-6,
-.btn-7,
-.btn-8 {
-  background-color: var(--color-primario);
-}
-
-.btn-2:hover,
-.btn-3:hover,
-.btn-6:hover,
-.btn-7:hover,
-.btn-8:hover {
-  background-color: #8e5c71;
-}
-
-.btn-4,
-.btn-5 {
-  background-color: var(--color-terciario);
-}
-
-.btn-4:hover,
-.btn-5:hover {
-  background-color: #3a7d60;
-}
-
 /* ==================== */
 /* VISOR PDF */
 /* ==================== */
@@ -608,21 +495,6 @@ nav.menu ul li a:hover {
     transform: translateY(0);
   }
 }
-
-/* ==================== */
-/* ELEMENTOS ESPECÍFICOS */
-/* ==================== */
-.qna {
-  --header-text: "Plantilla de Personal QNA 9";
-}
-
-.qna h1::before {
-  content: var(--header-text);
-}
-
-h1 {
-  margin-top: 80px;
-}
 /* ==================== */
 /* MENSAJE iOS - SOLO MOVILES */
 /* ==================== */
@@ -736,32 +608,4 @@ h1 {
       display: block;
     }
   }
-}
-/* ============ SCROLLBAR PARA SUBMENÚS ============ */
-.submenu {
-  max-height: 400px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #A5852E transparent;
-  padding-right: 5px;
-}
-.submenu-list {
-  margin-top: 5px !important; /* Ajusta este valor (antes era 10px) */
-}
-
-/* Estilo para navegadores WebKit (Chrome, Edge, Safari) */
-.submenu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.submenu::-webkit-scrollbar-thumb {
-  background-color: #A5852E;
-  border-radius: 4px;
-  background-clip: padding-box;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-}
-
-.submenu::-webkit-scrollbar-track {
-  background: transparent;
 }
