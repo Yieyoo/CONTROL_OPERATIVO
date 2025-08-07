@@ -1,6 +1,6 @@
-/* ==================== */
-/* VARIABLES Y RESET */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                          VARIABLES Y RESET                                            */
+/* ======================================================================================================*/
 :root {
   --color-primario: #691932;
   --color-secundario: #A5852E;
@@ -21,9 +21,9 @@ html {
   zoom: 1;
 }
 
-/* ==================== */
-/* ESTRUCTURA BASE */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                            ESTRUCTURA BASE                                            */
+/* ======================================================================================================*/
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
@@ -59,9 +59,9 @@ body::before {
   pointer-events: none;
 }
 
-/* ==================== */
-/* COMPONENTES DE CABECERA */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                           COMPONENTES DE CABECERA                                     */
+/* ======================================================================================================*/
 header {
   background-color: var(--color-primario);
   color: var(--color-blanco);
@@ -76,9 +76,9 @@ header {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* ==================== */
-/* ELEMENTOS FIJOS */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                              ELEMENTOS FIJOS                                          */
+/* ======================================================================================================*/
 .logo-container {
   position: fixed;
   top: 50px;
@@ -120,9 +120,9 @@ header {
   background-color: #8e5c71;
 }
 
-/* ==================== */
-/* MENÚ LATERAL */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                                 MENÚ LATERAL                                          */
+/* ======================================================================================================*/
 nav.menu {
   position: fixed;
   top: 0;
@@ -300,9 +300,9 @@ nav.menu ul li a:hover {
 .submenu::-webkit-scrollbar-track {
   background: transparent;
 }
-/* ==================== */
-/* COMPONENTES */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                                COMPONENTES                                            */
+/* ======================================================================================================*/
 .titulo-personalizado {
   background: white;
   padding: 20px 30px;
@@ -340,9 +340,9 @@ nav.menu ul li a:hover {
   z-index: -1;
   transform: translateZ(-10px);
 }
-/* ==================== */
-/* VISOR PDF */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                                  VISOR PDF                                            */
+/* ======================================================================================================*/
 .pdf-container {
   width: 100%;
   max-width: 1400px;
@@ -381,9 +381,9 @@ nav.menu ul li a:hover {
   background: #f5f5f5;
 }
 
-/* ==================== */
-/* MEDIA QUERIES */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                                MEDIA QUERIES                                          */
+/* ======================================================================================================*/
 @media screen and (max-width: 768px) {
   body {
     padding: 10px;
@@ -477,9 +477,9 @@ nav.menu ul li a:hover {
   }
 }
 
-/* ==================== */
-/* ANIMACIONES */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                                  ANIMACIONES                                          */
+/* ======================================================================================================*/
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -495,9 +495,9 @@ nav.menu ul li a:hover {
     transform: translateY(0);
   }
 }
-/* ==================== */
-/* MENSAJE iOS - SOLO MOVILES */
-/* ==================== */
+/* ======================================================================================================*/
+/*                                          MENSAJE iOS - SOLO MOVILES                                   */
+/* ======================================================================================================*/
 .ios-message {
   display: none; /* Oculto por defecto */
   text-align: center;
@@ -546,9 +546,9 @@ nav.menu ul li a:hover {
 .document-info p {
   margin: 5px 0;
 }
-/* ==================== */
-/* ESTILOS iOS ESPECÍFICOS */
-/* ==================== */
+/* ===================================================================================================== */
+/*                                      ESTILOS iOS ESPECÍFICOS                                          */
+/* ======================================================================================================*/
 .ios-only {
   display: none;
   text-align: center;
@@ -608,4 +608,177 @@ nav.menu ul li a:hover {
       display: block;
     }
   }
+}
+
+/* ======================================================================================================*/
+/*                                          ESTILOS UBICACIONES                                          */
+/* ======================================================================================================*/
+@media only screen and (max-width: 768px) {
+    .ios-only {
+        display: none; /* Oculto por defecto */
+    }
+    
+    /* Solo mostrar en iOS */
+    @supports (-webkit-touch-callout: none) {
+        .ios-only {
+            display: block;
+            text-align: center;
+            margin: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        .ios-pdf-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+        
+        .ios-pdf-link img {
+            width: 30px;
+            height: 30px;
+        }
+        
+        .ios-instructions {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+    }
+}
+
+/* Estilo para el contenedor del título y botón */
+.titulo-contenedor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 50px 0 20px 0;
+    flex-wrap: wrap;
+}
+
+/* Estilo para el título principal */
+.titulo-personalizado {
+    color: #2c3e50;
+    text-align: center;
+    font-size: 24px;
+    padding: 0 15px;
+    margin: 0;
+}
+
+/* Estilo para el botón de alternar */
+.alternar-btn {
+    background: #691932;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.alternar-btn:hover {
+    background: #2980b9;
+}
+
+/* Estilo cuando está activo */
+.alternar-btn.activo {
+    background: #e74c3c;
+}
+
+.alternar-btn.activo:hover {
+    background: #c0392b;
+}
+
+/* Estilo para la información del archivo */
+.file-info {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+}
+
+.file-info h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.download-btn {
+    display: inline-block;
+    background: #691932;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.download-btn:hover {
+    background: #2980b9;
+}
+
+/* Nuevos estilos para botones flotantes */
+.botones-flotantes {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+}
+
+.boton-descarga {
+    background: #691932;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.boton-descarga:hover {
+    background: #691932;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Ocultar botones según el documento activo */
+.boton-ubicaciones { display: none; }
+.boton-distancias { display: none; }
+
+.mostrar-ubicaciones .boton-ubicaciones,
+.mostrar-distancias .boton-distancias {
+    display: block;
+}
+
+.regresar-btn {
+    background: #691932;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.regresar-btn:hover {
+    background: #8a2a4a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
