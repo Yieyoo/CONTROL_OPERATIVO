@@ -79,6 +79,13 @@ header {
 /* ======================================================================================================*/
 /*                                              ELEMENTOS FIJOS                                          */
 /* ======================================================================================================*/
+.titulo-personalizado {
+    margin-top: 50px; /* Ajusta este valor según necesites */
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    padding: 10px;
+}
 .logo-container {
   position: fixed;
   top: 50px;
