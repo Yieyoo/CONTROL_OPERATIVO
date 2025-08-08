@@ -80,7 +80,7 @@ header {
 /*                                              ELEMENTOS FIJOS                                          */
 /* ======================================================================================================*/
 .titulo-personalizado {
-    margin-top: 50px; /* Ajusta este valor según necesites */
+    margin-top: 1000px; /* Ajusta este valor según necesites */
     text-align: center;
     font-size: 24px;
     color: #333;
