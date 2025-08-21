@@ -789,3 +789,8 @@ nav.menu ul li a:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
+#tituloContainer {
+    margin-top: 50px;        /* Agrega espacio por encima */
+    /* padding-top: 50px;    Alternativa si quieres espacio interno */
+    /* position: relative;   Requerido si usas 'top' */
+    /* top: 50px;            Solo si usas 'position: relative' o 'absolute' */
