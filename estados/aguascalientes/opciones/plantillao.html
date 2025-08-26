@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - BAJA CALIFORNIA</title>
+    <title>PLANTILLA DE PERSONAL - Aguascalientes</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
     <style>
@@ -225,11 +225,11 @@ async function cargarTituloPersonalizado() {
         }
 
         // 3. Título por defecto
-        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
 
     } catch (error) {
         console.error('Error:', error);
-        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
         tituloContainer.style.color = 'red';
     }
 }
@@ -328,7 +328,7 @@ async function loadPlantillaPersonal() {
                 iosLink.href = googleViewerUrl;
             }
         } else {
-            showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
+            showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
             fechaElement.textContent = 'No disponible';
         }
     } catch (error) {

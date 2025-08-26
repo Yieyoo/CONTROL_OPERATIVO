@@ -6,89 +6,13 @@
     <title>UBICACIÓN DE OFICINAS DEL INM</title>
     <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
-    <style>
-        /* Estilos específicos para móviles iOS */
-        @media only screen and (max-width: 768px) {
-            .ios-only {
-                display: none; /* Oculto por defecto */
-            }
-            
-            /* Solo mostrar en iOS */
-            @supports (-webkit-touch-callout: none) {
-                .ios-only {
-                    display: block;
-                    text-align: center;
-                    margin: 20px;
-                    padding: 15px;
-                    background: #f8f8f8;
-                    border-radius: 10px;
-                    border: 1px solid #ddd;
-                }
-                
-                .ios-pdf-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 10px;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 8px;
-                    text-decoration: none;
-                    margin-top: 15px;
-                }
-                
-                .ios-pdf-link img {
-                    width: 30px;
-                    height: 30px;
-                }
-                
-                .ios-instructions {
-                    font-size: 14px;
-                    color: #666;
-                    margin-top: 10px;
-                }
-            }
-        }
-        
-        /* Estilo para el título principal */
-        .titulo-personalizado {
-        color: #2c3e50;
-        text-align: center;
-        margin: 50px 0 20px 0; /* 100px arriba, 0 derecha, 20px abajo, 0 izquierda */
-        font-size: 24px;
-        padding: 0 15px;
-    }
-        
-        /* Estilo para la información del archivo */
-        .file-info {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border: 1px solid #ddd;
-        }
-        
-        .file-info h3 {
-            margin-top: 0;
-            color: #2c3e50;
-        }
-        
-        .download-btn {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-top: 10px;
-        }
-        
-        .download-btn:hover {
-            background: #2980b9;
-        }
-    </style>
 </head>
-<body>
-    <h1 id="titulo-documento" class="titulo-personalizado">UBICACIÓN DE OFICINAS DEL INM</h1>
+<body class="mostrar-ubicaciones">
+    <div class="titulo-contenedor">
+        <h1 id="titulo-documento" class="titulo-personalizado">UBICACIÓN DE OFICINAS DEL INM</h1>
+        <button id="alternar-documento" class="alternar-btn">Mostrar Distancias</button>
+    </div>
+    
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -117,7 +41,7 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                      <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                       <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                         <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
@@ -182,176 +106,259 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
+    <!-- Botones flotantes -->
+    <div class="botones-flotantes">
+        <button class="boton-descarga boton-ubicaciones" id="descargar-ubicaciones">
+            Descargar Ubicaciones
+        </button>
+        <button class="boton-descarga boton-distancias" id="descargar-distancias">
+            Descargar Distancias
+        </button>
+        <button class="regresar-btn" onclick="window.location.href='../sonoraindex.html'">
+    Regresar
+</button>
+    </div>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO = 'sonora';// Cambia por el estado que necesites
-    const TIPO_DOCUMENTO = 'ubicaciones_sedes'; // Cambia por el tipo de documento que necesite<s
-    const TITULO_DOCUMENTO = 'Ubicación de oficinas del INM en Sonora'; // Cambia por el título que quieras mostrar
+    const ESTADO = 'sonora';       // Cambia por el estado que necesites
+    const TIPO_UBICACIONES = 'ubicaciones_sedes'; // Tipo de documento para ubicaciones
+    const TIPO_DISTANCIAS = 'distancias_sedes'; // Tipo de documento para distancias
+    const TITULO_UBICACIONES = 'Ubicación de oficinas del INM en Sonora'; 
+    const TITULO_DISTANCIAS = 'Distancias entre oficinas del INM en Sonora';
 
-// Configuración dinámica desde URL (opcional)
-const params = new URLSearchParams(window.location.search);
-const estadoFromURL = params.get('estado');
-const tipoFromURL = params.get('tipo');
-const tituloFromURL = params.get('titulo');
+    // Variables para controlar el estado del documento
+    let documentoActual = 'ubicaciones';
+    let documentoUbicacionesUrl = '';
+    let documentoDistanciasUrl = '';
 
-// Valores finales (usa los de URL si existen, sino los definidos arriba)
-const ESTADO_FIJO = estadoFromURL || ESTADO;
-const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
-const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
-
-// Detectar iOS
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-// Mostrar/ocultar loading
-function showLoading(show) {
-    document.getElementById('loading').style.display = show ? 'flex' : 'none';
-}
-
-// Mostrar mensaje de error
-function showError(message, target = 'both') {
-    if (target === 'both' || target === 'pdf') {
-        const pdfError = document.getElementById('pdf-error');
-        pdfError.textContent = message;
-        pdfError.style.display = 'block';
+    // Detectar iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
-    if (target === 'both' || target === 'mobile') {
-        const mobileError = document.getElementById('mobile-error');
-        mobileError.textContent = message;
-        mobileError.style.display = 'block';
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
     }
-}
 
-// Ocultar errores
-function hideErrors() {
-    document.getElementById('pdf-error').style.display = 'none';
-    document.getElementById('mobile-error').style.display = 'none';
-}
-
-// Función para abrir/cerrar el menú
-function toggleMenu() {
-    const menu = document.querySelector('.menu');
-    const overlay = document.querySelector('.menu-overlay');
-    menu.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-// Cerrar menú al hacer clic fuera
-document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-// Función para submenús
-function toggleSubmenu(event) {
-    event.preventDefault();
-    document.querySelectorAll('.submenu.active').forEach(sub => {
-        if (sub !== event.target.closest('.submenu')) {
-            sub.classList.remove('active');
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
         }
-    });
-    event.target.closest('.submenu').classList.toggle('active');
-}
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
 
-// Formatear fecha legible
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('es-MX', options);
-}
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
 
-// Cargar PDF desde Cloudinary (función genérica)
-async function cargarDocumentoPDF() {
-    showLoading(true);
-    hideErrors();
+    // Función para abrir/cerrar el menú
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const overlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
 
-    // Actualizar título de la página
-    document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
-    document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
 
-    try {
-        console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
-        const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
-            headers: { 'x-api-key': API_KEY }
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
+            }
         });
+        event.target.closest('.submenu').classList.toggle('active');
+    }
 
-        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
 
-        const result = await response.json();
-        console.log('Respuesta API:', result);
+    // Función para cargar un documento específico
+    async function cargarDocumento(tipoDocumento) {
+        showLoading(true);
+        hideErrors();
 
-        if (!result?.data) throw new Error('Formato de respuesta inválido');
+        try {
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO}/${tipoDocumento}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
 
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const mobileContainer = document.querySelector('.mobile-images');
-        const iosLink = document.getElementById('ios-pdf-link');
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
-        if (result.data.length > 0) {
+            const result = await response.json();
+            
+            if (!result?.data || result.data.length === 0) {
+                throw new Error(`No se encontraron documentos de ${tipoDocumento}`);
+            }
+
             const latestPDF = result.data.sort((a, b) => 
                 new Date(b.uploaded_at) - new Date(a.uploaded_at)
             )[0];
 
-            // Configuración normal para PC
-            pdfViewer.src = latestPDF.url;
+            return latestPDF.url;
             
-            // Configuración para móviles (no iOS)
-            if (!isIOS()) {
-                mobileContainer.innerHTML = `
-                    <div class="file-info">
-                        <h3>${latestPDF.filename || TITULO_FINAL}</h3>
-                        <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                        <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                        <a href="${latestPDF.url}" class="download-btn" download>
-                            Descargar Documento
-                        </a>
-                    </div>
-                `;
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar el documento: ${error.message}`, 'both');
+            return null;
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Actualizar visibilidad de botones
+    function actualizarBotones() {
+        document.body.className = documentoActual === 'ubicaciones' ? 
+            'mostrar-ubicaciones' : 'mostrar-distancias';
+    }
+
+    // Configurar eventos de descarga
+    function configurarDescargas() {
+        document.getElementById('descargar-ubicaciones').onclick = function() {
+            if (documentoUbicacionesUrl) {
+                window.open(documentoUbicacionesUrl, '_blank');
+            }
+        };
+        
+        document.getElementById('descargar-distancias').onclick = function() {
+            if (documentoDistanciasUrl) {
+                window.open(documentoDistanciasUrl, '_blank');
+            }
+        };
+    }
+
+    // Alternar entre documentos
+    async function alternarDocumento() {
+        const boton = document.getElementById('alternar-documento');
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const titulo = document.getElementById('titulo-documento');
+        
+        if (documentoActual === 'ubicaciones') {
+            // Cambiar a documento de distancias
+            if (!documentoDistanciasUrl) {
+                documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
             }
             
-            // Configuración específica para iOS
-            if (isIOS()) {
-                // Usamos Google Viewer como alternativa para iOS
-                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                iosLink.href = googleViewerUrl;
+            if (documentoDistanciasUrl) {
+                pdfViewer.src = documentoDistanciasUrl;
+                titulo.textContent = TITULO_DISTANCIAS;
+                boton.textContent = 'Mostrar Ubicaciones';
+                boton.classList.add('activo');
+                documentoActual = 'distancias';
+                actualizarBotones();
             }
         } else {
-            showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+            // Volver al documento principal (ubicaciones)
+            if (!documentoUbicacionesUrl) {
+                documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
+            }
+            
+            if (documentoUbicacionesUrl) {
+                pdfViewer.src = documentoUbicacionesUrl;
+                titulo.textContent = TITULO_UBICACIONES;
+                boton.textContent = 'Mostrar Distancias';
+                boton.classList.remove('activo');
+                documentoActual = 'ubicaciones';
+                actualizarBotones();
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showError(`Error al cargar el documento: ${error.message}`, 'both');
-    } finally {
+    }
+
+    // Configurar el visor de PDF para un documento específico
+    async function configurarVisorPDF(url, titulo) {
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const mobileContainer = document.querySelector('.mobile-images');
+        const iosLink = document.getElementById('ios-pdf-link');
+        
+        if (!url) {
+            showError('No se pudo cargar el documento', 'both');
+            return;
+        }
+
+        // Configuración normal para PC
+        pdfViewer.src = url;
+        document.getElementById('titulo-documento').textContent = titulo;
+        
+        // Configuración para móviles (no iOS)
+        if (!isIOS()) {
+            mobileContainer.innerHTML = `
+                <div class="file-info">
+                    <h3>${titulo}</h3>
+                </div>
+            `;
+        }
+        
+        // Configuración específica para iOS
+        if (isIOS()) {
+            // Usamos Google Viewer como alternativa para iOS
+            const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+            iosLink.href = googleViewerUrl;
+        }
+    }
+
+    // Cargar el documento inicial (ubicaciones)
+    async function cargarDocumentoInicial() {
+        showLoading(true);
+        
+        // Cargar ambos documentos pero mostrar primero el de ubicaciones
+        documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
+        documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
+        
+        if (documentoUbicacionesUrl) {
+            await configurarVisorPDF(documentoUbicacionesUrl, TITULO_UBICACIONES);
+        }
+        
+        actualizarBotones();
+        configurarDescargas();
         showLoading(false);
     }
-}
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-    // Cargar el documento PDF
-    if (document.getElementById('pdf-viewer')) {
-        cargarDocumentoPDF();
-    }
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cargar el documento inicial
+        cargarDocumentoInicial();
 
-    // Cerrar submenús al hacer clic en opción
-    document.querySelectorAll('.submenu-list a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.querySelectorAll('.submenu').forEach(sub => {
-                sub.classList.remove('active');
+        // Configurar el botón de alternar
+        document.getElementById('alternar-documento').addEventListener('click', alternarDocumento);
+
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
+                });
             });
         });
+        
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
+        });
     });
-    
-    // Manejar clic en el enlace de iOS
-    document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
-        if (isIOS()) {
-            // Abrir en nueva pestaña sin restricciones
-            window.open(this.href, '_blank');
-            e.preventDefault();
-        }
-    });
-});
 </script>
 <script src="../../../carga,.js"></script>
 </body>
