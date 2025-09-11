@@ -7,10 +7,10 @@
     <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
 </head>
+
 <body class="mostrar-ubicaciones">
     <div class="titulo-contenedor">
         <h1 id="titulo-documento" class="titulo-personalizado">UBICACIÓN DE OFICINAS DEL INM</h1>
-        <button id="alternar-documento" class="alternar-btn">Mostrar Distancias</button>
     </div>
     
     <div class="menu-overlay"></div>
@@ -111,12 +111,9 @@
         <button class="boton-descarga boton-ubicaciones" id="descargar-ubicaciones">
             Descargar Ubicaciones
         </button>
-        <button class="boton-descarga boton-distancias" id="descargar-distancias">
-            Descargar Distancias
-        </button>
         <button class="regresar-btn" onclick="window.location.href='../jaliscoindex.html'">
-    Regresar
-</button>
+            Regresar
+        </button>
     </div>
 
 <script>
@@ -125,14 +122,10 @@
     const API_KEY = 'Xhy2md57';
     const ESTADO = 'jalisco';       // Cambia por el estado que necesites
     const TIPO_UBICACIONES = 'ubicaciones_sedes'; // Tipo de documento para ubicaciones
-    const TIPO_DISTANCIAS = 'distancias_sedes'; // Tipo de documento para distancias
     const TITULO_UBICACIONES = 'Ubicación de oficinas del INM en Jalisco'; 
-    const TITULO_DISTANCIAS = 'Distancias entre oficinas del INM en Jalisco';
 
     // Variables para controlar el estado del documento
-    let documentoActual = 'ubicaciones';
     let documentoUbicacionesUrl = '';
-    let documentoDistanciasUrl = '';
 
     // Detectar iOS
     function isIOS() {
@@ -187,12 +180,6 @@
         event.target.closest('.submenu').classList.toggle('active');
     }
 
-    // Formatear fecha legible
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('es-MX', options);
-    }
-
     // Función para cargar un documento específico
     async function cargarDocumento(tipoDocumento) {
         showLoading(true);
@@ -226,12 +213,6 @@
         }
     }
 
-    // Actualizar visibilidad de botones
-    function actualizarBotones() {
-        document.body.className = documentoActual === 'ubicaciones' ? 
-            'mostrar-ubicaciones' : 'mostrar-distancias';
-    }
-
     // Configurar eventos de descarga
     function configurarDescargas() {
         document.getElementById('descargar-ubicaciones').onclick = function() {
@@ -239,49 +220,6 @@
                 window.open(documentoUbicacionesUrl, '_blank');
             }
         };
-        
-        document.getElementById('descargar-distancias').onclick = function() {
-            if (documentoDistanciasUrl) {
-                window.open(documentoDistanciasUrl, '_blank');
-            }
-        };
-    }
-
-    // Alternar entre documentos
-    async function alternarDocumento() {
-        const boton = document.getElementById('alternar-documento');
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const titulo = document.getElementById('titulo-documento');
-        
-        if (documentoActual === 'ubicaciones') {
-            // Cambiar a documento de distancias
-            if (!documentoDistanciasUrl) {
-                documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
-            }
-            
-            if (documentoDistanciasUrl) {
-                pdfViewer.src = documentoDistanciasUrl;
-                titulo.textContent = TITULO_DISTANCIAS;
-                boton.textContent = 'Mostrar Ubicaciones';
-                boton.classList.add('activo');
-                documentoActual = 'distancias';
-                actualizarBotones();
-            }
-        } else {
-            // Volver al documento principal (ubicaciones)
-            if (!documentoUbicacionesUrl) {
-                documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
-            }
-            
-            if (documentoUbicacionesUrl) {
-                pdfViewer.src = documentoUbicacionesUrl;
-                titulo.textContent = TITULO_UBICACIONES;
-                boton.textContent = 'Mostrar Distancias';
-                boton.classList.remove('activo');
-                documentoActual = 'ubicaciones';
-                actualizarBotones();
-            }
-        }
     }
 
     // Configurar el visor de PDF para un documento específico
@@ -320,15 +258,13 @@
     async function cargarDocumentoInicial() {
         showLoading(true);
         
-        // Cargar ambos documentos pero mostrar primero el de ubicaciones
+        // Cargar el documento de ubicaciones
         documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
-        documentoDistanciasUrl = await cargarDocumento(TIPO_DISTANCIAS);
         
         if (documentoUbicacionesUrl) {
             await configurarVisorPDF(documentoUbicacionesUrl, TITULO_UBICACIONES);
         }
         
-        actualizarBotones();
         configurarDescargas();
         showLoading(false);
     }
@@ -337,9 +273,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Cargar el documento inicial
         cargarDocumentoInicial();
-
-        // Configurar el botón de alternar
-        document.getElementById('alternar-documento').addEventListener('click', alternarDocumento);
 
         // Cerrar submenús al hacer clic en opción
         document.querySelectorAll('.submenu-list a').forEach(link => {
