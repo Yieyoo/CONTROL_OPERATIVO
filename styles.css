@@ -542,7 +542,7 @@ nav.menu ul li a.active {
     }
     
     .mapa-container #map {
-        height: 500px;
+        height: 100px; /* Aumentado de 700px a 850px */
     }
     
     .mapa-container .titulo-mapa {
@@ -552,14 +552,13 @@ nav.menu ul li a.active {
 
 @media (max-width: 480px) {
     .mapa-container #map {
-        height: 300px;
+        height: 700px; /* Aumentado de 500px a 700px */
     }
     
     .mapa-container {
         padding: 1rem;
     }
 }
-  
  
 /* ============ LÍNEA SEPARADORA ============ */
 .linea {
