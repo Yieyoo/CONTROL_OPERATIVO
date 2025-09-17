@@ -107,21 +107,21 @@ header {
 }
 
 
-.regresar-btn {
-  background-color: var(--color-primario);
-  color: var(--color-blanco);
-  border: none;
-  padding: 12px 16px;
-  font-size: 16px;
-  cursor: pointer;
-  position: fixed;
-  top: 50px;
-  left: 20px;
-  border-radius: 5px;
-  z-index: 900;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.3s ease;
-}
+ .regresar-btn {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    position: fixed;
+    top: 50px;
+    left: 20px;
+    border-radius: 5px;
+    z-index: 900;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+  }
 
 .regresar-btn:hover {
   background-color: #8e5c71;
@@ -437,12 +437,10 @@ nav.menu ul li a:hover {
   
 .regresar-btn {
     font-size: 4px;
-    padding: 2px 3px;
-    top: 5%;
-    line-height: 0.8;
-    border-width: 0.5px;
-    min-width: 0;
-    min-height: 0;
+    padding: 3px 5px;
+    top: 6%;
+    transform: scale(0.6); /* Reduce a 40% del tamaño original */
+    transform-origin: left top;
 }
     
   
@@ -799,4 +797,20 @@ nav.menu ul li a:hover {
     /* padding-top: 50px;    Alternativa si quieres espacio interno */
     /* position: relative;   Requerido si usas 'top' */
     /* top: 50px;            Solo si usas 'position: relative' o 'absolute' */
+}
+/* Para móviles */
+@media (max-width: 768px) {
+    .titulo-personalizado {
+        font-size: 20px; /* Tamaño más pequeño para móviles */
+        margin-top: 30px; /* Bajamos el título 30px desde arriba */
+    }
+}
+
+/* Para móviles muy pequeños */
+@media (max-width: 480px) {
+    .titulo-personalizado {
+        font-size: 18px;
+        padding: 0 10px; /* Agrega padding para que no toque los bordes */
+        margin-top: 25px; /* Bajamos un poco más en móviles pequeños */
+    }
 }
