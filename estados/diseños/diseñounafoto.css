@@ -414,8 +414,8 @@ nav.menu ul li a:hover {
   }
   
   .logo-container {
-    top: 50px;
-    right: 2px;
+    top: 45px;
+    right: -60px;
     gap: 4px;
     position: fixed;
     display: flex;
@@ -435,11 +435,16 @@ nav.menu ul li a:hover {
     padding: 4px 5px;
   }
   
-  .regresar-btn {
-    font-size: 7px;
-    padding: 8px 10px;
-    margin-top: -10px;
-  }
+.regresar-btn {
+    font-size: 4px;
+    padding: 2px 3px;
+    top: 5%;
+    line-height: 0.8;
+    border-width: 0.5px;
+    min-width: 0;
+    min-height: 0;
+}
+    
   
   .instituto-info {
     padding: 5px 1px;
@@ -794,3 +799,4 @@ nav.menu ul li a:hover {
     /* padding-top: 50px;    Alternativa si quieres espacio interno */
     /* position: relative;   Requerido si usas 'top' */
     /* top: 50px;            Solo si usas 'position: relative' o 'absolute' */
+}
