@@ -542,7 +542,7 @@ nav.menu ul li a.active {
     }
     
     .mapa-container #map {
-        height: 100px; /* Aumentado de 700px a 850px */
+        height: 900px; /* Añadido "px" y aumentado a 900px */
     }
     
     .mapa-container .titulo-mapa {
@@ -552,7 +552,7 @@ nav.menu ul li a.active {
 
 @media (max-width: 480px) {
     .mapa-container #map {
-        height: 700px; /* Aumentado de 500px a 700px */
+        height: 750px; /* Aumentado de 500px a 750px */
     }
     
     .mapa-container {

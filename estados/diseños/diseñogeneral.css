@@ -541,13 +541,40 @@ nav.menu > ul {
       right: 10px;
       gap: 15px;
     }
+    /* Estilos para celular - Logo pequeño en esquina superior derecha */
+@media (max-width: 768px) {
+    .logo-container {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        width: auto;
+    }
+    
+    .logo-container img {
+        width: 100px; /* Ajusta este valor para hacerlo más grande o pequeño */
+        height: auto;
+    }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .logo-container {
+        top: 5px;
+        right: 5px;
+    }
+    
+    .logo-container img {
+        width: 70px; /* Aún más pequeño en móviles muy pequeños */
+    }
+}
     
     /* Fecha actual */
     .fecha-actual {
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 15px;
+      font-size: 10px;
       padding: 4px 5px;
     }
     
