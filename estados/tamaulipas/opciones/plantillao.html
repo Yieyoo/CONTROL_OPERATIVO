@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
     <style>
         /* Estilos específicos para móviles iOS */
-        .ios-only {
-            display: none; /* Oculto por defecto en todos los dispositivos */
-        }
-
-        /* Solo mostrar en iOS y en ancho móvil */
         @media only screen and (max-width: 768px) {
+            .ios-only {
+                display: none; /* Oculto por defecto */
+            }
+            
+            /* Solo mostrar en iOS */
             @supports (-webkit-touch-callout: none) {
                 .ios-only {
                     display: block;
@@ -29,7 +29,7 @@
                     display: inline-flex;
                     align-items: center;
                     gap: 10px;
-                    background: #e74c3c;
+                    background: #691932;
                     color: white;
                     padding: 12px 20px;
                     border-radius: 8px;
@@ -49,10 +49,28 @@
                 }
             }
         }
+        /* Estilo para la fecha de actualización */
+                #fecha-subida {
+                    position: fixed;
+                    bottom: 10px;
+                    right: 10px;
+                    background-color: rgba(0,0,0,0.7);
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    font-size: 12px;
+                    z-index: 1000;
+                }
+
+                @media (max-width: 768px) {
+                    #fecha-subida {
+                        font-size: 10px;
+                        padding: 3px 6px;
+                    }
+                }
     </style>
 </head>
-<body>
-    <script type="module" src="../../../common.js"></script>
+<body>   
     <!-- Contenedor para el título personalizado -->
     <div id="tituloContainer" class="titulo-personalizado">
         Cargando título...
@@ -86,7 +104,7 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                       <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                         <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
@@ -134,7 +152,6 @@
             class="pdf-embed"
             frameborder="0"
             title="Visualizador de PDF"
-            src="../../../documentacion/plantillas_personal/tamaulipasp/TAM1.pdf"
         ></iframe>
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
@@ -146,9 +163,16 @@
             <span>Abrir Plantilla</span>
         </a>
         <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
-<div id="fecha-subida" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px;">
+    </div>
+
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <div id="fecha-subida">
     Actualizado: <span id="fecha-texto">Cargando...</span>
-</div>
+    </div>
+
     <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
     <script>
@@ -201,11 +225,11 @@ async function cargarTituloPersonalizado() {
         }
 
         // 3. Título por defecto
-        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
 
     } catch (error) {
         console.error('Error:', error);
-        tituloContainer.textContent = 'Plantilla de Personal - Baja California';
+        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
         tituloContainer.style.color = 'red';
     }
 }
@@ -296,17 +320,15 @@ async function loadPlantillaPersonal() {
             
             // Configuración normal para PC
             pdfViewer.src = latestPDF.url;
-
             
             // Configuración específica para iOS
             if (isIOS()) {
                 // Usamos Google Viewer como alternativa para iOS
                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
                 iosLink.href = googleViewerUrl;
- 
             }
         } else {
-            showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
+            showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
             fechaElement.textContent = 'No disponible';
         }
     } catch (error) {
