@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - tabasco</title>
+    <title>PLANTILLA DE PERSONAL - Tabasco</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
     <style>
@@ -86,7 +86,7 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                       <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                         <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
@@ -134,7 +134,6 @@
             class="pdf-embed"
             frameborder="0"
             title="Visualizador de PDF"
-            src="../../../documentacion/plantillas_personal/tabascop/TAB1.pdf"
         ></iframe>
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
@@ -305,7 +304,7 @@ async function loadPlantillaPersonal() {
                 iosLink.href = googleViewerUrl;
             }
         } else {
-            showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
+            showError('No se encontraron documentos de plantilla de personal', 'both');
             fechaElement.textContent = 'No disponible';
         }
     } catch (error) {
