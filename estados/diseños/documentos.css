@@ -381,81 +381,118 @@ nav.menu ul li a:hover {
 /*                                          ESTILOS iOS ESPECÍFICOS                                      */
 /* ======================================================================================================*/
 .ios-only {
-  display: none;
-  text-align: center;
-  margin: 20px;
-  padding: 15px;
-  background: #f8f8f8;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+    display: none;
+    text-align: center;
+    margin: 20px;
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 10px;
+    border: 1px solid #ddd;
 }
 
 .ios-pdf-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--color-primario);
-  color: var(--color-blanco);
-  padding: 12px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  margin-top: 15px;
-  transition: var(--transicion);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #691932;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: 15px;
+    transition: all 0.3s ease;
 }
 
 .ios-pdf-link:hover {
-  background: #8e5c71;
-  transform: translateY(-2px);
+    background: #8a2a4a;
+    transform: translateY(-2px);
 }
 
 .ios-pdf-link img {
-  width: 30px;
-  height: 30px;
+    width: 30px;
+    height: 30px;
 }
 
 .ios-instructions {
-  font-size: 14px;
-  color: #666;
-  margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
 }
 
+/* Estilo para el título principal */
+.titulo-personalizado {
+    color: #2c3e50;
+    text-align: center;
+    margin: 50px 0 20px 0;
+    font-size: 24px;
+    padding: 0 15px;
+}
+
+/* Estilo para la información del archivo */
 .file-info {
-  background: #f9f9f9;
-  padding: 15px;
-  border-radius: 8px;
-  margin: 15px 0;
-  border: 1px solid #ddd;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid #ddd;
 }
 
 .file-info h3 {
-  margin-top: 0;
-  color: var(--color-primario);
+    margin-top: 0;
+    color: #2c3e50;
 }
 
 .download-btn {
-  display: inline-block;
-  background: var(--color-primario);
-  color: white;
-  padding: 10px 15px;
-  border-radius: 5px;
-  text-decoration: none;
-  margin-top: 10px;
-  transition: background 0.3s;
+    display: inline-block;
+    background: #691932;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: background 0.3s;
 }
 
 .download-btn:hover {
-  background: #2980b9;
+    background: #8a2a4a;
 }
 
 /* Mostrar solo en móviles iOS */
 @media only screen and (max-width: 768px) {
-  @supports (-webkit-touch-callout: none) {
-    .ios-only {
-      display: block;
+    @supports (-webkit-touch-callout: none) {
+        .ios-only {
+            display: block;
+        }
     }
-  }
+    
+    .titulo-personalizado {
+        font-size: 20px;
+        margin-top: 30px;
+    }
 }
 
+/* Para móviles muy pequeños */
+@media only screen and (max-width: 480px) {
+    .titulo-personalizado {
+        font-size: 18px;
+        padding: 0 10px;
+        margin-top: 25px;
+    }
+    
+    .ios-only {
+        margin: 15px;
+        padding: 12px;
+    }
+    
+    .ios-pdf-link {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .ios-instructions {
+        font-size: 13px;
+    }
+}
 /* ======================================================================================================*/
 /*                                          ESTILOS ADICIONALES                                          */
 /* ======================================================================================================*/
