@@ -817,3 +817,121 @@ nav.menu ul li a.active {
     margin: 0;
   }
 }
+/* ============ ANIMACIONES FALTANTES ============ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageLoad {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes expandLine {
+  to { width: 100%; }
+}
+
+/* ============ EFECTOS PRINCIPALES (LIMPIOS) ============ */
+
+/* Efecto de flotación sutil para la imagen */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.portada .imagen-container img {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Efecto de aparición escalonada para el texto */
+.portada .texto-container h1 {
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.portada .texto-container h2 {
+  animation: fadeInUp 0.8s ease 0.4s both;
+}
+
+.portada .texto-container h3 {
+  animation: fadeInUp 0.8s ease 0.6s both;
+}
+
+.portada .texto-container .linea {
+  animation: fadeInUp 0.8s ease 0.8s both;
+}
+
+.portada .texto-container .fecha-actual {
+  animation: fadeInUp 0.8s ease 1s both;
+}
+
+/* Efecto de brillo en los títulos */
+.portada .texto-container h1 {
+  position: relative;
+  display: inline-block;
+}
+
+.portada .texto-container h1::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #A5852E, transparent);
+  animation: expandLine 2s ease 1s forwards;
+}
+
+/* FONDO LIMPIO (sin partículas) */
+.portada {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ELIMINADO: el efecto de partículas que no te gusta */
+.portada::before {
+  display: none; /* Esto quita las partículas rectangulares */
+}
+
+.portada > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Suavizado general para todo el sitio */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Animación al hacer scroll para las secciones */
+.mapa-container {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+.mapa-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Transición de entrada para toda la página */
+body {
+  opacity: 0;
+  animation: pageLoad 1s ease 0.3s forwards;
+}
+
+/* Efecto de carga para elementos principales */
+.portada > * {
+  opacity: 0;
+}
+
+body.loaded .portada > * {
+  opacity: 1;
+}
