@@ -195,6 +195,64 @@ submenuLinks.forEach(link => {
                 }
             }, 1000);
         });
+// Añade esto antes de </body>
+document.addEventListener('DOMContentLoaded', function() {
+    // Efecto de carga inicial
+    setTimeout(() => {
+        document.body.classList.add('loaded');
+    }, 100);
+    
+    // Animaciones al hacer scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    const mapas = document.querySelectorAll('.mapa-container');
+    mapas.forEach(mapa => observer.observe(mapa));
+});        
+        // Efecto de aparición al hacer scroll
+function checkVisibility() {
+    const elements = document.querySelectorAll('.mapa-container');
+    
+    elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (elementTop < windowHeight - 100) {
+            element.classList.add('visible');
+        }
+    });
+}
+
+// Observador de intersección para mejor performance
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+// Aplicar a todos los elementos que quieres animar
+document.addEventListener('DOMContentLoaded', function() {
+    const animatedElements = document.querySelectorAll('.mapa-container');
+    animatedElements.forEach(el => observer.observe(el));
+    
+    // Efecto de carga inicial
+    setTimeout(() => {
+        document.body.classList.add('loaded');
+    }, 100);
+});
     </script>  
+    
 </body>
 </html>
