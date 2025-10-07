@@ -1,4 +1,4 @@
-// server.js - VERSIÓN COMPLETA CON AUTENTICACIÓN Y PERMISOS DIFERENCIADOS
+// server.js - VERSIÓN SIMPLIFICADA CON 2 USUARIOS
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -75,38 +75,20 @@ const authorizedUsers = [
   {
     id: 1,
     username: 'admin',
-    password: bcrypt.hashSync('admin123', 10),
-    name: 'Administrador Principal',
+    password: bcrypt.hashSync('XHy2md57*', 10),
+    name: 'Administrador',
     role: 'admin',
     email: 'admin@inm.gob.mx',
-    permissions: ['upload', 'delete', 'view', 'manage_users', 'system_config', 'access_files']
+    can_access_files: true  // ✅ Puede acceder al gestor de archivos
   },
   {
     id: 2,
-    username: 'diego',
-    password: bcrypt.hashSync('diego123', 10),
-    name: 'Diego Jiménez',
-    role: 'user',
-    email: 'diegojimher@yahoo.com.mx',
-    permissions: ['upload', 'delete', 'view', 'access_files']
-  },
-  {
-    id: 3,
-    username: 'coordinador',
-    password: bcrypt.hashSync('coord123', 10),
-    name: 'Coordinador Regional',
-    role: 'coordinator',
-    email: 'coordinacion@inm.gob.mx',
-    permissions: ['view'] // SOLO puede ver páginas normales, NO archivos
-  },
-  {
-    id: 4,
-    username: 'visor',
-    password: bcrypt.hashSync('visor123', 10),
-    name: 'Usuario Visor',
-    role: 'viewer',
-    email: 'visor@inm.gob.mx',
-    permissions: ['view'] // SOLO puede ver páginas normales
+    username: 'invitado',
+    password: bcrypt.hashSync('invitado123', 10),
+    name: 'Usuario Invitado',
+    role: 'guest',
+    email: 'invitado@inm.gob.mx',
+    can_access_files: false  // ❌ NO puede acceder al gestor de archivos
   }
 ];
 
@@ -119,57 +101,21 @@ const requireAuth = (req, res, next) => {
       status: 'error',
       error: 'unauthorized',
       message: 'Debe iniciar sesión para acceder a este recurso',
-      code: 'SESSION_REQUIRED',
-      redirect: '/login'
+      code: 'SESSION_REQUIRED'
     });
   }
 };
 
-const requireAdmin = (req, res, next) => {
-  if (req.session.user && req.session.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ 
-      status: 'error',
-      error: 'forbidden', 
-      message: 'Se requieren privilegios de administrador',
-      code: 'ADMIN_REQUIRED'
-    });
-  }
-};
-
-const requirePermission = (permission) => {
-  return (req, res, next) => {
-    if (req.session.user && req.session.user.permissions.includes(permission)) {
-      next();
-    } else {
-      res.status(403).json({ 
-        status: 'error',
-        error: 'forbidden',
-        message: `Permiso requerido: ${permission}`,
-        code: 'PERMISSION_DENIED'
-      });
-    }
-  };
-};
-
-// ==================== VERIFICACIÓN DE ACCESO A ARCHIVOS ====================
-const canAccessFiles = (user) => {
-  // Solo estos usuarios pueden acceder al gestor de archivos
-  const allowedUsers = ['admin', 'diego'];
-  return allowedUsers.includes(user.username);
-};
-
+// Middleware para verificar acceso a archivos
 const requireFileAccess = (req, res, next) => {
-  if (req.session.user && canAccessFiles(req.session.user)) {
+  if (req.session.user && req.session.user.can_access_files) {
     next();
   } else {
     res.status(403).json({ 
       status: 'error',
       error: 'forbidden',
       message: 'No tienes permisos para acceder al gestor de archivos',
-      code: 'FILE_ACCESS_DENIED',
-      user: req.session.user?.username
+      code: 'FILE_ACCESS_DENIED'
     });
   }
 };
@@ -222,7 +168,6 @@ app.get('/', cors({ origin: '*' }), (req, res) => {
     status: 'success',
     message: 'API de Gestión de Archivos PDF - INM',
     version: '2.0.0',
-    features: ['file_management', 'authentication', 'session_management'],
     requires_auth: true
   });
 });
@@ -342,43 +287,6 @@ app.use(require('compression')({
   filter: shouldCompress
 }));
 
-// ==================== MIDDLEWARE DE API KEY (PARA COMPATIBILIDAD) ====================
-const authenticateAPI = (req, res, next) => {
-  const apiKey = req.headers['x-api-key'];
-  
-  // Si hay sesión de usuario, permitir acceso
-  if (req.session.user) {
-    return next();
-  }
-  
-  // Si no hay sesión pero hay API key válida, permitir acceso
-  if (apiKey && apiKey === process.env.API_KEY) {
-    return next();
-  }
-
-  // Si no hay ninguna autenticación
-  if (!apiKey) {
-    return res.status(401).json({
-      status: 'error',
-      error: 'unauthorized',
-      message: 'Se requiere autenticación (sesión o API Key)',
-      code: 'AUTH_REQUIRED',
-      timestamp: new Date().toISOString(),
-      path: req.path
-    });
-  }
-
-  // API Key inválida
-  console.warn(`Intento de acceso con API Key inválida desde IP: ${req.ip}`);
-  return res.status(401).json({
-    status: 'error',
-    error: 'unauthorized',
-    message: 'API Key inválida',
-    code: 'INVALID_API_KEY',
-    timestamp: new Date().toISOString()
-  });
-};
-
 // ==================== MANEJO DE ERRORES ====================
 class AppError extends Error {
   constructor(message, statusCode, errorCode) {
@@ -442,8 +350,7 @@ router.post('/auth/login', authLimiter, express.json(), async (req, res, next) =
         data: {
           user: userSession,
           session_id: req.sessionID,
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-          can_access_files: canAccessFiles(userSession)
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
         }
       });
     } else {
@@ -482,137 +389,35 @@ router.post('/auth/logout', (req, res, next) => {
 
 // Verificar autenticación
 router.get('/auth/check', (req, res) => {
-  const canAccess = req.session.user ? canAccessFiles(req.session.user) : false;
+  const canAccessFiles = req.session.user ? req.session.user.can_access_files : false;
   
   res.json({ 
     status: 'success',
     data: {
       authenticated: !!req.session.user, 
       user: req.session.user || null,
-      can_access_files: canAccess,
+      can_access_files: canAccessFiles,
       session_id: req.sessionID,
       timestamp: new Date().toISOString()
     }
   });
 });
 
-// Verificar específicamente acceso a archivos
-router.get('/auth/check-file-access', requireAuth, (req, res) => {
-  const canAccess = canAccessFiles(req.session.user);
-  
-  res.json({
-    status: 'success',
-    data: {
-      can_access_files: canAccess,
-      user: req.session.user,
-      message: canAccess ? 'Acceso permitido al gestor de archivos' : 'Acceso denegado al gestor de archivos'
-    }
-  });
-});
+// ==================== RUTAS DE ARCHIVOS (SOLO ADMIN) ====================
 
-// Cambiar contraseña
-router.post('/auth/change-password', requireAuth, express.json(), async (req, res, next) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    const userId = req.session.user.id;
-    
-    if (!currentPassword || !newPassword) {
-      throw new AppError('Contraseña actual y nueva contraseña son requeridas', 400, 'missing_passwords');
-    }
-    
-    if (newPassword.length < 6) {
-      throw new AppError('La nueva contraseña debe tener al menos 6 caracteres', 400, 'weak_password');
-    }
-    
-    const user = authorizedUsers.find(u => u.id === userId);
-    
-    if (user && await bcrypt.compare(currentPassword, user.password)) {
-      user.password = bcrypt.hashSync(newPassword, 10);
-      
-      console.log(`✅ Contraseña cambiada para usuario: ${user.username}`);
-      
-      res.json({ 
-        status: 'success', 
-        message: 'Contraseña actualizada correctamente',
-        data: {
-          username: user.username,
-          updated_at: new Date().toISOString()
-        }
-      });
-    } else {
-      throw new AppError('Contraseña actual incorrecta', 400, 'invalid_current_password');
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-// ==================== RUTAS DE ADMINISTRACIÓN ====================
-
-// Listar usuarios (solo admin)
-router.get('/admin/users', requireAdmin, (req, res) => {
-  const usersSafe = authorizedUsers.map(user => {
-    const { password, ...userSafe } = user;
-    userSafe.can_access_files = canAccessFiles(user);
-    return userSafe;
-  });
-  
-  res.json({
-    status: 'success',
-    data: {
-      users: usersSafe,
-      total: usersSafe.length,
-      timestamp: new Date().toISOString()
-    }
-  });
-});
-
-// Estadísticas del sistema (solo admin)
-router.get('/admin/stats', requireAdmin, async (req, res, next) => {
-  try {
-    const recursos = await cloudinary.api.resources({
-      type: 'upload',
-      resource_type: 'raw',
-      max_results: 1
-    });
-    
-    const usersWithFileAccess = authorizedUsers.filter(user => canAccessFiles(user));
-    
-    res.json({
-      status: 'success',
-      data: {
-        total_users: authorizedUsers.length,
-        users_with_file_access: usersWithFileAccess.length,
-        total_files: recursos.total_count || 'N/A',
-        active_sessions: 'N/A',
-        system_status: 'Operativo',
-        cloudinary_status: 'Conectado',
-        server_uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// ==================== RUTAS DE ARCHIVOS (SOLO USUARIOS AUTORIZADOS) ====================
-
-// Ruta de salud (accesible para todos los autenticados)
+// Ruta de salud
 router.get('/health', requireAuth, async (req, res) => {
   const healthcheck = {
     status: 'healthy',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
     version: '2.0.0',
-    authentication: 'authenticated',
     user: req.session.user.username,
-    can_access_files: canAccessFiles(req.session.user),
+    can_access_files: req.session.user.can_access_files,
     checks: {
       memoryUsage: process.memoryUsage(),
       cloudinary: 'active',
-      session_store: 'active',
-      diskSpace: 'n/a'
+      session_store: 'active'
     }
   };
 
@@ -656,13 +461,6 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
         uploaded_by: uploadedBy,
         ...(tituloDocumento && { titulo_documento: tituloDocumento })
       }
-    },
-    responsive_breakpoints: {
-      create_derived: false,
-      bytes_step: 20000,
-      min_width: 200,
-      max_width: 1000,
-      transformation: { crop: 'limit' }
     }
   };
 
@@ -683,9 +481,7 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
   }
 };
 
-// ==================== RUTAS PROTEGIDAS DE ARCHIVOS (SOLO USUARIOS CON ACCESO) ====================
-
-// Ruta para subir archivos
+// Ruta para subir archivos (SOLO ADMIN)
 router.post('/upload', requireAuth, requireFileAccess, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
     try {
@@ -731,7 +527,7 @@ router.post('/upload', requireAuth, requireFileAccess, (req, res, next) => {
   });
 });
 
-// Ruta para eliminar archivos
+// Ruta para eliminar archivos (SOLO ADMIN)
 router.delete('/delete', requireAuth, requireFileAccess, async (req, res, next) => {
   try {
     const { public_id, estado, tipo_documento } = req.body;
@@ -783,29 +579,26 @@ router.delete('/delete', requireAuth, requireFileAccess, async (req, res, next) 
   }
 });
 
-// Ruta para listar archivos con cache busting
+// Ruta para listar archivos (SOLO ADMIN)
 router.get('/archivos/:estado/:tipoDocumento', requireAuth, requireFileAccess, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
     const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
 
-    // Agregar timestamp para evitar caché
     const result = await cloudinary.api.resources({
       type: 'upload',
       prefix: `${estado}/${tipoDocumento}/`,
       resource_type: 'raw',
       max_results: 500,
       context: true,
-      tags: true,
-      moderations: true,
-      timestamp: Date.now() // Cache busting
+      timestamp: Date.now()
     });
 
     const archivos = result.resources.map(resource => {
       const originalName = resource.context?.custom?.original_filename || 
                          path.parse(resource.public_id).name + '.pdf';
       return {
-        url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
+        url: `${resource.secure_url}?_=${Date.now()}`,
         public_id: resource.public_id,
         filename: originalName,
         estado: estado,
@@ -816,11 +609,6 @@ router.get('/archivos/:estado/:tipoDocumento', requireAuth, requireFileAccess, a
         uploaded_by: resource.context?.custom?.uploaded_by || 'system',
         size: resource.bytes,
         format: resource.format,
-        width: resource.width,
-        height: resource.height,
-        etag: resource.etag,
-        tags: resource.tags,
-        moderation: resource.moderation,
         ...(resource.context?.custom?.titulo_documento && { 
           titulo_documento: resource.context.custom.titulo_documento 
         })
@@ -841,9 +629,8 @@ router.get('/archivos/:estado/:tipoDocumento', requireAuth, requireFileAccess, a
   }
 });
 
-// ==================== RUTAS PARA TÍTULO GLOBAL ====================
+// ==================== RUTAS PARA TÍTULO GLOBAL (SOLO ADMIN) ====================
 
-// Variable para almacenar el título global
 let tituloGlobal = process.env.TITULO_GLOBAL_INICIAL || 'Plantilla de Personal - INM';
 
 // Ruta para guardar título global
@@ -856,36 +643,7 @@ router.post('/guardar-titulo-global', requireAuth, requireFileAccess, async (req
       throw new AppError('Título válido es requerido', 400, 'missing_titulo');
     }
 
-    // Actualizar en memoria
     tituloGlobal = titulo;
-
-    // También puedes guardar en Cloudinary como metadata si lo prefieres
-    try {
-      const recursos = await cloudinary.api.resources({
-        type: 'upload',
-        resource_type: 'raw',
-        max_results: 500,
-        context: true
-      });
-
-      const plantillas = recursos.resources.filter(
-        res => res.public_id.includes('/plantilla_personal/')
-      );
-
-      // Actualizar metadata en cada archivo encontrado
-      await Promise.all(plantillas.map(async (resource) => {
-        const originalName = resource.context?.custom?.original_filename || 'plantilla.pdf';
-        await cloudinary.uploader.explicit(resource.public_id, {
-          type: 'upload',
-          resource_type: 'raw',
-          context: `titulo_documento=${titulo}|original_filename=${originalName}|updated_by=${updatedBy}`
-        });
-      }));
-    } catch (cloudinaryError) {
-      console.warn('No se pudo actualizar metadata en Cloudinary:', cloudinaryError.message);
-    }
-
-    console.log(`📝 Título global actualizado por ${updatedBy}: ${titulo}`);
 
     res.json({
       status: 'success',
@@ -901,31 +659,13 @@ router.post('/guardar-titulo-global', requireAuth, requireFileAccess, async (req
   }
 });
 
-// Ruta para obtener título global
+// Ruta para obtener título global (SOLO ADMIN)
 router.get('/obtener-titulo-global', requireAuth, requireFileAccess, async (req, res, next) => {
   try {
-    // Primero intenta obtener de Cloudinary (metadata del primer archivo de plantilla encontrado)
-    try {
-      const recursos = await cloudinary.api.resources({
-        type: 'upload',
-        resource_type: 'raw',
-        max_results: 1,
-        context: true,
-        timestamp: Date.now() // Cache busting
-      });
-
-      if (recursos.resources.length > 0 && recursos.resources[0].context?.custom?.titulo_documento) {
-        tituloGlobal = recursos.resources[0].context.custom.titulo_documento;
-      }
-    } catch (cloudinaryError) {
-      console.warn('Error al buscar en Cloudinary:', cloudinaryError.message);
-    }
-
     res.json({
       status: 'success',
       data: {
         titulo: tituloGlobal,
-        source: 'memory',
         requested_by: req.session.user.username,
         timestamp: new Date().toISOString()
       }
@@ -939,9 +679,9 @@ router.get('/obtener-titulo-global', requireAuth, requireFileAccess, async (req,
 router.get('/render-ping', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.ip;
   const user = req.session.user?.username || 'anonymous';
-  const canAccess = req.session.user ? canAccessFiles(req.session.user) : false;
+  const canAccess = req.session.user ? req.session.user.can_access_files : false;
   
-  console.log(`📡 Ping recibido desde IP: ${clientIP} - Usuario: ${user} - ${new Date().toLocaleString()}`);
+  console.log(`📡 Ping recibido desde IP: ${clientIP} - Usuario: ${user}`);
   
   res.status(200).json({
     status: "active",
@@ -973,31 +713,20 @@ const server = app.listen(PORT, () => {
   console.log(`🌍 Modo: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔐 Sistema de autenticación activado`);
   console.log(`👥 Usuarios configurados: ${authorizedUsers.length}`);
-  console.log(`📁 Usuarios con acceso a archivos: ${authorizedUsers.filter(u => canAccessFiles(u)).length}`);
-  console.log(`✅ CORS configurado para: ${allowedOrigins.length} orígenes`);
+  console.log(`📁 Admin puede acceder a archivos: SÍ`);
+  console.log(`👀 Invitado puede acceder a archivos: NO`);
 });
 
 // Manejo de cierre
 const shutdown = async (signal) => {
   console.log(`🛑 Recibido ${signal}, cerrando servidor...`);
-  try {
-    await new Promise((resolve) => server.close(resolve));
+  server.close(() => {
     console.log('✅ Servidor cerrado correctamente');
     process.exit(0);
-  } catch (err) {
-    console.error('❌ Error al cerrar el servidor:', err);
-    process.exit(1);
-  }
+  });
 };
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('unhandledRejection', (err) => {
-  console.error('⚠️ Unhandled Rejection:', err);
-});
-process.on('uncaughtException', (err) => {
-  console.error('⚠️ Uncaught Exception:', err);
-  shutdown('uncaughtException');
-});
 
 module.exports = { app, server };
