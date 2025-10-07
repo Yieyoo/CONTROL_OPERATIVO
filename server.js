@@ -356,7 +356,7 @@ router.post('/auth/login', authLimiter, express.json(), async (req, res, next) =
       
       res.json({ 
         status: 'success',
-        message: `Bienvenido ${user.name}`,
+        message: `Bienvenido`,
         data: {
           user: userSession,
           session_id: req.sessionID
