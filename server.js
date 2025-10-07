@@ -19,21 +19,21 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ==================== CONFIGURACIÓN DE SESIONES CORREGIDA ====================
+// ==================== CONFIGURACIÓN DE SESIONES ====================
 app.use(session({
   name: 'control_operativo_sid',
   secret: process.env.SESSION_SECRET || 'clave-super-secreta-control-operativo-inm-2024',
-  resave: false,  // CAMBIADO a false
+  resave: true,
   saveUninitialized: false,
   cookie: { 
-    secure: true,
+    secure: true, // Siempre true en Render (HTTPS)
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'none', // IMPORTANTE para cross-origin
-    domain: '.onrender.com' // AGREGADO - permite subdominios
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    sameSite: 'none' // Importante para cross-origin
   },
   rolling: true
 }));
+
 // ==================== USUARIOS AUTORIZADOS ====================
 const authorizedUsers = [
   {
@@ -132,33 +132,37 @@ app.use(morgan('combined', {
 app.set('trust proxy', 1);
 
 // ==================== CONFIGURACIÓN CORS ====================
-// ==================== CONFIGURACIÓN CORS CORREGIDA ====================
+const allowedOrigins = [
+  'https://yieyoo.github.io',
+  'https://yieyoo.github.io/CONTROL_OPERATIVO/',
+  'http://localhost:3000',
+  'http://localhost',
+  'https://control-operativo-1.onrender.com'
+];
+
 const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'https://yieyoo.github.io',
-      'https://yieyoo.github.io',
-      'http://localhost:3000',
-      'http://localhost:8080',
-      'https://control-operativo-1.onrender.com'
-    ];
+    if (!origin && process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
     
-    // Permitir requests sin origin (móviles/apps nativas)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      return callback(null, true);
+    }
     
-    if (allowedOrigins.indexOf(origin) !== -1 || 
-        origin.endsWith('.github.io') ||
-        origin.endsWith('.onrender.com')) {
+    if (allowedOrigins.includes(origin) || 
+        (process.env.NODE_ENV === 'development' && !origin)) {
       callback(null, true);
     } else {
       console.log('Origen bloqueado:', origin);
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS'), false);
     }
   },
-  credentials: true, // ← CRÍTICO: esto permite cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'Cookie'],
-  optionsSuccessStatus: 200
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+  credentials: true, // IMPORTANTE para las cookies de sesión
+  optionsSuccessStatus: 200,
+  maxAge: 86400
 };
 
 // Middleware para deshabilitar caché globalmente
@@ -352,7 +356,7 @@ router.post('/auth/login', authLimiter, express.json(), async (req, res, next) =
       
       res.json({ 
         status: 'success',
-        message: `Bienvenido`,
+        message: `Bienvenido ${user.name}`,
         data: {
           user: userSession,
           session_id: req.sessionID
@@ -745,19 +749,7 @@ router.get('/render-ping', (req, res) => {
 });
 
 // ==================== CONFIGURACIÓN FINAL ====================
-// Ruta de diagnóstico para debug de sesiones
-router.get('/debug-session', (req, res) => {
-  res.json({
-    sessionID: req.sessionID,
-    session: req.session,
-    cookies: req.headers.cookie,
-    userAgent: req.headers['user-agent'],
-    origin: req.headers.origin,
-    timestamp: new Date().toISOString()
-  });
-});
 
-// ==================== CONFIGURACIÓN FINAL ====================
 // Montar rutas
 app.use('/api', apiLimiter, router);
 
