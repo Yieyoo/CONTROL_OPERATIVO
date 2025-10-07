@@ -192,12 +192,12 @@
 
         <!-- Solo para desarrollo - Mostrar credenciales -->
         <div class="user-credentials">
-            <h4>Credenciales de Prueba:</h4>
+            <h4>Credenciales del Sistema:</h4>
             <div class="credential">
-                <strong>Admin:</strong> admin / admin123
+                <strong>Usuario:</strong> admin
             </div>
             <div class="credential">
-                <strong>Invitado:</strong> invitado / invitado123
+                <strong>Contraseña:</strong> admin123
             </div>
         </div>
         
@@ -251,19 +251,30 @@
         // Verificar si ya está autenticado
         async function checkExistingAuth() {
             try {
+                console.log('🔍 Verificando sesión existente...');
+                
                 const response = await fetch(`${BACKEND_URL}/auth/check`, {
-                    credentials: 'include'
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('📋 Estado de autenticación:', data.data.authenticated);
+                    
                     if (data.data.authenticated) {
-                        // Ya está autenticado, redirigir al index
+                        console.log('✅ Sesión activa encontrada, redirigiendo...');
                         window.location.href = 'index.html';
+                        return true;
                     }
                 }
+                return false;
             } catch (error) {
-                console.log('No hay sesión activa');
+                console.log('🚫 Error al verificar sesión:', error);
+                return false;
             }
         }
 
@@ -283,6 +294,8 @@
             hideMessages();
             
             try {
+                console.log('🔐 Intentando login...');
+                
                 const response = await fetch(`${BACKEND_URL}/auth/login`, {
                     method: 'POST',
                     headers: {
@@ -298,7 +311,7 @@
                 const data = await response.json();
                 
                 if (response.ok && data.status === 'success') {
-                    showMessage(successMessage, `✅ Bienvenido ${data.data.user.name}`, false);
+                    showMessage(successMessage, `✅ ${data.message}`, false);
                     
                     // Redirigir después de 1 segundo
                     setTimeout(() => {
@@ -307,18 +320,21 @@
                     
                 } else {
                     showMessage(errorMessage, data.message || 'Error al iniciar sesión');
+                    setLoading(false);
                 }
                 
             } catch (error) {
-                console.error('Error de conexión:', error);
+                console.error('💥 Error de conexión:', error);
                 showMessage(errorMessage, 'Error de conexión con el servidor');
-            } finally {
                 setLoading(false);
             }
         });
 
         // Verificar autenticación al cargar la página
-        document.addEventListener('DOMContentLoaded', checkExistingAuth);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página de login cargada');
+            checkExistingAuth();
+        });
 
         // Limpiar mensajes al cambiar los inputs
         document.getElementById('username').addEventListener('input', hideMessages);
@@ -330,6 +346,12 @@
                 loginForm.dispatchEvent(new Event('submit'));
             }
         });
+
+        // Auto-completar credenciales para testing (solo en desarrollo)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+        }
     </script>
 </body>
 </html>
