@@ -1,11 +1,15 @@
-// server.js - VERSIÓN SIMPLIFICADA CON 1 USUARIO ADMIN
+// server.js
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
+const zlib = require('zlib');
 const stream = require('stream');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
@@ -14,9 +18,6 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// ==================== CONFIGURACIÓN BÁSICA ====================
-app.set('trust proxy', 1);
 
 // ==================== CONFIGURACIÓN DE SESIONES ====================
 app.use(session({
@@ -52,30 +53,119 @@ const requireAuth = (req, res, next) => {
     res.status(401).json({ 
       status: 'error',
       error: 'unauthorized',
-      message: 'Debe iniciar sesión para acceder a este recurso'
+      message: 'Debe iniciar sesión para acceder a este recurso',
+      code: 'SESSION_REQUIRED'
     });
   }
 };
 
-// ==================== CONFIGURACIÓN CORS ====================
-const corsOptions = {
-  origin: [
-    'https://yieyoo.github.io',
-    'https://yieyoo.github.io/CONTROL_OPERATIVO/',
-    'http://localhost:3000',
-    'http://localhost',
-    'https://control-operativo-1.onrender.com'
-  ],
-  credentials: true, // CRÍTICO para las cookies de sesión
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-  optionsSuccessStatus: 200
+// Middleware para compatibilidad con API Key existente
+const authenticate = (req, res, next) => {
+  // Si hay sesión de usuario, permitir acceso
+  if (req.session.user) {
+    return next();
+  }
+  
+  // Si no hay sesión pero hay API key válida, permitir acceso (para compatibilidad)
+  const apiKey = req.headers['x-api-key'];
+  if (apiKey && apiKey === process.env.API_KEY) {
+    return next();
+  }
+
+  // Si no hay ninguna autenticación
+  if (!apiKey) {
+    return res.status(401).json({
+      status: 'error',
+      error: 'unauthorized',
+      message: 'Se requiere autenticación (sesión o API Key)',
+      code: 'AUTH_REQUIRED',
+      timestamp: new Date().toISOString(),
+      path: req.path
+    });
+  }
+
+  // API Key inválida
+  console.warn(`Intento de acceso con API Key inválida desde IP: ${req.ip}`);
+  return res.status(401).json({
+    status: 'error',
+    error: 'unauthorized',
+    message: 'API Key inválida',
+    code: 'INVALID_API_KEY',
+    timestamp: new Date().toISOString()
+  });
 };
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+// ==================== CONFIGURACIÓN DE SEGURIDAD ====================
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
+      imgSrc: ["'self'", 'data:', 'res.cloudinary.com'],
+      connectSrc: ["'self'", 'https://api.cloudinary.com'],
+      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"]
+    }
+  },
+  hsts: {
+    maxAge: 63072000,
+    includeSubDomains: true,
+    preload: true
+  },
+  frameguard: {
+    action: 'deny'
+  },
+  referrerPolicy: {
+    policy: 'same-origin'
+  }
+}));
 
-// Middleware para deshabilitar caché
+app.use(morgan('combined', {
+  skip: (req, res) => req.path === '/api/health' || req.path === '/favicon.ico',
+  stream: process.env.NODE_ENV === 'production' 
+    ? fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) 
+    : process.stdout
+}));
+
+app.set('trust proxy', 1);
+
+// ==================== CONFIGURACIÓN CORS ====================
+const allowedOrigins = [
+  'https://yieyoo.github.io',
+  'https://yieyoo.github.io/CONTROL_OPERATIVO/',
+  'http://localhost:3000',
+  'http://localhost',
+  'https://control-operativo-1.onrender.com'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin && process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.includes(origin) || 
+        (process.env.NODE_ENV === 'development' && !origin)) {
+      callback(null, true);
+    } else {
+      console.log('Origen bloqueado:', origin);
+      callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+  credentials: true, // IMPORTANTE para las cookies de sesión
+  optionsSuccessStatus: 200,
+  maxAge: 86400
+};
+
+// Middleware para deshabilitar caché globalmente
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
@@ -84,19 +174,31 @@ app.use((req, res, next) => {
   next();
 });
 
-// Ruta principal
-app.get('/', (req, res) => {
+app.get('/', cors({ origin: '*' }), (req, res) => {
   res.json({
     status: 'success',
     message: 'API de Gestión de Archivos PDF - INM',
-    version: '2.0.0',
-    requires_auth: true
+    version: '2.0.0'
   });
 });
 
+app.use('/api', cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 // Middlewares para parsear el cuerpo de las peticiones
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({
+  limit: '10mb',
+  inflate: true,
+  strict: true,
+  type: 'application/json'
+}));
+
+app.use(express.urlencoded({
+  extended: true,
+  limit: '10mb',
+  parameterLimit: 1000,
+  inflate: true
+}));
 
 // ==================== CONFIGURACIÓN CLOUDINARY ====================
 const validateCloudinaryConfig = () => {
@@ -113,7 +215,13 @@ const validateCloudinaryConfig = () => {
       cloud_name: process.env.CLOUD_NAME,
       api_key: process.env.CLOUD_API_KEY,
       api_secret: process.env.CLOUD_API_SECRET,
-      secure: true
+      secure: true,
+      private_cdn: false,
+      secure_distribution: null,
+      cdn_subdomain: true,
+      shorten: true,
+      sign_url: true,
+      api_proxy: process.env.PROXY_URL
     });
     console.log('✅ Cloudinary configurado correctamente');
     return true;
@@ -125,36 +233,99 @@ const validateCloudinaryConfig = () => {
 
 validateCloudinaryConfig();
 
+// ==================== RATE LIMITING ====================
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    return req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip;
+  },
+  handler: (req, res) => {
+    res.status(429).json({
+      status: 'error',
+      error: 'rate_limit_exceeded',
+      message: 'Demasiadas peticiones desde esta IP, por favor intente más tarde',
+      retryAfter: req.rateLimit.resetTime
+    });
+  }
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: {
+    status: 'error',
+    error: 'auth_rate_limit',
+    message: 'Demasiados intentos de login, intente más tarde'
+  }
+});
+
 // ==================== CONFIGURACIÓN MULTER ====================
 const memoryStorage = multer.memoryStorage();
 const pdfUpload = multer({
   storage: memoryStorage,
   limits: {
     fileSize: 15 * 1024 * 1024,
-    files: 1
+    files: 1,
+    fields: 5
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(new Error('Solo se permiten archivos PDF'), false);
+    const validMimeTypes = ['application/pdf', 'application/x-pdf'];
+    const validExtensions = ['.pdf'];
+    
+    if (validMimeTypes.includes(file.mimetype)) {
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (validExtensions.includes(ext)) {
+        return cb(null, true);
+      }
     }
+    cb(new Error('Solo se permiten archivos PDF (extensión .pdf)'), false);
   }
 }).single('file');
 
+// ==================== COMPRESIÓN ====================
+const shouldCompress = (req, res) => {
+  if (req.headers['x-no-compression']) return false;
+  return /json|text|javascript|pdf/.test(res.getHeader('Content-Type'));
+};
+
+app.use(require('compression')({
+  level: zlib.constants.Z_BEST_COMPRESSION,
+  threshold: 1024,
+  filter: shouldCompress
+}));
+
 // ==================== MANEJO DE ERRORES ====================
+class AppError extends Error {
+  constructor(message, statusCode, errorCode) {
+    super(message);
+    this.statusCode = statusCode || 500;
+    this.errorCode = errorCode || 'server_error';
+    this.isOperational = true;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
 const handleError = (error, req, res, next) => {
-  console.error(`🔴 Error:`, {
+  const statusCode = error.statusCode || 500;
+  const errorCode = error.errorCode || 'server_error';
+  
+  console.error(`🔴 [${new Date().toISOString()}] Error ${statusCode}:`, {
     message: error.message,
+    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     path: req.path,
     method: req.method,
     ip: req.ip,
     user: req.session.user?.username || 'anonymous'
   });
 
-  res.status(500).json({
+  res.status(statusCode).json({
     status: 'error',
-    message: error.message
+    error: errorCode,
+    message: error.message,
+    ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
   });
 };
 
@@ -164,41 +335,36 @@ const router = express.Router();
 // ==================== RUTAS DE AUTENTICACIÓN ====================
 
 // Ruta de login
-router.post('/auth/login', async (req, res, next) => {
+router.post('/auth/login', authLimiter, express.json(), async (req, res, next) => {
   try {
     const { username, password } = req.body;
     
     if (!username || !password) {
-      return res.status(400).json({ 
-        status: 'error',
-        message: 'Usuario y contraseña son requeridos' 
-      });
+      throw new AppError('Usuario y contraseña son requeridos', 400, 'missing_credentials');
     }
     
     const user = authorizedUsers.find(u => u.username === username);
     
     if (user && await bcrypt.compare(password, user.password)) {
-      // Crear sesión
+      // No enviar la contraseña en la sesión
       const userSession = { ...user };
       delete userSession.password;
       
       req.session.user = userSession;
       
-      console.log(`✅ Login exitoso: ${user.name} desde IP: ${req.ip}`);
+      console.log(`✅ Login exitoso: ${user.name} (${user.username}) desde IP: ${req.ip}`);
       
       res.json({ 
         status: 'success',
         message: `Bienvenido ${user.name}`,
         data: {
-          user: userSession
+          user: userSession,
+          session_id: req.sessionID
         }
       });
     } else {
-      console.log(`❌ Intento de login fallido para usuario: ${username}`);
-      res.status(401).json({ 
-        status: 'error',
-        message: 'Usuario o contraseña incorrectos'
-      });
+      console.warn(`❌ Intento de login fallido para usuario: ${username} desde IP: ${req.ip}`);
+      throw new AppError('Usuario o contraseña incorrectos', 401, 'invalid_credentials');
     }
   } catch (error) {
     next(error);
@@ -206,24 +372,25 @@ router.post('/auth/login', async (req, res, next) => {
 });
 
 // Ruta de logout
-router.post('/auth/logout', (req, res) => {
-  const username = req.session.user?.username || 'unknown';
-  
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ 
-        status: 'error',
-        message: 'Error al cerrar sesión' 
+router.post('/auth/logout', (req, res, next) => {
+  try {
+    const username = req.session.user?.username || 'unknown';
+    
+    req.session.destroy((err) => {
+      if (err) {
+        throw new AppError('Error al cerrar sesión', 500, 'logout_error');
+      }
+      
+      console.log(`✅ Logout exitoso: ${username} desde IP: ${req.ip}`);
+      
+      res.json({ 
+        status: 'success', 
+        message: 'Sesión cerrada correctamente'
       });
-    }
-    
-    console.log(`✅ Logout exitoso: ${username}`);
-    
-    res.json({ 
-      status: 'success', 
-      message: 'Sesión cerrada correctamente'
     });
-  });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Verificar autenticación
@@ -237,22 +404,33 @@ router.get('/auth/check', (req, res) => {
   });
 });
 
-// ==================== RUTAS DE ARCHIVOS ====================
+// ==================== RUTAS EXISTENTES (MODIFICADAS PARA USAR SESIONES) ====================
 
 // Ruta de salud
-router.get('/health', requireAuth, async (req, res) => {
+router.get('/health', async (req, res) => {
   const healthcheck = {
-    status: 'healthy',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    user: req.session.user.username
+    version: '2.0.0',
+    user: req.session.user?.username || 'anonymous',
+    authenticated: !!req.session.user,
+    checks: {
+      memoryUsage: process.memoryUsage(),
+      cloudinary: 'active',
+      database: 'n/a'
+    }
   };
 
   try {
     await cloudinary.api.ping();
-    res.json(healthcheck);
+    res.json({
+      ...healthcheck,
+      status: 'healthy',
+      dbStatus: 'connected'
+    });
   } catch (error) {
     healthcheck.status = 'degraded';
+    healthcheck.dbStatus = 'disconnected';
     healthcheck.error = error.message;
     res.status(503).json(healthcheck);
   }
@@ -260,16 +438,20 @@ router.get('/health', requireAuth, async (req, res) => {
 
 // Función para subir archivos
 const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null) => {
-  if (!file) throw new Error('No se ha subido ningún archivo');
+  if (!file) throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
   
   const originalName = path.parse(file.originalname).name.replace(/[^\w- ]/gi, '') + '.pdf';
-  
+  if (!/^[\w- ]+\.pdf$/i.test(originalName)) {
+    throw new AppError('El nombre del archivo contiene caracteres no permitidos', 400, 'invalid_filename');
+  }
+
   const uploadOptions = {
     resource_type: 'raw',
     folder: `${estado}/${tipoDocumento}`,
     format: 'pdf',
     type: 'upload',
     access_mode: 'public',
+    transformation: [{ quality: 'auto', fetch_format: 'auto' }],
     filename_override: originalName,
     unique_filename: false,
     overwrite: true,
@@ -279,8 +461,16 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
       custom: {
         estado: estado,
         tipo_documento: tipoDocumento,
+        uploaded_by: req.session.user?.username || 'api',
         ...(tituloDocumento && { titulo_documento: tituloDocumento })
       }
+    },
+    responsive_breakpoints: {
+      create_derived: false,
+      bytes_step: 20000,
+      min_width: 200,
+      max_width: 1000,
+      transformation: { crop: 'limit' }
     }
   };
 
@@ -297,42 +487,45 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
       ).catch(reject);
     });
   } catch (error) {
-    throw new Error(`Error al subir a Cloudinary: ${error.message}`);
+    throw new AppError(`Error al subir a Cloudinary: ${error.message}`, 502, 'cloudinary_error');
   }
 };
 
-// Ruta para subir archivos
-router.post('/upload', requireAuth, (req, res, next) => {
+// Ruta para subir archivos (ahora usa sesiones O API Key)
+router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
     try {
       if (err) {
         if (err.code === 'LIMIT_FILE_SIZE') {
-          throw new Error('El archivo excede el límite de 15MB');
+          throw new AppError('El archivo excede el límite de 15MB', 413, 'file_too_large');
         }
-        throw new Error(err.message);
+        throw new AppError(err.message, 400, 'upload_error');
       }
 
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
       const tituloDocumento = req.body.titulo_documento || null;
-      const uploadedBy = req.session.user.username;
       
       const result = await processUpload(req.file, estado, tipoDocumento, tituloDocumento);
 
-      console.log(`📁 Archivo subido por ${uploadedBy}: ${result.original_filename}`);
+      console.log(`📁 Archivo subido por: ${req.session.user?.username || 'api'}`);
 
       res.status(201).json({
         status: 'success',
-        message: 'Archivo subido correctamente',
         data: {
           url: result.secure_url,
           public_id: result.public_id,
           filename: result.original_filename,
           estado: estado,
           tipo_documento: tipoDocumento,
+          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
+          download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
           uploaded_at: result.created_at,
-          uploaded_by: uploadedBy,
+          uploaded_by: req.session.user?.username || 'api',
           size: result.bytes,
+          pages: result.pages,
+          format: result.format,
+          etag: result.etag,
           ...(tituloDocumento && { titulo_documento: tituloDocumento })
         }
       });
@@ -342,13 +535,27 @@ router.post('/upload', requireAuth, (req, res, next) => {
   });
 });
 
-// Ruta para eliminar archivos
-router.delete('/delete', requireAuth, async (req, res, next) => {
+// Ruta para eliminar archivos (ahora usa sesiones O API Key)
+router.delete('/delete', authenticate, async (req, res, next) => {
   try {
     const { public_id, estado, tipo_documento } = req.body;
     
     if (!public_id) {
-      throw new Error('public_id es requerido');
+      throw new AppError('public_id es requerido', 400, 'missing_public_id');
+    }
+
+    const expectedPrefix = `${estado}/${tipo_documento}/`;
+    if (estado && tipo_documento && !public_id.startsWith(expectedPrefix)) {
+      throw new AppError('No tienes permiso para eliminar este archivo', 403, 'forbidden');
+    }
+
+    try {
+      await cloudinary.api.resource(public_id, { resource_type: 'raw' });
+    } catch (error) {
+      if (error.http_code === 404) {
+        throw new AppError('Archivo no encontrado', 404, 'not_found');
+      }
+      throw error;
     }
 
     const result = await cloudinary.uploader.destroy(public_id, {
@@ -357,45 +564,65 @@ router.delete('/delete', requireAuth, async (req, res, next) => {
     });
 
     if (result.result !== 'ok') {
-      throw new Error('Error al eliminar el archivo');
+      throw new AppError('Error al eliminar el archivo', 500, 'delete_failed');
     }
 
-    console.log(`🗑️ Archivo eliminado por ${req.session.user.username}: ${public_id}`);
+    console.log(`🗑️ Archivo eliminado por: ${req.session.user?.username || 'api'}`);
 
     res.json({
       status: 'success',
-      message: 'Archivo eliminado correctamente'
+      message: 'Archivo eliminado',
+      data: {
+        public_id: public_id,
+        estado: estado,
+        tipo_documento: tipo_documento,
+        deleted_by: req.session.user?.username || 'api',
+        deleted_at: new Date().toISOString(),
+        deletion_result: result
+      }
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Ruta para listar archivos
-router.get('/archivos/:estado/:tipoDocumento', requireAuth, async (req, res, next) => {
+// Ruta para listar archivos (ahora usa sesiones O API Key)
+router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
     const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
 
+    // Agregar timestamp para evitar caché
     const result = await cloudinary.api.resources({
       type: 'upload',
       prefix: `${estado}/${tipoDocumento}/`,
       resource_type: 'raw',
       max_results: 500,
-      context: true
+      context: true,
+      tags: true,
+      moderations: true,
+      timestamp: Date.now() // Cache busting
     });
 
     const archivos = result.resources.map(resource => {
       const originalName = resource.context?.custom?.original_filename || 
                          path.parse(resource.public_id).name + '.pdf';
       return {
-        url: resource.secure_url,
+        url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
         public_id: resource.public_id,
         filename: originalName,
         estado: estado,
         tipo_documento: tipoDocumento,
+        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true&_=${Date.now()}`,
+        download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
         uploaded_at: resource.created_at,
         size: resource.bytes,
+        format: resource.format,
+        width: resource.width,
+        height: resource.height,
+        etag: resource.etag,
+        tags: resource.tags,
+        moderation: resource.moderation,
         ...(resource.context?.custom?.titulo_documento && { 
           titulo_documento: resource.context.custom.titulo_documento 
         })
@@ -404,7 +631,12 @@ router.get('/archivos/:estado/:tipoDocumento', requireAuth, async (req, res, nex
 
     res.json({
       status: 'success',
-      data: archivos
+      data: archivos,
+      count: archivos.length,
+      estado: estado,
+      tipo_documento: tipoDocumento,
+      requested_by: req.session.user?.username || 'api',
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
     next(error);
@@ -415,59 +647,115 @@ router.get('/archivos/:estado/:tipoDocumento', requireAuth, async (req, res, nex
 
 let tituloGlobal = process.env.TITULO_GLOBAL_INICIAL || 'Plantilla de Personal - INM';
 
-// Ruta para guardar título global
-router.post('/guardar-titulo-global', requireAuth, async (req, res, next) => {
+// Ruta para guardar título global (ahora usa sesiones O API Key)
+router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
   try {
     const { titulo } = req.body;
     
     if (!titulo || typeof titulo !== 'string') {
-      throw new Error('Título válido es requerido');
+      throw new AppError('Título válido es requerido', 400, 'missing_titulo');
     }
 
+    // Actualizar en memoria
     tituloGlobal = titulo;
 
+    // También puedes guardar en Cloudinary como metadata si lo prefieres
+    try {
+      const recursos = await cloudinary.api.resources({
+        type: 'upload',
+        resource_type: 'raw',
+        max_results: 500,
+        context: true
+      });
+
+      const plantillas = recursos.resources.filter(
+        res => res.public_id.includes('/plantilla_personal/')
+      );
+
+      // Actualizar metadata en cada archivo encontrado
+      await Promise.all(plantillas.map(async (resource) => {
+        const originalName = resource.context?.custom?.original_filename || 'plantilla.pdf';
+        await cloudinary.uploader.explicit(resource.public_id, {
+          type: 'upload',
+          resource_type: 'raw',
+          context: `titulo_documento=${titulo}|original_filename=${originalName}`
+        });
+      }));
+    } catch (cloudinaryError) {
+      console.warn('No se pudo actualizar metadata en Cloudinary:', cloudinaryError.message);
+    }
+
     res.json({
       status: 'success',
-      message: 'Título global guardado correctamente'
+      message: 'Título global guardado correctamente',
+      data: {
+        titulo: titulo,
+        updated_by: req.session.user?.username || 'api',
+        updated_at: new Date().toISOString()
+      }
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Ruta para obtener título global
-router.get('/obtener-titulo-global', requireAuth, async (req, res, next) => {
+// Ruta para obtener título global (ahora usa sesiones O API Key)
+router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
   try {
+    // Primero intenta obtener de Cloudinary (metadata del primer archivo de plantilla encontrado)
+    try {
+      const recursos = await cloudinary.api.resources({
+        type: 'upload',
+        resource_type: 'raw',
+        max_results: 1,
+        context: true,
+        timestamp: Date.now() // Cache busting
+      });
+
+      if (recursos.resources.length > 0 && recursos.resources[0].context?.custom?.titulo_documento) {
+        tituloGlobal = recursos.resources[0].context.custom.titulo_documento;
+      }
+    } catch (cloudinaryError) {
+      console.warn('Error al buscar en Cloudinary:', cloudinaryError.message);
+    }
+
     res.json({
       status: 'success',
-      titulo: tituloGlobal
+      titulo: tituloGlobal,
+      source: 'memory',
+      requested_by: req.session.user?.username || 'api',
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Ruta de ping
+// Ruta de ping para Render
 router.get('/render-ping', (req, res) => {
+  const clientIP = req.headers['x-forwarded-for'] || req.ip;
+  const user = req.session.user?.username || 'anonymous';
+  
+  console.log(`📡 Ping recibido desde IP: ${clientIP} - Usuario: ${user}`);
+  
   res.status(200).json({
     status: "active",
     timestamp: new Date().toISOString(),
-    user: req.session.user?.username || 'anonymous',
-    authenticated: !!req.session.user
+    clientIP: clientIP,
+    user: user,
+    authenticated: !!req.session.user,
+    uptime: process.uptime()
   });
 });
 
 // ==================== CONFIGURACIÓN FINAL ====================
 
 // Montar rutas
-app.use('/api', router);
+app.use('/api', apiLimiter, router);
 
 // Manejo de rutas no encontradas
 app.use((req, res, next) => {
-  res.status(404).json({
-    status: 'error',
-    message: `Ruta no encontrada: ${req.method} ${req.path}`
-  });
+  next(new AppError(`Ruta no encontrada: ${req.method} ${req.path}`, 404, 'not_found'));
 });
 
 // Middleware de errores
@@ -475,18 +763,34 @@ app.use(handleError);
 
 // Iniciar servidor
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Servidor INM ejecutándose en puerto ${PORT}`);
-  console.log(`🔐 Sistema de autenticación activado - 1 usuario admin`);
+  console.log(`🚀 Servidor en puerto ${PORT}`);
+  console.log(`🌍 Modo: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔐 Sistema de autenticación por sesiones ACTIVADO`);
+  console.log(`✅ CORS configurado para los siguientes orígenes:`, allowedOrigins);
   console.log(`👤 Usuario: admin / admin123`);
 });
 
 // Manejo de cierre
-process.on('SIGTERM', () => {
-  console.log('🛑 Cerrando servidor...');
-  server.close(() => {
-    console.log('✅ Servidor cerrado');
+const shutdown = async (signal) => {
+  console.log(`🛑 Recibido ${signal}, cerrando servidor...`);
+  try {
+    await new Promise((resolve) => server.close(resolve));
+    console.log('✅ Servidor cerrado correctamente');
     process.exit(0);
-  });
+  } catch (err) {
+    console.error('❌ Error al cerrar el servidor:', err);
+    process.exit(1);
+  }
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('unhandledRejection', (err) => {
+  console.error('⚠️ Unhandled Rejection:', err);
+});
+process.on('uncaughtException', (err) => {
+  console.error('⚠️ Uncaught Exception:', err);
+  shutdown('uncaughtException');
 });
 
 module.exports = { app, server };
