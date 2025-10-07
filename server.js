@@ -39,7 +39,7 @@ const authorizedUsers = [
   {
     id: 1,
     username: 'admin',
-    password: bcrypt.hashSync('admin123', 10),
+    password: bcrypt.hashSync('dgcor01', 10),
     name: 'Administrador INM',
     role: 'admin'
   }
