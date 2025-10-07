@@ -90,23 +90,6 @@ function addLogoutButton(user) {
             
             header.appendChild(logoutBtn);
         }
-
-        // Agregar info del usuario
-        const userInfo = document.createElement('div');
-        userInfo.style.position = 'fixed';
-        userInfo.style.top = '10px';
-        userInfo.style.right = '10px';
-        userInfo.style.background = '#f8f9fa';
-        userInfo.style.padding = '8px 12px';
-        userInfo.style.borderRadius = '4px';
-        userInfo.style.fontSize = '12px';
-        userInfo.style.border = '1px solid #ddd';
-        userInfo.style.zIndex = '1000';
-        userInfo.innerHTML = `
-            <strong>${user.name}</strong><br>
-            <small>${user.role}</small>
-        `;
-        document.body.appendChild(userInfo);
     }
 }
 
