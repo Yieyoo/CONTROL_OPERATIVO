@@ -21,6 +21,104 @@
     </style>
 </head>
 <body>
+    <!-- Agrega esto AL PRINCIPIO del body en tu index.html -->
+<script>
+// Verificar autenticación al cargar cualquier página
+async function checkAuth() {
+    try {
+        const response = await fetch('https://control-operativo-1.onrender.com/api/auth/check', {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            throw new Error('No autenticado');
+        }
+        
+        const data = await response.json();
+        
+        if (!data.data.authenticated) {
+            // No está autenticado, redirigir al login
+            window.location.href = 'login.html';
+            return null;
+        }
+        
+        console.log('✅ Usuario autenticado:', data.data.user.name);
+        return data.data.user;
+        
+    } catch (error) {
+        console.warn('Usuario no autenticado, redirigiendo al login...');
+        window.location.href = 'login.html';
+        return null;
+    }
+}
+
+// Función para cerrar sesión
+async function logout() {
+    try {
+        await fetch('https://control-operativo-1.onrender.com/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+    } finally {
+        window.location.href = 'login.html';
+    }
+}
+
+// Agregar botón de logout al header
+function addLogoutButton(user) {
+    const header = document.querySelector('header');
+    if (header) {
+        // Buscar si ya existe un botón de logout
+        let logoutBtn = document.getElementById('logoutButton');
+        
+        if (!logoutBtn) {
+            logoutBtn = document.createElement('button');
+            logoutBtn.id = 'logoutButton';
+            logoutBtn.innerHTML = '🚪 Cerrar Sesión';
+            logoutBtn.style.marginLeft = 'auto';
+            logoutBtn.style.marginRight = '20px';
+            logoutBtn.style.padding = '8px 15px';
+            logoutBtn.style.background = '#dc3545';
+            logoutBtn.style.color = 'white';
+            logoutBtn.style.border = 'none';
+            logoutBtn.style.borderRadius = '4px';
+            logoutBtn.style.cursor = 'pointer';
+            logoutBtn.style.fontSize = '14px';
+            logoutBtn.onclick = logout;
+            
+            header.appendChild(logoutBtn);
+        }
+
+        // Agregar info del usuario
+        const userInfo = document.createElement('div');
+        userInfo.style.position = 'fixed';
+        userInfo.style.top = '10px';
+        userInfo.style.right = '10px';
+        userInfo.style.background = '#f8f9fa';
+        userInfo.style.padding = '8px 12px';
+        userInfo.style.borderRadius = '4px';
+        userInfo.style.fontSize = '12px';
+        userInfo.style.border = '1px solid #ddd';
+        userInfo.style.zIndex = '1000';
+        userInfo.innerHTML = `
+            <strong>${user.name}</strong><br>
+            <small>${user.role}</small>
+        `;
+        document.body.appendChild(userInfo);
+    }
+}
+
+// Inicializar verificación de autenticación
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = await checkAuth();
+    if (user) {
+        addLogoutButton(user);
+        // El usuario está autenticado, puede ver la página normalmente
+    }
+});
+</script>
 
     <!-- Elementos de menú movidos fuera del header -->
     <div class="menu-overlay"></div>

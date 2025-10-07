@@ -1,4 +1,4 @@
-// server.js - VERSIÓN COMPLETA CON AUTENTICACIÓN
+// server.js - VERSIÓN COMPLETA CON AUTENTICACIÓN Y PERMISOS DIFERENCIADOS
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -79,7 +79,7 @@ const authorizedUsers = [
     name: 'Administrador Principal',
     role: 'admin',
     email: 'admin@inm.gob.mx',
-    permissions: ['upload', 'delete', 'view', 'manage_users', 'system_config']
+    permissions: ['upload', 'delete', 'view', 'manage_users', 'system_config', 'access_files']
   },
   {
     id: 2,
@@ -88,7 +88,7 @@ const authorizedUsers = [
     name: 'Diego Jiménez',
     role: 'user',
     email: 'diegojimher@yahoo.com.mx',
-    permissions: ['upload', 'delete', 'view']
+    permissions: ['upload', 'delete', 'view', 'access_files']
   },
   {
     id: 3,
@@ -97,7 +97,16 @@ const authorizedUsers = [
     name: 'Coordinador Regional',
     role: 'coordinator',
     email: 'coordinacion@inm.gob.mx',
-    permissions: ['upload', 'view', 'delete_own']
+    permissions: ['view'] // SOLO puede ver páginas normales, NO archivos
+  },
+  {
+    id: 4,
+    username: 'visor',
+    password: bcrypt.hashSync('visor123', 10),
+    name: 'Usuario Visor',
+    role: 'viewer',
+    email: 'visor@inm.gob.mx',
+    permissions: ['view'] // SOLO puede ver páginas normales
   }
 ];
 
@@ -142,6 +151,27 @@ const requirePermission = (permission) => {
       });
     }
   };
+};
+
+// ==================== VERIFICACIÓN DE ACCESO A ARCHIVOS ====================
+const canAccessFiles = (user) => {
+  // Solo estos usuarios pueden acceder al gestor de archivos
+  const allowedUsers = ['admin', 'diego'];
+  return allowedUsers.includes(user.username);
+};
+
+const requireFileAccess = (req, res, next) => {
+  if (req.session.user && canAccessFiles(req.session.user)) {
+    next();
+  } else {
+    res.status(403).json({ 
+      status: 'error',
+      error: 'forbidden',
+      message: 'No tienes permisos para acceder al gestor de archivos',
+      code: 'FILE_ACCESS_DENIED',
+      user: req.session.user?.username
+    });
+  }
 };
 
 // ==================== CONFIGURACIÓN CORS ====================
@@ -412,7 +442,8 @@ router.post('/auth/login', authLimiter, express.json(), async (req, res, next) =
         data: {
           user: userSession,
           session_id: req.sessionID,
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          can_access_files: canAccessFiles(userSession)
         }
       });
     } else {
@@ -451,13 +482,30 @@ router.post('/auth/logout', (req, res, next) => {
 
 // Verificar autenticación
 router.get('/auth/check', (req, res) => {
+  const canAccess = req.session.user ? canAccessFiles(req.session.user) : false;
+  
   res.json({ 
     status: 'success',
     data: {
       authenticated: !!req.session.user, 
       user: req.session.user || null,
+      can_access_files: canAccess,
       session_id: req.sessionID,
       timestamp: new Date().toISOString()
+    }
+  });
+});
+
+// Verificar específicamente acceso a archivos
+router.get('/auth/check-file-access', requireAuth, (req, res) => {
+  const canAccess = canAccessFiles(req.session.user);
+  
+  res.json({
+    status: 'success',
+    data: {
+      can_access_files: canAccess,
+      user: req.session.user,
+      message: canAccess ? 'Acceso permitido al gestor de archivos' : 'Acceso denegado al gestor de archivos'
     }
   });
 });
@@ -505,6 +553,7 @@ router.post('/auth/change-password', requireAuth, express.json(), async (req, re
 router.get('/admin/users', requireAdmin, (req, res) => {
   const usersSafe = authorizedUsers.map(user => {
     const { password, ...userSafe } = user;
+    userSafe.can_access_files = canAccessFiles(user);
     return userSafe;
   });
   
@@ -527,12 +576,15 @@ router.get('/admin/stats', requireAdmin, async (req, res, next) => {
       max_results: 1
     });
     
+    const usersWithFileAccess = authorizedUsers.filter(user => canAccessFiles(user));
+    
     res.json({
       status: 'success',
       data: {
         total_users: authorizedUsers.length,
+        users_with_file_access: usersWithFileAccess.length,
         total_files: recursos.total_count || 'N/A',
-        active_sessions: 'N/A', // Podrías implementar tracking
+        active_sessions: 'N/A',
         system_status: 'Operativo',
         cloudinary_status: 'Conectado',
         server_uptime: process.uptime(),
@@ -544,17 +596,18 @@ router.get('/admin/stats', requireAdmin, async (req, res, next) => {
   }
 });
 
-// ==================== RUTAS DE ARCHIVOS (PROTEGIDAS) ====================
+// ==================== RUTAS DE ARCHIVOS (SOLO USUARIOS AUTORIZADOS) ====================
 
-// Ruta de salud
-router.get('/health', async (req, res) => {
+// Ruta de salud (accesible para todos los autenticados)
+router.get('/health', requireAuth, async (req, res) => {
   const healthcheck = {
     status: 'healthy',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
     version: '2.0.0',
-    authentication: req.session.user ? 'authenticated' : 'anonymous',
-    user: req.session.user?.username || 'none',
+    authentication: 'authenticated',
+    user: req.session.user.username,
+    can_access_files: canAccessFiles(req.session.user),
     checks: {
       memoryUsage: process.memoryUsage(),
       cloudinary: 'active',
@@ -630,8 +683,10 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
   }
 };
 
+// ==================== RUTAS PROTEGIDAS DE ARCHIVOS (SOLO USUARIOS CON ACCESO) ====================
+
 // Ruta para subir archivos
-router.post('/upload', requireAuth, requirePermission('upload'), (req, res, next) => {
+router.post('/upload', requireAuth, requireFileAccess, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
     try {
       if (err) {
@@ -677,7 +732,7 @@ router.post('/upload', requireAuth, requirePermission('upload'), (req, res, next
 });
 
 // Ruta para eliminar archivos
-router.delete('/delete', requireAuth, requirePermission('delete'), async (req, res, next) => {
+router.delete('/delete', requireAuth, requireFileAccess, async (req, res, next) => {
   try {
     const { public_id, estado, tipo_documento } = req.body;
     const deletedBy = req.session.user.username;
@@ -729,7 +784,7 @@ router.delete('/delete', requireAuth, requirePermission('delete'), async (req, r
 });
 
 // Ruta para listar archivos con cache busting
-router.get('/archivos/:estado/:tipoDocumento', requireAuth, requirePermission('view'), async (req, res, next) => {
+router.get('/archivos/:estado/:tipoDocumento', requireAuth, requireFileAccess, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
     const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
@@ -792,7 +847,7 @@ router.get('/archivos/:estado/:tipoDocumento', requireAuth, requirePermission('v
 let tituloGlobal = process.env.TITULO_GLOBAL_INICIAL || 'Plantilla de Personal - INM';
 
 // Ruta para guardar título global
-router.post('/guardar-titulo-global', requireAuth, requirePermission('upload'), async (req, res, next) => {
+router.post('/guardar-titulo-global', requireAuth, requireFileAccess, async (req, res, next) => {
   try {
     const { titulo } = req.body;
     const updatedBy = req.session.user.username;
@@ -847,7 +902,7 @@ router.post('/guardar-titulo-global', requireAuth, requirePermission('upload'), 
 });
 
 // Ruta para obtener título global
-router.get('/obtener-titulo-global', requireAuth, async (req, res, next) => {
+router.get('/obtener-titulo-global', requireAuth, requireFileAccess, async (req, res, next) => {
   try {
     // Primero intenta obtener de Cloudinary (metadata del primer archivo de plantilla encontrado)
     try {
@@ -884,6 +939,7 @@ router.get('/obtener-titulo-global', requireAuth, async (req, res, next) => {
 router.get('/render-ping', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.ip;
   const user = req.session.user?.username || 'anonymous';
+  const canAccess = req.session.user ? canAccessFiles(req.session.user) : false;
   
   console.log(`📡 Ping recibido desde IP: ${clientIP} - Usuario: ${user} - ${new Date().toLocaleString()}`);
   
@@ -892,6 +948,7 @@ router.get('/render-ping', (req, res) => {
     timestamp: new Date().toISOString(),
     clientIP: clientIP,
     user: user,
+    can_access_files: canAccess,
     uptime: process.uptime(),
     authenticated: !!req.session.user
   });
@@ -916,6 +973,7 @@ const server = app.listen(PORT, () => {
   console.log(`🌍 Modo: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔐 Sistema de autenticación activado`);
   console.log(`👥 Usuarios configurados: ${authorizedUsers.length}`);
+  console.log(`📁 Usuarios con acceso a archivos: ${authorizedUsers.filter(u => canAccessFiles(u)).length}`);
   console.log(`✅ CORS configurado para: ${allowedOrigins.length} orígenes`);
 });
 
