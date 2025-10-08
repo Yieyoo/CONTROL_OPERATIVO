@@ -108,21 +108,28 @@
 
 <script>
     // Configuración
+// Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
 const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
 const API_KEY = 'Xhy2md57';
 const ESTADO = 'datos-nacionales';
-const TIPO_DOCUMENTO = 'estado_fuerza';
+const TIPO_DOCUMENTO = 'estado_fuerza'; // Asegúrate que coincida con el gestor
 const TITULO_DOCUMENTO = 'ANALÍTICO ESTADO FUERZA';
 
-// Configuración dinámica desde URL
+// Configuración dinámica desde URL (opcional)
 const params = new URLSearchParams(window.location.search);
-const ESTADO_FIJO = params.get('estado') || ESTADO;
-const TIPO_DOC_FIJO = params.get('tipo') || TIPO_DOCUMENTO;
-const TITULO_FINAL = params.get('titulo') || TITULO_DOCUMENTO;
+const estadoFromURL = params.get('estado');
+const tipoFromURL = params.get('tipo');
+const tituloFromURL = params.get('titulo');
 
+// Valores finales
+const ESTADO_FIJO = estadoFromURL || ESTADO;
+const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+
+// Variable para almacenar la URL del documento
 let documentoUrl = '';
 
-// Funciones de UI
+// Mostrar/ocultar loading
 function showLoading(show) {
     const loading = document.getElementById('loading');
     if (loading) {
@@ -130,6 +137,7 @@ function showLoading(show) {
     }
 }
 
+// Mostrar mensaje de error
 function showError(message) {
     const pdfError = document.getElementById('pdf-error');
     if (pdfError) {
@@ -139,12 +147,13 @@ function showError(message) {
     console.error(message);
 }
 
+// Ocultar errores
 function hideErrors() {
     const pdfError = document.getElementById('pdf-error');
     if (pdfError) pdfError.style.display = 'none';
 }
 
-// Funciones de menú
+// Función para abrir/cerrar el menú
 function toggleMenu() {
     const menu = document.querySelector('.menu');
     const overlay = document.querySelector('.menu-overlay');
@@ -154,23 +163,27 @@ function toggleMenu() {
     }
 }
 
+// Cerrar menú al hacer clic fuera
+document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+// Función para submenús
 function toggleSubmenu(event) {
     event.preventDefault();
-    const submenu = event.target.closest('.submenu');
-    if (submenu) {
-        document.querySelectorAll('.submenu.active').forEach(sub => {
-            if (sub !== submenu) sub.classList.remove('active');
-        });
-        submenu.classList.toggle('active');
-    }
+    document.querySelectorAll('.submenu.active').forEach(sub => {
+        if (sub !== event.target.closest('.submenu')) {
+            sub.classList.remove('active');
+        }
+    });
+    event.target.closest('.submenu').classList.toggle('active');
 }
 
-// Funciones de utilidad
+// Formatear fecha legible
 function formatDate(dateString) {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('es-MX', options);
 }
 
+// Formatear tamaño de archivo
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -179,6 +192,7 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// Mostrar información del archivo
 function showFileInfo(file) {
     const container = document.getElementById('file-info-container');
     const fileName = document.getElementById('file-name');
@@ -193,40 +207,42 @@ function showFileInfo(file) {
     }
 }
 
-function configurarDescargas() {
-    const descargarBtn = document.getElementById('descargar-documento');
-    if (descargarBtn) {
-        descargarBtn.onclick = function() {
-            if (documentoUrl) {
-                window.open(documentoUrl, '_blank');
-            }
-        };
-    }
-}
-
-// Función principal para cargar PDF
+// Cargar PDF desde Cloudinary
 async function cargarDocumentoPDF() {
     showLoading(true);
     hideErrors();
 
-    // Actualizar título
+    // Actualizar título de la página
     document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
     const tituloElement = document.getElementById('titulo-documento');
     if (tituloElement) tituloElement.textContent = TITULO_FINAL;
 
     try {
-        console.log(`Consultando: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
-        const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
-            headers: { 'x-api-key': API_KEY }
+        console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+        
+        // Añadir parámetro de cache buster
+        const cacheBuster = `?v=${Date.now()}`;
+        const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}${cacheBuster}`, {
+            headers: { 
+                'x-api-key': API_KEY,
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
         });
 
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+        }
 
         const result = await response.json();
-        console.log('Respuesta API:', result);
+        console.log('Respuesta completa de la API:', result);
 
-        if (!result?.data || result.data.length === 0) {
-            showError(`No se encontraron documentos de ${TITULO_FINAL}`);
+        if (!result.success) {
+            throw new Error(result.message || 'Error en la respuesta del servidor');
+        }
+
+        if (!result.data || result.data.length === 0) {
+            showError(`No se encontraron documentos de ${TITULO_FINAL} para ${ESTADO_FIJO}`);
             return;
         }
 
@@ -234,32 +250,50 @@ async function cargarDocumentoPDF() {
             new Date(b.uploaded_at) - new Date(a.uploaded_at)
         )[0];
 
+        console.log('Documento más reciente:', latestPDF);
+
+        // Guardar la URL para descargas
         documentoUrl = latestPDF.url;
+        
+        // Mostrar información del archivo
         showFileInfo(latestPDF);
         
+        // Configurar el visor de PDF con cache buster
         const pdfViewer = document.getElementById('pdf-viewer');
         if (pdfViewer) {
-            pdfViewer.src = latestPDF.url;
+            const pdfUrl = latestPDF.url + `?v=${Date.now()}`;
+            pdfViewer.src = pdfUrl;
+            
+            // Manejar eventos del iframe
+            pdfViewer.onload = () => {
+                console.log('PDF cargado correctamente en el iframe');
+                showLoading(false);
+            };
+            
+            pdfViewer.onerror = () => {
+                console.error('Error al cargar el PDF en el iframe');
+                showError('Error al cargar el PDF. Intentando abrir en nueva pestaña...');
+                showLoading(false);
+                // Intentar abrir en nueva pestaña como fallback
+                window.open(latestPDF.url, '_blank');
+            };
         }
 
     } catch (error) {
-        console.error('Error:', error);
-        showError(`Error al cargar: ${error.message}`);
-    } finally {
+        console.error('Error al cargar el documento:', error);
+        showError(`Error: ${error.message}`);
         showLoading(false);
     }
 }
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Inicializando página...');
+    console.log('Inicializando página Estado Fuerza...');
     
-    // Configurar eventos del menú
-    const overlay = document.querySelector('.menu-overlay');
-    if (overlay) {
-        overlay.addEventListener('click', toggleMenu);
-    }
+    // Cargar el documento PDF
+    cargarDocumentoPDF();
 
+    // Cerrar submenús al hacer clic en opción
     document.querySelectorAll('.submenu-list a').forEach(link => {
         link.addEventListener('click', () => {
             document.querySelectorAll('.submenu').forEach(sub => {
@@ -268,7 +302,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Cargar documento
-    cargarDocumentoPDF();
-    configurarDescargas();
+    // Botón de regresar
+    const regresarBtn = document.querySelector('.regresar-btn');
+    if (regresarBtn) {
+        regresarBtn.addEventListener('click', () => {
+            window.history.back();
+        });
+    }
 });
