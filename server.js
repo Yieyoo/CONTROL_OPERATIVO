@@ -11,91 +11,13 @@ const fs = require('fs');
 const { promisify } = require('util');
 const zlib = require('zlib');
 const stream = require('stream');
-const session = require('express-session');
-const bcrypt = require('bcryptjs');
 const pipeline = promisify(stream.pipeline);
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ==================== CONFIGURACIÓN DE SESIONES ====================
-app.use(session({
-  name: 'control_operativo_sid',
-  secret: process.env.SESSION_SECRET || 'clave-super-secreta-control-operativo-inm-2024',
-  resave: true,
-  saveUninitialized: false,
-  cookie: { 
-    secure: true, // Siempre true en Render (HTTPS)
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 horas
-    sameSite: 'none' // Importante para cross-origin
-  },
-  rolling: true
-}));
-
-// ==================== USUARIOS AUTORIZADOS ====================
-const authorizedUsers = [
-  {
-    id: 1,
-    username: 'admin',
-    password: bcrypt.hashSync('dgcor01', 10),
-    name: 'Administrador INM',
-    role: 'admin'
-  }
-];
-
-// ==================== MIDDLEWARES DE AUTENTICACIÓN ====================
-const requireAuth = (req, res, next) => {
-  if (req.session.user) {
-    next();
-  } else {
-    res.status(401).json({ 
-      status: 'error',
-      error: 'unauthorized',
-      message: 'Debe iniciar sesión para acceder a este recurso',
-      code: 'SESSION_REQUIRED'
-    });
-  }
-};
-
-// Middleware para compatibilidad con API Key existente
-const authenticate = (req, res, next) => {
-  // Si hay sesión de usuario, permitir acceso
-  if (req.session.user) {
-    return next();
-  }
-  
-  // Si no hay sesión pero hay API key válida, permitir acceso (para compatibilidad)
-  const apiKey = req.headers['x-api-key'];
-  if (apiKey && apiKey === process.env.API_KEY) {
-    return next();
-  }
-
-  // Si no hay ninguna autenticación
-  if (!apiKey) {
-    return res.status(401).json({
-      status: 'error',
-      error: 'unauthorized',
-      message: 'Se requiere autenticación (sesión o API Key)',
-      code: 'AUTH_REQUIRED',
-      timestamp: new Date().toISOString(),
-      path: req.path
-    });
-  }
-
-  // API Key inválida
-  console.warn(`Intento de acceso con API Key inválida desde IP: ${req.ip}`);
-  return res.status(401).json({
-    status: 'error',
-    error: 'unauthorized',
-    message: 'API Key inválida',
-    code: 'INVALID_API_KEY',
-    timestamp: new Date().toISOString()
-  });
-};
-
-// ==================== CONFIGURACIÓN DE SEGURIDAD ====================
+// Configuración de seguridad mejorada
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -131,7 +53,7 @@ app.use(morgan('combined', {
 
 app.set('trust proxy', 1);
 
-// ==================== CONFIGURACIÓN CORS ====================
+// Configuración CORS
 const allowedOrigins = [
   'https://yieyoo.github.io',
   'https://yieyoo.github.io/CONTROL_OPERATIVO/',
@@ -160,13 +82,14 @@ const corsOptions = {
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
-  credentials: true, // IMPORTANTE para las cookies de sesión
+  credentials: true,
   optionsSuccessStatus: 200,
   maxAge: 86400
 };
 
 // Middleware para deshabilitar caché globalmente
 app.use((req, res, next) => {
+  // Headers para evitar caché en TODAS las respuestas
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
@@ -178,7 +101,7 @@ app.get('/', cors({ origin: '*' }), (req, res) => {
   res.json({
     status: 'success',
     message: 'API de Gestión de Archivos PDF - INM',
-    version: '2.0.0'
+    version: '1.2.0'
   });
 });
 
@@ -200,7 +123,7 @@ app.use(express.urlencoded({
   inflate: true
 }));
 
-// ==================== CONFIGURACIÓN CLOUDINARY ====================
+// Configuración de Cloudinary
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
   const missingVars = requiredVars.filter(varName => !process.env[varName]);
@@ -233,7 +156,7 @@ const validateCloudinaryConfig = () => {
 
 validateCloudinaryConfig();
 
-// ==================== RATE LIMITING ====================
+// Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: process.env.NODE_ENV === 'production' ? 100 : 1000,
@@ -252,17 +175,7 @@ const apiLimiter = rateLimit({
   }
 });
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: {
-    status: 'error',
-    error: 'auth_rate_limit',
-    message: 'Demasiados intentos de login, intente más tarde'
-  }
-});
-
-// ==================== CONFIGURACIÓN MULTER ====================
+// Configuración de Multer para PDFs
 const memoryStorage = multer.memoryStorage();
 const pdfUpload = multer({
   storage: memoryStorage,
@@ -285,7 +198,7 @@ const pdfUpload = multer({
   }
 }).single('file');
 
-// ==================== COMPRESIÓN ====================
+// Compresión GZIP
 const shouldCompress = (req, res) => {
   if (req.headers['x-no-compression']) return false;
   return /json|text|javascript|pdf/.test(res.getHeader('Content-Type'));
@@ -297,7 +210,36 @@ app.use(require('compression')({
   filter: shouldCompress
 }));
 
-// ==================== MANEJO DE ERRORES ====================
+// Middleware de autenticación
+const authenticate = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  
+  if (!apiKey) {
+    return res.status(401).json({
+      status: 'error',
+      error: 'unauthorized',
+      message: 'API Key no proporcionada',
+      code: 'MISSING_API_KEY',
+      timestamp: new Date().toISOString(),
+      path: req.path
+    });
+  }
+
+  if (apiKey !== process.env.API_KEY) {
+    console.warn(`Intento de acceso con API Key inválida desde IP: ${req.ip}`);
+    return res.status(401).json({
+      status: 'error',
+      error: 'unauthorized',
+      message: 'API Key inválida',
+      code: 'INVALID_API_KEY',
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  next();
+};
+
+// Manejo de errores
 class AppError extends Error {
   constructor(message, statusCode, errorCode) {
     super(message);
@@ -317,8 +259,7 @@ const handleError = (error, req, res, next) => {
     stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     path: req.path,
     method: req.method,
-    ip: req.ip,
-    user: req.session.user?.username || 'anonymous'
+    ip: req.ip
   });
 
   res.status(statusCode).json({
@@ -329,95 +270,27 @@ const handleError = (error, req, res, next) => {
   });
 };
 
-// ==================== RUTAS API ====================
+// Rutas API
 const router = express.Router();
-
-// ==================== RUTAS DE AUTENTICACIÓN ====================
-
-// Ruta de login
-router.post('/auth/login', authLimiter, express.json(), async (req, res, next) => {
-  try {
-    const { username, password } = req.body;
-    
-    if (!username || !password) {
-      throw new AppError('Usuario y contraseña son requeridos', 400, 'missing_credentials');
-    }
-    
-    const user = authorizedUsers.find(u => u.username === username);
-    
-    if (user && await bcrypt.compare(password, user.password)) {
-      // No enviar la contraseña en la sesión
-      const userSession = { ...user };
-      delete userSession.password;
-      
-      req.session.user = userSession;
-      
-      console.log(`✅ Login exitoso: ${user.name} (${user.username}) desde IP: ${req.ip}`);
-      
-      res.json({ 
-        status: 'success',
-        message: `Bienvenido ${user.name}`,
-        data: {
-          user: userSession,
-          session_id: req.sessionID
-        }
-      });
-    } else {
-      console.warn(`❌ Intento de login fallido para usuario: ${username} desde IP: ${req.ip}`);
-      throw new AppError('Usuario o contraseña incorrectos', 401, 'invalid_credentials');
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Ruta de logout
-router.post('/auth/logout', (req, res, next) => {
-  try {
-    const username = req.session.user?.username || 'unknown';
-    
-    req.session.destroy((err) => {
-      if (err) {
-        throw new AppError('Error al cerrar sesión', 500, 'logout_error');
-      }
-      
-      console.log(`✅ Logout exitoso: ${username} desde IP: ${req.ip}`);
-      
-      res.json({ 
-        status: 'success', 
-        message: 'Sesión cerrada correctamente'
-      });
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Verificar autenticación
-router.get('/auth/check', (req, res) => {
-  res.json({ 
-    status: 'success',
-    data: {
-      authenticated: !!req.session.user, 
-      user: req.session.user || null
-    }
-  });
-});
-
-// ==================== RUTAS EXISTENTES (MODIFICADAS PARA USAR SESIONES) ====================
 
 // Ruta de salud
 router.get('/health', async (req, res) => {
   const healthcheck = {
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    version: '2.0.0',
-    user: req.session.user?.username || 'anonymous',
-    authenticated: !!req.session.user,
+    version: '1.2.0',
     checks: {
       memoryUsage: process.memoryUsage(),
       cloudinary: 'active',
-      database: 'n/a'
+      database: 'n/a',
+      diskSpace: {
+        free: promisify(fs.statfs || (() => {}))('/')
+          .then(stats => stats.bfree * stats.bsize)
+          .catch(() => 'n/a'),
+        total: promisify(fs.statfs || (() => {}))('/')
+          .then(stats => stats.blocks * stats.bsize)
+          .catch(() => 'n/a')
+      }
     }
   };
 
@@ -461,7 +334,7 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
       custom: {
         estado: estado,
         tipo_documento: tipoDocumento,
-        uploaded_by: req.session.user?.username || 'api',
+        uploaded_by: 'api',
         ...(tituloDocumento && { titulo_documento: tituloDocumento })
       }
     },
@@ -491,7 +364,7 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
   }
 };
 
-// Ruta para subir archivos (ahora usa sesiones O API Key)
+// Ruta para subir archivos
 router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
     try {
@@ -508,8 +381,6 @@ router.post('/upload', authenticate, (req, res, next) => {
       
       const result = await processUpload(req.file, estado, tipoDocumento, tituloDocumento);
 
-      console.log(`📁 Archivo subido por: ${req.session.user?.username || 'api'}`);
-
       res.status(201).json({
         status: 'success',
         data: {
@@ -521,7 +392,6 @@ router.post('/upload', authenticate, (req, res, next) => {
           view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
           download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
           uploaded_at: result.created_at,
-          uploaded_by: req.session.user?.username || 'api',
           size: result.bytes,
           pages: result.pages,
           format: result.format,
@@ -535,7 +405,7 @@ router.post('/upload', authenticate, (req, res, next) => {
   });
 });
 
-// Ruta para eliminar archivos (ahora usa sesiones O API Key)
+// Ruta para eliminar archivos
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
     const { public_id, estado, tipo_documento } = req.body;
@@ -567,8 +437,6 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       throw new AppError('Error al eliminar el archivo', 500, 'delete_failed');
     }
 
-    console.log(`🗑️ Archivo eliminado por: ${req.session.user?.username || 'api'}`);
-
     res.json({
       status: 'success',
       message: 'Archivo eliminado',
@@ -576,7 +444,6 @@ router.delete('/delete', authenticate, async (req, res, next) => {
         public_id: public_id,
         estado: estado,
         tipo_documento: tipo_documento,
-        deleted_by: req.session.user?.username || 'api',
         deleted_at: new Date().toISOString(),
         deletion_result: result
       }
@@ -586,7 +453,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para listar archivos (ahora usa sesiones O API Key)
+// Ruta para listar archivos con cache busting
 router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
@@ -635,7 +502,6 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
       count: archivos.length,
       estado: estado,
       tipo_documento: tipoDocumento,
-      requested_by: req.session.user?.username || 'api',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -643,11 +509,12 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
   }
 });
 
-// ==================== RUTAS PARA TÍTULO GLOBAL ====================
+// ************ RUTAS PARA TÍTULO GLOBAL ************
 
+// Variable para almacenar el título global (en producción usa una base de datos)
 let tituloGlobal = process.env.TITULO_GLOBAL_INICIAL || 'Plantilla de Personal - INM';
 
-// Ruta para guardar título global (ahora usa sesiones O API Key)
+// Ruta para guardar título global
 router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
   try {
     const { titulo } = req.body;
@@ -660,6 +527,7 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
     tituloGlobal = titulo;
 
     // También puedes guardar en Cloudinary como metadata si lo prefieres
+    // Buscar todos los archivos de plantilla de personal para actualizar su metadata
     try {
       const recursos = await cloudinary.api.resources({
         type: 'upload',
@@ -690,7 +558,6 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
       message: 'Título global guardado correctamente',
       data: {
         titulo: titulo,
-        updated_by: req.session.user?.username || 'api',
         updated_at: new Date().toISOString()
       }
     });
@@ -699,7 +566,7 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para obtener título global (ahora usa sesiones O API Key)
+// Ruta para obtener título global
 router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
   try {
     // Primero intenta obtener de Cloudinary (metadata del primer archivo de plantilla encontrado)
@@ -723,7 +590,6 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
       status: 'success',
       titulo: tituloGlobal,
       source: 'memory',
-      requested_by: req.session.user?.username || 'api',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -731,24 +597,17 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta de ping para Render
 router.get('/render-ping', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.ip;
-  const user = req.session.user?.username || 'anonymous';
-  
-  console.log(`📡 Ping recibido desde IP: ${clientIP} - Usuario: ${user}`);
+  console.log(`📡 Ping recibido desde IP: ${clientIP} - ${new Date().toLocaleString()}`);
   
   res.status(200).json({
     status: "active",
     timestamp: new Date().toISOString(),
     clientIP: clientIP,
-    user: user,
-    authenticated: !!req.session.user,
     uptime: process.uptime()
   });
 });
-
-// ==================== CONFIGURACIÓN FINAL ====================
 
 // Montar rutas
 app.use('/api', apiLimiter, router);
@@ -765,9 +624,7 @@ app.use(handleError);
 const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`🌍 Modo: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔐 Sistema de autenticación por sesiones ACTIVADO`);
   console.log(`✅ CORS configurado para los siguientes orígenes:`, allowedOrigins);
-  console.log(`👤 Usuario: admin / admin123`);
 });
 
 // Manejo de cierre
@@ -794,3 +651,4 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = { app, server };
+
