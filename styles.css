@@ -537,7 +537,7 @@ nav.menu ul li a.active {
 /* Responsive */
 @media (max-width: 768px) {
     .mapa-container {
-        width: 95%;
+        width: 100%;
         padding: 1.5rem;
     }
     
@@ -770,7 +770,7 @@ nav.menu ul li a.active {
   }
 
   .mapa-container #map {
-    height: 169px;
+    height: 185px;
   }
 
   .logo-container {
