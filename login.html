@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Acceso - Sistema de Control Operativo INM</title>
     <style>
         * {
@@ -158,6 +161,16 @@
         .credential {
             margin: 5px 0;
         }
+        
+        .lockout-message {
+            color: #dc3545;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -188,18 +201,8 @@
             
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage"></div>
+            <div class="lockout-message" id="lockoutMessage"></div>
         </form>
-
-        <!-- Solo para desarrollo - Mostrar credenciales -->
-        <div class="user-credentials">
-            <h4>Credenciales del Sistema:</h4>
-            <div class="credential">
-                <strong>Usuario:</strong> admin
-            </div>
-            <div class="credential">
-                <strong>Contraseña:</strong> dgcor01
-            </div>
-        </div>
         
         <div class="system-info">
             <p><strong>Sistema restringido</strong></p>
@@ -214,27 +217,39 @@
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
+        const lockoutMessage = document.getElementById('lockoutMessage');
 
         // Credenciales válidas
         const VALID_USERNAME = 'admin';
         const VALID_PASSWORD = 'dgcor01';
+        
+        // Configuración de seguridad
+        const SECURITY_CONFIG = {
+            maxAttempts: 3,
+            lockoutTime: 5 * 60 * 1000, // 5 minutos
+            sessionDuration: 60 * 60 * 1000 // 1 hora
+        };
 
         // Mostrar/ocultar mensajes
         function showMessage(element, message, isError = true) {
             if (isError) {
-                errorMessage.textContent = message;
-                errorMessage.style.display = 'block';
+                element.textContent = message;
+                element.style.display = 'block';
+                if (element !== errorMessage) errorMessage.style.display = 'none';
+                if (element !== lockoutMessage) lockoutMessage.style.display = 'none';
                 successMessage.style.display = 'none';
             } else {
                 successMessage.textContent = message;
                 successMessage.style.display = 'block';
                 errorMessage.style.display = 'none';
+                lockoutMessage.style.display = 'none';
             }
         }
 
         function hideMessages() {
             errorMessage.style.display = 'none';
             successMessage.style.display = 'none';
+            lockoutMessage.style.display = 'none';
         }
 
         // Mostrar/ocultar loading
@@ -250,13 +265,61 @@
             }
         }
 
-        // Verificar si ya está autenticado
+        // Verificar seguridad (intentos fallidos)
+        function checkSecurity() {
+            const attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+            const lastAttempt = parseInt(localStorage.getItem('lastAttempt') || '0');
+            const now = Date.now();
+            
+            if (attempts >= SECURITY_CONFIG.maxAttempts && 
+                (now - lastAttempt) < SECURITY_CONFIG.lockoutTime) {
+                const remainingTime = Math.ceil((SECURITY_CONFIG.lockoutTime - (now - lastAttempt)) / 1000 / 60);
+                showMessage(lockoutMessage, `⏳ Demasiados intentos fallidos. Espere ${remainingTime} minutos.`);
+                disableLogin();
+                return false;
+            }
+            return true;
+        }
+
+        function recordFailedAttempt() {
+            const attempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
+            localStorage.setItem('loginAttempts', attempts.toString());
+            localStorage.setItem('lastAttempt', Date.now().toString());
+        }
+
+        function resetAttempts() {
+            localStorage.removeItem('loginAttempts');
+            localStorage.removeItem('lastAttempt');
+        }
+
+        function disableLogin() {
+            loginButton.disabled = true;
+            document.getElementById('username').disabled = true;
+            document.getElementById('password').disabled = true;
+        }
+
+        function enableLogin() {
+            loginButton.disabled = false;
+            document.getElementById('username').disabled = false;
+            document.getElementById('password').disabled = false;
+        }
+
+        // Verificar si ya está autenticado (con expiración)
         function checkExistingAuth() {
             const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-            if (isAuthenticated) {
+            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+            const now = Date.now();
+            
+            // Si hay sesión activa y no ha expirado, redirigir
+            if (isAuthenticated && (now - loginTime) < SECURITY_CONFIG.sessionDuration) {
                 console.log('✅ Sesión activa encontrada, redirigiendo...');
-                window.location.href = 'index.html';
+                // Usar replace para evitar que el botón "atrás" regrese al login
+                window.location.replace('index.html');
                 return true;
+            } else if (isAuthenticated) {
+                // Sesión expirada, limpiar
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('loginTime');
             }
             return false;
         }
@@ -264,6 +327,9 @@
         // Manejar el envío del formulario
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Verificar seguridad primero
+            if (!checkSecurity()) return;
             
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
@@ -281,25 +347,47 @@
                 if (username === VALID_USERNAME && password === VALID_PASSWORD) {
                     showMessage(successMessage, '✅ Credenciales correctas. Accediendo al sistema...', false);
                     
-                    // Guardar estado de autenticación
+                    // Guardar estado de autenticación y resetear intentos
+                    resetAttempts();
                     localStorage.setItem('authenticated', 'true');
+                    localStorage.setItem('loginTime', Date.now().toString());
                     
                     // Redirigir después de 1 segundo
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        // Usar replace para evitar que el botón "atrás" regrese al login
+                        window.location.replace('index.html');
                     }, 1000);
                     
                 } else {
-                    showMessage(errorMessage, '❌ Usuario o contraseña incorrectos');
+                    recordFailedAttempt();
+                    const attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+                    const remaining = SECURITY_CONFIG.maxAttempts - attempts;
+                    
+                    if (remaining > 0) {
+                        showMessage(errorMessage, 
+                            `❌ Credenciales incorrectas. ${remaining} intentos restantes.`);
+                    } else {
+                        checkSecurity(); // Esto mostrará el mensaje de bloqueo
+                    }
                     setLoading(false);
                 }
             }, 1000); // Simular tiempo de respuesta del servidor
         });
 
-        // Verificar autenticación al cargar la página
+        // Verificar autenticación y seguridad al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Página de login cargada');
+            
+            // Limpiar el formulario siempre
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            hideMessages();
+            
+            // Verificar si ya hay una sesión activa
             checkExistingAuth();
+            
+            // Verificar seguridad (bloqueos por intentos)
+            checkSecurity();
         });
 
         // Limpiar mensajes al cambiar los inputs
@@ -313,10 +401,27 @@
             }
         });
 
+        // Manejar cuando la página se carga desde cache (back/forward)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // La página viene del cache, verificar autenticación nuevamente
+                if (!checkExistingAuth()) {
+                    // Asegurarse de que el formulario esté limpio
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                    hideMessages();
+                    enableLogin();
+                }
+            }
+        });
+
         // Auto-completar credenciales para testing (solo en desarrollo)
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            document.getElementById('username').value = 'admin';
-            document.getElementById('password').value = 'dgcor01';
+            // Solo autocompletar si no hay intentos fallidos recientes
+            if (checkSecurity()) {
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = 'dgcor01';
+            }
         }
     </script>
 </body>
