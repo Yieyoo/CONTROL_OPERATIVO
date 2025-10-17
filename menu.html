@@ -1,13 +1,12 @@
-<!-- menu.html -->
-<!-- Elementos de menú movidos fuera del header -->
+<!-- menu.html - VERSIÓN SIMPLIFICADA -->
 <div class="menu-overlay"></div>
-<button class="menu-toggle" onclick="toggleMenu()">☰</button>
+<button class="menu-toggle">☰</button>
 <nav class="menu">
     <ul>
         <li><a href="index.html">Inicio</a></li>
 
         <li class="submenu">
-            <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+            <a href="javascript:void(0);">Datos Nacionales</a>
             <ul class="submenu-list">
                 <li><a href="datos_nacionales/datosindex.html">Datos Nacionales</a></li>
                 <li><a href="datos_nacionales/opcionesdatos/padronv.html">Padrón Vehicular</a></li>
@@ -18,15 +17,13 @@
                 <li><a href="datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
                 <li><a href="datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
                 <li><a href="construccion.html">Inmuebles</a></li>
-                <li><a href="construccion.html">Padron Vehicular</a></li>
-                <li><a href="gestion/archivos.html">Gestion de Archvios</a></li>
+                <li><a href="gestion/archivos.html">Gestion de Archivos</a></li>
             </ul>
         </li>
 
         <li class="submenu">
-            <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+            <a href="javascript:void(0);">Información de ORs</a>
             <ul class="submenu-list">
-                <!-- Lista de estados -->
                 <li><a href="estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                 <li><a href="estados/baja_california/baja_californiaindex.html">Baja California</a></li>
                 <li><a href="estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
@@ -62,74 +59,61 @@
             </ul>
         </li>
         
-        <li><a href="javascript:void(0);" onclick="logout()">Cerrar Sesión</a></li>
+        <li><a href="javascript:void(0);" class="logout-link">Cerrar Sesión</a></li>
     </ul>
 </nav>
 
 <script>
-// Funciones del menú
+// Script mínimo para el menú - solo las funciones esenciales
 function toggleMenu() {
     const menu = document.querySelector('.menu');
     const menuOverlay = document.querySelector('.menu-overlay');
-    menu.classList.toggle('active');
-    menuOverlay.classList.toggle('active');
+    if (menu && menuOverlay) {
+        menu.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+    }
 }
 
 function toggleSubmenu(event) {
     event.preventDefault();
     const submenu = event.target.closest('.submenu');
-    
-    if (submenu.classList.contains('active')) {
-        submenu.classList.remove('active');
-    } else {
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-        submenu.classList.add('active');
+    if (submenu) {
+        // Cerrar otros submenús
+        document.querySelectorAll('.submenu.active').forEach(sm => {
+            if (sm !== submenu) sm.classList.remove('active');
+        });
+        // Abrir/cerrar este submenú
+        submenu.classList.toggle('active');
     }
 }
 
-function closeAllSubmenus() {
-    const submenus = document.querySelectorAll('.submenu.active');
-    submenus.forEach(submenu => {
-        submenu.classList.remove('active');
-    });
-}
-
-// Configurar eventos cuando el menú se carga
+// Configuración básica de eventos
 document.addEventListener('DOMContentLoaded', function() {
-    // Cerrar el menú al hacer clic fuera de él
-    const menuOverlay = document.querySelector('.menu-overlay');
-    if (menuOverlay) {
-        menuOverlay.addEventListener('click', () => {
-            const menu = document.querySelector('.menu');
-            menu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-            closeAllSubmenus();
+    // Botón del menú
+    const menuToggle = document.querySelector('.menu-toggle');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', toggleMenu);
+    }
+    
+    // Submenús
+    const submenuToggles = document.querySelectorAll('.submenu > a');
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', toggleSubmenu);
+    });
+    
+    // Logout
+    const logoutLink = document.querySelector('.logout-link');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('loginTime');
+                window.location.href = 'login.html';
+            }
         });
     }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
-        }
-    });
-
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
-        });
-    });
+    
+    console.log('🎯 Menú inicializado correctamente');
 });
-
-// Función de logout
-function logout() {
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        localStorage.removeItem('authenticated');
-        localStorage.removeItem('loginTime');
-        window.location.href = 'login.html';
-    }
-}
 </script>
