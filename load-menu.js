@@ -1,4 +1,4 @@
-// load-menu.js - VERSIÓN CORREGIDA CON RUTAS DINÁMICAS
+// load-menu.js - VERSIÓN CORREGIDA CON NAVEGACIÓN FUNCIONAL
 class MenuLoader {
     static async loadMenu() {
         try {
@@ -60,9 +60,6 @@ class MenuLoader {
         
         if (!menuToggle || !menu || !menuOverlay) {
             console.error('❌ Elementos del menú no encontrados');
-            console.log('menu-toggle:', !!menuToggle);
-            console.log('.menu:', !!menu);
-            console.log('.menu-overlay:', !!menuOverlay);
             return;
         }
         
@@ -140,8 +137,13 @@ class MenuLoader {
     static setupMenuLinks() {
         const menuLinks = document.querySelectorAll('.menu a:not(.submenu > a)');
         
+        console.log(`🔍 Configurando ${menuLinks.length} enlaces del menú`);
+        
         menuLinks.forEach(link => {
-            link.addEventListener('click', () => {
+            link.addEventListener('click', (e) => {
+                console.log('🎯 Clic en enlace:', link.textContent, link.href);
+                
+                // Solo cerrar el menú, NO prevenir la navegación
                 const menu = document.querySelector('.menu');
                 const menuOverlay = document.querySelector('.menu-overlay');
                 
@@ -150,6 +152,8 @@ class MenuLoader {
                     menuOverlay.classList.remove('active');
                     this.closeAllSubmenus();
                 }
+                
+                // La navegación ocurre naturalmente después de esto
             });
         });
     }
@@ -212,7 +216,6 @@ class MenuLoader {
                         <a href="javascript:void(0);">Menú Simple</a>
                         <ul class="submenu-list">
                             <li><a href="login.html">Iniciar Sesión</a></li>
-                            <li><a href="#" onclick="alert('Menú completo no disponible')">Menú Completo</a></li>
                         </ul>
                     </li>
                 </ul>
