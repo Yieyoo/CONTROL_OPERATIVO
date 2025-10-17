@@ -124,6 +124,27 @@ body::before {
     width: 100%;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
+/* Para tablets */
+@media screen and (max-width: 768px) {
+    .linea-superior {
+        height: 25px;
+    }
+    
+    .linea-inferior {
+        height: 8px;
+    }
+}
+
+/* Para móviles pequeños */
+@media screen and (max-width: 480px) {
+    .linea-superior {
+        height: 20px;
+    }
+    
+    .linea-inferior {
+        height: 6px;
+    }
+}
 
 /* Ajustar el contenido para que no quede detrás del header */
 .titulo-personalizado {
