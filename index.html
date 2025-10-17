@@ -21,6 +21,19 @@
     </style>
 </head>
 <body> 
+     <script>
+    // Verificar si el usuario está logueado
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.href = 'login.html';
+    }
+    
+    // Función para cerrar sesión (agrégala donde quieras)
+    function logout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        window.location.href = 'login.html';
+    }
+</script>
 
     <!-- Elementos de menú movidos fuera del header -->
     <div class="menu-overlay"></div>
