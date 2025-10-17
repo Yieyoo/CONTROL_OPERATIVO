@@ -21,18 +21,45 @@
     </style>
 </head>
 <body> 
-     <script>
-    // Verificar si el usuario está logueado
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
+    <script>
+// VERIFICAR SI EL USUARIO ESTÁ AUTENTICADO
+async function checkAuth() {
+    try {
+        const response = await fetch('https://control-operativo-1.onrender.com/api/auth/check', {
+            method: 'GET',
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (!data.data.authenticated) {
+            window.location.href = 'login.html';
+        } else {
+            // Cargar datos del usuario
+            document.getElementById('userInfo').textContent = data.data.user?.username || 'Usuario';
+        }
+    } catch (error) {
+        console.error('Error:', error);
         window.location.href = 'login.html';
     }
-    
-    // Función para cerrar sesión (agrégala donde quieras)
-    function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
+}
+
+// FUNCIÓN PARA CERRAR SESIÓN
+async function logout() {
+    try {
+        await fetch('https://control-operativo-1.onrender.com/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+    } finally {
         window.location.href = 'login.html';
     }
+}
+
+// Verificar autenticación cuando carga la página
+document.addEventListener('DOMContentLoaded', checkAuth);
 </script>
 
     <!-- Elementos de menú movidos fuera del header -->

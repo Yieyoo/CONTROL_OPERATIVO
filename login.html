@@ -44,7 +44,7 @@
         .subtitle {
             color: #666;
             margin-bottom: 30px;
-            font-size: .7 rem;
+            font-size: 0.7rem; /* CORREGIDO: espacio eliminado */
         }
 
         .input-group {
@@ -194,10 +194,10 @@
         <div class="user-credentials">
             <h4>Credenciales del Sistema:</h4>
             <div class="credential">
-                <strong>Usuario:</strong>admin
+                <strong>Usuario:</strong> admin
             </div>
             <div class="credential">
-                <strong>Contraseña:</strong>dgcor01
+                <strong>Contraseña:</strong> dgcor01
             </div>
         </div>
         
@@ -248,37 +248,55 @@
             }
         }
 
-        // Verificar si ya está autenticado
+        // Verificación MEJORADA de sesión existente
         async function checkExistingAuth() {
             try {
                 console.log('🔍 Verificando sesión existente...');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 
                 const response = await fetch(`${BACKEND_URL}/auth/check`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    signal: controller.signal
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('📋 Estado de autenticación:', data.data.authenticated);
-                    
-                    if (data.data.authenticated) {
-                        console.log('✅ Sesión activa encontrada, redirigiendo...');
-                        window.location.href = 'index.html';
-                        return true;
-                    }
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    console.log('❌ Respuesta no OK del servidor:', response.status);
+                    return false;
                 }
+                
+                const data = await response.json();
+                console.log('📋 Respuesta del servidor:', data);
+                
+                // Verificación más robusta
+                if (data.status === 'success' && 
+                    data.data && 
+                    data.data.authenticated === true) {
+                    console.log('✅ Sesión activa encontrada, redirigiendo...');
+                    window.location.href = 'index.html';
+                    return true;
+                }
+                
                 return false;
+                
             } catch (error) {
-                console.log('🚫 Error al verificar sesión:', error);
+                if (error.name === 'AbortError') {
+                    console.log('⏰ Timeout al verificar sesión');
+                } else {
+                    console.log('🚫 Error al verificar sesión:', error.message);
+                }
                 return false;
             }
         }
 
-        // Manejar el envío del formulario
+        // Manejo MEJORADO del envío del formulario
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -296,17 +314,23 @@
             try {
                 console.log('🔐 Intentando login...');
                 
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                
                 const response = await fetch(`${BACKEND_URL}/auth/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'include',
+                    signal: controller.signal,
                     body: JSON.stringify({
                         username: username,
                         password: password
                     })
                 });
+                
+                clearTimeout(timeoutId);
                 
                 const data = await response.json();
                 
@@ -325,7 +349,13 @@
                 
             } catch (error) {
                 console.error('💥 Error de conexión:', error);
-                showMessage(errorMessage, 'Error de conexión con el servidor');
+                
+                if (error.name === 'AbortError') {
+                    showMessage(errorMessage, 'El servidor está tardando demasiado en responder');
+                } else {
+                    showMessage(errorMessage, 'Error de conexión con el servidor');
+                }
+                
                 setLoading(false);
             }
         });
@@ -350,7 +380,7 @@
         // Auto-completar credenciales para testing (solo en desarrollo)
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             document.getElementById('username').value = 'admin';
-            document.getElementById('password').value = 'admin123';
+            document.getElementById('password').value = 'dgcor01';
         }
     </script>
 </body>
