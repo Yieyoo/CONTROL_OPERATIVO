@@ -1,90 +1,99 @@
-// load-menu.js - VERSIÓN CON CORRECCIÓN AUTOMÁTICA DE RUTAS
+// load-menu.js - VERSIÓN CON DEBUGGING MEJORADO
 class MenuLoader {
     static async loadMenu() {
         try {
-            console.log('🔄 Cargando menú global...');
+            console.log('🔄 Iniciando carga del menú...');
             
+            // Obtener y verificar la ruta del menú
             const menuPath = this.getMenuPath();
-            console.log('📍 Ruta del menú:', menuPath);
+            console.log('📍 Ruta calculada del menú:', menuPath);
+            console.log('📁 URL completa:', window.location.origin + menuPath);
             
             const response = await fetch(menuPath);
             if (!response.ok) {
-                throw new Error(`Error ${response.status} al cargar menu.html`);
+                throw new Error(`HTTP ${response.status}: No se encontró menu.html en ${menuPath}`);
             }
             
             const menuHTML = await response.text();
-            this.injectMenu(menuHTML);
+            console.log('✅ menu.html cargado exitosamente');
             
-            console.log('✅ Menú cargado, configurando eventos...');
+            this.injectMenu(menuHTML);
             
             setTimeout(() => {
                 this.setupMenuEvents();
             }, 100);
             
         } catch (error) {
-            console.error('❌ Error:', error);
+            console.error('❌ Error crítico:', error);
+            console.log('🔧 Intentando cargar menú de respaldo...');
             this.loadFallbackMenu();
         }
     }
     
     static getMenuPath() {
         const currentPath = window.location.pathname;
+        console.log('🔍 Analizando ruta actual:', currentPath);
         
-        // Contar niveles de carpeta
-        const pathParts = currentPath.split('/').filter(part => 
-            part && part !== '' && !part.includes('.html')
-        );
-        const depth = pathParts.length;
+        // Dividir la ruta en partes
+        const allParts = currentPath.split('/').filter(part => part !== '');
+        console.log('📋 Todas las partes de la ruta:', allParts);
         
-        console.log('📊 Profundidad actual:', depth, 'carpetas');
+        // Filtrar solo carpetas (excluir archivos .html)
+        const folders = allParts.filter(part => !part.includes('.html'));
+        console.log('📂 Carpetas encontradas:', folders);
         
-        // Construir ruta al menú
+        const depth = folders.length;
+        console.log('📊 Profundidad calculada:', depth, 'carpetas');
+        
+        // Construir ruta relativa
         let menuPath = '';
         for (let i = 0; i < depth; i++) {
             menuPath += '../';
         }
         menuPath += 'menu.html';
         
+        console.log('🎯 Ruta final del menú:', menuPath);
         return menuPath;
     }
     
     static injectMenu(menuHTML) {
-        // Limpiar menús existentes
-        const oldMenu = document.querySelector('.menu');
-        const oldOverlay = document.querySelector('.menu-overlay');
-        const oldToggle = document.querySelector('.menu-toggle');
+        // Limpiar menús existentes de forma más agresiva
+        const elementsToRemove = document.querySelectorAll('.menu, .menu-overlay, .menu-toggle, nav, .menu-container');
+        elementsToRemove.forEach(element => element.remove());
         
-        if (oldMenu) oldMenu.remove();
-        if (oldOverlay) oldOverlay.remove();
-        if (oldToggle) oldToggle.remove();
-        
-        // Insertar nuevo menú
         document.body.insertAdjacentHTML('afterbegin', menuHTML);
+        console.log('📝 Menú inyectado en el DOM');
     }
     
     static setupMenuEvents() {
-        console.log('🔧 Configurando eventos...');
+        console.log('⚙️ Configurando eventos del menú...');
         
         const menuToggle = document.querySelector('.menu-toggle');
         const menu = document.querySelector('.menu');
         const menuOverlay = document.querySelector('.menu-overlay');
         
+        console.log('🔎 Elementos encontrados:', {
+            menuToggle: !!menuToggle,
+            menu: !!menu,
+            menuOverlay: !!menuOverlay
+        });
+        
         if (!menuToggle || !menu) {
-            console.error('❌ Elementos del menú no encontrados');
+            console.error('❌ No se pudieron encontrar los elementos del menú');
             return;
         }
         
-        // 1. CORREGIR RUTAS ANTES DE CONFIGURAR EVENTOS
+        // 1. Primero corregir todas las rutas
         this.fixAllMenuLinks();
         
-        // 2. Configurar toggle del menú
+        // 2. Configurar eventos básicos
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             menu.classList.toggle('active');
             if (menuOverlay) menuOverlay.classList.toggle('active');
+            console.log('🎯 Menú ' + (menu.classList.contains('active') ? 'abierto' : 'cerrado'));
         });
         
-        // 3. Cerrar menú con overlay
         if (menuOverlay) {
             menuOverlay.addEventListener('click', () => {
                 menu.classList.remove('active');
@@ -93,33 +102,36 @@ class MenuLoader {
             });
         }
         
-        // 4. Configurar submenús
+        // 3. Configurar submenús
         this.setupSubmenus();
         
-        // 5. Configurar logout
+        // 4. Configurar logout
         this.setupLogout();
         
-        console.log('✅ Menú completamente configurado');
+        console.log('✅ Todos los eventos configurados correctamente');
     }
     
-    /**
-     * ¡ESTA ES LA FUNCIÓN MÁS IMPORTANTE!
-     * Corrige todas las rutas del menú para que funcionen desde cualquier carpeta
-     */
     static fixAllMenuLinks() {
         const allLinks = document.querySelectorAll('.menu a[href]');
-        console.log(`🔗 Encontrados ${allLinks.length} enlaces para corregir`);
+        console.log(`🔗 Encontrados ${allLinks.length} enlaces en el menú`);
+        
+        let correctedCount = 0;
         
         allLinks.forEach(link => {
             const originalHref = link.getAttribute('href');
             
-            // Solo corregir enlaces relativos
             if (this.shouldFixLink(originalHref)) {
                 const correctedHref = this.fixLinkPath(originalHref);
-                link.setAttribute('href', correctedHref);
-                console.log(`🔄 ${originalHref} → ${correctedHref}`);
+                
+                if (correctedHref !== originalHref) {
+                    link.setAttribute('href', correctedHref);
+                    correctedCount++;
+                    console.log(`🔄 "${link.textContent.trim()}" : ${originalHref} → ${correctedHref}`);
+                }
             }
         });
+        
+        console.log(`📈 ${correctedCount} enlaces corregidos`);
     }
     
     static shouldFixLink(href) {
@@ -140,21 +152,11 @@ class MenuLoader {
         );
         const currentDepth = currentFolders.length;
         
-        // Contar carpetas en el enlace de destino
-        const linkFolders = originalHref.split('/').filter(folder => 
-            folder && folder !== '' && !folder.includes('.html')
-        );
-        const linkDepth = linkFolders.length;
+        console.log(`📍 Desde: ${currentPath} (${currentDepth} niveles)`);
         
-        // Calcular cuántos "../" necesitamos
-        const depthDifference = currentDepth - linkDepth;
-        
-        if (depthDifference <= 0) {
-            return originalHref; // No necesita corrección
-        }
-        
+        // Construir ruta corregida
         let correctedPath = '';
-        for (let i = 0; i < depthDifference; i++) {
+        for (let i = 0; i < currentDepth; i++) {
             correctedPath += '../';
         }
         correctedPath += originalHref;
@@ -164,6 +166,7 @@ class MenuLoader {
     
     static setupSubmenus() {
         const submenuToggles = document.querySelectorAll('.submenu > a');
+        console.log(`🎯 Configurando ${submenuToggles.length} submenús`);
         
         submenuToggles.forEach(toggle => {
             toggle.addEventListener('click', (e) => {
@@ -173,17 +176,15 @@ class MenuLoader {
                 const submenu = toggle.parentElement;
                 const isActive = submenu.classList.contains('active');
                 
-                // Cerrar todos los submenús
                 this.closeAllSubmenus();
                 
-                // Abrir este submenú si no estaba activo
                 if (!isActive) {
                     submenu.classList.add('active');
+                    console.log('📂 Submenú abierto:', toggle.textContent.trim());
                 }
             });
         });
         
-        // Cerrar submenús al hacer clic fuera
         document.addEventListener('click', () => {
             this.closeAllSubmenus();
         });
@@ -205,26 +206,9 @@ class MenuLoader {
             localStorage.removeItem('authenticated');
             localStorage.removeItem('loginTime');
             
-            // Redirigir al login con la ruta corregida
-            const loginPath = this.getCorrectedPath('login.html');
+            const loginPath = this.fixLinkPath('login.html');
             window.location.href = loginPath;
         }
-    }
-    
-    static getCorrectedPath(originalPath) {
-        const currentPath = window.location.pathname;
-        const currentFolders = currentPath.split('/').filter(folder => 
-            folder && folder !== '' && !folder.includes('.html')
-        );
-        const currentDepth = currentFolders.length;
-        
-        let correctedPath = '';
-        for (let i = 0; i < currentDepth; i++) {
-            correctedPath += '../';
-        }
-        correctedPath += originalPath;
-        
-        return correctedPath;
     }
     
     static closeAllSubmenus() {
@@ -234,16 +218,17 @@ class MenuLoader {
     }
     
     static loadFallbackMenu() {
-        console.log('🔄 Cargando menú de respaldo...');
+        console.log('🆘 Cargando menú de emergencia...');
         
         const fallbackMenu = `
             <div class="menu-overlay"></div>
             <button class="menu-toggle">☰</button>
             <nav class="menu">
                 <ul>
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="login.html">Iniciar Sesión</a></li>
-                    <li><a href="#" class="logout-link">Cerrar Sesión</a></li>
+                    <li><a href="index.html">🏠 Inicio</a></li>
+                    <li><a href="login.html">🔐 Iniciar Sesión</a></li>
+                    <li><a href="#" class="logout-link">🚪 Cerrar Sesión</a></li>
+                    <li><a href="#" onclick="location.reload()">🔄 Recargar Página</a></li>
                 </ul>
             </nav>
         `;
@@ -256,11 +241,14 @@ class MenuLoader {
     }
 }
 
-// Inicialización
+// Inicialización mejorada
+console.log('🚀 Script load-menu.js cargado');
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 DOM completamente cargado, iniciando menú...');
         MenuLoader.loadMenu();
     });
 } else {
+    console.log('📄 DOM ya está listo, iniciando menú...');
     MenuLoader.loadMenu();
 }
