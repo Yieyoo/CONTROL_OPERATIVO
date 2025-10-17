@@ -1,10 +1,14 @@
-// load-menu.js - VERSIÓN CORREGIDA CON SUBMENÚS
+// load-menu.js - VERSIÓN CORREGIDA CON RUTAS DINÁMICAS
 class MenuLoader {
     static async loadMenu() {
         try {
             console.log('🔄 Cargando menú...');
             
-            const response = await fetch('menu.html');
+            // Determinar la ruta correcta basada en la ubicación actual
+            const menuPath = this.getMenuPath();
+            console.log('📍 Ruta del menú:', menuPath);
+            
+            const response = await fetch(menuPath);
             if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
             
             const menuHTML = await response.text();
@@ -12,7 +16,7 @@ class MenuLoader {
             // Insertar el menú al inicio del body
             document.body.insertAdjacentHTML('afterbegin', menuHTML);
             
-            console.log('✅ Menú HTML cargado');
+            console.log('✅ Menú HTML cargado desde:', menuPath);
             
             // Pequeña pausa para que el DOM procese el nuevo contenido
             setTimeout(() => {
@@ -22,6 +26,27 @@ class MenuLoader {
         } catch (error) {
             console.error('❌ Error cargando el menú:', error);
             this.loadFallbackMenu();
+        }
+    }
+    
+    static getMenuPath() {
+        const currentPath = window.location.pathname;
+        
+        // Si estamos en una página de estado (ej: /estados/aguascalientes/aguascalientesindex.html)
+        if (currentPath.includes('/estados/') && currentPath.split('/').length > 3) {
+            return '../../menu.html';
+        }
+        // Si estamos en datos_nacionales (ej: /datos_nacionales/datosindex.html)
+        else if (currentPath.includes('/datos_nacionales/')) {
+            return '../menu.html';
+        }
+        // Si estamos en opcionesdatos (ej: /datos_nacionales/opcionesdatos/padronv.html)
+        else if (currentPath.includes('/opcionesdatos/')) {
+            return '../../menu.html';
+        }
+        // Si estamos en la raíz
+        else {
+            return 'menu.html';
         }
     }
     
@@ -35,6 +60,9 @@ class MenuLoader {
         
         if (!menuToggle || !menu || !menuOverlay) {
             console.error('❌ Elementos del menú no encontrados');
+            console.log('menu-toggle:', !!menuToggle);
+            console.log('.menu:', !!menu);
+            console.log('.menu-overlay:', !!menuOverlay);
             return;
         }
         
@@ -92,13 +120,13 @@ class MenuLoader {
                 // Si no estaba activo, abrirlo
                 if (!wasActive) {
                     submenu.classList.add('active');
-                    console.log('🎯 Submenú abierto:', newToggle.textContent);
+                    console.log('🎯 Submenú abierto:', newToggle.textContent.trim());
                 } else {
-                    console.log('🎯 Submenú cerrado:', newToggle.textContent);
+                    console.log('🎯 Submenú cerrado:', newToggle.textContent.trim());
                 }
             });
             
-            console.log(`✅ Evento añadido a submenú: ${newToggle.textContent}`);
+            console.log(`✅ Evento añadido a submenú: ${newToggle.textContent.trim()}`);
         });
         
         // Cerrar submenús al hacer clic fuera
@@ -135,10 +163,29 @@ class MenuLoader {
                 if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
                     localStorage.removeItem('authenticated');
                     localStorage.removeItem('loginTime');
-                    window.location.href = 'login.html';
+                    // Determinar la ruta correcta para login
+                    const loginPath = this.getLoginPath();
+                    window.location.href = loginPath;
                 }
             });
         });
+    }
+    
+    static getLoginPath() {
+        const currentPath = window.location.pathname;
+        
+        if (currentPath.includes('/estados/') && currentPath.split('/').length > 3) {
+            return '../../login.html';
+        }
+        else if (currentPath.includes('/datos_nacionales/')) {
+            return '../login.html';
+        }
+        else if (currentPath.includes('/opcionesdatos/')) {
+            return '../../login.html';
+        }
+        else {
+            return 'login.html';
+        }
     }
     
     static closeAllSubmenus() {
@@ -165,6 +212,7 @@ class MenuLoader {
                         <a href="javascript:void(0);">Menú Simple</a>
                         <ul class="submenu-list">
                             <li><a href="login.html">Iniciar Sesión</a></li>
+                            <li><a href="#" onclick="alert('Menú completo no disponible')">Menú Completo</a></li>
                         </ul>
                     </li>
                 </ul>
