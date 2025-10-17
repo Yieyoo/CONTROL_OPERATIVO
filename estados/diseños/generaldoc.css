@@ -532,21 +532,11 @@ nav.menu ul li a.active {
             display: block;
         }
     }
-    
-    .titulo-personalizado {
-        font-size: 20px;
-        margin-top: 100px;
-    }
+  
 }
 
 /* Para móviles muy pequeños */
-@media only screen and (max-width: 480px) {
-    .titulo-personalizado {
-        font-size: 18px;
-        padding: 0 10px;
-        margin-top: 80px;
-    }
-    
+@media only screen and (max-width: 480px) {    
     .ios-only {
         margin: 15px;
         padding: 12px;
@@ -611,12 +601,7 @@ nav.menu ul li a.active {
     min-height: 300px;
   }
   
-  .titulo-personalizado {
-    font-size: 20px;
-    margin-top: 10px;
-    max-width: 90%;
   }
-}
 
 @media screen and (max-width: 480px) {
   .pdf-container {
@@ -633,7 +618,7 @@ nav.menu ul li a.active {
   .titulo-personalizado {
     font-size: 18px;
     padding: 15px 20px;
-    margin-top: 30px;
+    margin-top: 10px;
   }
 
   .menu-toggle {
