@@ -613,7 +613,7 @@ nav.menu ul li a.active {
   
   .titulo-personalizado {
     font-size: 20px;
-    margin-top: 100px;
+    margin-top: 10px;
     max-width: 90%;
   }
 }
@@ -633,7 +633,7 @@ nav.menu ul li a.active {
   .titulo-personalizado {
     font-size: 18px;
     padding: 15px 20px;
-    margin-top: 80px;
+    margin-top: 30px;
   }
 
   .menu-toggle {
