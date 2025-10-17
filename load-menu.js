@@ -1,4 +1,4 @@
-// load-menu.js - VERSIÓN CORREGIDA
+// load-menu.js - VERSIÓN CORREGIDA CON SUBMENÚS
 class MenuLoader {
     static async loadMenu() {
         try {
@@ -14,8 +14,10 @@ class MenuLoader {
             
             console.log('✅ Menú HTML cargado');
             
-            // Configurar los eventos inmediatamente
-            this.setupMenuEvents();
+            // Pequeña pausa para que el DOM procese el nuevo contenido
+            setTimeout(() => {
+                this.setupMenuEvents();
+            }, 50);
             
         } catch (error) {
             console.error('❌ Error cargando el menú:', error);
@@ -26,77 +28,128 @@ class MenuLoader {
     static setupMenuEvents() {
         console.log('🔧 Configurando eventos del menú...');
         
-        // Botón del menú
+        // Botón del menú principal
         const menuToggle = document.querySelector('.menu-toggle');
         const menu = document.querySelector('.menu');
         const menuOverlay = document.querySelector('.menu-overlay');
         
-        if (menuToggle && menu && menuOverlay) {
-            // Función para abrir/cerrar menú principal
-            menuToggle.addEventListener('click', () => {
-                menu.classList.toggle('active');
-                menuOverlay.classList.toggle('active');
-                console.log('🎯 Menú toggled');
-            });
+        if (!menuToggle || !menu || !menuOverlay) {
+            console.error('❌ Elementos del menú no encontrados');
+            return;
+        }
+        
+        // 1. EVENTO PARA EL BOTÓN DEL MENÚ PRINCIPAL
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+            console.log('🎯 Menú principal toggled');
+        });
+        
+        // 2. EVENTO PARA CERRAR MENÚ AL CLICAR EN OVERLAY
+        menuOverlay.addEventListener('click', () => {
+            menu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            this.closeAllSubmenus();
+            console.log('🎯 Menú cerrado por overlay');
+        });
+        
+        // 3. EVENTOS PARA SUBMENÚS
+        this.setupSubmenus();
+        
+        // 4. EVENTO PARA CERRAR MENÚ AL CLICAR ENLACES
+        this.setupMenuLinks();
+        
+        // 5. EVENTO PARA LOGOUT
+        this.setupLogout();
+        
+        console.log('✅ Todos los eventos del menú configurados');
+    }
+    
+    static setupSubmenus() {
+        // Encontrar todos los enlaces que abren submenús
+        const submenuToggles = document.querySelectorAll('.submenu > a');
+        
+        console.log(`🔍 Encontrados ${submenuToggles.length} submenús`);
+        
+        submenuToggles.forEach((toggle, index) => {
+            // Remover cualquier evento existente
+            toggle.replaceWith(toggle.cloneNode(true));
             
-            // Cerrar menú al hacer clic en el overlay
-            menuOverlay.addEventListener('click', () => {
-                menu.classList.remove('active');
-                menuOverlay.classList.remove('active');
+            // Nuevo evento
+            const newToggle = document.querySelectorAll('.submenu > a')[index];
+            
+            newToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const submenu = newToggle.closest('.submenu');
+                const wasActive = submenu.classList.contains('active');
+                
+                // Cerrar todos los submenús primero
                 this.closeAllSubmenus();
+                
+                // Si no estaba activo, abrirlo
+                if (!wasActive) {
+                    submenu.classList.add('active');
+                    console.log('🎯 Submenú abierto:', newToggle.textContent);
+                } else {
+                    console.log('🎯 Submenú cerrado:', newToggle.textContent);
+                }
             });
             
-            // Submenús
-            const submenuToggles = document.querySelectorAll('.submenu > a');
-            submenuToggles.forEach(toggle => {
-                toggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const submenu = e.target.closest('.submenu');
-                    
-                    // Cerrar otros submenús
-                    this.closeAllSubmenus();
-                    
-                    // Abrir/cerrar este submenú
-                    submenu.classList.toggle('active');
-                    console.log('🎯 Submenú toggled');
-                });
-            });
-            
-            // Cerrar menú al hacer clic en enlaces
-            const menuLinks = document.querySelectorAll('.menu a');
-            menuLinks.forEach(link => {
-                link.addEventListener('click', () => {
+            console.log(`✅ Evento añadido a submenú: ${newToggle.textContent}`);
+        });
+        
+        // Cerrar submenús al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.submenu')) {
+                this.closeAllSubmenus();
+            }
+        });
+    }
+    
+    static setupMenuLinks() {
+        const menuLinks = document.querySelectorAll('.menu a:not(.submenu > a)');
+        
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const menu = document.querySelector('.menu');
+                const menuOverlay = document.querySelector('.menu-overlay');
+                
+                if (menu && menuOverlay) {
                     menu.classList.remove('active');
                     menuOverlay.classList.remove('active');
                     this.closeAllSubmenus();
-                });
+                }
             });
-            
-            // Logout
-            const logoutLinks = document.querySelectorAll('a[onclick*="logout"]');
-            logoutLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                        localStorage.removeItem('authenticated');
-                        localStorage.removeItem('loginTime');
-                        window.location.href = 'login.html';
-                    }
-                });
+        });
+    }
+    
+    static setupLogout() {
+        const logoutLinks = document.querySelectorAll('.logout-link');
+        
+        logoutLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                    localStorage.removeItem('authenticated');
+                    localStorage.removeItem('loginTime');
+                    window.location.href = 'login.html';
+                }
             });
-            
-            console.log('✅ Todos los eventos del menú configurados');
-            
-        } else {
-            console.error('❌ No se encontraron elementos del menú');
-        }
+        });
     }
     
     static closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
+        const activeSubmenus = document.querySelectorAll('.submenu.active');
+        
+        if (activeSubmenus.length > 0) {
+            activeSubmenus.forEach(submenu => {
+                submenu.classList.remove('active');
+            });
+            console.log('🎯 Todos los submenús cerrados');
+        }
     }
     
     static loadFallbackMenu() {
@@ -108,26 +161,25 @@ class MenuLoader {
             <nav class="menu">
                 <ul>
                     <li><a href="index.html">Inicio</a></li>
-                    <li><a href="login.html">Iniciar Sesión</a></li>
+                    <li class="submenu">
+                        <a href="javascript:void(0);">Menú Simple</a>
+                        <ul class="submenu-list">
+                            <li><a href="login.html">Iniciar Sesión</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
         `;
         
         document.body.insertAdjacentHTML('afterbegin', fallbackMenu);
-        this.setupMenuEvents();
+        
+        setTimeout(() => {
+            this.setupMenuEvents();
+        }, 50);
     }
 }
 
-// Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        MenuLoader.loadMenu();
-    });
-} else {
-    MenuLoader.loadMenu();
-}
-
-// Hacer las funciones globales para que funcionen los onclick
+// Hacer funciones globales para compatibilidad
 window.toggleMenu = function() {
     const menu = document.querySelector('.menu');
     const menuOverlay = document.querySelector('.menu-overlay');
@@ -139,14 +191,19 @@ window.toggleMenu = function() {
 
 window.toggleSubmenu = function(event) {
     event.preventDefault();
+    event.stopPropagation();
+    
     const submenu = event.target.closest('.submenu');
-    if (submenu) {
-        // Cerrar otros submenús
-        document.querySelectorAll('.submenu.active').forEach(sm => {
-            if (sm !== submenu) sm.classList.remove('active');
-        });
-        // Abrir/cerrar este submenú
-        submenu.classList.toggle('active');
+    const wasActive = submenu.classList.contains('active');
+    
+    // Cerrar todos los submenús
+    document.querySelectorAll('.submenu.active').forEach(sm => {
+        sm.classList.remove('active');
+    });
+    
+    // Si no estaba activo, abrirlo
+    if (!wasActive) {
+        submenu.classList.add('active');
     }
 };
 
@@ -157,3 +214,14 @@ window.logout = function() {
         window.location.href = 'login.html';
     }
 };
+
+// Inicializar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 DOM listo, iniciando menú...');
+        MenuLoader.loadMenu();
+    });
+} else {
+    console.log('📄 DOM ya listo, iniciando menú...');
+    MenuLoader.loadMenu();
+}
