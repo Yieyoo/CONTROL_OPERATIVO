@@ -9,8 +9,8 @@
     <meta http-equiv="Expires" content="0">
     <title>Aguascalientes - Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../../imagenes/iconom.png">
-    <link rel="stylesheet" href="../../estados/diseños/diseñogeneral.css">  <!-- ✅ CORREGIDO: sube 2 niveles -->
-    <script src="../../load-menu.js" defer></script>  <!-- ✅ CORRECTO: sube 2 niveles -->
+    <link rel="stylesheet" href="../../estados/diseños/diseñogeneral.css">
+    <script src="../../load-menu.js" defer></script>
 </head>
 <body>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ -->
@@ -30,7 +30,7 @@
         <h3>Dirección de Control Operativo</h3>
         <div class="fecha-actual" id="fechaActual"></div>
         <button class="regresar-btn" onclick="window.location.href='../../index.html'">
-            <i class="fas fa-arrow-left"></i> Regresa
+            <i class="fas fa-arrow-left"></i> Regresar
         </button>
     </section>
 
@@ -151,7 +151,7 @@
             }
         }
 
-        // Efectos visuales adicionales
+        // Efectos visuales adicionales - MANTENIENDO LA ANIMACIÓN QUE TE GUSTA
         document.addEventListener('DOMContentLoaded', function() {
             // Animación de entrada para los botones
             const buttons = document.querySelectorAll('.opciones-grid button');
@@ -161,48 +161,37 @@
                     button.style.transform = 'translateY(0)';
                 }, 100 * index);
             });
+            
+            // Efecto de carga de la página
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 100);
         });
     </script>
 
     <style>
-        /* Estilos específicos para Aguascalientes */
-        .estado-info {
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: linear-gradient(135deg, #1a3e72, #2d5aa0);
-            color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .estado-info h4 {
-            margin: 0;
-            font-size: 2em;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
+        /* SOLO ESTILOS ESPECÍFICOS PARA AGUASCALIENTES - MÍNIMOS */
+        
+        /* Animación de los botones - MANTENER */
         .opciones-grid button {
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.5s ease;
         }
 
-        .regresar-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: background 0.3s ease;
+        /* Color específico para Aguascalientes */
+        .estado-info {
+            background: linear-gradient(135deg, #a08d2d, #a08d2d);
         }
 
-        .regresar-btn:hover {
-            background: #5a6268;
+        /* Efecto de carga de la página */
+        body {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        body.loaded {
+            opacity: 1;
         }
     </style>
 </body>

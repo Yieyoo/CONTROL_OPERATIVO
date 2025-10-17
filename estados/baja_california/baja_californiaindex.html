@@ -7,9 +7,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Baja Califoria - Control Operativo</title>
+    <title>Baja California - Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../../imagenes/iconom.png">
-    <link rel="stylesheet" href="../diseños/diseñogeneral.css">
+    <link rel="stylesheet" href="../../estados/diseños/diseñogeneral.css">
     <script src="../../load-menu.js" defer></script>
 </head>
 <body>
@@ -30,7 +30,7 @@
         <h3>Dirección de Control Operativo</h3>
         <div class="fecha-actual" id="fechaActual"></div>
         <button class="regresar-btn" onclick="window.location.href='../../index.html'">
-            Regresar
+            <i class="fas fa-arrow-left"></i> Regresar
         </button>
     </section>
 
@@ -93,20 +93,42 @@
         // Sistema de autenticación
         class AuthManager {
             constructor() {
-                this.sessionDuration = 60 * 60 * 1000;
+                this.sessionDuration = 60 * 60 * 1000; // 1 hora
                 this.checkAuth();
+                this.setupNavigationHandlers();
             }
 
             checkAuth() {
                 const isAuthenticated = localStorage.getItem('authenticated') === 'true';
                 const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
                 const now = Date.now();
+                
+                console.log('🔐 Verificando autenticación en Aguascalientes...');
 
                 if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                    window.location.replace('../../login.html');
+                    console.log('❌ Sesión inválida, redirigiendo...');
+                    this.redirectToLogin();
                     return false;
                 }
+
+                console.log('✅ Sesión válida en Aguascalientes');
                 return true;
+            }
+
+            redirectToLogin() {
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('loginTime');
+                window.location.replace('../../login.html');
+            }
+
+            setupNavigationHandlers() {
+                window.addEventListener('pageshow', (event) => {
+                    if (event.persisted) {
+                        if (!this.checkAuth()) {
+                            this.redirectToLogin();
+                        }
+                    }
+                });
             }
         }
 
@@ -128,6 +150,49 @@
                 window.location.href = '../../login.html';
             }
         }
+
+        // Efectos visuales adicionales - MANTENIENDO LA ANIMACIÓN QUE TE GUSTA
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación de entrada para los botones
+            const buttons = document.querySelectorAll('.opciones-grid button');
+            buttons.forEach((button, index) => {
+                setTimeout(() => {
+                    button.style.opacity = '1';
+                    button.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            // Efecto de carga de la página
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 100);
+        });
     </script>
+
+    <style>
+        /* SOLO ESTILOS ESPECÍFICOS PARA AGUASCALIENTES - MÍNIMOS */
+        
+        /* Animación de los botones - MANTENER */
+        .opciones-grid button {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        /* Color específico para Aguascalientes */
+        .estado-info {
+            background: linear-gradient(135deg, #a08d2d, #a08d2d);
+        }
+
+        /* Efecto de carga de la página */
+        body {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+    </style>
 </body>
 </html>
