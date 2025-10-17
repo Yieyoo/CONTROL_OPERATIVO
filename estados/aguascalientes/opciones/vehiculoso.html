@@ -5,10 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VEHÍCULOS</title>
     <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
-    <link rel="stylesheet" href="../../diseños/documentos.css">
+    <link rel="stylesheet" href="../../diseños/generaldoc.css">
     <script src="../../../load-menu.js" defer></script>
 </head>
 <body>
+    <!-- HEADER DE DOS LÍNEAS -->
+    <div class="header-lineas">
+        <div class="linea-superior"></div>
+        <div class="linea-inferior"></div>
+    </div>
+
+    <!-- MENÚ LATERAL -->
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="menu-overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="menu" id="main-menu">
+        <img src="../../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
+        <ul>
+            <!-- El menú se cargará desde load-menu.js -->
+        </ul>
+    </nav>
+
     <h1 id="titulo-documento" class="titulo-personalizado">VEHÍCULOS</h1>       
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -92,8 +109,15 @@
         document.getElementById('mobile-error').style.display = 'none';
     }
 
-    // ❌ ELIMINAR LAS FUNCIONES toggleMenu() y toggleSubmenu() 
-    // porque ahora las maneja el load-menu.js automáticamente
+    // Función para el menú lateral
+    function toggleMenu() {
+        const menu = document.getElementById('main-menu');
+        const overlay = document.querySelector('.menu-overlay');
+        if (menu && overlay) {
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+    }
 
     // Formatear fecha legible
     function formatDate(dateString) {
@@ -171,11 +195,7 @@
         if (document.getElementById('pdf-viewer')) {
             cargarDocumentoPDF();
         }
-
-        // ❌ ELIMINAR la configuración de submenús manual
-        // porque ahora lo maneja el load-menu.js automáticamente
     });
 </script>
-<!-- ❌ ELIMINAR esta línea: <script src="../../../carga,.js"></script> -->
 </body>
 </html>
