@@ -585,7 +585,7 @@ nav.menu ul li a.active {
   
   .logo-container {
     top: 45px;
-    right: 10px;
+    right: -30px;
     gap: 10px;
   }
   
