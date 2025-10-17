@@ -4,84 +4,23 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aguascalientes</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Aguascalientes - Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../../imagenes/iconom.png">
     <link rel="stylesheet" href="../diseños/diseñogeneral.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">      
+    <script src="../../load-menu.js" defer></script>
 </head>
 <body>
-    <script type="module" src="../../common.js"></script>
-    <!-- Fondo oscuro para el menú -->
-    <div class="menu-overlay"></div>
+    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ -->
 
     <header>
-        <!-- Botón para abrir el menú en móviles -->
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
-        <nav class="menu">
-            <img src="../../imagenes/unnamed.png" class="logo-arriba-img" alt="Logo">
-            <ul>
-                <li><a href="../../index.html">Inicio</a></li>
-
-                <!-- Submenú Datos Nacionales -->
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                    <li><a href="../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="../../construccion.html">Inmuebles</a></li>
-                    <li><a href="../../construccion.html">Padron Vehicular</a></li>
-                    <li><a href="../../gestion/archivos.html">Gestion de Archvios</a></li>
-                    </ul>
-                </li>
-
-                <!-- Submenú Información de ORs -->
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                        <li><a href="aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../cdmx/cdmxindex.html">Colima</a></li>
-                        <li><a href="../durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../edomex/edomexindex.html">Estado de Mexico</a></li>
-                        <li><a href="../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../cdmx/cdmxindex.html">Estado de México</a></li>
-                        <li><a href="../michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../nuevo_leon/nuevolindex.html">Nuevo León</a></li>
-                        <li><a href="../oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../queretaro/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-        
+        <!-- EL BOTÓN DEL MENÚ SE INSERTA AUTOMÁTICAMENTE -->
+        <!-- SOLO MANTENEMOS EL LOGO EN EL HEADER -->
+        <div class="logo-container">
+            <img src="../../imagenes/unnamed.png" alt="Gobernación" class="logo">
+        </div>
     </header>
 
     <!-- Información del instituto -->
@@ -90,14 +29,14 @@
         <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
         <h3>Dirección de Control Operativo</h3>
         <div class="fecha-actual" id="fechaActual"></div>
-       <button class="regresar-btn" onclick="window.location.href='../../index.html'">
-        Regresar
-    </button>
+        <button class="regresar-btn" onclick="window.location.href='../../index.html'">
+            Regresar
+        </button>
     </section>
 
     <!-- Agregamos el nombre del estado aquí -->
     <div class="estado-info">
-        <h4>Aguascalientes</h4> <!-- Aquí puedes cambiar el nombre del estado según sea necesario -->
+        <h4>Aguascalientes</h4>
     </div>
 
     <!-- Contenedor solo para las opciones -->
@@ -139,6 +78,7 @@
                     </button>
                     <button class="btn-8" onclick="location.href='opciones/perroso.html'">
                         <i class="fas fa-dog"></i> Unidad Canina
+                    </button>
                 </div>
             </div>
         </div>
@@ -146,70 +86,48 @@
 
     <!-- Contenedor de logos -->
     <div class="logo-container">
-        <img src="../../imagenes/inm logo.png" alt="Logo 1">
+        <img src="../../imagenes/inm logo.png" alt="Logo INM">
     </div>
 
     <script>
-// Función para abrir y cerrar el menú lateral
-function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
+        // Sistema de autenticación
+        class AuthManager {
+            constructor() {
+                this.sessionDuration = 60 * 60 * 1000;
+                this.checkAuth();
+            }
 
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-// Función para cerrar todos los submenús
-function closeAllSubmenus() {
-    const submenus = document.querySelectorAll('.submenu.active');
-    submenus.forEach(submenu => {
-        submenu.classList.remove('active');
-    });
-}
+            checkAuth() {
+                const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+                const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+                const now = Date.now();
 
-// Función para mostrar/ocultar el submenú
-function toggleSubmenu(event) {
-    event.preventDefault(); // Evita que el enlace recargue la página
+                if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
+                    window.location.replace('../../login.html');
+                    return false;
+                }
+                return true;
+            }
+        }
 
-    // Identificar el submenú al que pertenece el enlace
-    const submenu = event.target.closest('.submenu');
+        // Inicializar autenticación
+        const authManager = new AuthManager();
 
-    // Si el submenú está abierto, lo cerramos; si está cerrado, lo abrimos
-    if (submenu.classList.contains('active')) {
-        submenu.classList.remove('active');
-    } else {
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-        submenu.classList.add('active');
-    }
-}
+        // Mostrar la fecha actual
+        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
 
-// Cerrar el submenú al hacer clic fuera de él
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.submenu')) {
-        closeAllSubmenus();
-    }
-});
-
-// Cerrar el submenú al hacer clic en una opción de submenú
-const submenuLinks = document.querySelectorAll('.submenu-list a');
-submenuLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        closeAllSubmenus(); // Cierra todos los submenús
-    });
-});
-// Mostrar la fecha actual
-document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
-
-// Regresar al historial
-
+        // Función global para logout
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('loginTime');
+                window.location.href = '../../login.html';
+            }
+        }
     </script>
 </body>
 </html>
-    
