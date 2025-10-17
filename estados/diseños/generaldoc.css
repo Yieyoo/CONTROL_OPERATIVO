@@ -378,9 +378,9 @@ nav.menu ul li a.active {
   padding: 20px 30px;
   margin: 50px auto 25px; /* Aumentado para espacio del menú */
   text-align: center;
-  font-size: 1.4em;
+  font-size: 1.9em;
   color: var(--color-primario);
-  border-radius: 12px;
+  border-radius: 15px;
   box-shadow: 0 5px 15px rgba(26, 62, 114, 0.1);
   max-width: 80%;
   position: relative;
