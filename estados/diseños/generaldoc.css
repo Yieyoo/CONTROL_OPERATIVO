@@ -312,7 +312,7 @@ nav.menu ul li a:hover {
 .titulo-personalizado {
   background: white;
   padding: 20px 30px;
-  margin: 70px auto 25px; /* Aumentado para espacio del menú */
+  margin: 50px auto 25px; /* Aumentado para espacio del menú */
   text-align: center;
   font-size: 1.4em;
   color: var(--color-primario);
