@@ -44,7 +44,7 @@
         .subtitle {
             color: #666;
             margin-bottom: 30px;
-            font-size: 0.7rem; /* CORREGIDO: espacio eliminado */
+            font-size: 0.9rem;
         }
 
         .input-group {
@@ -208,14 +208,16 @@
     </div>
 
     <script>
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-        
         // Elementos del DOM
         const loginForm = document.getElementById('loginForm');
         const loginButton = document.getElementById('loginButton');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
+
+        // Credenciales válidas
+        const VALID_USERNAME = 'admin';
+        const VALID_PASSWORD = 'dgcor01';
 
         // Mostrar/ocultar mensajes
         function showMessage(element, message, isError = true) {
@@ -248,55 +250,18 @@
             }
         }
 
-        // Verificación MEJORADA de sesión existente
-        async function checkExistingAuth() {
-            try {
-                console.log('🔍 Verificando sesión existente...');
-                
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-                
-                const response = await fetch(`${BACKEND_URL}/auth/check`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) {
-                    console.log('❌ Respuesta no OK del servidor:', response.status);
-                    return false;
-                }
-                
-                const data = await response.json();
-                console.log('📋 Respuesta del servidor:', data);
-                
-                // Verificación más robusta
-                if (data.status === 'success' && 
-                    data.data && 
-                    data.data.authenticated === true) {
-                    console.log('✅ Sesión activa encontrada, redirigiendo...');
-                    window.location.href = 'index.html';
-                    return true;
-                }
-                
-                return false;
-                
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.log('⏰ Timeout al verificar sesión');
-                } else {
-                    console.log('🚫 Error al verificar sesión:', error.message);
-                }
-                return false;
+        // Verificar si ya está autenticado
+        function checkExistingAuth() {
+            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+            if (isAuthenticated) {
+                console.log('✅ Sesión activa encontrada, redirigiendo...');
+                window.location.href = 'index.html';
+                return true;
             }
+            return false;
         }
 
-        // Manejo MEJORADO del envío del formulario
+        // Manejar el envío del formulario
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -311,31 +276,13 @@
             setLoading(true);
             hideMessages();
             
-            try {
-                console.log('🔐 Intentando login...');
-                
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
-                
-                const response = await fetch(`${BACKEND_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                    signal: controller.signal,
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    })
-                });
-                
-                clearTimeout(timeoutId);
-                
-                const data = await response.json();
-                
-                if (response.ok && data.status === 'success') {
-                    showMessage(successMessage, `✅ ${data.message}`, false);
+            // Simular verificación de credenciales
+            setTimeout(() => {
+                if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                    showMessage(successMessage, '✅ Credenciales correctas. Accediendo al sistema...', false);
+                    
+                    // Guardar estado de autenticación
+                    localStorage.setItem('authenticated', 'true');
                     
                     // Redirigir después de 1 segundo
                     setTimeout(() => {
@@ -343,21 +290,10 @@
                     }, 1000);
                     
                 } else {
-                    showMessage(errorMessage, data.message || 'Error al iniciar sesión');
+                    showMessage(errorMessage, '❌ Usuario o contraseña incorrectos');
                     setLoading(false);
                 }
-                
-            } catch (error) {
-                console.error('💥 Error de conexión:', error);
-                
-                if (error.name === 'AbortError') {
-                    showMessage(errorMessage, 'El servidor está tardando demasiado en responder');
-                } else {
-                    showMessage(errorMessage, 'Error de conexión con el servidor');
-                }
-                
-                setLoading(false);
-            }
+            }, 1000); // Simular tiempo de respuesta del servidor
         });
 
         // Verificar autenticación al cargar la página
