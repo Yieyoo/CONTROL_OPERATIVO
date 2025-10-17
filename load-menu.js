@@ -1,4 +1,4 @@
-// load-menu.js - VERSIÓN COMPLETA CON CORRECCIÓN DE RUTAS
+// load-menu.js - VERSIÓN CON NAVEGACIÓN COMPLETA
 class MenuLoader {
     static async loadMenu() {
         try {
@@ -38,7 +38,7 @@ class MenuLoader {
             document.body.insertAdjacentHTML('afterbegin', menuHTML);
             console.log('✅ Menú insertado correctamente');
             
-            // Configurar eventos CON CORRECCIÓN DE RUTAS
+            // Configurar eventos CON CORRECCIÓN DE RUTAS Y NAVEGACIÓN
             setTimeout(() => {
                 this.setupMenuEvents();
             }, 100);
@@ -85,6 +85,9 @@ class MenuLoader {
         
         // 5. Configurar logout
         this.setupLogout();
+        
+        // 6. CONFIGURAR NAVEGACIÓN PARA TODOS LOS ENLACES
+        this.setupNavigation();
         
         console.log('✅ Menú completamente configurado');
     }
@@ -168,6 +171,38 @@ class MenuLoader {
         });
     }
     
+    /**
+     * CONFIGURA LA NAVEGACIÓN PARA TODOS LOS ENLACES
+     * Esto hace que los enlaces funcionen correctamente
+     */
+    static setupNavigation() {
+        const allMenuLinks = document.querySelectorAll('.menu a[href]');
+        console.log(`🧭 Configurando navegación para ${allMenuLinks.length} enlaces`);
+        
+        allMenuLinks.forEach(link => {
+            // No aplicar a enlaces especiales (logout, submenús)
+            if (link.classList.contains('logout-link') || 
+                link.parentElement.classList.contains('submenu')) {
+                return;
+            }
+            
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const href = link.getAttribute('href');
+                console.log(`🚀 Navegando a: ${href}`);
+                
+                // Cerrar el menú antes de navegar
+                this.closeMenu();
+                
+                // Navegar después de un breve delay para que se cierre el menú
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 200);
+            });
+        });
+    }
+    
     static setupLogout() {
         const logoutLinks = document.querySelectorAll('.logout-link');
         
@@ -181,6 +216,7 @@ class MenuLoader {
     
     static performLogout() {
         if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            console.log('🚪 Cerrando sesión...');
             localStorage.removeItem('authenticated');
             localStorage.removeItem('loginTime');
             
@@ -188,6 +224,16 @@ class MenuLoader {
             const loginPath = this.fixLinkPath('login.html');
             window.location.href = loginPath;
         }
+    }
+    
+    static closeMenu() {
+        const menu = document.querySelector('.menu');
+        const menuOverlay = document.querySelector('.menu-overlay');
+        
+        if (menu) menu.classList.remove('active');
+        if (menuOverlay) menuOverlay.classList.remove('active');
+        
+        this.closeAllSubmenus();
     }
     
     static closeAllSubmenus() {
