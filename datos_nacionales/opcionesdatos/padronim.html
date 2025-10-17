@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Padrón Inmobiliario</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
+    <link rel="stylesheet" href="../../estados/diseños/diseñounafoto.css">
+</head>
+
+<body class="mostrar-ubicaciones">
+    <div class="titulo-contenedor">
+        <h1 id="titulo-documento" class="titulo-personalizado">Padrón Inmobiliario</h1>
+    </div>
+    
+    <div class="menu-overlay"></div>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <header>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <nav class="menu">
+            <img src="../../imagenes/unnamed.png" class="logo-arriba-img" alt="Logo">
+            <ul>
+                <li><a href="../../../index.html">Inicio</a></li>
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../construccion.html">Inmuebles</a></li>
+                        <li><a href="../../construccion.html">Padron Vehicular</a></li>
+                        <li><a href="../../gestion/archivos.html">Gestion de Archivos</a></li>
+                    </ul>
+                </li>
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../../estados/baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../../estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
+                        <li><a href="../../estados/campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="../../estados/chiapas/chiapasindex.html">Chiapas</a></li>
+                        <li><a href="../../estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../../estados/coahuila/coahuilaindex.html">Coahuila</a></li>
+                        <li><a href="../../estados/colima/colimaindex.html">Colima</a></li>
+                        <li><a href="../../estados/cdmx/cdmxindex.html">Ciudad de México</a></li>
+                        <li><a href="../../estados/durango/durangoindex.html">Durango</a></li>
+                        <li><a href="../../estados/guanajuato/guanajuatoindex.html">Guanajuato</a></li>
+                        <li><a href="../../estados/guerrero/guerreroindex.html">Guerrero</a></li>
+                        <li><a href="../../estados/hidalgo/hidalgoindex.html">Hidalgo</a></li>
+                        <li><a href="../../estados/jalisco/jaliscoindex.html">Jalisco</a></li>
+                        <li><a href="../../estados/edomex/edomexindex.html">Estado de México</a></li>
+                        <li><a href="../../estados/michoacan/michoacanindex.html">Michoacán</a></li>
+                        <li><a href="../../estados/morelos/morelosindex.html">Morelos</a></li>
+                        <li><a href="../../estados/nayarit/nayaritindex.html">Nayarit</a></li>
+                        <li><a href="../../estados/nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
+                        <li><a href="../../estados/oaxaca/oaxacaindex.html">Oaxaca</a></li>
+                        <li><a href="../../estados/puebla/pueblaindex.html">Puebla</a></li>
+                        <li><a href="../../estados/queretaro/queretaroindex.html">Querétaro</a></li>
+                        <li><a href="../../estados/quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
+                        <li><a href="../../estados/san_luis/san_luisindex.html">San Luis Potosí</a></li>
+                        <li><a href="../../estados/sinaloa/sinaloaindex.html">Sinaloa</a></li>
+                        <li><a href="../../estados/sonora/sonoraindex.html">Sonora</a></li>
+                        <li><a href="../../estados/tabasco/tabascoindex.html">Tabasco</a></li>
+                        <li><a href="../../estados/tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
+                        <li><a href="../../estados/tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
+                        <li><a href="../../estados/veracruz/veracruzindex.html">Veracruz</a></li>
+                        <li><a href="../../estados/yucatan/yucatanindex.html">Yucatán</a></li>
+                        <li><a href="../../estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="logo-container">
+        <img src="../../imagenes/inm logo.png" alt="Logo INM">
+    </div>
+    
+    <div class="pdf-container">
+        <iframe 
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+            title="Visualizador de PDF"
+        ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <!-- Contenedor específico para iOS -->
+    <div id="ios-container" class="ios-only">
+        <p>Para una mejor experiencia en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
+        <span>Abrir Documento</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
+    </div>
+
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <!-- Botones flotantes -->
+    <div class="botones-flotantes">
+        <button class="boton-descarga boton-ubicaciones" id="descargar-ubicaciones">
+            Descargar Ubicaciones
+        </button>
+        <button class="regresar-btn" onclick="window.location.href='../datosindex.html'">
+            Regresar
+        </button>
+    </div>
+
+<script>
+    // Configuración - 
+    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+    const API_KEY = 'Xhy2md57';
+    const ESTADO = 'datos-nacionales';       // Cambia por el estado que necesites
+    const TIPO_UBICACIONES = 'padron_inmobiliario'; // Tipo de documento para ubicaciones
+    const TITULO_UBICACIONES = 'Padrón Inmobiliario'; // Título para el documento de ubicaciones
+
+    // Variables para controlar el estado del documento
+    let documentoUbicacionesUrl = '';
+
+    // Detectar iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
+        }
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
+
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
+
+    // Función para abrir/cerrar el menú
+    function toggleMenu() {
+        const menu = document.querySelector('.menu');
+        const overlay = document.querySelector('.menu-overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
+            }
+        });
+        event.target.closest('.submenu').classList.toggle('active');
+    }
+
+    // Función para cargar un documento específico
+    async function cargarDocumento(tipoDocumento) {
+        showLoading(true);
+        hideErrors();
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO}/${tipoDocumento}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            
+            if (!result?.data || result.data.length === 0) {
+                throw new Error(`No se encontraron documentos de ${tipoDocumento}`);
+            }
+
+            const latestPDF = result.data.sort((a, b) => 
+                new Date(b.uploaded_at) - new Date(a.uploaded_at)
+            )[0];
+
+            return latestPDF.url;
+            
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar el documento: ${error.message}`, 'both');
+            return null;
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Configurar eventos de descarga
+    function configurarDescargas() {
+        document.getElementById('descargar-ubicaciones').onclick = function() {
+            if (documentoUbicacionesUrl) {
+                window.open(documentoUbicacionesUrl, '_blank');
+            }
+        };
+    }
+
+    // Configurar el visor de PDF para un documento específico
+    async function configurarVisorPDF(url, titulo) {
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const mobileContainer = document.querySelector('.mobile-images');
+        const iosLink = document.getElementById('ios-pdf-link');
+        
+        if (!url) {
+            showError('No se pudo cargar el documento', 'both');
+            return;
+        }
+
+        // Configuración normal para PC
+        pdfViewer.src = url;
+        document.getElementById('titulo-documento').textContent = titulo;
+        
+        // Configuración para móviles (no iOS)
+        if (!isIOS()) {
+            mobileContainer.innerHTML = `
+                <div class="file-info">
+                    <h3>${titulo}</h3>
+                </div>
+            `;
+        }
+        
+        // Configuración específica para iOS
+        if (isIOS()) {
+            // Usamos Google Viewer como alternativa para iOS
+            const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+            iosLink.href = googleViewerUrl;
+        }
+    }
+
+    // Cargar el documento inicial (ubicaciones)
+    async function cargarDocumentoInicial() {
+        showLoading(true);
+        
+        // Cargar el documento de ubicaciones
+        documentoUbicacionesUrl = await cargarDocumento(TIPO_UBICACIONES);
+        
+        if (documentoUbicacionesUrl) {
+            await configurarVisorPDF(documentoUbicacionesUrl, TITULO_UBICACIONES);
+        }
+        
+        configurarDescargas();
+        showLoading(false);
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cargar el documento inicial
+        cargarDocumentoInicial();
+
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
+                });
+            });
+        });
+        
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+<script src="../../../carga,.js"></script>
+</body>
+</html>

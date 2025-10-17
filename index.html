@@ -20,20 +20,8 @@
         }
     </style>
 </head>
-<body> <!-- Elementos de menú movidos fuera del header 
- <script>
-    // Verificar si el usuario está logueado
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-        window.location.href = 'login.html';
-    }
-    
-    // Función para cerrar sesión (agrégala donde quieras)
-    function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        window.location.href = 'login.html';
-    }
-</script>-->
+<body> 
+
     <!-- Elementos de menú movidos fuera del header -->
     <div class="menu-overlay"></div>
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
@@ -45,7 +33,9 @@
                 <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
                 <ul class="submenu-list">
                     <li><a href="datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                    <li><a href="datos_nacionales/padronvm.html">Padrón Vehicular</a></li>
+                    <li><a href="datos_nacionales/padronvm.html">Padrón Inmobiliario</a></li>
+                    <li><a href="datos_nacionales/opcionesdatos/mapaplan.html">Plantilla de Personal</a></li>
                     <li><a href="datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
                     <li><a href="datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
                     <li><a href="datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
