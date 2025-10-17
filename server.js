@@ -1,4 +1,8 @@
-// server.js
+// Agrega después de los otros requires
+const cookieParser = require('cookie-parser');
+
+// Agrega después de los otros middlewares
+app.use(cookieParser());// server.js
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -652,3 +656,137 @@ process.on('uncaughtException', (err) => {
 
 module.exports = { app, server };
 
+// Agrega después de las otras rutas, antes del manejo de errores
+
+// ************ RUTAS DE AUTENTICACIÓN ************
+
+// Usuarios válidos (en producción usa una base de datos)
+const validUsers = {
+    'admin': 'dgcor01',
+    'usuario': 'password123'
+};
+
+// Middleware de sesión (simple para demo)
+const sessions = new Map();
+
+// Ruta de login
+router.post('/auth/login', async (req, res, next) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            throw new AppError('Usuario y contraseña son requeridos', 400, 'missing_credentials');
+        }
+
+        // Verificar credenciales
+        if (validUsers[username] && validUsers[username] === password) {
+            // Crear sesión
+            const sessionId = require('crypto').randomBytes(32).toString('hex');
+            const sessionData = {
+                username: username,
+                loggedInAt: new Date(),
+                lastActivity: new Date()
+            };
+            
+            sessions.set(sessionId, sessionData);
+
+            // Configurar cookie de sesión
+            res.cookie('sessionId', sessionId, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 24 * 60 * 60 * 1000 // 24 horas
+            });
+
+            res.json({
+                status: 'success',
+                message: 'Login exitoso',
+                data: {
+                    user: {
+                        username: username,
+                        role: 'admin'
+                    },
+                    session: sessionId,
+                    expiresIn: '24h'
+                }
+            });
+        } else {
+            throw new AppError('Credenciales inválidas', 401, 'invalid_credentials');
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Ruta para verificar sesión
+router.get('/auth/check', async (req, res, next) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        
+        if (!sessionId || !sessions.has(sessionId)) {
+            return res.json({
+                status: 'success',
+                data: {
+                    authenticated: false,
+                    user: null
+                }
+            });
+        }
+
+        // Actualizar última actividad
+        const sessionData = sessions.get(sessionId);
+        sessionData.lastActivity = new Date();
+        sessions.set(sessionId, sessionData);
+
+        res.json({
+            status: 'success',
+            data: {
+                authenticated: true,
+                user: {
+                    username: sessionData.username,
+                    role: 'admin'
+                },
+                session: sessionData
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Ruta para logout
+router.post('/auth/logout', async (req, res, next) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        
+        if (sessionId && sessions.has(sessionId)) {
+            sessions.delete(sessionId);
+        }
+
+        // Limpiar cookie
+        res.clearCookie('sessionId');
+
+        res.json({
+            status: 'success',
+            message: 'Sesión cerrada correctamente',
+            data: {
+                loggedOut: true
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Middleware para limpiar sesiones expiradas (ejecutar periódicamente)
+setInterval(() => {
+    const now = new Date();
+    const maxAge = 24 * 60 * 60 * 1000; // 24 horas
+    
+    for (const [sessionId, sessionData] of sessions.entries()) {
+        if (now - sessionData.lastActivity > maxAge) {
+            sessions.delete(sessionId);
+            console.log(`🧹 Sesión expirada eliminada: ${sessionId}`);
+        }
+    }
+}, 60 * 60 * 1000); // Ejecutar cada hora
