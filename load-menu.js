@@ -1,19 +1,17 @@
-// load-menu.js - VERSIÓN CON NAVEGACIÓN COMPLETA
+// load-menu.js - VERSIÓN SIN CORRECCIÓN (SOLO DEBUG)
 class MenuLoader {
     static async loadMenu() {
         try {
             console.log('🔄 Cargando menú...');
             
-            // INTENTA ESTAS RUTAS EN ORDEN:
             const possiblePaths = [
-                'menu.html',           // Si está en la misma carpeta
-                '../menu.html',        // Si está en una subcarpeta
-                '../../menu.html',     // Si está dos niveles abajo
-                '../../../menu.html'   // Si está tres niveles abajo
+                'menu.html',
+                '../menu.html', 
+                '../../menu.html',
+                '../../../menu.html'
             ];
             
             let menuHTML = '';
-            let successfulPath = '';
             
             for (const path of possiblePaths) {
                 try {
@@ -21,7 +19,6 @@ class MenuLoader {
                     const response = await fetch(path);
                     if (response.ok) {
                         menuHTML = await response.text();
-                        successfulPath = path;
                         console.log(`✅ menu.html encontrado en: ${path}`);
                         break;
                     }
@@ -31,16 +28,15 @@ class MenuLoader {
             }
             
             if (!menuHTML) {
-                throw new Error('No se pudo encontrar menu.html en ninguna ruta');
+                throw new Error('No se pudo encontrar menu.html');
             }
             
-            // Insertar menú
             document.body.insertAdjacentHTML('afterbegin', menuHTML);
-            console.log('✅ Menú insertado correctamente');
+            console.log('✅ Menú insertado - LAS RUTAS NO SE CORRIGEN');
+            console.log('⚠️ Los enlaces usarán las rutas originales del menu.html');
             
-            // Configurar eventos CON CORRECCIÓN DE RUTAS Y NAVEGACIÓN
             setTimeout(() => {
-                this.setupMenuEvents();
+                this.setupBasicEvents();
             }, 100);
             
         } catch (error) {
@@ -49,204 +45,45 @@ class MenuLoader {
         }
     }
     
-    static setupMenuEvents() {
-        console.log('🔧 Configurando eventos...');
+    static setupBasicEvents() {
+        console.log('🔧 Configurando eventos básicos...');
         
         const menuToggle = document.querySelector('.menu-toggle');
         const menu = document.querySelector('.menu');
         const menuOverlay = document.querySelector('.menu-overlay');
         
-        if (!menuToggle || !menu) {
-            console.error('❌ Elementos del menú no encontrados');
-            return;
-        }
+        if (!menuToggle || !menu) return;
         
-        // 1. PRIMERO CORREGIR TODAS LAS RUTAS DEL MENÚ
-        this.fixAllMenuLinks();
-        
-        // 2. Configurar toggle del menú
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             menu.classList.toggle('active');
             if (menuOverlay) menuOverlay.classList.toggle('active');
         });
         
-        // 3. Cerrar con overlay
         if (menuOverlay) {
             menuOverlay.addEventListener('click', () => {
                 menu.classList.remove('active');
                 menuOverlay.classList.remove('active');
-                this.closeAllSubmenus();
             });
         }
         
-        // 4. Configurar submenús
-        this.setupSubmenus();
-        
-        // 5. Configurar logout
-        this.setupLogout();
-        
-        // 6. CONFIGURAR NAVEGACIÓN PARA TODOS LOS ENLACES
-        this.setupNavigation();
-        
-        console.log('✅ Menú completamente configurado');
-    }
-    
-    /**
-     * ¡FUNCIÓN CLAVE! Corrige todas las rutas del menú
-     */
-    static fixAllMenuLinks() {
-        const allLinks = document.querySelectorAll('.menu a[href]');
-        console.log(`🔗 Encontrados ${allLinks.length} enlaces para corregir`);
-        
-        allLinks.forEach(link => {
-            const originalHref = link.getAttribute('href');
-            
-            if (this.shouldFixLink(originalHref)) {
-                const correctedHref = this.fixLinkPath(originalHref);
-                link.setAttribute('href', correctedHref);
-                console.log(`🔄 ${originalHref} → ${correctedHref}`);
-            }
-        });
-    }
-    
-    static shouldFixLink(href) {
-        return href && 
-               !href.startsWith('http') && 
-               !href.startsWith('//') &&
-               !href.startsWith('#') && 
-               !href.startsWith('javascript:') &&
-               !href.startsWith('mailto:');
-    }
-    
-    static fixLinkPath(originalHref) {
-        const currentPath = window.location.pathname;
-        
-        // Contar cuántas carpetas hay en la ruta actual
-        const pathParts = currentPath.split('/').filter(part => 
-            part && part !== '' && !part.includes('.html')
-        );
-        const currentDepth = pathParts.length;
-        
-        console.log(`📍 Estamos en: ${currentPath} (${currentDepth} niveles de carpeta)`);
-        
-        // Construir la ruta corregida
-        let correctedPath = '';
-        for (let i = 0; i < currentDepth; i++) {
-            correctedPath += '../';
-        }
-        correctedPath += originalHref;
-        
-        return correctedPath;
-    }
-    
-    static setupSubmenus() {
+        // Configurar submenús
         const submenuToggles = document.querySelectorAll('.submenu > a');
-        console.log(`🎯 Configurando ${submenuToggles.length} submenús`);
-        
         submenuToggles.forEach(toggle => {
             toggle.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
                 const submenu = toggle.parentElement;
-                const isActive = submenu.classList.contains('active');
-                
-                // Cerrar todos los submenús primero
-                this.closeAllSubmenus();
-                
-                // Abrir este submenú si no estaba activo
-                if (!isActive) {
-                    submenu.classList.add('active');
-                    console.log('📂 Submenú abierto:', toggle.textContent.trim());
-                }
+                submenu.classList.toggle('active');
             });
         });
         
-        // Cerrar submenús al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                this.closeAllSubmenus();
-            }
-        });
-    }
-    
-    /**
-     * CONFIGURA LA NAVEGACIÓN PARA TODOS LOS ENLACES
-     * Esto hace que los enlaces funcionen correctamente
-     */
-    static setupNavigation() {
-        const allMenuLinks = document.querySelectorAll('.menu a[href]');
-        console.log(`🧭 Configurando navegación para ${allMenuLinks.length} enlaces`);
-        
-        allMenuLinks.forEach(link => {
-            // No aplicar a enlaces especiales (logout, submenús)
-            if (link.classList.contains('logout-link') || 
-                link.parentElement.classList.contains('submenu')) {
-                return;
-            }
-            
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                const href = link.getAttribute('href');
-                console.log(`🚀 Navegando a: ${href}`);
-                
-                // Cerrar el menú antes de navegar
-                this.closeMenu();
-                
-                // Navegar después de un breve delay para que se cierre el menú
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 200);
-            });
-        });
-    }
-    
-    static setupLogout() {
-        const logoutLinks = document.querySelectorAll('.logout-link');
-        
-        logoutLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.performLogout();
-            });
-        });
-    }
-    
-    static performLogout() {
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-            console.log('🚪 Cerrando sesión...');
-            localStorage.removeItem('authenticated');
-            localStorage.removeItem('loginTime');
-            
-            // Usar la corrección de rutas para el logout también
-            const loginPath = this.fixLinkPath('login.html');
-            window.location.href = loginPath;
-        }
-    }
-    
-    static closeMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        
-        if (menu) menu.classList.remove('active');
-        if (menuOverlay) menuOverlay.classList.remove('active');
-        
-        this.closeAllSubmenus();
-    }
-    
-    static closeAllSubmenus() {
-        const activeSubmenus = document.querySelectorAll('.submenu.active');
-        activeSubmenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
+        console.log('✅ Eventos básicos configurados');
+        console.log('🔗 Los enlaces navegarán con sus rutas originales');
     }
     
     static loadFallbackMenu() {
-        console.log('🔄 Mostrando menú básico...');
-        
-        const basicMenu = `
+        const fallbackMenu = `
             <div class="menu-overlay"></div>
             <button class="menu-toggle">☰</button>
             <nav class="menu">
@@ -258,15 +95,11 @@ class MenuLoader {
             </nav>
         `;
         
-        document.body.insertAdjacentHTML('afterbegin', basicMenu);
-        
-        setTimeout(() => {
-            this.setupMenuEvents();
-        }, 100);
+        document.body.insertAdjacentHTML('afterbegin', fallbackMenu);
+        setTimeout(() => this.setupBasicEvents(), 100);
     }
 }
 
-// Inicializar
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', MenuLoader.loadMenu);
 } else {
