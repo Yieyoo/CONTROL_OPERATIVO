@@ -102,225 +102,125 @@
     <script src="mapa/html5countrymapv4.5/mapdata.js"></script>
     <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
 
-    <script>
-        // Sistema mejorado de autenticación
-        class AuthManager {
-            constructor() {
-                this.sessionDuration = 60 * 60 * 1000; // 1 hora
-                this.checkAuth();
-                this.setupNavigationHandlers();
+   <script>
+    // Sistema mejorado de autenticación
+    class AuthManager {
+        constructor() {
+            this.sessionDuration = 60 * 60 * 1000; // 1 hora
+            this.checkAuth();
+            this.setupNavigationHandlers();
+        }
+
+        checkAuth() {
+            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+            const now = Date.now();
+            
+            console.log('🔐 Verificando autenticación:', {
+                isAuthenticated,
+                loginTime: new Date(loginTime),
+                now: new Date(now),
+                diferencia: now - loginTime,
+                expirado: (now - loginTime) > this.sessionDuration
+            });
+
+            if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
+                console.log('❌ Sesión inválida o expirada, redirigiendo a login...');
+                this.redirectToLogin();
+                return false;
             }
 
-            checkAuth() {
-                const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-                const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-                const now = Date.now();
+            console.log('✅ Sesión válida, mostrando contenido...');
+            this.hideLoadingScreen();
+            return true;
+        }
+
+        redirectToLogin() {
+            // Limpiar el estado de autenticación
+            localStorage.removeItem('authenticated');
+            localStorage.removeItem('loginTime');
+            
+            // Redirigir al login de forma que no se pueda volver con el botón back
+            window.location.replace('login.html');
+        }
+
+        hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+            }
+            document.body.style.overflow = 'auto';
+        }
+
+        setupNavigationHandlers() {
+            // Manejar el evento de página mostrada (back/forward)
+            window.addEventListener('pageshow', (event) => {
+                console.log('🔄 Página mostrada desde:', event.persisted ? 'cache' : 'nueva carga');
                 
-                console.log('🔐 Verificando autenticación:', {
-                    isAuthenticated,
-                    loginTime: new Date(loginTime),
-                    now: new Date(now),
-                    diferencia: now - loginTime,
-                    expirado: (now - loginTime) > this.sessionDuration
-                });
-
-                if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                    console.log('❌ Sesión inválida o expirada, redirigiendo a login...');
-                    this.redirectToLogin();
-                    return false;
+                if (event.persisted) {
+                    // La página viene del cache, verificar autenticación nuevamente
+                    if (!this.checkAuth()) {
+                        this.redirectToLogin();
+                    }
                 }
+            });
+        }
 
-                console.log('✅ Sesión válida, mostrando contenido...');
-                this.hideLoadingScreen();
-                return true;
-            }
-
-            redirectToLogin() {
-                // Limpiar el estado de autenticación
+        logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                console.log('🚪 Cerrando sesión...');
                 localStorage.removeItem('authenticated');
                 localStorage.removeItem('loginTime');
-                
-                // Redirigir al login de forma que no se pueda volver con el botón back
-                window.location.replace('login.html');
-            }
-
-            hideLoadingScreen() {
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.style.display = 'none';
-                }
-                document.body.style.overflow = 'auto';
-            }
-
-            setupNavigationHandlers() {
-                // Manejar el evento de página mostrada (back/forward)
-                window.addEventListener('pageshow', (event) => {
-                    console.log('🔄 Página mostrada desde:', event.persisted ? 'cache' : 'nueva carga');
-                    
-                    if (event.persisted) {
-                        // La página viene del cache, verificar autenticación nuevamente
-                        if (!this.checkAuth()) {
-                            this.redirectToLogin();
-                        }
-                    }
-                });
-
-                // Prevenir que se abra en nueva pestaña sin autenticación
-                window.addEventListener('beforeunload', () => {
-                    // Solo mantener la sesión si es una navegación interna
-                });
-            }
-
-            logout() {
-                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                    console.log('🚪 Cerrando sesión...');
-                    localStorage.removeItem('authenticated');
-                    localStorage.removeItem('loginTime');
-                    this.redirectToLogin();
-                }
+                this.redirectToLogin();
             }
         }
+    }
 
-        // Inicializar el sistema de autenticación
-        const authManager = new AuthManager();
+    // Inicializar el sistema de autenticación
+    const authManager = new AuthManager();
 
-        // Tu código existente para el menú
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const menuOverlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        }
+    // Mostrar fecha actual
+    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 
-        // Función para cerrar todos los submenús
-        function closeAllSubmenus() {
-            const submenus = document.querySelectorAll('.submenu.active');
-            submenus.forEach(submenu => {
-                submenu.classList.remove('active');
-            });
-        }
-
-        // Función para mostrar/ocultar el submenú
-        function toggleSubmenu(event) {
-            event.preventDefault(); // Evita que el enlace recargue la página
-
-            // Identificar el submenú al que pertenece el enlace
-            const submenu = event.target.closest('.submenu');
-
-            // Si el submenú está abierto, lo cerramos; si está cerrado, lo abrimos
-            if (submenu.classList.contains('active')) {
-                submenu.classList.remove('active');
-            } else {
-                // Cerrar todos los submenús antes de abrir uno nuevo
-                closeAllSubmenus();
-                submenu.classList.add('active');
+    // Verificación de carga del mapa
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof simplemaps_countrymap === 'undefined') {
+                document.getElementById('mapa-error').textContent = 
+                    'Error: No se cargó countrymap.js. Verifica la ruta.';
+                document.getElementById('mapa-error').style.display = 'block';
             }
-        }
+        }, 1000);
+    });
 
-        // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menuOverlay.addEventListener('click', () => {
-            const menu = document.querySelector('.menu');
-            menu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-
-        // Cerrar el submenú al hacer clic fuera de él
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                closeAllSubmenus();
-            }
-        });
-
-        // Cerrar el submenú al hacer clic en una opción de submenú
-        const submenuLinks = document.querySelectorAll('.submenu-list a');
-        submenuLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                closeAllSubmenus(); // Cierra todos los submenús
-            });
-        });
-
-        // Mostrar fecha actual
-        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        // Verificación de carga del mapa
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (typeof simplemaps_countrymap === 'undefined') {
-                    document.getElementById('mapa-error').textContent = 
-                        'Error: No se cargó countrymap.js. Verifica la ruta.';
-                    document.getElementById('mapa-error').style.display = 'block';
-                }
-            }, 1000);
-        });
-
+    // Efectos visuales
+    document.addEventListener('DOMContentLoaded', function() {
         // Efecto de carga inicial
-        document.addEventListener('DOMContentLoaded', function() {
-            // Efecto de carga inicial
-            setTimeout(() => {
-                document.body.classList.add('loaded');
-            }, 100);
-            
-            // Animaciones al hacer scroll
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-            
-            const mapas = document.querySelectorAll('.mapa-container');
-            mapas.forEach(mapa => observer.observe(mapa));
-        });        
-
-        // Efecto de aparición al hacer scroll
-        function checkVisibility() {
-            const elements = document.querySelectorAll('.mapa-container');
-            
-            elements.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                const windowHeight = window.innerHeight;
-                
-                if (elementTop < windowHeight - 100) {
-                    element.classList.add('visible');
-                }
-            });
-        }
-
-        // Observador de intersección para mejor performance
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
+        setTimeout(() => {
+            document.body.classList.add('loaded');
+        }, 100);
+        
+        // Animaciones al hacer scroll
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
+        
+        const mapas = document.querySelectorAll('.mapa-container');
+        mapas.forEach(mapa => observer.observe(mapa));
+    });
 
-        // Aplicar a todos los elementos que quieres animar
-        document.addEventListener('DOMContentLoaded', function() {
-            const animatedElements = document.querySelectorAll('.mapa-container');
-            animatedElements.forEach(el => observer.observe(el));
-            
-            // Efecto de carga inicial
-            setTimeout(() => {
-                document.body.classList.add('loaded');
-            }, 100);
-        });
-
-        // Función global para logout (para usar en el HTML)
-        function logout() {
-            authManager.logout();
-        }
-    </script>  
+    // Función global para logout (para usar en el HTML)
+    function logout() {
+        authManager.logout();
+    }
+</script>
 </body>
 </html>
