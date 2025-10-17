@@ -1,115 +1,195 @@
-// load-menu.js - VERSIÓN UNIVERSAL PARA CUALQUIER CARPETA
+// load-menu.js - SISTEMA DE MENÚ GLOBAL UNIVERSAL
 class MenuLoader {
+    static CONFIG = {
+        MENU_FILE: 'menu.html',
+        LOAD_DELAY: 100,
+        MAX_RETRIES: 3,
+        RETRY_DELAY: 200
+    };
+
     static async loadMenu() {
         try {
-            console.log('🔄 Cargando menú...');
+            console.log('🌐 Cargando menú global...');
             
-            const menuPath = this.getMenuPath();
-            console.log('📍 Ruta del menú calculada:', menuPath);
+            const menuPath = this.getUniversalMenuPath();
+            console.log('📍 Ruta universal del menú:', menuPath);
             
             const response = await fetch(menuPath);
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Error ${response.status} al cargar: ${menuPath}`);
+            }
             
             const menuHTML = await response.text();
             
-            // Insertar el menú al inicio del body
-            document.body.insertAdjacentHTML('afterbegin', menuHTML);
+            // Inyectar el menú de forma segura
+            this.injectMenuSafely(menuHTML);
             
-            console.log('✅ Menú HTML cargado');
+            console.log('✅ Menú global inyectado correctamente');
             
-            // Configurar eventos después de cargar
-            setTimeout(() => {
-                this.setupMenuEvents();
-            }, 50);
+            // Configurar eventos con reintentos
+            await this.setupMenuWithRetry();
             
         } catch (error) {
-            console.error('❌ Error cargando el menú:', error);
-            this.loadFallbackMenu();
+            console.error('❌ Error crítico cargando menú:', error);
+            await this.loadIntelligentFallback();
         }
     }
     
-    static getMenuPath() {
+    /**
+     * CALCULA LA RUTA CORRECTA DESDE CUALQUIER CARPETA
+     * Esta es la clave del sistema universal
+     */
+    static getUniversalMenuPath() {
         const currentPath = window.location.pathname;
-        console.log('📍 Ruta actual:', currentPath);
+        console.log('📁 Ruta actual:', currentPath);
         
-        // Contar cuántos niveles de carpeta tenemos que subir
-        const depth = this.calculateDepth(currentPath);
-        console.log('📁 Profundidad calculada:', depth);
+        // Determinar cuántos niveles debemos subir
+        const depth = this.calculateFolderDepth(currentPath);
+        console.log('📊 Niveles de carpeta a subir:', depth);
         
-        // Construir la ruta relativa al menú
-        let menuPath = '';
+        // Construir la ruta relativa al menú principal
+        let relativePath = '';
         for (let i = 0; i < depth; i++) {
-            menuPath += '../';
+            relativePath += '../';
         }
-        menuPath += 'menu.html';
+        relativePath += this.CONFIG.MENU_FILE;
         
-        return menuPath;
+        console.log('🔄 Ruta relativa calculada:', relativePath);
+        return relativePath;
     }
     
-    static calculateDepth(currentPath) {
-        // Eliminar el nombre del archivo y contar las carpetas
-        const pathWithoutFile = currentPath.split('/').slice(0, -1).join('/');
-        const folders = pathWithoutFile.split('/').filter(folder => folder !== '');
+    /**
+     * CALCULA PROFUNDIDAD DE CARPETAS DE FORMA INTELIGENTE
+     */
+    static calculateFolderDepth(currentPath) {
+        // Remover el archivo actual del path
+        const pathWithoutFile = currentPath.substring(0, currentPath.lastIndexOf('/'));
         
-        console.log('📂 Carpetas en la ruta:', folders);
+        // Contar carpetas (excluyendo vacías y la raíz)
+        const folders = pathWithoutFile.split('/').filter(folder => 
+            folder && folder !== '' && folder !== 'index.html'
+        );
+        
+        console.log('📂 Estructura de carpetas:', folders);
         return folders.length;
     }
     
-    static setupMenuEvents() {
-        console.log('🔧 Configurando eventos del menú...');
+    /**
+     * INYECCIÓN SEGURA DEL MENÚ
+     */
+    static injectMenuSafely(menuHTML) {
+        // Eliminar menús existentes para evitar duplicados
+        this.removeExistingMenus();
         
+        // Insertar al inicio del body
+        document.body.insertAdjacentHTML('afterbegin', menuHTML);
+        
+        // Forzar reflow para asegurar que el DOM se actualice
+        document.body.offsetHeight;
+    }
+    
+    /**
+     * ELIMINA MENÚS EXISTENTES PARA EVITAR DUPLICADOS
+     */
+    static removeExistingMenus() {
+        const existingMenus = document.querySelectorAll('.menu, .menu-overlay, .menu-toggle');
+        existingMenus.forEach(element => {
+            if (element && element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        });
+    }
+    
+    /**
+     * CONFIGURACIÓN CON REINTENTOS INTELIGENTES
+     */
+    static async setupMenuWithRetry(retryCount = 0) {
+        try {
+            await this.delay(this.CONFIG.LOAD_DELAY);
+            this.setupAllMenuEvents();
+            console.log('🎯 Eventos del menú configurados correctamente');
+        } catch (error) {
+            if (retryCount < this.CONFIG.MAX_RETRIES) {
+                console.log(`🔄 Reintentando configuración... (${retryCount + 1}/${this.CONFIG.MAX_RETRIES})`);
+                await this.delay(this.CONFIG.RETRY_DELAY * (retryCount + 1));
+                return this.setupMenuWithRetry(retryCount + 1);
+            }
+            throw new Error(`No se pudo configurar el menú después de ${this.CONFIG.MAX_RETRIES} intentos`);
+        }
+    }
+    
+    /**
+     * CONFIGURACIÓN COMPLETA DE EVENTOS
+     */
+    static setupAllMenuEvents() {
+        // 1. Eventos básicos del menú
+        this.setupBasicMenuEvents();
+        
+        // 2. Corregir TODAS las rutas automáticamente
+        this.fixAllMenuLinks();
+        
+        // 3. Configurar submenús
+        this.setupSubmenus();
+        
+        // 4. Configurar enlaces de navegación
+        this.setupNavigationLinks();
+        
+        // 5. Configurar logout
+        this.setupLogout();
+    }
+    
+    /**
+     * EVENTOS BÁSICOS DEL MENÚ
+     */
+    static setupBasicMenuEvents() {
         const menuToggle = document.querySelector('.menu-toggle');
         const menu = document.querySelector('.menu');
         const menuOverlay = document.querySelector('.menu-overlay');
         
         if (!menuToggle || !menu || !menuOverlay) {
-            console.error('❌ Elementos del menú no encontrados');
-            return;
+            throw new Error('Elementos esenciales del menú no encontrados');
         }
         
-        // 1. EVENTO PARA EL BOTÓN DEL MENÚ PRINCIPAL
+        // Toggle del menú principal
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             menu.classList.toggle('active');
             menuOverlay.classList.toggle('active');
-            console.log('🎯 Menú principal toggled');
+            console.log('🎯 Menú toggled');
         });
         
-        // 2. EVENTO PARA CERRAR MENÚ AL CLICAR EN OVERLAY
+        // Cerrar menú al hacer clic en overlay
         menuOverlay.addEventListener('click', () => {
             menu.classList.remove('active');
             menuOverlay.classList.remove('active');
             this.closeAllSubmenus();
-            console.log('🎯 Menú cerrado por overlay');
         });
         
-        // 3. CORREGIR TODAS LAS RUTAS ANTES DE CONFIGURAR EVENTOS
-        this.fixAllMenuLinks();
-        
-        // 4. EVENTOS PARA SUBMENÚS
-        this.setupSubmenus();
-        
-        // 5. EVENTO PARA CERRAR MENÚ AL CLICAR ENLACES
-        this.setupMenuLinks();
-        
-        // 6. EVENTO PARA LOGOUT
-        this.setupLogout();
-        
-        console.log('✅ Todos los eventos del menú configurados');
+        // Cerrar menú con ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                menu.classList.remove('active');
+                menuOverlay.classList.remove('active');
+                this.closeAllSubmenus();
+            }
+        });
     }
     
+    /**
+     * CORREGIR TODAS LAS RUTAS DEL MENÚ AUTOMÁTICAMENTE
+     * ESTO ES CLAVE PARA EL FUNCIONAMIENTO UNIVERSAL
+     */
     static fixAllMenuLinks() {
-        console.log('🔧 Corrigiendo TODAS las rutas del menú...');
+        console.log('🔧 Corrigiendo rutas de todos los enlaces...');
         
         const allLinks = document.querySelectorAll('.menu a[href]');
-        console.log(`🔗 Encontrados ${allLinks.length} enlaces en el menú`);
+        console.log(`🔗 Encontrados ${allLinks.length} enlaces para corregir`);
         
         allLinks.forEach(link => {
             const originalHref = link.getAttribute('href');
             
-            // Solo corregir rutas relativas que no sean especiales
             if (this.shouldFixLink(originalHref)) {
-                const correctedHref = this.fixLinkPath(originalHref);
+                const correctedHref = this.fixSingleLinkPath(originalHref);
                 
                 if (correctedHref !== originalHref) {
                     link.setAttribute('href', correctedHref);
@@ -117,28 +197,34 @@ class MenuLoader {
                 }
             }
         });
-        
-        console.log('✅ Todas las rutas del menú corregidas');
     }
     
+    /**
+     * DECIDE SI UN ENLACE DEBE SER CORREGIDO
+     */
     static shouldFixLink(href) {
+        // No corregir enlaces absolutos, anchors, o scripts
         return href && 
                !href.startsWith('http') && 
                !href.startsWith('//') &&
                !href.startsWith('#') && 
                !href.startsWith('javascript:') &&
                !href.startsWith('mailto:') &&
-               href !== 'index.html' &&
-               !href.includes('/');
+               !href.startsWith('tel:');
     }
     
-    static fixLinkPath(originalHref) {
-        const currentPath = window.location.pathname;
-        const depth = this.calculateDepth(currentPath);
+    /**
+     * CORRIGE LA RUTA DE UN ENLACE INDIVIDUAL
+     */
+    static fixSingleLinkPath(originalHref) {
+        const currentDepth = this.calculateFolderDepth(window.location.pathname);
+        const targetDepth = this.calculateLinkDepth(originalHref);
         
-        // Construir la ruta corregida
+        // Calcular cuántos "../" necesitamos
+        const depthDifference = currentDepth - targetDepth;
+        
         let correctedPath = '';
-        for (let i = 0; i < depth; i++) {
+        for (let i = 0; i < depthDifference; i++) {
             correctedPath += '../';
         }
         correctedPath += originalHref;
@@ -146,82 +232,102 @@ class MenuLoader {
         return correctedPath;
     }
     
+    /**
+     * CALCULA LA PROFUNDIDAD DE UN ENLACE
+     */
+    static calculateLinkDepth(href) {
+        // Contar las carpetas en el enlace de destino
+        const path = href.split('/').filter(part => part && !part.includes('.html'));
+        return path.length;
+    }
+    
+    /**
+     * CONFIGURACIÓN MEJORADA DE SUBMENÚS
+     */
     static setupSubmenus() {
         const submenuToggles = document.querySelectorAll('.submenu > a');
-        console.log(`🔍 Encontrados ${submenuToggles.length} submenús`);
+        console.log(`🎯 Configurando ${submenuToggles.length} submenús`);
         
-        submenuToggles.forEach((toggle, index) => {
-            // Clonar para limpiar eventos anteriores
+        submenuToggles.forEach(toggle => {
+            // Limpiar eventos anteriores
             toggle.replaceWith(toggle.cloneNode(true));
             
-            const newToggle = document.querySelectorAll('.submenu > a')[index];
-            
-            newToggle.addEventListener('click', (e) => {
+            toggle.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                const submenu = newToggle.closest('.submenu');
-                const wasActive = submenu.classList.contains('active');
+                const submenu = toggle.parentElement;
+                const isActive = submenu.classList.contains('active');
                 
+                // Cerrar todos los submenús primero
                 this.closeAllSubmenus();
                 
-                if (!wasActive) {
+                // Abrir el actual si no estaba activo
+                if (!isActive) {
                     submenu.classList.add('active');
-                    console.log('🎯 Submenú abierto:', newToggle.textContent.trim());
                 }
             });
         });
         
         // Cerrar submenús al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.submenu')) {
-                this.closeAllSubmenus();
-            }
+        document.addEventListener('click', () => {
+            this.closeAllSubmenus();
         });
     }
     
-    static setupMenuLinks() {
+    /**
+     * CONFIGURACIÓN DE ENLACES DE NAVEGACIÓN
+     */
+    static setupNavigationLinks() {
         const menuLinks = document.querySelectorAll('.menu a:not(.submenu > a)');
-        console.log(`🔗 Configurando ${menuLinks.length} enlaces del menú`);
         
         menuLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                console.log('🎯 Clic en enlace:', link.textContent, '→', link.href);
-                
-                // Solo cerrar el menú, NO prevenir la navegación
-                const menu = document.querySelector('.menu');
-                const menuOverlay = document.querySelector('.menu-overlay');
-                
-                if (menu && menuOverlay) {
-                    menu.classList.remove('active');
-                    menuOverlay.classList.remove('active');
-                    this.closeAllSubmenus();
-                }
+            link.addEventListener('click', () => {
+                // Cerrar menú al navegar
+                this.closeMenu();
+                console.log('🔗 Navegando a:', link.href);
             });
         });
     }
     
+    /**
+     * CONFIGURACIÓN DE LOGOUT MEJORADA
+     */
     static setupLogout() {
         const logoutLinks = document.querySelectorAll('.logout-link');
         
         logoutLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                    localStorage.removeItem('authenticated');
-                    localStorage.removeItem('loginTime');
-                    const loginPath = this.getLoginPath();
-                    window.location.href = loginPath;
-                }
+                this.performLogout();
             });
         });
     }
     
-    static getLoginPath() {
-        const currentPath = window.location.pathname;
-        const depth = this.calculateDepth(currentPath);
-        
+    /**
+     * LOGOUT CON REDIRECCIÓN INTELIGENTE
+     */
+    static performLogout() {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            console.log('🚪 Cerrando sesión...');
+            
+            // Limpiar datos de sesión
+            localStorage.removeItem('authenticated');
+            localStorage.removeItem('loginTime');
+            
+            // Redirigir al login con la ruta correcta
+            const loginPath = this.getUniversalLoginPath();
+            window.location.href = loginPath;
+        }
+    }
+    
+    /**
+     * OBTIENE RUTA UNIVERSAL PARA LOGIN
+     */
+    static getUniversalLoginPath() {
+        const depth = this.calculateFolderDepth(window.location.pathname);
         let loginPath = '';
+        
         for (let i = 0; i < depth; i++) {
             loginPath += '../';
         }
@@ -230,85 +336,128 @@ class MenuLoader {
         return loginPath;
     }
     
-    static closeAllSubmenus() {
-        const activeSubmenus = document.querySelectorAll('.submenu.active');
-        
-        if (activeSubmenus.length > 0) {
-            activeSubmenus.forEach(submenu => {
-                submenu.classList.remove('active');
-            });
-        }
-    }
-    
-    static loadFallbackMenu() {
-        console.log('🔄 Cargando menú de respaldo...');
+    /**
+     * MENÚ DE RESERVA INTELIGENTE
+     */
+    static async loadIntelligentFallback() {
+        console.warn('🔄 Cargando menú de respaldo inteligente...');
         
         const fallbackMenu = `
             <div class="menu-overlay"></div>
             <button class="menu-toggle">☰</button>
             <nav class="menu">
                 <ul>
-                    <li><a href="#" class="go-home">Inicio</a></li>
-                    <li><a href="#" class="go-login">Iniciar Sesión</a></li>
+                    <li><a href="#" class="go-home">🏠 Inicio</a></li>
+                    <li><a href="#" class="go-login">🔐 Iniciar Sesión</a></li>
+                    <li><a href="#" class="reload-page">🔄 Recargar Página</a></li>
                 </ul>
             </nav>
         `;
         
-        document.body.insertAdjacentHTML('afterbegin', fallbackMenu);
+        this.injectMenuSafely(fallbackMenu);
         
-        // Configurar eventos para el menú de respaldo
+        // Configurar eventos del menú de respaldo
         setTimeout(() => {
-            const homeLink = document.querySelector('.go-home');
-            const loginLink = document.querySelector('.go-login');
-            const menuToggle = document.querySelector('.menu-toggle');
-            const menu = document.querySelector('.menu');
-            const menuOverlay = document.querySelector('.menu-overlay');
-            
-            if (homeLink) {
-                homeLink.addEventListener('click', () => {
-                    const depth = this.calculateDepth(window.location.pathname);
-                    let homePath = '';
-                    for (let i = 0; i < depth; i++) homePath += '../';
-                    homePath += 'index.html';
-                    window.location.href = homePath;
-                });
-            }
-            
-            if (loginLink) {
-                loginLink.addEventListener('click', () => {
-                    const depth = this.calculateDepth(window.location.pathname);
-                    let loginPath = '';
-                    for (let i = 0; i < depth; i++) loginPath += '../';
-                    loginPath += 'login.html';
-                    window.location.href = loginPath;
-                });
-            }
-            
-            if (menuToggle && menu && menuOverlay) {
-                menuToggle.addEventListener('click', () => {
-                    menu.classList.toggle('active');
-                    menuOverlay.classList.toggle('active');
-                });
-                
-                menuOverlay.addEventListener('click', () => {
-                    menu.classList.remove('active');
-                    menuOverlay.classList.remove('active');
-                });
-            }
-        }, 50);
+            this.setupFallbackEvents();
+        }, this.CONFIG.LOAD_DELAY);
+    }
+    
+    /**
+     * EVENTOS DEL MENÚ DE RESERVA
+     */
+    static setupFallbackEvents() {
+        const homeLink = document.querySelector('.go-home');
+        const loginLink = document.querySelector('.go-login');
+        const reloadLink = document.querySelector('.reload-page');
+        
+        if (homeLink) {
+            homeLink.addEventListener('click', () => {
+                const homePath = this.getUniversalHomePath();
+                window.location.href = homePath;
+            });
+        }
+        
+        if (loginLink) {
+            loginLink.addEventListener('click', () => {
+                const loginPath = this.getUniversalLoginPath();
+                window.location.href = loginPath;
+            });
+        }
+        
+        if (reloadLink) {
+            reloadLink.addEventListener('click', () => {
+                window.location.reload();
+            });
+        }
+        
+        this.setupBasicMenuEvents();
+    }
+    
+    /**
+     * OBTIENE RUTA UNIVERSAL PARA INICIO
+     */
+    static getUniversalHomePath() {
+        const depth = this.calculateFolderDepth(window.location.pathname);
+        let homePath = '';
+        
+        for (let i = 0; i < depth; i++) {
+            homePath += '../';
+        }
+        homePath += 'index.html';
+        
+        return homePath;
+    }
+    
+    /**
+     * CIERRA EL MENÚ COMPLETAMENTE
+     */
+    static closeMenu() {
+        const menu = document.querySelector('.menu');
+        const menuOverlay = document.querySelector('.menu-overlay');
+        
+        if (menu) menu.classList.remove('active');
+        if (menuOverlay) menuOverlay.classList.remove('active');
+        
+        this.closeAllSubmenus();
+    }
+    
+    /**
+     * CIERRA TODOS LOS SUBMENÚS
+     */
+    static closeAllSubmenus() {
+        document.querySelectorAll('.submenu.active').forEach(submenu => {
+            submenu.classList.remove('active');
+        });
+    }
+    
+    /**
+     * UTILIDAD: DELAY ASÍNCRONO
+     */
+    static delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
-// Funciones globales para compatibilidad
+// =============================================================================
+// FUNCIONES GLOBALES PARA COMPATIBILIDAD
+// =============================================================================
+
+/**
+ * Función global para abrir/cerrar menú (para usar en HTML)
+ */
 window.toggleMenu = function() {
     const menu = document.querySelector('.menu');
     const menuOverlay = document.querySelector('.menu-overlay');
+    
     if (menu && menuOverlay) {
         menu.classList.toggle('active');
         menuOverlay.classList.toggle('active');
     }
 };
 
+/**
+ * Función global para submenús (para usar en HTML)
+ */
 window.toggleSubmenu = function(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -316,30 +465,46 @@ window.toggleSubmenu = function(event) {
     const submenu = event.target.closest('.submenu');
     const wasActive = submenu.classList.contains('active');
     
-    document.querySelectorAll('.submenu.active').forEach(sm => {
-        sm.classList.remove('active');
-    });
+    MenuLoader.closeAllSubmenus();
     
     if (!wasActive) {
         submenu.classList.add('active');
     }
 };
 
+/**
+ * Función global para logout (para usar en HTML)
+ */
 window.logout = function() {
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        localStorage.removeItem('authenticated');
-        localStorage.removeItem('loginTime');
-        window.location.href = 'login.html';
-    }
+    MenuLoader.performLogout();
 };
 
-// Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 DOM listo, iniciando menú...');
-        MenuLoader.loadMenu();
-    });
-} else {
-    console.log('📄 DOM ya listo, iniciando menú...');
+/**
+ * Función global para recargar el menú manualmente
+ */
+window.reloadMenu = function() {
+    console.log('🔄 Recargando menú manualmente...');
     MenuLoader.loadMenu();
+};
+
+// =============================================================================
+// INICIALIZACIÓN AUTOMÁTICA
+// =============================================================================
+
+/**
+ * Inicializa el menú cuando el DOM esté listo
+ */
+function initializeMenuSystem() {
+    console.log('🚀 Iniciando sistema de menú global...');
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            MenuLoader.loadMenu();
+        });
+    } else {
+        MenuLoader.loadMenu();
+    }
 }
+
+// Iniciar el sistema
+initializeMenuSystem();

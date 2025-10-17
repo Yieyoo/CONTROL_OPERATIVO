@@ -9,8 +9,8 @@
     <meta http-equiv="Expires" content="0">
     <title>Aguascalientes - Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../../imagenes/iconom.png">
-    <link rel="stylesheet" href="../diseños/diseñogeneral.css">
-    <script src="../../load-menu.js" defer></script>
+    <link rel="stylesheet" href="../../styles.css">  <!-- ✅ CORREGIDO: sube 2 niveles -->
+    <script src="../../load-menu.js" defer></script>  <!-- ✅ CORRECTO: sube 2 niveles -->
 </head>
 <body>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ -->
@@ -30,7 +30,7 @@
         <h3>Dirección de Control Operativo</h3>
         <div class="fecha-actual" id="fechaActual"></div>
         <button class="regresar-btn" onclick="window.location.href='../../index.html'">
-            Regresar
+            <i class="fas fa-arrow-left"></i> Regresar al Inicio
         </button>
     </section>
 
@@ -93,20 +93,42 @@
         // Sistema de autenticación
         class AuthManager {
             constructor() {
-                this.sessionDuration = 60 * 60 * 1000;
+                this.sessionDuration = 60 * 60 * 1000; // 1 hora
                 this.checkAuth();
+                this.setupNavigationHandlers();
             }
 
             checkAuth() {
                 const isAuthenticated = localStorage.getItem('authenticated') === 'true';
                 const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
                 const now = Date.now();
+                
+                console.log('🔐 Verificando autenticación en Aguascalientes...');
 
                 if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                    window.location.replace('../../login.html');
+                    console.log('❌ Sesión inválida, redirigiendo...');
+                    this.redirectToLogin();
                     return false;
                 }
+
+                console.log('✅ Sesión válida en Aguascalientes');
                 return true;
+            }
+
+            redirectToLogin() {
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('loginTime');
+                window.location.replace('../../login.html');
+            }
+
+            setupNavigationHandlers() {
+                window.addEventListener('pageshow', (event) => {
+                    if (event.persisted) {
+                        if (!this.checkAuth()) {
+                            this.redirectToLogin();
+                        }
+                    }
+                });
             }
         }
 
@@ -128,6 +150,60 @@
                 window.location.href = '../../login.html';
             }
         }
+
+        // Efectos visuales adicionales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación de entrada para los botones
+            const buttons = document.querySelectorAll('.opciones-grid button');
+            buttons.forEach((button, index) => {
+                setTimeout(() => {
+                    button.style.opacity = '1';
+                    button.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
     </script>
+
+    <style>
+        /* Estilos específicos para Aguascalientes */
+        .estado-info {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a3e72, #2d5aa0);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .estado-info h4 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .opciones-grid button {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .regresar-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+
+        .regresar-btn:hover {
+            background: #5a6268;
+        }
+    </style>
 </body>
 </html>
