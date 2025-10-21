@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UBICACIONES</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
+    <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
     <script src="../../../load-menu.js" defer></script>
 </head>
@@ -57,15 +57,15 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
- <button class="regresar-btn" onclick="window.location.href = '../aguascalientesindex.html'">Regresar</button>
+    <button class="regresar-btn" onclick="window.location.href = '../aguascalientesindex.html'">Regresar</button>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO = 'aguascalientes';       // Cambia por el estado que necesites 
-    const TIPO_UBICACIONES = 'ubicaciones_sedes'; // Tipo de documento para ubicaciones
-    const TITULO_UBICACIONES = 'Ubicación de oficinas del INM en Aguascalientes'; // Título del documento
+    const ESTADO = 'aguascalientes';       // Cambia por el estado que necesites
+    const TIPO_DOCUMENTO = 'ubicaciones_sedes'; // Cambia por el tipo de documento que necesites
+    const TITULO_DOCUMENTO = 'UBICACIONES'; // Cambia por el título que quieras mostrar
 
     // Configuración dinámica desde URL (opcional)
     const params = new URLSearchParams(window.location.search);
@@ -176,7 +176,7 @@
                 // Configuración específica para iOS - Descarga directa
                 if (isIOS()) {
                     iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'vehiculos.pdf');
+                    iosLink.setAttribute('download', latestPDF.filename || 'ubicaciones.pdf');
                 }
             } else {
                 showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
