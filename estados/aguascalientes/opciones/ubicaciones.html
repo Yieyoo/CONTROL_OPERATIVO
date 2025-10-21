@@ -3,25 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UBICACIÓN DE OFICINAS DEL INM</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
+    <title>UBICACIONES</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
-    <!-- Cargar el script del menú dinámico -->
     <script src="../../../load-menu.js" defer></script>
 </head>
-
 <body>
+    <!-- HEADER DE DOS LÍNEAS -->
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
     </div>
-    <h1 id="titulo-documento" class="titulo-personalizado">UBICACIÓN DE OFICINAS DEL INM</h1>       
+
+    <!-- MENÚ LATERAL -->
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="menu-overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="menu" id="main-menu">
+        <img src="../../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
+        <ul>
+            <!-- El menú se cargará desde load-menu.js -->
+        </ul>
+    </nav>
+
+    <h1 id="titulo-documento" class="titulo-personalizado">UBICACIONES</h1>       
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
-
-    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ -->
-
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
@@ -49,15 +57,15 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
+ <button class="regresar-btn" onclick="window.location.href = '../aguascalientesindex.html'">Regresar</button>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO = 'aguascalientes';       // Cambia por el estado que necesites
-    const TIPO_DOCUMENTO = 'ubicaciones'; // Cambia por el tipo de documento que necesites
-    const TITULO_DOCUMENTO = 'UBICACIÓN DE OFICINAS DEL INM'; // Cambia por el título que quieras mostrar
+    const ESTADO = 'aguascalientes';       // Cambia por el estado que necesites 
+    const TIPO_UBICACIONES = 'ubicaciones_sedes'; // Tipo de documento para ubicaciones
+    const TITULO_UBICACIONES = 'Ubicación de oficinas del INM en Aguascalientes'; // Título del documento
 
     // Configuración dinámica desde URL (opcional)
     const params = new URLSearchParams(window.location.search);
@@ -99,6 +107,16 @@
     function hideErrors() {
         document.getElementById('pdf-error').style.display = 'none';
         document.getElementById('mobile-error').style.display = 'none';
+    }
+
+    // Función para el menú lateral
+    function toggleMenu() {
+        const menu = document.getElementById('main-menu');
+        const overlay = document.querySelector('.menu-overlay');
+        if (menu && overlay) {
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
     }
 
     // Formatear fecha legible
@@ -158,7 +176,7 @@
                 // Configuración específica para iOS - Descarga directa
                 if (isIOS()) {
                     iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'ubicaciones.pdf');
+                    iosLink.setAttribute('download', latestPDF.filename || 'vehiculos.pdf');
                 }
             } else {
                 showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
