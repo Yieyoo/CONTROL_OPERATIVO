@@ -85,7 +85,7 @@
                 <li class="submenu">
                     <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
                     <ul class="submenu-list">
-                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                       <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                         <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
                         <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
                         <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
@@ -117,7 +117,6 @@
                         <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
                         <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
                         <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
                 </li>
             </ul>
         </nav>
@@ -133,7 +132,6 @@
             class="pdf-embed"
             frameborder="0"
             title="Visualizador de PDF"
-            src="../../../documentacion/plantillas_personal/hidalgop/HID1.pdf"
         ></iframe>
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
@@ -146,6 +144,10 @@
             <span>Abrir Plantilla</span>
         </a>
         <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
+    </div>
+
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 <div id="fecha-subida" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px;">
     Actualizado: <span id="fecha-texto">Cargando...</span>
@@ -296,12 +298,14 @@ async function loadPlantillaPersonal() {
             fechaElement.textContent = formatDate(latestPDF.uploaded_at);
             
             // Configuración normal para PC
-            pdfViewer.src = latestPDF.url;            
+            pdfViewer.src = latestPDF.url;
+            
             // Configuración específica para iOS
             if (isIOS()) {
                 // Usamos Google Viewer como alternativa para iOS
                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                iosLink.href = googleViewerUrl;            }
+                iosLink.href = googleViewerUrl;
+            }
         } else {
             showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
             fechaElement.textContent = 'No disponible';
@@ -341,5 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
     </script>
+    <script src="../../../carga,.js"></script>
 </body>
 </html>
