@@ -6,6 +6,9 @@
     <title>ESTADO FUERZA</title>
     <link rel="icon" type="image/png" href="../../imagenes/inm logo.png">
     <link rel="stylesheet" href="../../estados/diseños/generaldoc.css">
+    <!-- Cargar Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Cargar el script del menú dinámico -->
     <script src="../../load-menu.js" defer></script>
 </head>
 <body>
@@ -20,7 +23,7 @@
     <div class="menu-overlay" onclick="toggleMenu()"></div>
     
     <nav class="menu" id="main-menu">
-        <img src="../../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
+        <img src="../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
         <ul>
             <!-- El menú se cargará desde load-menu.js -->
         </ul>
@@ -31,7 +34,7 @@
         <div class="spinner"></div>
     </div>
     <div class="logo-container">
-        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
+        <img src="../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
     <div class="pdf-container">
@@ -39,7 +42,7 @@
             id="pdf-viewer" 
             class="pdf-embed"
             frameborder="0"
-            title="Visualizador de PDF"
+            title="Visualizador de PDF - Estado de Fuerza"
         ></iframe>
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
@@ -57,7 +60,7 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
- <button class="regresar-btn" onclick="window.location.href = '../datosindex.html'">Regresar</button>
+    <button class="regresar-btn" onclick="window.location.href = '../datosindex.html'">Regresar</button>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
@@ -65,7 +68,7 @@
     const API_KEY = 'Xhy2md57';
     const ESTADO = 'datos-nacionales';
     const TIPO_DOCUMENTO = 'estado_fuerza';
-    const TITULO_DOCUMENTO = 'Estado de Fuerza';
+    const TITULO_DOCUMENTO = 'ESTADO DE FUERZA';
 
     // Configuración dinámica desde URL (opcional)
     const params = new URLSearchParams(window.location.search);
@@ -135,7 +138,7 @@
         document.getElementById('titulo-documento').textContent = TITULO_FINAL;
 
         try {
-            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+            console.log(`🔄 Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
             const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
                 headers: { 'x-api-key': API_KEY }
             });
@@ -143,7 +146,7 @@
             if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
             const result = await response.json();
-            console.log('Respuesta API:', result);
+            console.log('✅ Respuesta API:', result);
 
             if (!result?.data) throw new Error('Formato de respuesta inválido');
 
@@ -156,6 +159,8 @@
                     new Date(b.uploaded_at) - new Date(a.uploaded_at)
                 )[0];
 
+                console.log(`📄 Documento encontrado: ${latestPDF.filename}`);
+
                 // Configuración normal para PC
                 pdfViewer.src = latestPDF.url;
                 
@@ -167,7 +172,7 @@
                             <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
                             <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
                             <a href="${latestPDF.url}" class="download-btn" download>
-                                Descargar Documento
+                                <i class="fas fa-download"></i> Descargar Documento
                             </a>
                         </div>
                     `;
@@ -176,27 +181,94 @@
                 // Configuración específica para iOS - Descarga directa
                 if (isIOS()) {
                     iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'vehiculos.pdf');
+                    iosLink.setAttribute('download', latestPDF.filename || 'estado_fuerza.pdf');
                 }
             } else {
                 showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('❌ Error:', error);
             showError(`Error al cargar el documento: ${error.message}`, 'both');
         } finally {
             showLoading(false);
         }
     }
 
+    // Sistema de autenticación
+    class AuthManager {
+        constructor() {
+            this.sessionDuration = 60 * 60 * 1000; // 1 hora
+            this.checkAuth();
+            this.setupNavigationHandlers();
+        }
+
+        checkAuth() {
+            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+            const now = Date.now();
+            
+            console.log('🔐 Verificando autenticación...');
+
+            if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
+                console.log('❌ Sesión inválida, redirigiendo...');
+                this.redirectToLogin();
+                return false;
+            }
+
+            console.log('✅ Sesión válida');
+            return true;
+        }
+
+        redirectToLogin() {
+            localStorage.removeItem('authenticated');
+            localStorage.removeItem('loginTime');
+            window.location.replace('../../login.html');
+        }
+
+        setupNavigationHandlers() {
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted) {
+                    if (!this.checkAuth()) {
+                        this.redirectToLogin();
+                    }
+                }
+            });
+        }
+    }
+
+    // Función global para logout
+    function logout() {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            localStorage.removeItem('authenticated');
+            localStorage.removeItem('loginTime');
+            window.location.href = '../../login.html';
+        }
+    }
+
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar autenticación
+        const authManager = new AuthManager();
+        
         // Cargar el documento PDF
         if (document.getElementById('pdf-viewer')) {
             cargarDocumentoPDF();
         }
     });
 </script>
-<script src="../../../carga,.js"></script>
+
+<style>
+    /* Eliminar íconos del menú lateral */
+    .menu i,
+    .menu .fas,
+    .menu .fa {
+        display: none !important;
+    }
+    
+    /* Ajustar el espaciado del menú sin íconos */
+    .menu ul li a {
+        padding-left: 20px !important;
+    }
+</style>
 </body>
 </html>
