@@ -15,9 +15,9 @@
         <div class="linea-inferior"></div>
     </div>
 
-    <!-- MENÚ LATERAL -->
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="menu-overlay" onclick="toggleMenu()"></div>
+    <!-- ⚠️ ELIMINA LOS onclick - load-menu.js manejará los eventos -->
+    <button class="menu-toggle">☰</button>
+    <div class="menu-overlay"></div>
     
     <nav class="menu" id="main-menu">
         <img src="../../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
@@ -57,15 +57,15 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
- <button class="regresar-btn" onclick="window.location.href = '../aguascalientesindex.html'">Regresar</button>
+    <button class="regresar-btn" onclick="window.location.href = '../aguascalientesindex.html'">Regresar</button>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO = 'datos-nacionales';       // Cambia por el estado que necesites
-    const TIPO_DOCUMENTO = 'estado_fuerza'; // Cambia por el tipo de documento que necesites
-    const TITULO_DOCUMENTO = 'VEHICULOS'; // Cambia por el título que quieras mostrar
+    const ESTADO = 'datos-nacionales';
+    const TIPO_DOCUMENTO = 'estado_fuerza';
+    const TITULO_DOCUMENTO = 'VEHICULOS';
 
     // Configuración dinámica desde URL (opcional)
     const params = new URLSearchParams(window.location.search);
@@ -109,15 +109,7 @@
         document.getElementById('mobile-error').style.display = 'none';
     }
 
-    // Función para el menú lateral
-    function toggleMenu() {
-        const menu = document.getElementById('main-menu');
-        const overlay = document.querySelector('.menu-overlay');
-        if (menu && overlay) {
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-    }
+    // ⚠️ ELIMINA la función toggleMenu - load-menu.js maneja esto
 
     // Formatear fecha legible
     function formatDate(dateString) {
@@ -197,6 +189,8 @@
         }
     });
 </script>
-<script src="../../../carga,.js"></script>
+
+<!-- ⚠️ CORRIGE ESTE ERROR: carga,.js → carga.js -->
+<script src="../../../carga.js"></script>
 </body>
 </html>
