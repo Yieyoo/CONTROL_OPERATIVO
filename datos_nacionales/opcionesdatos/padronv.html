@@ -3,36 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PADRÓN VEHICULAR</title>
+    <title>PADRON VEHICULAR</title>
     <link rel="icon" type="image/png" href="../../imagenes/pasaporte.png">
-    <link rel="stylesheet" href="../../estados/diseños/generaldoc.css">
-    <!-- Cargar Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Cargar el script del menú dinámico -->
-    <script src="../../load-menu.js" defer></script>
+    <link rel="stylesheet" href="../../estados/diseños/diseñounafoto.css">
+    <style>
+        /* Estilos específicos para móviles iOS */
+        @media only screen and (max-width: 768px) {
+            .ios-only {
+                display: none; /* Oculto por defecto */
+            }
+            
+            /* Solo mostrar en iOS */
+            @supports (-webkit-touch-callout: none) {
+                .ios-only {
+                    display: block;
+                    text-align: center;
+                    margin: 20px;
+                    padding: 15px;
+                    background: #f8f8f8;
+                    border-radius: 10px;
+                    border: 1px solid #ddd;
+                }
+                
+                .ios-pdf-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    background: #3498db;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    margin-top: 15px;
+                }
+                
+                .ios-pdf-link img {
+                    width: 30px;
+                    height: 30px;
+                }
+                
+                .ios-instructions {
+                    font-size: 14px;
+                    color: #666;
+                    margin-top: 10px;
+                }
+            }
+        }
+        
+        /* Estilo para el título principal */
+        .titulo-personalizado {
+            color: #2c3e50;
+            text-align: center;
+            margin: 50px 0 20px 0; /* 100px arriba, 0 derecha, 20px abajo, 0 izquierda */
+            font-size: 24px;
+            padding: 0 15px;
+        }
+        
+        /* Estilo para la información del archivo */
+        .file-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        
+        .file-info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: #2980b9;
+        }
+        
+        /* Estilos para mensajes de error */
+        .error-message {
+            color: #e74c3c;
+            background: #fdecea;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #e74c3c;
+        }
+        
+        /* Estilos para el logo */
+        .logo-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .logo-container img {
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <!-- HEADER DE DOS LÍNEAS -->
-    <div class="header-lineas">
-        <div class="linea-superior"></div>
-        <div class="linea-inferior"></div>
-    </div>
-
-    <!-- MENÚ LATERAL -->
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="menu-overlay" onclick="toggleMenu()"></div>
-    
-    <nav class="menu" id="main-menu">
-        <img src="../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
-        <ul>
-            <!-- El menú se cargará desde load-menu.js -->
-        </ul>
-    </nav>
-
-    <h1 id="titulo-documento" class="titulo-personalizado">PADRÓN VEHICULAR</h1>       
+    <script type="module" src="../../common.js"></script>
+    <h1 id="titulo-documento" class="titulo-personalizado">PADRON VEHICULAR</h1>
+        
+    <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
+
+    <header>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <nav class="menu">
+            <img src="../../imagenes/unnamed.png" class="logo-arriba-img" alt="Logo">
+            <ul>
+                <li><a href="../../index.html">Inicio</a></li>
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
+                        <li><a href="../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
+                        <li><a href="../../construccion.html">Inmuebles</a></li>
+                        <li><a href="../../construccion.html">Padron Vehicular</a></li>
+                        <li><a href="../../gestion/archivos.html">Gestion de Archivos</a></li>
+                    </ul>
+                </li>
+                <li class="submenu">
+                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
+                    <ul class="submenu-list">
+                        <li><a href="../../estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
+                        <li><a href="../../estados/baja_california/baja_californiaindex.html">Baja California</a></li>
+                        <li><a href="../../estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
+                        <li><a href="../../estados/campeche/campecheindex.html">Campeche</a></li>
+                        <li><a href="../../estados/chiapas/chiapasindex.html">Chiapas</a></li>
+                        <li><a href="../../estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
+                        <li><a href="../../estados/coahuila/coahuilaindex.html">Coahuila</a></li>
+                        <li><a href="../../estados/colima/colimaindex.html">Colima</a></li>
+                        <li><a href="../../estados/cdmx/cdmxindex.html">Ciudad de México</a></li>
+                        <li><a href="../../estados/durango/durangoindex.html">Durango</a></li>
+                        <li><a href="../../estados/guanajuato/guanajuatoindex.html">Guanajuato</a></li>
+                        <li><a href="../../estados/guerrero/guerreroindex.html">Guerrero</a></li>
+                        <li><a href="../../estados/hidalgo/hidalgoindex.html">Hidalgo</a></li>
+                        <li><a href="../../estados/jalisco/jaliscoindex.html">Jalisco</a></li>
+                        <li><a href="../../estados/edomex/edomexindex.html">Estado de México</a></li>
+                        <li><a href="../../estados/michoacan/michoacanindex.html">Michoacán</a></li>
+                        <li><a href="../../estados/morelos/morelosindex.html">Morelos</a></li>
+                        <li><a href="../../estados/nayarit/nayaritindex.html">Nayarit</a></li>
+                        <li><a href="../../estados/nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
+                        <li><a href="../../estados/oaxaca/oaxacaindex.html">Oaxaca</a></li>
+                        <li><a href="../../estados/puebla/pueblaindex.html">Puebla</a></li>
+                        <li><a href="../../estados/queretaro/queretaroindex.html">Querétaro</a></li>
+                        <li><a href="../../estados/quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
+                        <li><a href="../../estados/san_luis/san_luisindex.html">San Luis Potosí</a></li>
+                        <li><a href="../../estados/sinaloa/sinaloaindex.html">Sinaloa</a></li>
+                        <li><a href="../../estados/sonora/sonoraindex.html">Sonora</a></li>
+                        <li><a href="../../estados/tabasco/tabascoindex.html">Tabasco</a></li>
+                        <li><a href="../../estados/tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
+                        <li><a href="../../estados/tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
+                        <li><a href="../../estados/veracruz/veracruzindex.html">Veracruz</a></li>
+                        <li><a href="../../estados/yucatan/yucatanindex.html">Yucatán</a></li>
+                        <li><a href="../../estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
     <div class="logo-container">
         <img src="../../imagenes/inm logo.png" alt="Logo INM">
     </div>
@@ -59,18 +208,18 @@
 
     <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
     <div id="ios-container" class="ios-only">
-        <p>Para visualizar el documento en tu dispositivo iOS:</p>
-        <a href="#" id="ios-pdf-link" class="ios-pdf-link" download>
-            <span>Descargar Documento</span>
+        <p>Para una mejor experiencia en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
+            <span>Abrir Documento</span>
         </a>
-        <p class="ios-instructions">Toca el botón arriba para descargar el PDF a tu dispositivo</p>
+        <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
     </div>
 
     <div class="mobile-images">
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <button class="regresar-btn" onclick="window.location.href = '../../index.html'">Regresar</button>
+    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
@@ -122,19 +271,31 @@
         document.getElementById('mobile-error').style.display = 'none';
     }
 
-    // Función para el menú lateral
+    // Función para abrir/cerrar el menú
     function toggleMenu() {
-        const menu = document.getElementById('main-menu');
+        const menu = document.querySelector('.menu');
         const overlay = document.querySelector('.menu-overlay');
-        if (menu && overlay) {
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Cerrar menú al hacer clic fuera
+    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
+
+    // Función para submenús
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        document.querySelectorAll('.submenu.active').forEach(sub => {
+            if (sub !== event.target.closest('.submenu')) {
+                sub.classList.remove('active');
+            }
+        });
+        event.target.closest('.submenu').classList.toggle('active');
     }
 
     // Formatear fecha legible
     function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
@@ -200,24 +361,11 @@
                 // Configuración normal para PC
                 pdfViewer.src = latestPDF.url;
                 
-                // Configuración para móviles (no iOS)
-                if (!isIOS()) {
-                    mobileContainer.innerHTML = `
-                        <div class="file-info">
-                            <h3>${latestPDF.filename || TITULO_FINAL}</h3>
-                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                            <a href="${latestPDF.url}" class="download-btn" download>
-                                Descargar Documento
-                            </a>
-                        </div>
-                    `;
-                }
-                
-                // Configuración específica para iOS - Descarga directa
+                // Configuración específica para iOS
                 if (isIOS()) {
-                    iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'padron_vehicular.pdf');
+                    // Usamos Google Viewer como alternativa para iOS
+                    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
+                    iosLink.href = googleViewerUrl;
                 }
             } else {
                 showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
@@ -230,67 +378,32 @@
         }
     }
 
-    // Sistema de autenticación
-    class AuthManager {
-        constructor() {
-            this.sessionDuration = 60 * 60 * 1000; // 1 hora
-            this.checkAuth();
-            this.setupNavigationHandlers();
-        }
-
-        checkAuth() {
-            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-            const now = Date.now();
-            
-            console.log('🔐 Verificando autenticación...');
-
-            if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                console.log('❌ Sesión inválida, redirigiendo...');
-                this.redirectToLogin();
-                return false;
-            }
-
-            console.log('✅ Sesión válida');
-            return true;
-        }
-
-        redirectToLogin() {
-            localStorage.removeItem('authenticated');
-            localStorage.removeItem('loginTime');
-            window.location.replace('../../login.html');
-        }
-
-        setupNavigationHandlers() {
-            window.addEventListener('pageshow', (event) => {
-                if (event.persisted) {
-                    if (!this.checkAuth()) {
-                        this.redirectToLogin();
-                    }
-                }
-            });
-        }
-    }
-
-    // Función global para logout
-    function logout() {
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-            localStorage.removeItem('authenticated');
-            localStorage.removeItem('loginTime');
-            window.location.href = '../../login.html';
-        }
-    }
-
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        // Inicializar autenticación
-        const authManager = new AuthManager();
-        
         // Cargar el documento PDF
         if (document.getElementById('pdf-viewer')) {
             cargarDocumentoPDF();
         }
+
+        // Cerrar submenús al hacer clic en opción
+        document.querySelectorAll('.submenu-list a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.submenu').forEach(sub => {
+                    sub.classList.remove('active');
+                });
+            });
+        });
+        
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
+        });
     });
 </script>
+<script src="../../carga,.js"></script>
 </body>
 </html>
