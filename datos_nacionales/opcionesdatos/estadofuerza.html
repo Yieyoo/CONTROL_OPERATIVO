@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ESTADO FUERZA</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
-    <link rel="stylesheet" href="../../estados/diseños/generaldoc.css">
-    <!-- Cargar Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Cargar el script del menú dinámico -->
+    <link rel="icon" type="image/png" href="../../imagenes/inm logo.png">
+    <link rel="stylesheet" href="../../diseños/generaldoc.css">
     <script src="../../load-menu.js" defer></script>
 </head>
-
 <body>
     <!-- HEADER DE DOS LÍNEAS -->
     <div class="header-lineas">
@@ -24,7 +20,7 @@
     <div class="menu-overlay" onclick="toggleMenu()"></div>
     
     <nav class="menu" id="main-menu">
-        <img src="../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
+        <img src="../../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
         <ul>
             <!-- El menú se cargará desde load-menu.js -->
         </ul>
@@ -35,7 +31,7 @@
         <div class="spinner"></div>
     </div>
     <div class="logo-container">
-        <img src="../../imagenes/inm logo.png" alt="Logo INM">
+        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
     <div class="pdf-container">
@@ -61,15 +57,15 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <button class="regresar-btn" onclick="window.location.href = '../datosindex.html'">Regresar</button>
+ <button class="regresar-btn" onclick="window.location.href = '../datosindex.html'">Regresar</button>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO = 'datos-nacionales';       // Cambia por el estado que necesites
-    const TIPO_DOCUMENTO = 'estado_fuerza'; // Cambia por el tipo de documento que necesites
-    const TITULO_DOCUMENTO = 'ESTADO FUERZA'; // Cambia por el título que quieras mostrar
+    const ESTADO = 'estado-fuerza';       // Cambia por el estado que necesites
+    const TIPO_DOCUMENTO = 'datos_nacionales'; // Cambia por el tipo de documento que necesites
+    const TITULO_DOCUMENTO = 'VEHICULOS'; // Cambia por el título que quieras mostrar
 
     // Configuración dinámica desde URL (opcional)
     const params = new URLSearchParams(window.location.search);
@@ -180,7 +176,7 @@
                 // Configuración específica para iOS - Descarga directa
                 if (isIOS()) {
                     iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'estado_fuerza.pdf');
+                    iosLink.setAttribute('download', latestPDF.filename || 'vehiculos.pdf');
                 }
             } else {
                 showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
@@ -193,81 +189,14 @@
         }
     }
 
-    // Sistema de autenticación
-    class AuthManager {
-        constructor() {
-            this.sessionDuration = 60 * 60 * 1000; // 1 hora
-            this.checkAuth();
-            this.setupNavigationHandlers();
-        }
-
-        checkAuth() {
-            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-            const now = Date.now();
-            
-            console.log('🔐 Verificando autenticación...');
-
-            if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                console.log('❌ Sesión inválida, redirigiendo...');
-                this.redirectToLogin();
-                return false;
-            }
-
-            console.log('✅ Sesión válida');
-            return true;
-        }
-
-        redirectToLogin() {
-            localStorage.removeItem('authenticated');
-            localStorage.removeItem('loginTime');
-            window.location.replace('../../login.html');
-        }
-
-        setupNavigationHandlers() {
-            window.addEventListener('pageshow', (event) => {
-                if (event.persisted) {
-                    if (!this.checkAuth()) {
-                        this.redirectToLogin();
-                    }
-                }
-            });
-        }
-    }
-
-    // Función global para logout
-    function logout() {
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-            localStorage.removeItem('authenticated');
-            localStorage.removeItem('loginTime');
-            window.location.href = '../../login.html';
-        }
-    }
-
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        // Inicializar autenticación
-        const authManager = new AuthManager();
-        
         // Cargar el documento PDF
         if (document.getElementById('pdf-viewer')) {
             cargarDocumentoPDF();
         }
     });
 </script>
-
-<style>
-    /* Eliminar íconos del menú lateral */
-    .menu i,
-    .menu .fas,
-    .menu .fa {
-        display: none !important;
-    }
-    
-    /* Ajustar el espaciado del menú sin íconos */
-    .menu ul li a {
-        padding-left: 20px !important;
-    }
-</style>
+<script src="../../../carga,.js"></script>
 </body>
 </html>
