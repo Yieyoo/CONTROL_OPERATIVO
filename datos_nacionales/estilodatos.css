@@ -637,3 +637,43 @@ nav.menu {
       font-size: 1rem;
     }
   }
+    /* SOLO ESTILOS ESPECÍFICOS PARA COAHUILA - MÍNIMOS */
+    
+    /* Animación de los botones - MANTENER */
+    .opciones-grid button {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+
+    /* Color específico para Coahuila */
+    .estado-info {
+        background: linear-gradient(135deg, #a08d2d, #a08d2d);
+    }
+
+    /* Efecto de carga de la página */
+    body {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+    
+    body.loaded {
+        opacity: 1;
+    }
+
+    /* === ELIMINAR ÍCONOS SOLO DEL MENÚ LATERAL === */
+    .menu i,
+    .menu .fas,
+    .menu .fa {
+        display: none !important;
+    }
+    
+    /* Ajustar el espaciado del menú sin íconos */
+    .menu ul li a {
+        padding-left: 20px !important;
+    }
+    
+    /* Asegurar que los submenús también se vean bien */
+    .menu .submenu-list li a {
+        padding-left: 30px !important;
+    }
