@@ -18,8 +18,12 @@
         <div class="linea-inferior"></div>
     </div>
 
-    <!-- EL MENÚ SE CARGARÁ AUTOMÁTICAMENTE DESDE load-menu.js -->
-    <!-- NO incluir elementos del menú aquí -->
+    <!-- ⚠️ AGREGAR LOS ELEMENTOS BÁSICOS DEL MENÚ QUE load-menu.js ESPERA -->
+    <button class="menu-toggle">☰</button>
+    <div class="menu-overlay"></div>
+    <nav class="menu">
+        <!-- El contenido se cargará dinámicamente desde menu.html -->
+    </nav>
 
     <h1 id="titulo-documento" class="titulo-personalizado">ESTADO FUERZA</h1>       
     <div class="loading" id="loading">
@@ -231,6 +235,52 @@
 </script>
 
 <style>
+    /* Estilos básicos para el menú mientras carga */
+    .menu-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1000;
+        background: #2c3e50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 998;
+        display: none;
+    }
+
+    .menu {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 280px;
+        height: 100%;
+        background: #34495e;
+        z-index: 999;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+    }
+
+    .menu.active {
+        left: 0;
+    }
+
+    .menu-overlay.active {
+        display: block;
+    }
+
     /* Eliminar íconos del menú lateral */
     .menu i,
     .menu .fas,
