@@ -100,8 +100,8 @@
                         <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
                         <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
                         <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../morelosindex.html">Morelos</a></li>
+                        <li><a href="../michoacanindex.html">Michoacán</a></li>
+                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
                         <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
                         <li><a href="../../nuevo_leon/nuevolindex.html">Nuevo León</a></li>
                         <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
@@ -117,7 +117,6 @@
                         <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
                         <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
                         <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
                 </li>
             </ul>
         </nav>
@@ -133,7 +132,6 @@
             class="pdf-embed"
             frameborder="0"
             title="Visualizador de PDF"
-            src="../../../documentacion/plantillas_personal/morelosp/MOR1.pdf"
         ></iframe>
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
@@ -142,9 +140,14 @@
     <div id="ios-container" class="ios-only">
         <p>Para una mejor experiencia en tu dispositivo iOS:</p>
         <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
+            <img src="../../../imagenes/pdf-icon.png" alt="PDF">
             <span>Abrir Plantilla</span>
         </a>
         <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
+    </div>
+
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 <div id="fecha-subida" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px;">
     Actualizado: <span id="fecha-texto">Cargando...</span>
@@ -295,23 +298,25 @@ async function loadPlantillaPersonal() {
             fechaElement.textContent = formatDate(latestPDF.uploaded_at);
             
             // Configuración normal para PC
-            pdfViewer.src = latestPDF.url;            
+            pdfViewer.src = latestPDF.url;
+            
             // Configuración específica para iOS
             if (isIOS()) {
                 // Usamos Google Viewer como alternativa para iOS
                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                iosLink.href = googleViewerUrl;            }
-            } else {
-                showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
-                fechaElement.textContent = 'No disponible';
+                iosLink.href = googleViewerUrl;
             }
-            } catch (error) {
-                console.error('Error:', error);
-                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-                fechaElement.textContent = 'Error al cargar';
-            } finally {
-                showLoading(false);
-            }
+        } else {
+            showError('No se encontraron documentos de plantilla de personal para Baja California', 'both');
+            fechaElement.textContent = 'No disponible';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+        fechaElement.textContent = 'Error al cargar';
+    } finally {
+        showLoading(false);
+    }
 }
 
 // Inicialización
