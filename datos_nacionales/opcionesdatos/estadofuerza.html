@@ -18,16 +18,8 @@
         <div class="linea-inferior"></div>
     </div>
 
-    <!-- MENÚ LATERAL -->
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="menu-overlay" onclick="toggleMenu()"></div>
-    
-    <nav class="menu" id="main-menu">
-        <img src="../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
-        <ul>
-            <!-- El menú se cargará desde load-menu.js -->
-        </ul>
-    </nav>
+    <!-- EL MENÚ SE CARGARÁ AUTOMÁTICAMENTE DESDE load-menu.js -->
+    <!-- NO incluir elementos del menú aquí -->
 
     <h1 id="titulo-documento" class="titulo-personalizado">ESTADO FUERZA</h1>       
     <div class="loading" id="loading">
@@ -110,16 +102,6 @@
     function hideErrors() {
         document.getElementById('pdf-error').style.display = 'none';
         document.getElementById('mobile-error').style.display = 'none';
-    }
-
-    // Función para el menú lateral
-    function toggleMenu() {
-        const menu = document.getElementById('main-menu');
-        const overlay = document.querySelector('.menu-overlay');
-        if (menu && overlay) {
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
     }
 
     // Formatear fecha legible
@@ -233,15 +215,6 @@
                     }
                 }
             });
-        }
-    }
-
-    // Función global para logout
-    function logout() {
-        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-            localStorage.removeItem('authenticated');
-            localStorage.removeItem('loginTime');
-            window.location.href = '../../login.html';
         }
     }
 
