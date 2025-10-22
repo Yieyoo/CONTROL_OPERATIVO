@@ -6,75 +6,28 @@
     <title>Datos Nacionales</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../imagenes/mapa.png">
     <link rel="stylesheet" href="estilodatos.css">
+    <!-- Cargar Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Cargar el script del menú dinámico -->
+    <script src="../load-menu.js" defer></script>
 </head>
 <body>
-    <!-- Fondo oscuro para el menú -->
-    <div class="menu-overlay"></div>
+    <!-- HEADER DE DOS LÍNEAS (como en las otras páginas) -->
+    <div class="header-lineas">
+        <div class="linea-superior"></div>
+        <div class="linea-inferior"></div>
+    </div>
 
-    <header>
-        <!-- Botón para abrir el menú en móviles -->
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-
-        <!-- Menú principal -->
-        <nav class="menu">
-            <img src="../imagenes/unnamed.png" class="logo-arriba-img" alt="Logo">
-            <ul>
-                <li><a href="../index.html">Inicio</a></li>
-                <!-- Submenú Datos Nacionales -->
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                        <li><a href="datosindex.html">Datos Nacionales</a></li>
-                        <li><a href="opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                        <li><a href="opcionesdatos/tabulador.html">Tabulador</a></li>
-                        <li><a href="opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                        <li><a href="opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                        <li><a href="../construccion.html">Inmuebles</a></li>
-                        <li><a href="../gestion/archivos.html">Gestion de Archvios</a></li>
-                    </ul>
-                </li>
-
-                <!-- Submenú Información de ORs -->
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                        <li><a href="../estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../estados/baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../estados/campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../estados/chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="../estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../estados/cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../estados/coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../estados/colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../estados/durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../estados/guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../estados/guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../estados/hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../estados/jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../estados/edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../estados/michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../estados/morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../stados/nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../estados/nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
-                        <li><a href="../estados/oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../estados/puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../estados/quererato/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../estados/quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../estados/san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../estados/sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../estados/sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../estados/tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../estados/tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../estados/tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../estados/veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../estados/yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
+    <!-- MENÚ LATERAL (se insertará automáticamente por load-menu.js) -->
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="menu-overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="menu" id="main-menu">
+        <img src="../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
+        <ul>
+            <!-- El menú se cargará desde load-menu.js -->
+        </ul>
+    </nav>
 
     <!-- Información del instituto -->
     <section class="instituto-info">
@@ -82,12 +35,14 @@
         <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
         <h3>Dirección de Control Operativo</h3>
         <div class="fecha-actual" id="fechaActual"></div>
-        <button class="regresar-btn">Regresar</button>
+        <button class="regresar-btn" onclick="window.location.href='../index.html'">
+            <i class="fas fa-arrow-left"></i> Regresar
+        </button>
     </section>
 
     <!-- Agregamos el nombre del estado aquí -->
     <div class="estado-info">
-        <h4>Datos Nacionales</h4> <!-- Aquí puedes cambiar el nombre del estado según sea necesario -->
+        <h4>Datos Nacionales</h4>
     </div>
 
     <!-- Contenedor solo para las opciones -->
@@ -95,88 +50,135 @@
         <div class="opciones-container">
             <div class="opciones-grid">
                 <div class="fila">
-                    <button class="btn-1" onclick="location.href='opcionesdatos/padronv.html'">Padron Vehicular</button>
-                    <button class="btn-2" onclick="location.href='opcionesdatos/plantillad.html'">Plantilla de Personal</button>
-                    <button class="btn-3" onclick="location.href='opcionesdatos/unidadcd.html'">Unidades Caninas</button>
-                    <button class="btn-4" onclick="location.href='../construccion.html'">Inmuebles</button>
+                    <button class="btn-1" onclick="location.href='opcionesdatos/padronv.html'">
+                        <i class="fas fa-car"></i> Padron Vehicular
+                    </button>
+                    <button class="btn-2" onclick="location.href='opcionesdatos/plantillad.html'">
+                        <i class="fas fa-users"></i> Plantilla de Personal
+                    </button>
+                    <button class="btn-3" onclick="location.href='opcionesdatos/unidadcd.html'">
+                        <i class="fas fa-dog"></i> Unidades Caninas
+                    </button>
+                    <button class="btn-4" onclick="location.href='../construccion.html'">
+                        <i class="fas fa-building"></i> Inmuebles
+                    </button>
                 </div>
                 <div class="fila">
-                    <button class="btn-5" onclick="location.href='opcionesdatos/personalcom.html'">Personal Comisionado</button>
-                    <button class="btn-6" onclick="location.href='opcionesdatos/estadofuerza.html'">Analítico de Estado de fuerza</button>
-                    <button class="btn-7" onclick="location.href='opcionesdatos/rubro.html'">Gastos Operativos</button>
-                    <button class="btn-8" onclick="location.href='opcionesdatos/tabulador.html'">Tabulador</button>
+                    <button class="btn-5" onclick="location.href='opcionesdatos/personalcom.html'">
+                        <i class="fas fa-user-check"></i> Personal Comisionado
+                    </button>
+                    <button class="btn-6" onclick="location.href='opcionesdatos/estadofuerza.html'">
+                        <i class="fas fa-chart-bar"></i> Analítico de Estado de fuerza
+                    </button>
+                    <button class="btn-7" onclick="location.href='opcionesdatos/rubro.html'">
+                        <i class="fas fa-money-bill-wave"></i> Gastos Operativos
+                    </button>
+                    <button class="btn-8" onclick="location.href='opcionesdatos/tabulador.html'">
+                        <i class="fas fa-table"></i> Tabulador
+                    </button>
                 </div>
-                  <div class="fila">
-                    <button class="btn-9" onclick="location.href='../gestion/archivos.html'">GESTOR DE ARCHIVOS</button>
+                <div class="fila">
+                    <button class="btn-9" onclick="location.href='../gestion/archivos.html'">
+                        <i class="fas fa-archive"></i> GESTOR DE ARCHIVOS
+                    </button>
                 </div>
+            </div>
         </div>
     </div>
 
     <!-- Contenedor de logos -->
     <div class="logo-container">
-        <img src="../imagenes/inm logo.png" alt="Logo 1">
+        <img src="../imagenes/inm logo.png" alt="Logo INM">
     </div>
 
     <script>
-// Función para abrir y cerrar el menú lateral
-function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
-
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
-
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault(); // Evita que el enlace recargue la página
-
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
-
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
-
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+        // Función para el menú lateral (compatible con load-menu.js)
+        function toggleMenu() {
+            const menu = document.getElementById('main-menu');
+            const overlay = document.querySelector('.menu-overlay');
+            if (menu && overlay) {
+                menu.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
         }
-    });
 
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
+        // Sistema de autenticación (como en las otras páginas)
+        class AuthManager {
+            constructor() {
+                this.sessionDuration = 60 * 60 * 1000; // 1 hora
+                this.checkAuth();
+                this.setupNavigationHandlers();
+            }
+
+            checkAuth() {
+                const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+                const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+                const now = Date.now();
+                
+                console.log('🔐 Verificando autenticación en Datos Nacionales...');
+
+                if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
+                    console.log('❌ Sesión inválida, redirigiendo...');
+                    this.redirectToLogin();
+                    return false;
+                }
+
+                console.log('✅ Sesión válida en Datos Nacionales');
+                return true;
+            }
+
+            redirectToLogin() {
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('loginTime');
+                window.location.replace('../login.html');
+            }
+
+            setupNavigationHandlers() {
+                window.addEventListener('pageshow', (event) => {
+                    if (event.persisted) {
+                        if (!this.checkAuth()) {
+                            this.redirectToLogin();
+                        }
+                    }
+                });
+            }
+        }
+
+        // Inicializar autenticación
+        const authManager = new AuthManager();
+
+        // Mostrar la fecha actual
+        document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
-    });
-// Mostrar la fecha actual
-document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString();
 
-// Regresar al historial
-document.querySelector('.regresar-btn').addEventListener('click', function() {
-    window.history.back();
-});
+        // Función global para logout
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('loginTime');
+                window.location.href = '../login.html';
+            }
+        }
 
+        // Efectos visuales adicionales (como en las otras páginas)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación de entrada para los botones
+            const buttons = document.querySelectorAll('.opciones-grid button');
+            buttons.forEach((button, index) => {
+                setTimeout(() => {
+                    button.style.opacity = '1';
+                    button.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            // Efecto de carga de la página
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 100);
+        });
     </script>
 </body>
 </html>
-    
