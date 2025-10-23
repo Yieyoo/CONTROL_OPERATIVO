@@ -650,28 +650,36 @@ nav.menu {
     }
   }
   /* Prevenir que Font Awesome afecte el menú */
-/* Resetear Font Awesome en el menú dinámico */
-.menu i,
-#main-menu i,
-nav.menu i {
-    font-family: inherit !important;
+/* ===== RESET COMPLETO PARA EL MENÚ ===== */
+.menu,
+.menu ul,
+.menu li,
+.menu a,
+.menu span,
+#main-menu,
+#main-menu ul,
+#main-menu li, 
+#main-menu a,
+#main-menu span {
+    font-family: Arial, Helvetica, sans-serif !important;
     font-style: normal !important;
     font-weight: normal !important;
+    text-decoration: none !important;
 }
 
-/* Asegurar que solo los botones usen Font Awesome */
-.opciones-grid .btn-1 i,
-.opciones-grid .btn-2 i,
-.opciones-grid .btn-3 i,
-.opciones-grid .btn-4 i,
-.opciones-grid .btn-5 i,
-.opciones-grid .btn-6 i,
-.opciones-grid .btn-7 i,
-.opciones-grid .btn-8 i,
-.opciones-grid .btn-9 i,
-.opciones-grid .btn-10 i,
-.opciones-grid .btn-11 i,
-.opciones-grid .btn-12 i {
+/* Eliminar cualquier pseudo-elemento de Font Awesome en el menú */
+.menu a:before,
+.menu li:before,
+#main-menu a:before,
+#main-menu li:before {
+    content: "" !important;
+    display: none !important;
+}
+
+/* ===== HABILITAR FONT AWARE SOLO PARA BOTONES ===== */
+.opciones-grid button i,
+.opciones-grid .fas,
+.opciones-grid .fa {
     font-family: 'Font Awesome 6 Free' !important;
     font-weight: 900;
 }
