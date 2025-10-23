@@ -1,38 +1,19 @@
-// load-menu.js - VERSIÓN QUE FUNCIONA EN INDEX Y ESTADOS
+// load-menu.js - VERSIÓN MEJORADA CON DETECCIÓN AUTOMÁTICA DE RUTAS
 class MenuLoader {
     static async loadMenu() {
         try {
             console.log('🔄 Iniciando carga del menú...');
             
-            // Estrategia: probar rutas desde la más específica a la más general
-            const possiblePaths = [
-                'menu.html',           // Raíz
-                '../menu.html',        // 1 nivel arriba  
-                '../../menu.html',     // 2 niveles arriba
-                '../../../menu.html'   // 3 niveles arriba
-            ];
+            // Estrategia mejorada: detectar automáticamente la ruta
+            const menuPath = await this.findMenuPath();
+            console.log(`📍 Ruta encontrada: ${menuPath}`);
             
-            let menuHTML = '';
-            let successfulPath = '';
-            
-            for (const path of possiblePaths) {
-                try {
-                    console.log(`🔍 Probando: ${path}`);
-                    const response = await fetch(path);
-                    if (response.ok) {
-                        menuHTML = await response.text();
-                        successfulPath = path;
-                        console.log(`✅ menu.html encontrado en: ${path}`);
-                        break;
-                    }
-                } catch (e) {
-                    console.log(`❌ Falló: ${path}`);
-                }
+            const response = await fetch(menuPath);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            if (!menuHTML) {
-                throw new Error('No se pudo cargar menu.html desde ninguna ruta');
-            }
+            const menuHTML = await response.text();
             
             // Insertar menú limpio
             this.cleanExistingMenu();
@@ -41,13 +22,40 @@ class MenuLoader {
             
             // Configurar eventos después de un breve delay
             setTimeout(() => {
-                this.setupCompleteMenu();
+                this.setupCompleteMenu(menuPath);
             }, 150);
             
         } catch (error) {
             console.error('❌ Error crítico:', error);
             this.loadEmergencyMenu();
         }
+    }
+    
+    static async findMenuPath() {
+        // Estrategia: probar rutas desde la más específica a la más general
+        const possiblePaths = [
+            'menu.html',           // Raíz
+            '../menu.html',        // 1 nivel arriba  
+            '../../menu.html',     // 2 niveles arriba
+            '../../../menu.html',  // 3 niveles arriba
+            '/menu.html'           // Ruta absoluta desde raíz
+        ];
+        
+        for (const path of possiblePaths) {
+            try {
+                console.log(`🔍 Probando: ${path}`);
+                const response = await fetch(path, { method: 'HEAD' });
+                if (response.ok) {
+                    console.log(`✅ menu.html encontrado en: ${path}`);
+                    return path;
+                }
+            } catch (e) {
+                console.log(`❌ Falló: ${path}`);
+                // Continuar con siguiente ruta
+            }
+        }
+        
+        throw new Error('No se pudo cargar menu.html desde ninguna ruta');
     }
     
     static cleanExistingMenu() {
@@ -61,7 +69,7 @@ class MenuLoader {
         });
     }
     
-    static setupCompleteMenu() {
+    static setupCompleteMenu(menuPath) {
         console.log('🔧 Configurando menú completo...');
         
         const menuToggle = document.querySelector('.menu-toggle');
@@ -75,8 +83,9 @@ class MenuLoader {
         
         console.log('✅ Elementos del menú encontrados');
         
-        // 1. CORREGIR RUTAS PARA LA UBICACIÓN ACTUAL
-        this.fixAllMenuLinks();
+        // 1. CORREGIR RUTAS PARA LA UBICACIÓN ACTUAL (MEJORADO)
+        const basePath = this.calculateBasePath(menuPath);
+        this.fixAllMenuLinks(basePath);
         
         // 2. Configurar eventos básicos del menú
         this.setupBasicMenuEvents(menuToggle, menu, menuOverlay);
@@ -87,24 +96,35 @@ class MenuLoader {
         // 4. Configurar logout
         this.setupLogout();
         
-        // 5. Configurar navegación
+        // 5. Configurar navegación (MEJORADO)
         this.setupNavigation();
         
         console.log('🎉 Menú completamente configurado y listo');
     }
     
-    static fixAllMenuLinks() {
-        const allLinks = document.querySelectorAll('.menu a[href]');
-        console.log(`🔗 Corrigiendo ${allLinks.length} enlaces del menú`);
+    static calculateBasePath(menuPath) {
+        // Calcular el path base basado en dónde encontramos menu.html
+        if (menuPath === 'menu.html') return './';
+        if (menuPath === '/menu.html') return '/';
         
-        const currentLocation = window.location.pathname;
-        console.log(`📍 Ubicación actual: ${currentLocation}`);
+        // Para rutas como '../menu.html', '../../menu.html', etc.
+        const pathParts = menuPath.split('/');
+        pathParts.pop(); // Remover 'menu.html'
+        
+        if (pathParts.length === 0) return './';
+        
+        return pathParts.join('/') + '/';
+    }
+    
+    static fixAllMenuLinks(basePath) {
+        const allLinks = document.querySelectorAll('.menu a[href]');
+        console.log(`🔗 Corrigiendo ${allLinks.length} enlaces del menú con base: ${basePath}`);
         
         allLinks.forEach(link => {
             const originalHref = link.getAttribute('href');
             
             if (this.needsCorrection(originalHref)) {
-                const correctedHref = this.calculateCorrectPath(originalHref, currentLocation);
+                const correctedHref = this.calculateCorrectPath(originalHref, basePath);
                 
                 if (correctedHref !== originalHref) {
                     link.setAttribute('href', correctedHref);
@@ -121,37 +141,18 @@ class MenuLoader {
                !href.startsWith('#') && 
                !href.startsWith('javascript:') &&
                !href.startsWith('mailto:') &&
-               !href.startsWith('tel:');
+               !href.startsWith('tel:') &&
+               !href.startsWith('/'); // Mantener rutas absolutas
     }
     
-    static calculateCorrectPath(originalHref, currentPath) {
-        // Determinar niveles necesarios basado en la ubicación actual
-        let levelsUp = 0;
-        
-        if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
-            levelsUp = 3; // estados/xxx/opciones/archivo.html
-        } else if (currentPath.includes('/estados/')) {
-            levelsUp = 2; // estados/xxx/archivo.html  
-        } else if (currentPath.includes('/datos_nacionales/')) {
-            levelsUp = 1; // datos_nacionales/archivo.html
-        } else if (currentPath === '/' || currentPath.endsWith('/index.html') || currentPath.endsWith('.html')) {
-            levelsUp = 0; // Raíz
-        } else {
-            // Método automático de respaldo
-            const pathParts = currentPath.split('/').filter(part => part && !part.includes('.html'));
-            levelsUp = pathParts.length;
+    static calculateCorrectPath(originalHref, basePath) {
+        // Para enlaces que ya son relativos a la raíz, mantenerlos
+        if (originalHref.startsWith('/')) {
+            return originalHref;
         }
         
-        console.log(`📊 Niveles a subir: ${levelsUp} (desde: ${currentPath})`);
-        
-        // Construir ruta corregida
-        let correctedPath = '';
-        for (let i = 0; i < levelsUp; i++) {
-            correctedPath += '../';
-        }
-        correctedPath += originalHref;
-        
-        return correctedPath;
+        // Aplicar el basePath calculado
+        return basePath + originalHref;
     }
     
     static setupBasicMenuEvents(menuToggle, menu, menuOverlay) {
@@ -232,13 +233,19 @@ class MenuLoader {
         
         menuLinks.forEach(link => {
             // No aplicar a enlaces especiales
-            if (link.classList.contains('logout-link') || link.parentElement.classList.contains('submenu')) {
+            if (this.isSpecialLink(link)) {
                 return;
             }
             
             link.addEventListener('click', (e) => {
-                e.preventDefault();
                 const href = link.getAttribute('href');
+                
+                // Permitir comportamiento normal para enlaces externos, anchors, etc.
+                if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+                    return;
+                }
+                
+                e.preventDefault();
                 console.log(`🚀 Navegando a: ${href}`);
                 
                 this.closeMenu();
@@ -249,6 +256,13 @@ class MenuLoader {
                 }, 200);
             });
         });
+    }
+    
+    static isSpecialLink(link) {
+        return link.classList.contains('logout-link') || 
+               link.parentElement.classList.contains('submenu') ||
+               link.getAttribute('target') === '_blank' ||
+               link.getAttribute('download') !== null;
     }
     
     static closeMenu() {
@@ -308,7 +322,7 @@ class MenuLoader {
 }
 
 // Inicialización mejorada
-console.log('🚀 load-menu.js cargado - Sistema de menú global');
+console.log('🚀 load-menu.js cargado - Sistema de menú global (Versión Mejorada)');
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         console.log('📄 DOM listo, iniciando menú...');
@@ -325,6 +339,6 @@ window.toggleMenu = function() {
     const menuOverlay = document.querySelector('.menu-overlay');
     if (menu) {
         menu.classList.toggle('active');
-        if (menuOverlay) menuOverlay.classList.toggle('active');
+        if (menuOverlay) menuOverlay.classList.remove('active');
     }
 };
