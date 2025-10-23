@@ -650,36 +650,21 @@ nav.menu {
     }
   }
   /* Prevenir que Font Awesome afecte el menú */
-/* ===== RESET COMPLETO PARA EL MENÚ ===== */
-.menu,
-.menu ul,
-.menu li,
-.menu a,
-.menu span,
-#main-menu,
-#main-menu ul,
-#main-menu li, 
-#main-menu a,
-#main-menu span {
-    font-family: Arial, Helvetica, sans-serif !important;
-    font-style: normal !important;
-    font-weight: normal !important;
-    text-decoration: none !important;
-}
 
-/* Eliminar cualquier pseudo-elemento de Font Awesome en el menú */
-.menu a:before,
-.menu li:before,
-#main-menu a:before,
-#main-menu li:before {
-    content: "" !important;
-    display: none !important;
-}
 
-/* ===== HABILITAR FONT AWARE SOLO PARA BOTONES ===== */
-.opciones-grid button i,
-.opciones-grid .fas,
-.opciones-grid .fa {
-    font-family: 'Font Awesome 6 Free' !important;
-    font-weight: 900;
-}
+    /* === ELIMINAR ÍCONOS SOLO DEL MENÚ LATERAL === */
+    .menu i,
+    .menu .fas,
+    .menu .fa {
+        display: none !important;
+    }
+    
+    /* Ajustar el espaciado del menú sin íconos */
+    .menu ul li a {
+        padding-left: 20px !important;
+    }
+    
+    /* Asegurar que los submenús también se vean bien */
+    .menu .submenu-list li a {
+        padding-left: 30px !important;
+    }
