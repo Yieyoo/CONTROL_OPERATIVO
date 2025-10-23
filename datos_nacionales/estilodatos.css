@@ -650,13 +650,28 @@ nav.menu {
     }
   }
   /* Prevenir que Font Awesome afecte el menú */
-.menu i:not(.fa):not(.fas):not(.far):not(.fal):not(.fat):not(.fad):not(.fab) {
+/* Resetear Font Awesome en el menú dinámico */
+.menu i,
+#main-menu i,
+nav.menu i {
     font-family: inherit !important;
     font-style: normal !important;
     font-weight: normal !important;
 }
 
-/* Asegurar que solo los íconos con clases FA tengan los estilos */
-.fas, .far, .fal, .fab {
-    /* Mantener estilos de Font Awesome */
+/* Asegurar que solo los botones usen Font Awesome */
+.opciones-grid .btn-1 i,
+.opciones-grid .btn-2 i,
+.opciones-grid .btn-3 i,
+.opciones-grid .btn-4 i,
+.opciones-grid .btn-5 i,
+.opciones-grid .btn-6 i,
+.opciones-grid .btn-7 i,
+.opciones-grid .btn-8 i,
+.opciones-grid .btn-9 i,
+.opciones-grid .btn-10 i,
+.opciones-grid .btn-11 i,
+.opciones-grid .btn-12 i {
+    font-family: 'Font Awesome 6 Free' !important;
+    font-weight: 900;
 }
