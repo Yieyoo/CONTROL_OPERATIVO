@@ -21,33 +21,53 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         .login-container {
             background: white;
             padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1a3e72, #0d2b57);
         }
 
         .logo {
             width: 120px;
             margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         h1 {
             color: #1a3e72;
             margin-bottom: 10px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
         .subtitle {
             color: #666;
             margin-bottom: 30px;
             font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         .input-group {
@@ -57,79 +77,147 @@
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #333;
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
+            padding: 14px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
         }
 
         input:focus {
             outline: none;
             border-color: #1a3e72;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 62, 114, 0.1);
+        }
+
+        input:invalid {
+            border-color: #dc3545;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 1.1rem;
         }
 
         .login-button {
             width: 100%;
-            padding: 12px;
-            background: #1a3e72;
+            padding: 14px;
+            background: linear-gradient(135deg, #1a3e72 0%, #0d2b57 100%);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .login-button:hover {
-            background: #0d2b57;
+        .login-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 62, 114, 0.3);
+        }
+
+        .login-button:active:not(:disabled) {
+            transform: translateY(0);
         }
 
         .login-button:disabled {
             background: #ccc;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .button-loading .button-text {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .button-loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-spinner 1s ease infinite;
+        }
+
+        @keyframes button-spinner {
+            from {
+                transform: rotate(0turn);
+            }
+            to {
+                transform: rotate(1turn);
+            }
         }
 
         .error-message {
             color: #dc3545;
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 15px;
+            padding: 12px;
             background: #f8d7da;
             border: 1px solid #f5c6cb;
-            border-radius: 5px;
+            border-radius: 8px;
             display: none;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         .success-message {
             color: #28a745;
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 15px;
+            padding: 12px;
             background: #d4edda;
             border: 1px solid #c3e6cb;
-            border-radius: 5px;
+            border-radius: 8px;
             display: none;
+            font-size: 0.9rem;
         }
 
         .loading {
             display: none;
-            margin-top: 10px;
+            margin-top: 15px;
+            text-align: center;
         }
 
         .spinner {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #1a3e72;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
@@ -142,56 +230,81 @@
             padding-top: 20px;
             border-top: 1px solid #eee;
             color: #666;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .lockout-message {
+            color: #dc3545;
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            display: none;
             font-size: 0.9rem;
         }
 
-        .user-credentials {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            font-size: 0.8rem;
-        }
-
-        .user-credentials h4 {
-            margin-bottom: 10px;
-            color: #1a3e72;
-        }
-
-        .credential {
-            margin: 5px 0;
-        }
-        
-        .lockout-message {
-            color: #dc3545;
-            margin-top: 10px;
+        .session-info {
+            background: #e8f4fd;
             padding: 10px;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #1a3e72;
             display: none;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 1.1rem;
+            }
+            
+            input {
+                padding: 12px;
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <img src="imagenes/inm logo.png" alt="Logo INM" class="logo" onerror="this.style.display='none'">
-        <h1>Dirección General de Coordinación de Oficinas de Representación </h1>
-        <p class="subtitle">Control Operativo</p>
+        <h1>Dirección General de Coordinación de Oficinas de Representación</h1>
+        <p class="subtitle">Sistema de Control Operativo</p>
         
         <form id="loginForm">
             <div class="input-group">
                 <label for="username">Usuario:</label>
-                <input type="text" id="username" name="username" required autocomplete="username" placeholder="Ingresa tu usuario">
+                <input type="text" id="username" name="username" required autocomplete="username" 
+                       placeholder="Ingresa tu usuario" autofocus>
             </div>
             
             <div class="input-group">
                 <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Ingresa tu contraseña">
+                <div class="password-container">
+                    <input type="password" id="password" name="password" required 
+                           autocomplete="current-password" placeholder="Ingresa tu contraseña">
+                    <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                </div>
             </div>
             
             <button type="submit" class="login-button" id="loginButton">
-                Iniciar Sesión
+                <span class="button-text">Iniciar Sesión</span>
             </button>
             
             <div class="loading" id="loading">
@@ -202,225 +315,271 @@
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage"></div>
             <div class="lockout-message" id="lockoutMessage"></div>
+            <div class="session-info" id="sessionInfo"></div>
         </form>
         
         <div class="system-info">
-            <p><strong>Sistema restringido</strong></p>
-            <p>Acceso solo para personal autorizado</p>
+            <p><strong>🔒 Sistema restringido</strong></p>
+            <p>Acceso solo para personal autorizado del INM</p>
+            <p style="margin-top: 8px; font-size: 0.8rem; color: #888;">
+                Sesión válida por 8 horas
+            </p>
         </div>
     </div>
 
     <script>
-        // Elementos del DOM
-        const loginForm = document.getElementById('loginForm');
-        const loginButton = document.getElementById('loginButton');
-        const loading = document.getElementById('loading');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const lockoutMessage = document.getElementById('lockoutMessage');
-
-        // Credenciales válidas
-        const VALID_USERNAME = 'admin';
-        const VALID_PASSWORD = 'dgcor01';
-        
-        // Configuración de seguridad
-        const SECURITY_CONFIG = {
-            maxAttempts: 3,
-            lockoutTime: 5 * 60 * 1000, // 5 minutos
-            sessionDuration: 60 * 60 * 1000 // 1 hora
+        // Configuración mejorada
+        const CONFIG = {
+            credentials: {
+                username: 'admin',
+                password: 'dgcor01'
+            },
+            security: {
+                maxAttempts: 3,
+                lockoutTime: 10 * 60 * 1000, // 10 minutos
+                sessionDuration: 8 * 60 * 60 * 1000 // 8 horas en lugar de 1
+            },
+            ui: {
+                loadingDelay: 800, // ms para simular verificación
+                redirectDelay: 1200 // ms antes de redirigir
+            }
         };
 
-        // Mostrar/ocultar mensajes
-        function showMessage(element, message, isError = true) {
-            if (isError) {
-                element.textContent = message;
-                element.style.display = 'block';
-                if (element !== errorMessage) errorMessage.style.display = 'none';
-                if (element !== lockoutMessage) lockoutMessage.style.display = 'none';
-                successMessage.style.display = 'none';
-            } else {
-                successMessage.textContent = message;
-                successMessage.style.display = 'block';
-                errorMessage.style.display = 'none';
-                lockoutMessage.style.display = 'none';
+        // Elementos del DOM
+        const elements = {
+            form: document.getElementById('loginForm'),
+            button: document.getElementById('loginButton'),
+            loading: document.getElementById('loading'),
+            error: document.getElementById('errorMessage'),
+            success: document.getElementById('successMessage'),
+            lockout: document.getElementById('lockoutMessage'),
+            sessionInfo: document.getElementById('sessionInfo'),
+            togglePassword: document.getElementById('togglePassword'),
+            username: document.getElementById('username'),
+            password: document.getElementById('password')
+        };
+
+        // Utilidades
+        const utils = {
+            showMessage(element, message, isError = true) {
+                if (isError) {
+                    element.textContent = message;
+                    element.style.display = 'block';
+                    elements.error.style.display = element === elements.error ? 'block' : 'none';
+                    elements.lockout.style.display = element === elements.lockout ? 'block' : 'none';
+                    elements.success.style.display = 'none';
+                } else {
+                    elements.success.textContent = message;
+                    elements.success.style.display = 'block';
+                    elements.error.style.display = 'none';
+                    elements.lockout.style.display = 'none';
+                }
+            },
+
+            hideMessages() {
+                elements.error.style.display = 'none';
+                elements.success.style.display = 'none';
+                elements.lockout.style.display = 'none';
+                elements.sessionInfo.style.display = 'none';
+            },
+
+            setLoading(loading) {
+                if (loading) {
+                    elements.loading.style.display = 'block';
+                    elements.button.disabled = true;
+                    elements.button.classList.add('button-loading');
+                } else {
+                    elements.loading.style.display = 'none';
+                    elements.button.disabled = false;
+                    elements.button.classList.remove('button-loading');
+                }
+            },
+
+            shakeElement(element) {
+                element.classList.add('shake');
+                setTimeout(() => element.classList.remove('shake'), 500);
             }
-        }
+        };
 
-        function hideMessages() {
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-            lockoutMessage.style.display = 'none';
-        }
-
-        // Mostrar/ocultar loading
-        function setLoading(loadingState) {
-            if (loadingState) {
-                loading.style.display = 'block';
-                loginButton.disabled = true;
-                loginButton.textContent = 'Verificando...';
-            } else {
-                loading.style.display = 'none';
-                loginButton.disabled = false;
-                loginButton.textContent = 'Iniciar Sesión';
-            }
-        }
-
-        // Verificar seguridad (intentos fallidos)
-        function checkSecurity() {
-            const attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
-            const lastAttempt = parseInt(localStorage.getItem('lastAttempt') || '0');
-            const now = Date.now();
-            
-            if (attempts >= SECURITY_CONFIG.maxAttempts && 
-                (now - lastAttempt) < SECURITY_CONFIG.lockoutTime) {
-                const remainingTime = Math.ceil((SECURITY_CONFIG.lockoutTime - (now - lastAttempt)) / 1000 / 60);
-                showMessage(lockoutMessage, `⏳ Demasiados intentos fallidos. Espere ${remainingTime} minutos.`);
-                disableLogin();
-                return false;
-            }
-            return true;
-        }
-
-        function recordFailedAttempt() {
-            const attempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
-            localStorage.setItem('loginAttempts', attempts.toString());
-            localStorage.setItem('lastAttempt', Date.now().toString());
-        }
-
-        function resetAttempts() {
-            localStorage.removeItem('loginAttempts');
-            localStorage.removeItem('lastAttempt');
-        }
-
-        function disableLogin() {
-            loginButton.disabled = true;
-            document.getElementById('username').disabled = true;
-            document.getElementById('password').disabled = true;
-        }
-
-        function enableLogin() {
-            loginButton.disabled = false;
-            document.getElementById('username').disabled = false;
-            document.getElementById('password').disabled = false;
-        }
-
-        // Verificar si ya está autenticado (con expiración)
-        function checkExistingAuth() {
-            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-            const now = Date.now();
-            
-            // Si hay sesión activa y no ha expirado, redirigir
-            if (isAuthenticated && (now - loginTime) < SECURITY_CONFIG.sessionDuration) {
-                console.log('✅ Sesión activa encontrada, redirigiendo...');
-                // Usar replace para evitar que el botón "atrás" regrese al login
-                window.location.replace('index.html');
+        // Gestión de seguridad
+        const security = {
+            checkLockout() {
+                const attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+                const lastAttempt = parseInt(localStorage.getItem('lastAttempt') || '0');
+                const now = Date.now();
+                
+                if (attempts >= CONFIG.security.maxAttempts && 
+                    (now - lastAttempt) < CONFIG.security.lockoutTime) {
+                    const remainingTime = Math.ceil((CONFIG.security.lockoutTime - (now - lastAttempt)) / 1000 / 60);
+                    utils.showMessage(elements.lockout, 
+                        `⏳ Demasiados intentos fallidos. Espere ${remainingTime} minuto(s) antes de intentar nuevamente.`);
+                    this.disableForm();
+                    return false;
+                }
                 return true;
-            } else if (isAuthenticated) {
-                // Sesión expirada, limpiar
-                localStorage.removeItem('authenticated');
-                localStorage.removeItem('loginTime');
-            }
-            return false;
-        }
+            },
 
-        // Manejar el envío del formulario
-        loginForm.addEventListener('submit', async (e) => {
+            recordFailedAttempt() {
+                const attempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
+                localStorage.setItem('loginAttempts', attempts.toString());
+                localStorage.setItem('lastAttempt', Date.now().toString());
+                
+                // Mostrar información de intentos
+                elements.sessionInfo.textContent = 
+                    `Intento ${attempts} de ${CONFIG.security.maxAttempts}`;
+                elements.sessionInfo.style.display = 'block';
+            },
+
+            resetAttempts() {
+                localStorage.removeItem('loginAttempts');
+                localStorage.removeItem('lastAttempt');
+                elements.sessionInfo.style.display = 'none';
+            },
+
+            disableForm() {
+                elements.button.disabled = true;
+                elements.username.disabled = true;
+                elements.password.disabled = true;
+            },
+
+            enableForm() {
+                elements.button.disabled = false;
+                elements.username.disabled = false;
+                elements.password.disabled = false;
+            }
+        };
+
+        // Gestión de sesión
+        const session = {
+            checkExisting() {
+                const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+                const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+                const now = Date.now();
+                
+                if (isAuthenticated && (now - loginTime) < CONFIG.security.sessionDuration) {
+                    console.log('✅ Sesión activa encontrada, redirigiendo...');
+                    setTimeout(() => {
+                        window.location.replace('index.html');
+                    }, 500);
+                    return true;
+                } else if (isAuthenticated) {
+                    localStorage.removeItem('authenticated');
+                    localStorage.removeItem('loginTime');
+                    utils.showMessage(elements.sessionInfo, 
+                        '🔒 Su sesión ha expirado. Por favor inicie sesión nuevamente.');
+                    elements.sessionInfo.style.display = 'block';
+                }
+                return false;
+            },
+
+            create() {
+                security.resetAttempts();
+                localStorage.setItem('authenticated', 'true');
+                localStorage.setItem('loginTime', Date.now().toString());
+            }
+        };
+
+        // Toggle password visibility
+        elements.togglePassword.addEventListener('click', function() {
+            const type = elements.password.getAttribute('type') === 'password' ? 'text' : 'password';
+            elements.password.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+
+        // Manejar envío del formulario
+        elements.form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Verificar seguridad primero
-            if (!checkSecurity()) return;
+            if (!security.checkLockout()) return;
             
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+            const username = elements.username.value.trim();
+            const password = elements.password.value;
             
             if (!username || !password) {
-                showMessage(errorMessage, 'Por favor completa todos los campos');
+                utils.showMessage(elements.error, 'Por favor complete todos los campos');
+                utils.shakeElement(elements.form);
                 return;
             }
             
-            setLoading(true);
-            hideMessages();
+            utils.setLoading(true);
+            utils.hideMessages();
             
-            // Simular verificación de credenciales
+            // Simular verificación
             setTimeout(() => {
-                if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-                    showMessage(successMessage, '✅ Credenciales correctas. Accediendo al sistema...', false);
+                if (username === CONFIG.credentials.username && 
+                    password === CONFIG.credentials.password) {
                     
-                    // Guardar estado de autenticación y resetear intentos
-                    resetAttempts();
-                    localStorage.setItem('authenticated', 'true');
-                    localStorage.setItem('loginTime', Date.now().toString());
+                    utils.showMessage(elements.success, 
+                        '✅ Credenciales correctas. Accediendo al sistema...', false);
+                    session.create();
                     
-                    // Redirigir después de 1 segundo
                     setTimeout(() => {
-                        // Usar replace para evitar que el botón "atrás" regrese al login
                         window.location.replace('index.html');
-                    }, 1000);
+                    }, CONFIG.ui.redirectDelay);
                     
                 } else {
-                    recordFailedAttempt();
+                    security.recordFailedAttempt();
                     const attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
-                    const remaining = SECURITY_CONFIG.maxAttempts - attempts;
+                    const remaining = CONFIG.security.maxAttempts - attempts;
                     
                     if (remaining > 0) {
-                        showMessage(errorMessage, 
-                            `❌ Credenciales incorrectas. ${remaining} intentos restantes.`);
+                        utils.showMessage(elements.error,
+                            `❌ Credenciales incorrectas. Le quedan ${remaining} intento(s).`);
+                        utils.shakeElement(elements.form);
                     } else {
-                        checkSecurity(); // Esto mostrará el mensaje de bloqueo
+                        security.checkLockout();
                     }
-                    setLoading(false);
+                    utils.setLoading(false);
                 }
-            }, 1000); // Simular tiempo de respuesta del servidor
+            }, CONFIG.ui.loadingDelay);
         });
 
-        // Verificar autenticación y seguridad al cargar la página
+        // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Página de login cargada');
+            console.log('🚀 Sistema de login INM cargado');
             
-            // Limpiar el formulario siempre
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            hideMessages();
+            // Limpiar y preparar formulario
+            elements.username.value = '';
+            elements.password.value = '';
+            utils.hideMessages();
             
-            // Verificar si ya hay una sesión activa
-            checkExistingAuth();
+            // Verificar sesión existente
+            if (!session.checkExisting()) {
+                // Verificar bloqueos de seguridad
+                security.checkLockout();
+            }
             
-            // Verificar seguridad (bloqueos por intentos)
-            checkSecurity();
+            // Auto-focus en usuario
+            elements.username.focus();
         });
 
-        // Limpiar mensajes al cambiar los inputs
-        document.getElementById('username').addEventListener('input', hideMessages);
-        document.getElementById('password').addEventListener('input', hideMessages);
+        // Event listeners para mejor UX
+        elements.username.addEventListener('input', utils.hideMessages);
+        elements.password.addEventListener('input', utils.hideMessages);
 
-        // Enter para enviar el formulario
-        document.getElementById('password').addEventListener('keypress', function(e) {
+        elements.password.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                loginForm.dispatchEvent(new Event('submit'));
+                elements.form.dispatchEvent(new Event('submit'));
             }
         });
 
-        // Manejar cuando la página se carga desde cache (back/forward)
+        // Manejar cache del navegador
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
-                // La página viene del cache, verificar autenticación nuevamente
-                if (!checkExistingAuth()) {
-                    // Asegurarse de que el formulario esté limpio
-                    document.getElementById('username').value = '';
-                    document.getElementById('password').value = '';
-                    hideMessages();
-                    enableLogin();
+                if (!session.checkExisting()) {
+                    elements.username.value = '';
+                    elements.password.value = '';
+                    utils.hideMessages();
+                    security.enableForm();
                 }
             }
         });
 
-        // Auto-completar credenciales para testing (solo en desarrollo)
+        // Auto-completar solo en desarrollo
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            // Solo autocompletar si no hay intentos fallidos recientes
-            if (checkSecurity()) {
-                document.getElementById('username').value = 'admin';
-                document.getElementById('password').value = 'dgcor01';
+            if (security.checkLockout()) {
+                elements.username.value = CONFIG.credentials.username;
+                elements.password.value = CONFIG.credentials.password;
             }
         }
     </script>
