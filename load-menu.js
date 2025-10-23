@@ -213,20 +213,27 @@ class MenuLoader {
         });
     }
     
-    static setupLogout() {
-        const logoutLinks = document.querySelectorAll('.logout-link');
-        
-        logoutLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
+static setupLogout() {
+    const logoutLinks = document.querySelectorAll('.logout-link');
+    
+    logoutLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Usar la función global de auth.js si existe
+            if (typeof window.logout === 'function') {
+                window.logout(); // ✅ Usa el logout centralizado de auth.js
+            } else {
+                // Fallback al método antiguo
                 if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
                     localStorage.removeItem('authenticated');
                     localStorage.removeItem('loginTime');
                     window.location.href = 'login.html';
                 }
-            });
+            }
         });
-    }
+    });
+}
     
     static setupNavigation() {
         const menuLinks = document.querySelectorAll('.menu a[href]');
