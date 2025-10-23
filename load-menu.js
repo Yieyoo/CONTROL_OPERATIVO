@@ -216,21 +216,43 @@ class MenuLoader {
 static setupLogout() {
     const logoutLinks = document.querySelectorAll('.logout-link');
     
+    console.log(`🔍 Encontrados ${logoutLinks.length} enlaces de logout`);
+    
     logoutLinks.forEach(link => {
+        // Remover event listeners anteriores para evitar duplicados
+        link.replaceWith(link.cloneNode(true));
+    });
+    
+    // Volver a seleccionar después del clone
+    document.querySelectorAll('.logout-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation(); // ✅ CRÍTICO: Evitar múltiples ejecuciones
+            e.stopImmediatePropagation();
             
-            // Usar la función global de auth.js si existe
-            if (typeof window.logout === 'function') {
-                window.logout(); // ✅ Usa el logout centralizado de auth.js
-            } else {
-                // Fallback al método antiguo
-                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                    localStorage.removeItem('authenticated');
-                    localStorage.removeItem('loginTime');
-                    window.location.href = 'login.html';
+            console.log('🖱️ Click en cerrar sesión detectado');
+            
+            // Cerrar el menú inmediatamente
+            this.closeMenu();
+            
+            // Pequeño delay para que se cierre el menú visualmente
+            setTimeout(() => {
+                // Usar la función global de auth.js si existe
+                if (typeof window.logout === 'function') {
+                    console.log('✅ Usando window.logout() de auth.js');
+                    window.logout();
+                } else {
+                    console.warn('⚠️ window.logout no disponible, usando fallback');
+                    // Fallback al método antiguo
+                    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                        localStorage.removeItem('authenticated');
+                        localStorage.removeItem('loginTime');
+                        localStorage.removeItem('loginAttempts');
+                        localStorage.removeItem('lastAttempt');
+                        window.location.href = 'login.html';
+                    }
                 }
-            }
+            }, 100);
         });
     });
 }
