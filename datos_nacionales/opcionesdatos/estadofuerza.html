@@ -6,6 +6,9 @@
     <title>ESTADO FUERZA</title>
     <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
     <link rel="stylesheet" href="../../estados/diseños/diseñounafoto.css">
+    
+    <!-- Cargar el menú global -->
+    <script src="../../load-menu.js" defer></script>
 </head>
 
 <body class="mostrar-ubicaciones">
@@ -13,72 +16,11 @@
         <h1 id="titulo-documento" class="titulo-personalizado">ESTADO FUERZA</h1>
     </div>
     
-    <div class="menu-overlay"></div>
+    <!-- El menú se insertará automáticamente aquí por load-menu.js -->
+    
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
-
-    <header>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <nav class="menu">
-            <img src="../../imagenes/unnamed.png" class="logo-arriba-img" alt="Logo">
-            <ul>
-                <li><a href="../../../index.html">Inicio</a></li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                        <li><a href="../datosindex.html">Datos Nacionales</a></li>
-                        <li><a href="padronv.html">Padrón Vehicular</a></li>
-                        <li><a href="padronim.html">Padrón Inmobiliario</a></li>
-                        <li><a href="mapaplan.html">Plantilla de Personal</a></li>
-                        <li><a href="tabulador.html">Tabulador</a></li>
-                        <li><a href="rubro.html">Gastos de Operación</a></li>
-                        <li><a href="estadofuerza.html">Analítico Estado Fuerza</a></li>
-                        <li><a href="unidadcd.html">Unidades Caninas</a></li>
-                        <li><a href="../../construccion.html">Inmuebles</a></li>
-                        <li><a href="../../gestion/archivos.html">Gestión de Archivos</a></li>
-                    </ul>
-                </li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                        <li><a href="../../estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../estados/baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../../estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../../estados/campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../../estados/chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="../../estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../../estados/coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../../estados/colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../../estados/cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../../estados/durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../../estados/guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../../estados/guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../../estados/hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../../estados/jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../../estados/edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../estados/michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../../estados/morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../../estados/nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../estados/nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
-                        <li><a href="../../estados/oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../../estados/puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../../estados/queretaro/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../../estados/quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../../estados/san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../../estados/sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../../estados/sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../../estados/tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../../estados/tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../../estados/tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../../estados/veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../../estados/yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../../estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
 
     <div class="logo-container">
         <img src="../../imagenes/inm logo.png" alt="Logo INM">
@@ -157,28 +99,6 @@
     function hideErrors() {
         document.getElementById('pdf-error').style.display = 'none';
         document.getElementById('mobile-error').style.display = 'none';
-    }
-
-    // Función para abrir/cerrar el menú
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const overlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        overlay.classList.toggle('active');
-    }
-
-    // Cerrar menú al hacer clic fuera
-    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-    // Función para submenús
-    function toggleSubmenu(event) {
-        event.preventDefault();
-        document.querySelectorAll('.submenu.active').forEach(sub => {
-            if (sub !== event.target.closest('.submenu')) {
-                sub.classList.remove('active');
-            }
-        });
-        event.target.closest('.submenu').classList.toggle('active');
     }
 
     // Función para cargar un documento específico
@@ -275,15 +195,6 @@
         // Cargar el documento inicial
         cargarDocumentoInicial();
 
-        // Cerrar submenús al hacer clic en opción
-        document.querySelectorAll('.submenu-list a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.querySelectorAll('.submenu').forEach(sub => {
-                    sub.classList.remove('active');
-                });
-            });
-        });
-        
         // Manejar clic en el enlace de iOS
         document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
             if (isIOS()) {
@@ -294,6 +205,8 @@
         });
     });
 </script>
-<script src="../../../carga,.js"></script>
+
+<!-- Asegúrate de que esta ruta sea correcta para tu estructura de carpetas -->
+<script src="../../../carga.js"></script>
 </body>
 </html>
