@@ -161,6 +161,18 @@ body::before {
 {
     background-color: #1a3e72;
 }
+.btn-10
+{
+    background-color: #006847;
+}
+.btn-11
+{
+    background-color: #1a3e72;
+}
+.btn-12
+{
+    background-color: #5C5C5C;
+}
 
 /* --- Menú lateral estilizado --- *//* Menú principal - Diseño mejorado */
 nav.menu {
