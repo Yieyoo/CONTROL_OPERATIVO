@@ -649,3 +649,14 @@ nav.menu {
       font-size: 1rem;
     }
   }
+  /* Prevenir que Font Awesome afecte el menú */
+.menu i:not(.fa):not(.fas):not(.far):not(.fal):not(.fat):not(.fad):not(.fab) {
+    font-family: inherit !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+}
+
+/* Asegurar que solo los íconos con clases FA tengan los estilos */
+.fas, .far, .fal, .fab {
+    /* Mantener estilos de Font Awesome */
+}
