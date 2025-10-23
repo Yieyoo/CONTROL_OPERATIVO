@@ -1,4 +1,4 @@
-// js/auth.js - Sistema de autenticación unificado
+// js/auth.js - Sistema de autenticación unificado MEJORADO
 class AuthSystem {
     constructor() {
         this.config = {
@@ -11,36 +11,39 @@ class AuthSystem {
     init() {
         // Solo verificar si NO estamos en la página de login
         if (!this.isLoginPage()) {
+            console.log('🔄 Iniciando verificación de autenticación...');
             this.checkAuthentication();
             this.setupPeriodicCheck();
+        } else {
+            console.log('📄 Página de login, omitiendo verificación');
+            // En login, limpiar cualquier sesión expirada
+            this.cleanExpiredSession();
         }
     }
 
     isLoginPage() {
-        return window.location.pathname.includes('login.html') || 
-               window.location.href.includes('login.html');
+        const currentPath = window.location.pathname + window.location.search;
+        const isLogin = currentPath.includes('login.html') || 
+                       window.location.href.includes('login.html');
+        console.log('📍 Página actual:', currentPath, 'Es login:', isLogin);
+        return isLogin;
     }
 
     checkAuthentication() {
         const isAuthenticated = localStorage.getItem('authenticated') === 'true';
         const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
         const now = Date.now();
+        const sessionAge = now - loginTime;
         
-        console.log('🔐 Verificando autenticación...', {
-            página: window.location.href,
+        console.log('🔐 Estado de sesión:', {
             autenticado: isAuthenticated,
-            tiempoSesión: `${Math.round((now - loginTime) / 1000 / 60)} minutos`,
-            expirado: (now - loginTime) >= this.config.sessionDuration
+            tiempoSesión: `${Math.round(sessionAge / 1000 / 60)} minutos`,
+            expirado: sessionAge >= this.config.sessionDuration
         });
 
-        if (!isAuthenticated || (now - loginTime) >= this.config.sessionDuration) {
-            // Limpiar sesión expirada
-            if (isAuthenticated) {
-                this.clearSession();
-            }
-            
-            console.log('❌ Sin sesión válida, redirigiendo al login...');
-            this.redirectToLogin();
+        if (!isAuthenticated || sessionAge >= this.config.sessionDuration) {
+            console.log('❌ Sesión inválida o expirada');
+            this.handleInvalidSession();
             return false;
         }
 
@@ -48,14 +51,56 @@ class AuthSystem {
         return true;
     }
 
+    handleInvalidSession() {
+        // Limpiar sesión expirada
+        this.clearSession();
+        
+        // Solo redirigir si no estamos ya en login
+        if (!this.isLoginPage()) {
+            console.log('🔄 Redirigiendo al login...');
+            this.redirectToLogin();
+        }
+    }
+
+    cleanExpiredSession() {
+        const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+        const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+        const now = Date.now();
+        
+        if (isAuthenticated && (now - loginTime) >= this.config.sessionDuration) {
+            console.log('🧹 Limpiando sesión expirada en página de login');
+            this.clearSession();
+        }
+    }
+
     clearSession() {
+        console.log('🗑️ Limpiando datos de sesión');
         localStorage.removeItem('authenticated');
         localStorage.removeItem('loginTime');
         localStorage.removeItem('userData');
     }
 
     redirectToLogin() {
-        window.location.href = this.config.loginPage;
+        // Usar replace para evitar que quede en el historial
+        const loginUrl = this.getLoginUrl();
+        console.log('🚀 Redirigiendo a:', loginUrl);
+        window.location.replace(loginUrl);
+    }
+
+    getLoginUrl() {
+        // Calcular la ruta correcta al login desde la ubicación actual
+        const currentPath = window.location.pathname;
+        
+        if (currentPath.includes('/estados/')) {
+            // Si estamos en una página de estado
+            return '../../login.html';
+        } else if (currentPath.includes('/datos_nacionales/')) {
+            // Si estamos en datos nacionales
+            return '../login.html';
+        } else {
+            // Si estamos en la raíz
+            return 'login.html';
+        }
     }
 
     logout() {
@@ -69,7 +114,9 @@ class AuthSystem {
     setupPeriodicCheck() {
         // Verificar cada 30 segundos
         setInterval(() => {
-            this.checkAuthentication();
+            if (!this.isLoginPage()) {
+                this.checkAuthentication();
+            }
         }, 30000);
     }
 
@@ -79,12 +126,28 @@ class AuthSystem {
     }
 }
 
-// Inicializar automáticamente
-document.addEventListener('DOMContentLoaded', function() {
+// Inicialización MEJORADA
+console.log('🔧 auth.js cargado - Iniciando sistema de autenticación');
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📄 DOM listo - Inicializando AuthSystem');
+        new AuthSystem();
+    });
+} else {
+    console.log('📄 DOM ya listo - Inicializando AuthSystem inmediatamente');
     new AuthSystem();
-});
+}
 
 // Función global para usar en onclick
 window.logout = function() {
+    console.log('🖱️ Click en logout detectado');
     AuthSystem.logout();
 };
+
+// Debug info
+console.log('🔍 Debug auth - localStorage:', {
+    authenticated: localStorage.getItem('authenticated'),
+    loginTime: localStorage.getItem('loginTime'),
+    currentTime: Date.now()
+});
