@@ -6,142 +6,24 @@
     <title>PLANTILLA DE PERSONAL - Aguascalientes</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
-    <style>
-        /* Estilos específicos para móviles iOS */
-        @media only screen and (max-width: 768px) {
-            .ios-only {
-                display: none; /* Oculto por defecto */
-            }
-            
-            /* Solo mostrar en iOS */
-            @supports (-webkit-touch-callout: none) {
-                .ios-only {
-                    display: block;
-                    text-align: center;
-                    margin: 20px;
-                    padding: 15px;
-                    background: #f8f8f8;
-                    border-radius: 10px;
-                    border: 1px solid #ddd;
-                }
-                
-                .ios-pdf-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 10px;
-                    background: #691932;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 8px;
-                    text-decoration: none;
-                    margin-top: 15px;
-                }
-                
-                .ios-pdf-link img {
-                    width: 30px;
-                    height: 30px;
-                }
-                
-                .ios-instructions {
-                    font-size: 14px;
-                    color: #666;
-                    margin-top: 10px;
-                }
-            }
-        }
-        /* Estilo para la fecha de actualización */
-                #fecha-subida {
-                    position: fixed;
-                    bottom: 10px;
-                    right: 10px;
-                    background-color: rgba(0,0,0,0.7);
-                    color: white;
-                    padding: 5px 10px;
-                    border-radius: 5px;
-                    font-size: 12px;
-                    z-index: 1000;
-                }
-
-                @media (max-width: 768px) {
-                    #fecha-subida {
-                        font-size: 10px;
-                        padding: 3px 6px;
-                    }
-                }
-    </style>
-</head>
-<body>   
-    <!-- Contenedor para el título personalizado -->
-    <div id="tituloContainer" class="titulo-personalizado">
-        Cargando título...
-    </div>
     
-    <div class="menu-overlay"></div>
+    <!-- Cargar el menú global -->
+    <script src="../../load-menu.js" defer></script>
+</head>
+
+<body class="mostrar-ubicaciones">
+    <!-- HEADER DE DOS LÍNEAS -->
+    <div class="header-lineas">
+        <div class="linea-superior"></div>
+        <div class="linea-inferior"></div>
+    </div>
+
+    <!-- El menú se insertará automáticamente aquí por load-menu.js -->
+    
+    <h1 id="titulo-documento" class="titulo-personalizado">PLANTILLA DE PERSONAL</h1>       
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
-
-    <header>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <nav class="menu">
-            <img src="../../../imagenes/unnamed.png" class="logo-arriba-img" alt="Logo">
-            <ul>
-                <li><a href="../../../index.html">Inicio</a></li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                        <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a></li>
-                        <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                        <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
-                    </ul>
-                </li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                    <li><a href="../aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../nuevo_leon/nuevolindex.html">Nuevo León</a></li>
-                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../../queretaro/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
@@ -158,213 +40,249 @@
 
     <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
     <div id="ios-container" class="ios-only">
-        <p>Para una mejor experiencia en tu dispositivo iOS:</p>
-        <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
-            <span>Abrir Plantilla</span>
+        <p>Para visualizar el documento en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" download>
+            <span>Descargar Documento</span>
         </a>
-        <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
+        <p class="ios-instructions">Toca el botón arriba para descargar el PDF a tu dispositivo</p>
     </div>
 
     <div class="mobile-images">
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <div id="fecha-subida">
-    Actualizado: <span id="fecha-texto">Cargando...</span>
+    <!-- Botones flotantes -->
+    <div class="botones-flotantes">
+        <button class="boton-descarga boton-ubicaciones" id="descargar-documento">
+            Descargar Documento
+        </button>
+        <button class="regresar-btn" onclick="window.location.href='../aguascalientesindex.html'">
+            Regresar
+        </button>
     </div>
 
-    <button class="regresar-btn" onclick="window.location.href = '../aguascalientesindex.html'">Regresar</button>
+    <!-- Fecha de actualización -->
+    <div id="fecha-subida">
+        Actualizado: <span id="fecha-texto">Cargando...</span>
+    </div>
 
-    <script>
-    // Configuración
+<script>
+    // CONFIGURACIÓN - PLANTILLA DE PERSONAL
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO_FIJO = 'aguascalientes';
-    const TIPO_DOCUMENTO = 'plantilla_personal';
-// Detectar iOS
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
+    const ESTADO = 'aguascalientes';              // Estado específico
+    const TIPO_DOCUMENTO = 'plantilla_personal';  // Tipo de documento específico
+    const TITULO_DOCUMENTO = 'PLANTILLA DE PERSONAL'; // Título por defecto
 
-// Función para obtener y cargar el título personalizado
-async function cargarTituloPersonalizado() {
-    const tituloContainer = document.getElementById('tituloContainer');
+    // Configuración dinámica desde URL
+    const params = new URLSearchParams(window.location.search);
+    const estadoFromURL = params.get('estado');
+    const tipoFromURL = params.get('tipo');
+    const tituloFromURL = params.get('titulo');
 
-    try {
-        // 1. Obtener el archivo más reciente con título
-        const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-            headers: { 'x-api-key': API_KEY }
-        });
+    // Valores finales (usa los de URL si existen, sino los definidos arriba)
+    const ESTADO_FIJO = estadoFromURL || ESTADO;
+    const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+    const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
 
-        if (archivosResponse.ok) {
-            const { data: archivos } = await archivosResponse.json();
-            if (archivos.length > 0) {
-                const ultimoArchivo = archivos.sort((a, b) => 
-                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                )[0];
+    // Variables para controlar el estado del documento
+    let documentoUrl = '';
 
-                if (ultimoArchivo.titulo_documento) {
-                    tituloContainer.textContent = ultimoArchivo.titulo_documento;
+    // Detectar iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
+        }
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
+
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
+
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
+
+    // Función para cargar título personalizado desde la API
+    async function cargarTituloPersonalizado() {
+        const tituloElement = document.getElementById('titulo-documento');
+
+        try {
+            // Intentar obtener el título desde el endpoint de títulos
+            const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (tituloResponse.ok) {
+                const data = await tituloResponse.json();
+                if (data.titulo) {
+                    tituloElement.textContent = data.titulo;
+                    document.title = data.titulo + ' - ' + ESTADO_FIJO.toUpperCase();
                     return;
                 }
             }
-        }
 
-        // 2. Obtener desde endpoint de títulos
-        const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-            headers: { 'x-api-key': API_KEY }
-        });
-
-        if (tituloResponse.ok) {
-            const data = await tituloResponse.json();
-            if (data.titulo) {
-                tituloContainer.textContent = data.titulo;
-                return;
-            }
-        }
-
-        // 3. Título por defecto
-        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
-
-    } catch (error) {
-        console.error('Error:', error);
-        tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
-        tituloContainer.style.color = 'red';
-    }
-}
-
-// Mostrar/ocultar loading
-function showLoading(show) {
-    document.getElementById('loading').style.display = show ? 'flex' : 'none';
-}
-
-// Mostrar mensaje de error
-function showError(message, target = 'both') {
-    if (target === 'both' || target === 'pdf') {
-        const pdfError = document.getElementById('pdf-error');
-        pdfError.textContent = message;
-        pdfError.style.display = 'block';
-    }
-    if (target === 'both' || target === 'mobile') {
-        const mobileError = document.getElementById('mobile-error');
-        mobileError.textContent = message;
-        mobileError.style.display = 'block';
-    }
-}
-
-// Ocultar errores
-function hideErrors() {
-    document.getElementById('pdf-error').style.display = 'none';
-    document.getElementById('mobile-error').style.display = 'none';
-}
-
-// Función para abrir/cerrar el menú
-function toggleMenu() {
-    const menu = document.querySelector('.menu');
-    const overlay = document.querySelector('.menu-overlay');
-    menu.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-// Cerrar menú al hacer clic fuera
-document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-// Función para submenús
-function toggleSubmenu(event) {
-    event.preventDefault();
-    document.querySelectorAll('.submenu.active').forEach(sub => {
-        if (sub !== event.target.closest('.submenu')) {
-            sub.classList.remove('active');
-        }
-    });
-    event.target.closest('.submenu').classList.toggle('active');
-}
-
-// Formatear fecha legible
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('es-MX', options);
-}
-
-// Cargar PDF de Plantilla de Personal de Baja California
-async function loadPlantillaPersonal() {
-    showLoading(true);
-    hideErrors();
-    const fechaElement = document.getElementById('fecha-texto'); // Movida al inicio de la función
-
-    try {
-        console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
-        const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-            headers: { 'x-api-key': API_KEY }
-        });
-
-        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-
-        const result = await response.json();
-        console.log('Respuesta API:', result);
-
-        if (!result?.data) throw new Error('Formato de respuesta inválido');
-
-        const pdfViewer = document.getElementById('pdf-viewer');
-        const mobileContainer = document.querySelector('.mobile-images');
-        const iosLink = document.getElementById('ios-pdf-link');
-
-        if (result.data.length > 0) {
-            const latestPDF = result.data.sort((a, b) => 
-                new Date(b.uploaded_at) - new Date(a.uploaded_at)
-            )[0];
-
-            // Mostrar fecha de actualización
-            fechaElement.textContent = formatDate(latestPDF.uploaded_at);
-            
-            // Configuración normal para PC
-            pdfViewer.src = latestPDF.url;
-            
-            // Configuración específica para iOS
-            if (isIOS()) {
-                // Usamos Google Viewer como alternativa para iOS
-                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                iosLink.href = googleViewerUrl;
-            }
-        } else {
-            showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
-            fechaElement.textContent = 'No disponible';
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-        fechaElement.textContent = 'Error al cargar';
-    } finally {
-        showLoading(false);
-    }
-}
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-    cargarTituloPersonalizado();
-    if (document.getElementById('pdf-viewer')) {
-        loadPlantillaPersonal();
-    }
-
-    // Cerrar submenús al hacer clic en opción
-    document.querySelectorAll('.submenu-list a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.querySelectorAll('.submenu').forEach(sub => {
-                sub.classList.remove('active');
+            // Si no hay título global, intentar obtenerlo desde los metadatos del archivo
+            const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                headers: { 'x-api-key': API_KEY }
             });
+
+            if (archivosResponse.ok) {
+                const { data: archivos } = await archivosResponse.json();
+                if (archivos.length > 0) {
+                    const ultimoArchivo = archivos.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+
+                    if (ultimoArchivo.titulo_documento) {
+                        tituloElement.textContent = ultimoArchivo.titulo_documento;
+                        document.title = ultimoArchivo.titulo_documento + ' - ' + ESTADO_FIJO.toUpperCase();
+                        return;
+                    }
+                }
+            }
+
+            // Título por defecto si todo falla
+            tituloElement.textContent = TITULO_FINAL;
+            document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+
+        } catch (error) {
+            console.error('Error cargando título:', error);
+            tituloElement.textContent = TITULO_FINAL;
+            document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+        }
+    }
+
+    // Cargar PDF desde Cloudinary
+    async function cargarDocumentoPDF() {
+        showLoading(true);
+        hideErrors();
+
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            console.log('Respuesta API:', result);
+
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const iosLink = document.getElementById('ios-pdf-link');
+            const fechaElement = document.getElementById('fecha-texto');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                // Guardar URL para descarga
+                documentoUrl = latestPDF.url;
+
+                // Actualizar fecha
+                fechaElement.textContent = formatDate(latestPDF.uploaded_at);
+
+                // Configuración normal para PC
+                pdfViewer.src = latestPDF.url;
+                
+                // Configuración para móviles (no iOS)
+                if (!isIOS()) {
+                    mobileContainer.innerHTML = `
+                        <div class="file-info">
+                            <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar Documento
+                            </a>
+                        </div>
+                    `;
+                }
+                
+                // Configuración específica para iOS - Descarga directa
+                if (isIOS()) {
+                    iosLink.href = latestPDF.url;
+                    iosLink.setAttribute('download', latestPDF.filename || 'plantilla_personal.pdf');
+                }
+            } else {
+                showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+                fechaElement.textContent = 'No disponible';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar el documento: ${error.message}`, 'both');
+            document.getElementById('fecha-texto').textContent = 'Error al cargar';
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Configurar eventos de descarga
+    function configurarDescargas() {
+        const descargarBtn = document.getElementById('descargar-documento');
+        if (descargarBtn) {
+            descargarBtn.onclick = function() {
+                if (documentoUrl) {
+                    window.open(documentoUrl, '_blank');
+                } else {
+                    showError('No hay documento disponible para descargar', 'both');
+                }
+            };
+        }
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cargar título personalizado primero
+        cargarTituloPersonalizado();
+        
+        // Cargar el documento PDF
+        if (document.getElementById('pdf-viewer')) {
+            cargarDocumentoPDF();
+        }
+
+        // Configurar descargas después de cargar el documento
+        setTimeout(configurarDescargas, 1000);
+
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
         });
     });
-    
-    // Manejar clic en el enlace de iOS
-    document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
-        if (isIOS()) {
-            // Abrir en nueva pestaña sin restricciones
-            window.open(this.href, '_blank');
-            e.preventDefault();
-        }
-    });
-});
-    </script>
+</script>
+
+<!-- Asegúrate de que esta ruta sea correcta para tu estructura de carpetas -->
+<script src="../../../carga.js"></script>
 </body>
 </html>
