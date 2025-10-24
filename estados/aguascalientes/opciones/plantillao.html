@@ -7,48 +7,6 @@
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
     <style>
-        /* Estilos específicos para móviles iOS */
-        @media only screen and (max-width: 768px) {
-            .ios-only {
-                display: none; /* Oculto por defecto */
-            }
-            
-            /* Solo mostrar en iOS */
-            @supports (-webkit-touch-callout: none) {
-                .ios-only {
-                    display: block;
-                    text-align: center;
-                    margin: 20px;
-                    padding: 15px;
-                    background: #f8f8f8;
-                    border-radius: 10px;
-                    border: 1px solid #ddd;
-                }
-                
-                .ios-pdf-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 10px;
-                    background: #691932;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 8px;
-                    text-decoration: none;
-                    margin-top: 15px;
-                }
-                
-                .ios-pdf-link img {
-                    width: 30px;
-                    height: 30px;
-                }
-                
-                .ios-instructions {
-                    font-size: 14px;
-                    color: #666;
-                    margin-top: 10px;
-                }
-            }
-        }
         /* Estilo para la fecha de actualización */
         #fecha-subida {
             position: fixed;
@@ -71,13 +29,13 @@
     </style>
 </head>
 <body>
-    <!-- HEADER DE DOS LÍNEAS (del primer código) -->
+    <!-- HEADER DE DOS LÍNEAS -->
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
     </div>
 
-    <!-- MENÚ LATERAL (del primer código) -->
+    <!-- MENÚ LATERAL -->
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <div class="menu-overlay" onclick="toggleMenu()"></div>
     
@@ -88,7 +46,7 @@
         </ul>
     </nav>
 
-    <!-- Contenedor para el título personalizado (del segundo código) -->
+    <!-- Contenedor para el título personalizado -->
     <div id="tituloContainer" class="titulo-personalizado">
         Cargando título...
     </div>
@@ -109,15 +67,6 @@
             title="Visualizador de PDF"
         ></iframe>
         <div id="pdf-error" class="error-message" style="display: none;"></div>
-    </div>
-
-    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
-    <div id="ios-container" class="ios-only">
-        <p>Para una mejor experiencia en tu dispositivo iOS:</p>
-        <a href="#" id="ios-pdf-link" class="ios-pdf-link" target="_blank">
-            <span>Abrir Plantilla</span>
-        </a>
-        <p class="ios-instructions">Toca el botón arriba para abrir el PDF en una nueva ventana</p>
     </div>
 
     <div class="mobile-images">
@@ -143,7 +92,7 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        // Función para obtener y cargar el título personalizado (del segundo código)
+        // Función para obtener y cargar el título personalizado
         async function cargarTituloPersonalizado() {
             const tituloContainer = document.getElementById('tituloContainer');
 
@@ -215,7 +164,7 @@
             document.getElementById('mobile-error').style.display = 'none';
         }
 
-        // Función para el menú lateral (del primer código)
+        // Función para el menú lateral
         function toggleMenu() {
             const menu = document.getElementById('main-menu');
             const overlay = document.querySelector('.menu-overlay');
@@ -231,7 +180,7 @@
             return new Date(dateString).toLocaleDateString('es-MX', options);
         }
 
-        // Cargar PDF de Plantilla de Personal de Aguascalientes (del segundo código)
+        // Cargar PDF de Plantilla de Personal de Aguascalientes
         async function loadPlantillaPersonal() {
             showLoading(true);
             hideErrors();
@@ -252,7 +201,6 @@
 
                 const pdfViewer = document.getElementById('pdf-viewer');
                 const mobileContainer = document.querySelector('.mobile-images');
-                const iosLink = document.getElementById('ios-pdf-link');
 
                 if (result.data.length > 0) {
                     const latestPDF = result.data.sort((a, b) => 
@@ -265,11 +213,18 @@
                     // Configuración normal para PC
                     pdfViewer.src = latestPDF.url;
                     
-                    // Configuración específica para iOS
-                    if (isIOS()) {
-                        // Usamos Google Viewer como alternativa para iOS
-                        const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(latestPDF.url)}&embedded=true`;
-                        iosLink.href = googleViewerUrl;
+                    // Configuración para móviles (igual que en el primer código)
+                    if (!isIOS()) {
+                        mobileContainer.innerHTML = `
+                            <div class="file-info">
+                                <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                                <a href="${latestPDF.url}" class="download-btn" download>
+                                    Descargar Documento
+                                </a>
+                            </div>
+                        `;
                     }
                 } else {
                     showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
@@ -290,15 +245,6 @@
             if (document.getElementById('pdf-viewer')) {
                 loadPlantillaPersonal();
             }
-            
-            // Manejar clic en el enlace de iOS
-            document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
-                if (isIOS()) {
-                    // Abrir en nueva pestaña sin restricciones
-                    window.open(this.href, '_blank');
-                    e.preventDefault();
-                }
-            });
         });
     </script>
     <script src="../../../load-menu.js" defer></script>
