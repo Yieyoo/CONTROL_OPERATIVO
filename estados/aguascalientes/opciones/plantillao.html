@@ -7,53 +7,7 @@
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
     
-    <!-- ✅ SCRIPT DE VERIFICACIÓN TEMPORAL -->
-    <script>
-        console.log('🔧 VERIFICANDO CARGA DE SCRIPTS...');
-        console.log('📍 Ruta actual:', window.location.pathname);
-        
-        // Verificación temporal de autenticación
-        function verificarAutenticacionTemporal() {
-            console.log('🔐 VERIFICACIÓN TEMPORAL DE AUTENTICACIÓN');
-            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-            const now = Date.now();
-            const sessionAge = now - loginTime;
-            const sessionDuration = 8 * 60 * 60 * 1000; // 8 horas
-            
-            console.log('Estado sesión:', {
-                autenticado: isAuthenticated,
-                tiempo: Math.round(sessionAge / 1000 / 60) + ' minutos',
-                expirado: sessionAge >= sessionDuration
-            });
-
-            if (!isAuthenticated || sessionAge >= sessionDuration) {
-                console.log('❌ Sesión inválida - Redirigiendo al login');
-                
-                // Determinar ruta de login
-                const currentPath = window.location.pathname;
-                let loginUrl = '../../../login.html'; // Desde /estados/aguascalientes/opciones/
-                
-                console.log('🚀 Redirigiendo a:', loginUrl);
-                setTimeout(() => {
-                    window.location.replace(loginUrl);
-                }, 100);
-                return false;
-            }
-            
-            console.log('✅ Sesión válida');
-            return true;
-        }
-
-        // Ejecutar verificación cuando el DOM esté listo
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', verificarAutenticacionTemporal);
-        } else {
-            verificarAutenticacionTemporal();
-        }
-    </script>
-
-    <!-- ✅ SCRIPTS ORIGINALES -->
+    <!-- ✅ SCRIPTS ESENCIALES -->
     <script src="../../../auth.js" defer></script>
     <script src="../../../load-menu.js" defer></script>
     
@@ -86,8 +40,6 @@
     <div id="tituloContainer" class="titulo-personalizado">
         Cargando título...
     </div>
-    
-    <!-- EL RESTO DE TU CÓDIGO SE MANTIENE IGUAL -->
     
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -241,7 +193,7 @@
                     // Configuración normal para PC
                     pdfViewer.src = latestPDF.url;
                     
-                    // Configuración para móviles (igual que en el primer código)
+                    // Configuración para móviles
                     if (!isIOS()) {
                         mobileContainer.innerHTML = `
                             <div class="file-info">
