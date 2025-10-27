@@ -10,10 +10,15 @@
     <title>Querétaro - Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../../imagenes/iconom.png">
     <link rel="stylesheet" href="../../estados/diseños/diseñogeneral.css">
+    <script src="../../auth.js" defer></script>
     <script src="../../load-menu.js" defer></script>
 </head>
 <body>
+    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ -->
+
     <header>
+        <!-- EL BOTÓN DEL MENÚ SE INSERTA AUTOMÁTICAMENTE -->
+        <!-- SOLO MANTENEMOS EL LOGO EN EL HEADER -->
         <div class="logo-container">
             <img src="../../imagenes/unnamed.png" alt="Gobernación" class="logo">
         </div>
@@ -86,66 +91,12 @@
     </div>
 
     <script>
-        // Sistema de autenticación
-        class AuthManager {
-            constructor() {
-                this.sessionDuration = 60 * 60 * 1000; // 1 hora
-                this.checkAuth();
-                this.setupNavigationHandlers();
-            }
-
-            checkAuth() {
-                const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-                const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-                const now = Date.now();
-                
-                console.log('🔐 Verificando autenticación en Aguascalientes...');
-
-                if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                    console.log('❌ Sesión inválida, redirigiendo...');
-                    this.redirectToLogin();
-                    return false;
-                }
-
-                console.log('✅ Sesión válida en Aguascalientes');
-                return true;
-            }
-
-            redirectToLogin() {
-                localStorage.removeItem('authenticated');
-                localStorage.removeItem('loginTime');
-                window.location.replace('../../login.html');
-            }
-
-            setupNavigationHandlers() {
-                window.addEventListener('pageshow', (event) => {
-                    if (event.persisted) {
-                        if (!this.checkAuth()) {
-                            this.redirectToLogin();
-                        }
-                    }
-                });
-            }
-        }
-
-        // Inicializar autenticación
-        const authManager = new AuthManager();
-
         // Mostrar la fecha actual
         document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
-
-        // Función global para logout
-        function logout() {
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                localStorage.removeItem('authenticated');
-                localStorage.removeItem('loginTime');
-                window.location.href = '../../login.html';
-            }
-        }
 
         // Efectos visuales adicionales - MANTENIENDO LA ANIMACIÓN QUE TE GUSTA
         document.addEventListener('DOMContentLoaded', function() {
