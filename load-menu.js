@@ -145,15 +145,36 @@ class MenuLoader {
                !href.startsWith('/'); // Mantener rutas absolutas
     }
     
-    static calculateCorrectPath(originalHref, basePath) {
-        // Para enlaces que ya son relativos a la raíz, mantenerlos
-        if (originalHref.startsWith('/')) {
-            return originalHref;
-        }
-        
-        // Aplicar el basePath calculado
-        return basePath + originalHref;
+   static calculateCorrectPath(originalHref, basePath) {
+    console.log(`🔗 Calculando: "${originalHref}" desde: "${window.location.pathname}"`);
+    
+    // 1. No tocar enlaces absolutos o especiales
+    if (originalHref.startsWith('/') || originalHref.startsWith('http') || 
+        originalHref.startsWith('#') || originalHref.startsWith('javascript:')) {
+        return originalHref;
     }
+    
+    // 2. Estrategia MEJORADA: basada en la ubicación actual
+    const currentPath = window.location.pathname;
+    
+    // Si estamos en opciones (subcarpeta profunda)
+    if (currentPath.includes('/opciones/')) {
+        if (originalHref === 'index.html') {
+            return '../../../index.html';
+        }
+        // Para otros enlaces, mantenerlos como están (ya son relativos correctos en menu.html)
+    }
+    // Si estamos en la raíz de un estado
+    else if (currentPath.includes('/estados/') && !currentPath.includes('/opciones/')) {
+        if (originalHref === 'index.html') {
+            return '../../index.html';
+        }
+    }
+    
+    // 3. Para todos los demás casos, mantener la ruta ORIGINAL del menu.html
+    // NO aplicar basePath para evitar corromper las rutas
+    return originalHref;
+}
     
     static setupBasicMenuEvents(menuToggle, menu, menuOverlay) {
         // Toggle del menú principal
