@@ -4,27 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNIDAD CANINA</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
+    <link rel="icon" type="image/png" href="../../../imagenes/huella.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
+    <script src="../../../auth.js" defer></script>   
     <script src="../../../load-menu.js" defer></script>
 </head>
 <body>
-    <!-- HEADER DE DOS LÍNEAS -->
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
     </div>
-
-    <!-- MENÚ LATERAL -->
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="menu-overlay" onclick="toggleMenu()"></div>
-    
-    <nav class="menu" id="main-menu">
-        <img src="../../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
-        <ul>
-            <!-- El menú se cargará desde load-menu.js -->
-        </ul>
-    </nav>
+    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
     <h1 id="titulo-documento" class="titulo-personalizado">UNIDAD CANINA</h1>       
     <div class="loading" id="loading">
@@ -57,146 +47,135 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
- <button class="regresar-btn" onclick="window.location.href = '../pueblaindex.html'">Regresar</button>
+    <button class="regresar-btn" onclick="window.location.href = '../pueblaindex.html'">Regresar</button>
 
-<script>
-    // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
-   const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-    const API_KEY = 'Xhy2md57';
-    const ESTADO = 'puebla';       // Cambia por el estado que necesites
-    const TIPO_DOCUMENTO = 'unidad_canina'; // Cambia por el tipo de documento que necesites
-    const TITULO_DOCUMENTO = 'Unidad Canina'; // Cambia por el título que quieras mostrar
+    <script>
+        // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
+        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+        const API_KEY = 'Xhy2md57';
+        const ESTADO = 'puebla';
+        const TIPO_DOCUMENTO = 'unidad_canina';
+        const TITULO_DOCUMENTO = 'Unidad Canina';
 
-    // Configuración dinámica desde URL (opcional)
-    const params = new URLSearchParams(window.location.search);
-    const estadoFromURL = params.get('estado');
-    const tipoFromURL = params.get('tipo');
-    const tituloFromURL = params.get('titulo');
+        // Configuración dinámica desde URL (opcional)
+        const params = new URLSearchParams(window.location.search);
+        const estadoFromURL = params.get('estado');
+        const tipoFromURL = params.get('tipo');
+        const tituloFromURL = params.get('titulo');
 
-    // Valores finales (usa los de URL si existen, sino los definidos arriba)
-    const ESTADO_FIJO = estadoFromURL || ESTADO;
-    const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
-    const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+        // Valores finales (usa los de URL si existen, sino los definidos arriba)
+        const ESTADO_FIJO = estadoFromURL || ESTADO;
+        const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+        const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
 
-    // Detectar iOS
-    function isIOS() {
-        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    }
-
-    // Mostrar/ocultar loading
-    function showLoading(show) {
-        document.getElementById('loading').style.display = show ? 'flex' : 'none';
-    }
-
-    // Mostrar mensaje de error
-    function showError(message, target = 'both') {
-        if (target === 'both' || target === 'pdf') {
-            const pdfError = document.getElementById('pdf-error');
-            pdfError.textContent = message;
-            pdfError.style.display = 'block';
+        // Detectar iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
-        if (target === 'both' || target === 'mobile') {
-            const mobileError = document.getElementById('mobile-error');
-            mobileError.textContent = message;
-            mobileError.style.display = 'block';
+
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
         }
-    }
 
-    // Ocultar errores
-    function hideErrors() {
-        document.getElementById('pdf-error').style.display = 'none';
-        document.getElementById('mobile-error').style.display = 'none';
-    }
-
-    // Función para el menú lateral
-    function toggleMenu() {
-        const menu = document.getElementById('main-menu');
-        const overlay = document.querySelector('.menu-overlay');
-        if (menu && overlay) {
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-    }
-
-    // Formatear fecha legible
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('es-MX', options);
-    }
-
-    // Cargar PDF desde Cloudinary (función genérica)
-    async function cargarDocumentoPDF() {
-        showLoading(true);
-        hideErrors();
-
-        // Actualizar título de la página
-        document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
-        document.getElementById('titulo-documento').textContent = TITULO_FINAL;
-
-        try {
-            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
-            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
-                headers: { 'x-api-key': API_KEY }
-            });
-
-            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-
-            const result = await response.json();
-            console.log('Respuesta API:', result);
-
-            if (!result?.data) throw new Error('Formato de respuesta inválido');
-
-            const pdfViewer = document.getElementById('pdf-viewer');
-            const mobileContainer = document.querySelector('.mobile-images');
-            const iosLink = document.getElementById('ios-pdf-link');
-
-            if (result.data.length > 0) {
-                const latestPDF = result.data.sort((a, b) => 
-                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                )[0];
-
-                // Configuración normal para PC
-                pdfViewer.src = latestPDF.url;
-                
-                // Configuración para móviles (no iOS)
-                if (!isIOS()) {
-                    mobileContainer.innerHTML = `
-                        <div class="file-info">
-                            <h3>${latestPDF.filename || TITULO_FINAL}</h3>
-                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                            <a href="${latestPDF.url}" class="download-btn" download>
-                                Descargar Documento
-                            </a>
-                        </div>
-                    `;
-                }
-                
-                // Configuración específica para iOS - Descarga directa
-                if (isIOS()) {
-                    iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'vehiculos.pdf');
-                }
-            } else {
-                showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+        // Mostrar mensaje de error
+        function showError(message, target = 'both') {
+            if (target === 'both' || target === 'pdf') {
+                const pdfError = document.getElementById('pdf-error');
+                pdfError.textContent = message;
+                pdfError.style.display = 'block';
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showError(`Error al cargar el documento: ${error.message}`, 'both');
-        } finally {
-            showLoading(false);
+            if (target === 'both' || target === 'mobile') {
+                const mobileError = document.getElementById('mobile-error');
+                mobileError.textContent = message;
+                mobileError.style.display = 'block';
+            }
         }
-    }
 
-    // Inicialización
-    document.addEventListener('DOMContentLoaded', () => {
-        // Cargar el documento PDF
-        if (document.getElementById('pdf-viewer')) {
-            cargarDocumentoPDF();
+        // Ocultar errores
+        function hideErrors() {
+            document.getElementById('pdf-error').style.display = 'none';
+            document.getElementById('mobile-error').style.display = 'none';
         }
-    });
-</script>
-<script src="../../../carga,.js"></script>
+
+        // Formatear fecha legible
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-MX', options);
+        }
+
+        // Cargar PDF desde Cloudinary (función genérica)
+        async function cargarDocumentoPDF() {
+            showLoading(true);
+            hideErrors();
+
+            // Actualizar título de la página
+            document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+            document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+
+            try {
+                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+                const result = await response.json();
+                console.log('Respuesta API:', result);
+
+                if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+                const pdfViewer = document.getElementById('pdf-viewer');
+                const mobileContainer = document.querySelector('.mobile-images');
+                const iosLink = document.getElementById('ios-pdf-link');
+
+                if (result.data.length > 0) {
+                    const latestPDF = result.data.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+
+                    // Configuración normal para PC
+                    pdfViewer.src = latestPDF.url;
+                    
+                    // Configuración para móviles (no iOS)
+                    if (!isIOS()) {
+                        mobileContainer.innerHTML = `
+                            <div class="file-info">
+                                <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                                <a href="${latestPDF.url}" class="download-btn" download>
+                                    Descargar Documento
+                                </a>
+                            </div>
+                        `;
+                    }
+                    
+                    // Configuración específica para iOS - Descarga directa
+                    if (isIOS()) {
+                        iosLink.href = latestPDF.url;
+                        iosLink.setAttribute('download', latestPDF.filename || 'unidad_canina.pdf');
+                    }
+                } else {
+                    showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al cargar el documento: ${error.message}`, 'both');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar el documento PDF
+            if (document.getElementById('pdf-viewer')) {
+                cargarDocumentoPDF();
+            }
+        });
+    </script>
 </body>
 </html>
