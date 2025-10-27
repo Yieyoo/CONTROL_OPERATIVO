@@ -78,6 +78,8 @@ class AuthSystem {
         localStorage.removeItem('authenticated');
         localStorage.removeItem('loginTime');
         localStorage.removeItem('userData');
+        localStorage.removeItem('loginAttempts');
+        localStorage.removeItem('lastAttempt');
     }
 
     redirectToLogin() {
@@ -88,18 +90,36 @@ class AuthSystem {
     }
 
     getLoginUrl() {
-        // Calcular la ruta correcta al login desde la ubicación actual
         const currentPath = window.location.pathname;
+        console.log('📍 Ruta actual:', currentPath);
         
-        if (currentPath.includes('/estados/')) {
-            // Si estamos en una página de estado
-            return '../../login.html';
-        } else if (currentPath.includes('/datos_nacionales/')) {
-            // Si estamos en datos nacionales
-            return '../login.html';
-        } else {
-            // Si estamos en la raíz
-            return 'login.html';
+        try {
+            // Método ROBUSTO: calcular niveles de profundidad automáticamente
+            const pathSegments = currentPath.split('/').filter(segment => 
+                segment && segment !== '' && !segment.includes('.html')
+            );
+            
+            // Si estamos en la raíz, no necesitamos "../"
+            if (pathSegments.length === 0) {
+                console.log('🎯 En raíz → login.html');
+                return 'login.html';
+            }
+            
+            // Calcular "../" necesarios
+            let relativePath = '';
+            for (let i = 0; i < pathSegments.length; i++) {
+                relativePath += '../';
+            }
+            
+            const finalUrl = relativePath + 'login.html';
+            console.log(`🎯 Ruta calculada: ${finalUrl} (${pathSegments.length} niveles)`);
+            
+            return finalUrl;
+            
+        } catch (error) {
+            console.error('❌ Error calculando ruta, usando fallback:', error);
+            // Fallback seguro
+            return '../../../login.html';
         }
     }
 
@@ -129,13 +149,30 @@ class AuthSystem {
 // Inicialización MEJORADA
 console.log('🔧 auth.js cargado - Iniciando sistema de autenticación');
 
+// Función para debug inicial
+function debugAuthInfo() {
+    console.log('🔍 DIAGNÓSTICO AUTH:');
+    console.log('- URL:', window.location.href);
+    console.log('- Path:', window.location.pathname);
+    console.log('- Authenticated:', localStorage.getItem('authenticated'));
+    console.log('- LoginTime:', localStorage.getItem('loginTime'));
+    console.log('- Ruta login calculada:', new AuthSystem().getLoginUrl());
+    
+    const pathSegments = window.location.pathname.split('/').filter(s => s && !s.includes('.html'));
+    console.log('- Segmentos path:', pathSegments);
+    console.log('- Niveles profundidad:', pathSegments.length);
+}
+
+// Inicializar cuando el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📄 DOM listo - Inicializando AuthSystem');
+        debugAuthInfo(); // Debug info
         new AuthSystem();
     });
 } else {
     console.log('📄 DOM ya listo - Inicializando AuthSystem inmediatamente');
+    debugAuthInfo(); // Debug info
     new AuthSystem();
 }
 
@@ -145,9 +182,7 @@ window.logout = function() {
     AuthSystem.logout();
 };
 
-// Debug info
-console.log('🔍 Debug auth - localStorage:', {
-    authenticated: localStorage.getItem('authenticated'),
-    loginTime: localStorage.getItem('loginTime'),
-    currentTime: Date.now()
-});
+// Función global para diagnóstico (útil para debugging)
+window.authDebug = function() {
+    debugAuthInfo();
+};
