@@ -1,4 +1,4 @@
-// js/auth.js - Sistema de autenticación unificado MEJORADO
+// js/auth.js - Sistema de autenticación unificado CORREGIDO
 class AuthSystem {
     constructor() {
         this.config = {
@@ -22,8 +22,10 @@ class AuthSystem {
     }
 
     isLoginPage() {
-        const currentPath = window.location.pathname + window.location.search;
-        const isLogin = currentPath.includes('login.html') || 
+        const currentPath = window.location.pathname;
+        // Verificar si estamos en login.html (ignorando parámetros URL)
+        const isLogin = currentPath.endsWith('login.html') || 
+                       currentPath.includes('/login.html') ||
                        window.location.href.includes('login.html');
         console.log('📍 Página actual:', currentPath, 'Es login:', isLogin);
         return isLogin;
@@ -86,40 +88,135 @@ class AuthSystem {
         // Usar replace para evitar que quede en el historial
         const loginUrl = this.getLoginUrl();
         console.log('🚀 Redirigiendo a:', loginUrl);
-        window.location.replace(loginUrl);
+        
+        // Pequeño delay para asegurar que se procesen los logs
+        setTimeout(() => {
+            window.location.replace(loginUrl);
+        }, 100);
     }
 
     getLoginUrl() {
         const currentPath = window.location.pathname;
+        const currentUrl = window.location.href;
         console.log('📍 Ruta actual:', currentPath);
+        console.log('🌐 URL completa:', currentUrl);
         
         try {
-            // Método ROBUSTO: calcular niveles de profundidad automáticamente
-            const pathSegments = currentPath.split('/').filter(segment => 
-                segment && segment !== '' && !segment.includes('.html')
-            );
+            // Estrategia MEJORADA: usar la URL base del proyecto
+            const baseUrl = this.getBaseUrl();
+            const loginUrl = baseUrl + 'login.html';
             
-            // Si estamos en la raíz, no necesitamos "../"
-            if (pathSegments.length === 0) {
-                console.log('🎯 En raíz → login.html');
-                return 'login.html';
-            }
+            console.log('🎯 URL base del proyecto:', baseUrl);
+            console.log('🎯 URL final del login:', loginUrl);
             
-            // Calcular "../" necesarios
-            let relativePath = '';
-            for (let i = 0; i < pathSegments.length; i++) {
-                relativePath += '../';
-            }
-            
-            const finalUrl = relativePath + 'login.html';
-            console.log(`🎯 Ruta calculada: ${finalUrl} (${pathSegments.length} niveles)`);
-            
-            return finalUrl;
+            return loginUrl;
             
         } catch (error) {
-            console.error('❌ Error calculando ruta, usando fallback:', error);
-            // Fallback seguro
+            console.error('❌ Error calculando ruta:', error);
+            // Fallback: estrategia de niveles
+            return this.getLoginUrlByLevels();
+        }
+    }
+
+    getBaseUrl() {
+        const currentUrl = window.location.href;
+        
+        // Si estamos en localhost o servidor local
+        if (currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1') || currentUrl.includes('file://')) {
+            return this.getBaseUrlForLocal();
+        } else {
+            // Para servidor remoto
+            return this.getBaseUrlForServer();
+        }
+    }
+
+    getBaseUrlForLocal() {
+        const currentUrl = window.location.href;
+        
+        // Para archivos locales (file://)
+        if (currentUrl.startsWith('file://')) {
+            const pathSegments = currentUrl.split('/');
+            // Encontrar la carpeta raíz del proyecto
+            const projectRootIndex = pathSegments.findIndex(segment => 
+                segment.includes('tu-proyecto') || // Cambia por el nombre de tu carpeta
+                segment.includes('INM') || 
+                segment.includes('ControlOperativo')
+            );
+            
+            if (projectRootIndex !== -1) {
+                return pathSegments.slice(0, projectRootIndex + 1).join('/') + '/';
+            }
+        }
+        
+        // Fallback: calcular desde path
+        return this.getBaseUrlByPath();
+    }
+
+    getBaseUrlForServer() {
+        const currentUrl = window.location.href;
+        const urlObj = new URL(currentUrl);
+        
+        // Obtener el path hasta la raíz del proyecto
+        const pathSegments = urlObj.pathname.split('/').filter(segment => segment);
+        
+        // Si estamos en la raíz del dominio
+        if (pathSegments.length === 0) {
+            return urlObj.origin + '/';
+        }
+        
+        // Buscar patrones comunes de estructura
+        if (pathSegments.includes('estados') || pathSegments.includes('datos_nacionales')) {
+            // Asumir que el proyecto está en la raíz del dominio
+            return urlObj.origin + '/';
+        }
+        
+        // Fallback: usar el origen + primer segmento como raíz
+        return urlObj.origin + '/' + (pathSegments[0] || '') + '/';
+    }
+
+    getBaseUrlByPath() {
+        const currentPath = window.location.pathname;
+        const pathSegments = currentPath.split('/').filter(segment => segment && !segment.includes('.html'));
+        
+        let basePath = '/';
+        for (let i = 0; i < pathSegments.length; i++) {
+            basePath += '../';
+        }
+        
+        // Para file://, necesitamos construir la URL completa
+        if (window.location.href.startsWith('file://')) {
+            const absolutePath = window.location.href.split('/').slice(0, -pathSegments.length).join('/') + '/';
+            return absolutePath;
+        }
+        
+        return basePath;
+    }
+
+    getLoginUrlByLevels() {
+        const currentPath = window.location.pathname;
+        console.log('🔄 Usando cálculo por niveles para:', currentPath);
+        
+        // Estrategia de niveles mejorada
+        if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
+            // estados/aguascalientes/opciones/perroso.html
+            console.log('🎯 Patrón: estado + opciones → ../../../login.html');
             return '../../../login.html';
+        } else if (currentPath.includes('/estados/')) {
+            // estados/aguascalientes/aguascalientesindex.html
+            console.log('🎯 Patrón: estado → ../../login.html');
+            return '../../login.html';
+        } else if (currentPath.includes('/datos_nacionales/') && currentPath.includes('/opcionesdatos/')) {
+            // datos_nacionales/opcionesdatos/estadofuerza.html
+            console.log('🎯 Patrón: datos_nacionales + opcionesdatos → ../../login.html');
+            return '../../login.html';
+        } else if (currentPath.includes('/datos_nacionales/')) {
+            // datos_nacionales/datosindex.html
+            console.log('🎯 Patrón: datos_nacionales → ../login.html');
+            return '../login.html';
+        } else {
+            // Raíz: index.html, login.html
+            console.log('🎯 Patrón: raíz → login.html');
+            return 'login.html';
         }
     }
 
@@ -127,7 +224,11 @@ class AuthSystem {
         if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
             console.log('🚪 Cerrando sesión...');
             this.clearSession();
-            this.redirectToLogin();
+            
+            // Pequeño delay para que se vea el mensaje de confirmación
+            setTimeout(() => {
+                this.redirectToLogin();
+            }, 300);
         }
     }
 
@@ -149,30 +250,33 @@ class AuthSystem {
 // Inicialización MEJORADA
 console.log('🔧 auth.js cargado - Iniciando sistema de autenticación');
 
-// Función para debug inicial
+// Función para debug detallado
 function debugAuthInfo() {
-    console.log('🔍 DIAGNÓSTICO AUTH:');
+    console.log('🔍 DIAGNÓSTICO COMPLETO AUTH:');
     console.log('- URL:', window.location.href);
     console.log('- Path:', window.location.pathname);
-    console.log('- Authenticated:', localStorage.getItem('authenticated'));
-    console.log('- LoginTime:', localStorage.getItem('loginTime'));
-    console.log('- Ruta login calculada:', new AuthSystem().getLoginUrl());
+    console.log('- Origin:', window.location.origin);
+    console.log('- Protocol:', window.location.protocol);
+    console.log('- Host:', window.location.host);
     
-    const pathSegments = window.location.pathname.split('/').filter(s => s && !s.includes('.html'));
-    console.log('- Segmentos path:', pathSegments);
-    console.log('- Niveles profundidad:', pathSegments.length);
+    const auth = new AuthSystem();
+    console.log('- Ruta login (baseUrl):', auth.getBaseUrl() + 'login.html');
+    console.log('- Ruta login (niveles):', auth.getLoginUrlByLevels());
+    
+    console.log('- LocalStorage auth:', localStorage.getItem('authenticated'));
+    console.log('- LocalStorage loginTime:', localStorage.getItem('loginTime'));
 }
 
 // Inicializar cuando el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📄 DOM listo - Inicializando AuthSystem');
-        debugAuthInfo(); // Debug info
+        debugAuthInfo();
         new AuthSystem();
     });
 } else {
     console.log('📄 DOM ya listo - Inicializando AuthSystem inmediatamente');
-    debugAuthInfo(); // Debug info
+    debugAuthInfo();
     new AuthSystem();
 }
 
@@ -182,7 +286,10 @@ window.logout = function() {
     AuthSystem.logout();
 };
 
-// Función global para diagnóstico (útil para debugging)
+// Función global para diagnóstico
 window.authDebug = function() {
     debugAuthInfo();
 };
+
+// También exportar para uso en consola
+window.AuthSystem = AuthSystem;
