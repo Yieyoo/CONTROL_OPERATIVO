@@ -6,6 +6,9 @@
     <title>PLANTILLA DE PERSONAL - Aguascalientes</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
+    <!-- ✅ AGREGAR auth.js Y ORDEN CORRECTO -->
+    <script src="../../../auth.js" defer></script>
+    <script src="../../../load-menu.js" defer></script>
     <style>
         /* Estilo para la fecha de actualización */
         #fecha-subida {
@@ -29,22 +32,7 @@
     </style>
 </head>
 <body>
-    <!-- HEADER DE DOS LÍNEAS -->
-    <div class="header-lineas">
-        <div class="linea-superior"></div>
-        <div class="linea-inferior"></div>
-    </div>
-
-    <!-- MENÚ LATERAL -->
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="menu-overlay" onclick="toggleMenu()"></div>
-    
-    <nav class="menu" id="main-menu">
-        <img src="../../../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
-        <ul>
-            <!-- El menú se cargará desde load-menu.js -->
-        </ul>
-    </nav>
+    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
     <!-- Contenedor para el título personalizado -->
     <div id="tituloContainer" class="titulo-personalizado">
@@ -164,16 +152,6 @@
             document.getElementById('mobile-error').style.display = 'none';
         }
 
-        // Función para el menú lateral
-        function toggleMenu() {
-            const menu = document.getElementById('main-menu');
-            const overlay = document.querySelector('.menu-overlay');
-            if (menu && overlay) {
-                menu.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
-
         // Formatear fecha legible
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -247,6 +225,5 @@
             }
         });
     </script>
-    <script src="../../../load-menu.js" defer></script>
 </body>
 </html>
