@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vehiculos</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/camioneta.png">
+    <title>Ubicaciones</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
     <script src="../../../auth.js" defer></script>   
     <script src="../../../load-menu.js" defer></script>
@@ -16,7 +16,7 @@
     </div>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
-    <h1 id="titulo-documento" class="titulo-personalizado">Vehiculos</h1>       
+    <h1 id="titulo-documento" class="titulo-personalizado">Ubicaciones</h1>       
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
@@ -54,8 +54,8 @@
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
         const ESTADO = 'yucatan';
-        const TIPO_DOCUMENTO = 'vehiculos';
-        const TITULO_DOCUMENTO = 'Vehículos';
+        const TIPO_DOCUMENTO = 'ubicaciones_sedes';
+        const TITULO_DOCUMENTO = 'Ubicaciones de oficinas del INM en Yucatán';
 
         // Configuración dinámica desde URL (opcional)
         const params = new URLSearchParams(window.location.search);
