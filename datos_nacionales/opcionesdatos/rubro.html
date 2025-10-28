@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gastos de Operacion</title>
+    <title>Gastos de Operación</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../estados/diseños/generaldoc.css">
     
-    <!-- Cargar el menú global -->
+    <!-- Scripts de autenticación y menú -->
+    <script src="../../auth.js" defer></script>   
     <script src="../../load-menu.js" defer></script>
 </head>
 
@@ -20,7 +21,7 @@
 
     <!-- El menú se insertará automáticamente aquí por load-menu.js -->
     
-    <h1 id="titulo-documento" class="titulo-personalizado">Gastos de Operacion</h1>       
+    <h1 id="titulo-documento" class="titulo-personalizado">Gastos de Operación</h1>       
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
@@ -51,20 +52,18 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Botones flotantes -->
-    <div class="botones-flotantes">
-        <button class="regresar-btn" onclick="window.location.href='../datosindex.html'">
-            Regresar
-        </button>
-    </div>
+    <!-- Botón de regreso -->
+    <button class="regresar-btn" onclick="window.location.href='../datosindex.html'">
+        Regresar
+    </button>
 
 <script>
-    // CONFIGURACIÓN - PERSONAL COMISIONADO
+    // CONFIGURACIÓN - GASTOS DE OPERACIÓN
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO = 'datos-nacionales';           // Estado específico para Personal Comisionado
-    const TIPO_DOCUMENTO = 'gastos'; // Tipo de documento específico
-    const TITULO_DOCUMENTO = 'Gastos de Operación'; // Título específico
+    const ESTADO = 'datos-nacionales';
+    const TIPO_DOCUMENTO = 'gastos';
+    const TITULO_DOCUMENTO = 'Gastos de Operación';
 
     // Configuración dinámica desde URL
     const params = new URLSearchParams(window.location.search);
@@ -171,7 +170,7 @@
                 // Configuración específica para iOS - Descarga directa
                 if (isIOS()) {
                     iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'personal_comisionado.pdf');
+                    iosLink.setAttribute('download', latestPDF.filename || 'gastos_operacion.pdf');
                 }
             } else {
                 showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
@@ -184,29 +183,12 @@
         }
     }
 
-    // Configurar eventos de descarga
-    function configurarDescargas() {
-        const descargarBtn = document.getElementById('descargar-documento');
-        if (descargarBtn) {
-            descargarBtn.onclick = function() {
-                if (documentoUrl) {
-                    window.open(documentoUrl, '_blank');
-                } else {
-                    showError('No hay documento disponible para descargar', 'both');
-                }
-            };
-        }
-    }
-
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
         // Cargar el documento PDF
         if (document.getElementById('pdf-viewer')) {
             cargarDocumentoPDF();
         }
-
-        // Configurar descargas después de cargar el documento
-        setTimeout(configurarDescargas, 1000);
 
         // Manejar clic en el enlace de iOS
         document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
@@ -218,8 +200,5 @@
         });
     });
 </script>
-
-<!-- Asegúrate de que esta ruta sea correcta para tu estructura de carpetas -->
-<script src="../../../carga.js"></script>
 </body>
 </html>
