@@ -9,26 +9,16 @@
     <!-- Cargar Font Awesome para íconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Cargar el script del menú dinámico -->
+     <script src="../js/auth.js" defer></script>
     <script src="../load-menu.js" defer></script>
+    
 </head>
 <body>
-    <!-- HEADER DE DOS LÍNEAS (como en las otras páginas) -->
+    <!-- HEADER DE DOS LÍNEAS -->
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
     </div>
-
-    <!-- MENÚ LATERAL (se insertará automáticamente por load-menu.js) -->
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="menu-overlay" onclick="toggleMenu()"></div>
-    
-    <nav class="menu" id="main-menu">
-        <img src="../imagenes/inm logo.png" alt="Logo" class="logo-arriba-img">
-        <ul>
-            <!-- El menú se cargará desde load-menu.js -->
-        </ul>
-    </nav>
-
     <!-- Información del instituto -->
     <section class="instituto-info">
         <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
@@ -37,6 +27,10 @@
         <div class="fecha-actual" id="fechaActual"></div>
         <button class="regresar-btn" onclick="window.location.href='../index.html'">
             <i class="fas fa-arrow-left"></i> Regresar
+        </button>
+        <!-- Botón de Cerrar Sesión integrado -->
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
         </button>
     </section>
 
@@ -93,7 +87,6 @@
                         <i class="fas fa-archive"></i> GESTOR DE ARCHIVOS
                     </button>
                 </div>
-                
             </div>
         </div>
     </div>
@@ -104,61 +97,6 @@
     </div>
 
     <script>
-        // Función para el menú lateral (compatible con load-menu.js)
-        function toggleMenu() {
-            const menu = document.getElementById('main-menu');
-            const overlay = document.querySelector('.menu-overlay');
-            if (menu && overlay) {
-                menu.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
-
-        // Sistema de autenticación (como en las otras páginas)
-        class AuthManager {
-            constructor() {
-                this.sessionDuration = 60 * 60 * 1000; // 1 hora
-                this.checkAuth();
-                this.setupNavigationHandlers();
-            }
-
-            checkAuth() {
-                const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-                const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-                const now = Date.now();
-                
-                console.log('🔐 Verificando autenticación en Datos Nacionales...');
-
-                if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                    console.log('❌ Sesión inválida, redirigiendo...');
-                    this.redirectToLogin();
-                    return false;
-                }
-
-                console.log('✅ Sesión válida en Datos Nacionales');
-                return true;
-            }
-
-            redirectToLogin() {
-                localStorage.removeItem('authenticated');
-                localStorage.removeItem('loginTime');
-                window.location.replace('../login.html');
-            }
-
-            setupNavigationHandlers() {
-                window.addEventListener('pageshow', (event) => {
-                    if (event.persisted) {
-                        if (!this.checkAuth()) {
-                            this.redirectToLogin();
-                        }
-                    }
-                });
-            }
-        }
-
-        // Inicializar autenticación
-        const authManager = new AuthManager();
-
         // Mostrar la fecha actual
         document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
             year: 'numeric',
@@ -166,16 +104,7 @@
             day: 'numeric'
         });
 
-        // Función global para logout
-        function logout() {
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                localStorage.removeItem('authenticated');
-                localStorage.removeItem('loginTime');
-                window.location.href = '../login.html';
-            }
-        }
-
-        // Efectos visuales adicionales (como en las otras páginas)
+        // Efectos visuales adicionales
         document.addEventListener('DOMContentLoaded', function() {
             // Animación de entrada para los botones
             const buttons = document.querySelectorAll('.opciones-grid button');
