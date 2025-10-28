@@ -1,4 +1,3 @@
-// js/auth.js - Sistema de autenticación unificado CORREGIDO Y MEJORADO
 class AuthSystem {
     constructor() {
         this.config = {
@@ -11,7 +10,6 @@ class AuthSystem {
     init() {
         console.log('🔄 Sistema de autenticación MEJORADO iniciado');
         
-        // PRIMERO configurar eventos de navegación
         this.setupNavigationEvents();
         
         // LUEGO verificar autenticación
