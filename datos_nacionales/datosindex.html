@@ -2,23 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datos Nacionales</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Datos Nacionales - Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../imagenes/mapa.png">
     <link rel="stylesheet" href="estilodatos.css">
-    <!-- Cargar Font Awesome para íconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Cargar el script del menú dinámico -->
-     <script src="../js/auth.js" defer></script>
+    <script src="../auth.js" defer></script>
     <script src="../load-menu.js" defer></script>
-    
 </head>
 <body>
-    <!-- HEADER DE DOS LÍNEAS -->
-    <div class="header-lineas">
-        <div class="linea-superior"></div>
-        <div class="linea-inferior"></div>
-    </div>
+    <header>
+        <div class="logo-container">
+            <img src="../imagenes/unnamed.png" alt="Gobernación" class="logo">
+        </div>
+    </header>
+
     <!-- Información del instituto -->
     <section class="instituto-info">
         <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
@@ -27,10 +28,6 @@
         <div class="fecha-actual" id="fechaActual"></div>
         <button class="regresar-btn" onclick="window.location.href='../index.html'">
             <i class="fas fa-arrow-left"></i> Regresar
-        </button>
-        <!-- Botón de Cerrar Sesión integrado -->
-        <button class="logout-btn" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
         </button>
     </section>
 
@@ -104,7 +101,7 @@
             day: 'numeric'
         });
 
-        // Efectos visuales adicionales
+        // Efectos visuales adicionales - MANTENIENDO LA ANIMACIÓN QUE TE GUSTA
         document.addEventListener('DOMContentLoaded', function() {
             // Animación de entrada para los botones
             const buttons = document.querySelectorAll('.opciones-grid button');
