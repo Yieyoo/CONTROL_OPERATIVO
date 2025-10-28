@@ -1127,4 +1127,46 @@ button:disabled {
         padding: 10px 14px;
     }
     }
+    .header-lineas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 900;
+    pointer-events: none;
+}
+
+.linea-superior {
+    height: 30px;
+    background: linear-gradient(90deg, #691932, #691932, #691932);
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.linea-inferior {
+    height: 10px;
+    background: linear-gradient(90deg, #A5852E, #c49d3a, #A5852E);
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+/* Para tablets */
+@media screen and (max-width: 768px) {
+    .linea-superior {
+        height: 25px;
+    }
     
+    .linea-inferior {
+        height: 8px;
+    }
+}
+
+/* Para móviles pequeños */
+@media screen and (max-width: 480px) {
+    .linea-superior {
+        height: 20px;
+    }
+    
+    .linea-inferior {
+        height: 6px;
+    }
+}

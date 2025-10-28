@@ -6,6 +6,11 @@
     <title>Gestión de Archivos PDF - INM</title>
     <link rel="icon" type="image/png" href="../imagenes/descargar.png">
     <link rel="stylesheet" href="diseñog.css">
+    
+    <!-- Scripts de autenticación y menú -->
+    <script src="../auth.js" defer></script>   
+    <script src="../load-menu.js" defer></script>
+    
     <style>
         /* Estilos mejorados */
         .current-filter {
@@ -147,78 +152,24 @@ h1::after {
     </style>
 </head>
 <body>
-    <script type="module" src="../common.js"></script>
     <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
 
-    <header>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <nav class="menu">
-            <ul>
-                <li><a href="../index.html">Inicio</a></li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                        <li><a href="../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                        <li><a href="../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                        <li><a href="../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                        <li><a href="../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                        <li><a href="../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                        <li><a href="../construccion.html">Inmuebles</a></li>
-                        <li><a href="archivos.html">Gestión de Archivos</a></li>
-                    </ul>
-                </li>
+    <!-- HEADER DE DOS LÍNEAS -->
+    <div class="header-lineas">
+        <div class="linea-superior"></div>
+        <div class="linea-inferior"></div>
+    </div>
 
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                        <li><a href="../estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../estados/baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../estados/campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../estados/chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="../estados/chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../estados/cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../estados/coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../estados/colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../estados/durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../estados/guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../estados/guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../estados/hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../estados/jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../estados/edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../estados/michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../estados/morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../estados/nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../estados/nuevo_leon/nuevolindex.html">Nuevo León</a></li>
-                        <li><a href="../estados/oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../estados/puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../estados/queretaro/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../estados/quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../estados/san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../estados/sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../estados/sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../estados/tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../estados/tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../estados/tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../estados/veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../estados/yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
-    <button class="regresar-btn">Regresar</button>
+    <!-- El menú se insertará automáticamente aquí por load-menu.js -->
+    
+    <h1 id="titulo-documento" class="titulo-personalizado">GESTOR DE ARCHIVOS</h1>       
     <div class="logo-container">
         <img src="../imagenes/inm logo.png" alt="Logo INM">
     </div>
 
-    <div class="header-container">
-        <h1>GESTOR DE ARCHIVOS</h1>
-    </div>
     <!-- Panel de gestión de archivos -->
     <div class="gestion-archivos">
         <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
@@ -333,6 +284,9 @@ h1::after {
             <iframe id="pdf-iframe" class="pdf-iframe"></iframe>
         </div>
     </div>
+
+    <!-- Botón de regreso -->
+    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
 
     <script>
         // Configuración global
@@ -727,48 +681,6 @@ h1::after {
             document.getElementById('fileList').innerHTML = '<li>Por favor selecciona una opción y un tipo de documento para ver los archivos disponibles</li>';
         });
 
-        // Funciones para el menú
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            const overlay = document.querySelector('.menu-overlay');
-            if (menu && overlay) {
-                menu.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
-
-        function closeAllSubmenus() {
-            const submenus = document.querySelectorAll('.submenu.active');
-            submenus.forEach(submenu => {
-                submenu.classList.remove('active');
-            });
-        }
-
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            const submenu = event.target.closest('.submenu');
-            
-            if (submenu.classList.contains('active')) {
-                submenu.classList.remove('active');
-            } else {
-                closeAllSubmenus();
-                submenu.classList.add('active');
-            }
-        }
-
-        // Cerrar menú al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.menu') && !e.target.closest('.menu-toggle')) {
-                const menu = document.querySelector('.menu');
-                const overlay = document.querySelector('.menu-overlay');
-                if (menu && overlay) {
-                    menu.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-                closeAllSubmenus();
-            }
-        });
-        
         // Función para obtener el título personalizado GLOBAL (puede ser llamada desde otras páginas)
         window.obtenerTituloPlantilla = async function() {
             try {
@@ -794,12 +706,6 @@ h1::after {
                 return 'Plantilla de Personal'; // Valor por defecto
             }
         };
-        
-        // Regresar al historial
-        document.querySelector('.regresar-btn').addEventListener('click', function() {
-            window.history.back();
-        });
     </script>
-    <script src="../carga,.js"></script>
 </body>
 </html>
