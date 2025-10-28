@@ -1,4 +1,4 @@
-// js/auth.js - Sistema de autenticación unificado CORREGIDO
+// js/auth.js - Sistema de autenticación unificado CORREGIDO Y MEJORADO
 class AuthSystem {
     constructor() {
         this.config = {
@@ -9,21 +9,70 @@ class AuthSystem {
     }
 
     init() {
-        // Solo verificar si NO estamos en la página de login
+        console.log('🔄 Sistema de autenticación MEJORADO iniciado');
+        
+        // PRIMERO configurar eventos de navegación
+        this.setupNavigationEvents();
+        
+        // LUEGO verificar autenticación
         if (!this.isLoginPage()) {
-            console.log('🔄 Iniciando verificación de autenticación...');
-            this.checkAuthentication();
+            console.log('🔐 Verificación INMEDIATA de autenticación...');
+            this.immediateAuthCheck();
             this.setupPeriodicCheck();
         } else {
             console.log('📄 Página de login, omitiendo verificación');
-            // En login, limpiar cualquier sesión expirada
             this.cleanExpiredSession();
         }
     }
 
+    // NUEVO: Configurar eventos para detectar navegación "Atrás"
+    setupNavigationEvents() {
+        // 1. Detectar cuando la página se muestra desde cache (navegación Atrás)
+        window.addEventListener('pageshow', (event) => {
+            console.log('🔄 Evento pageshow detectado');
+            if (event.persisted) {
+                console.log('📋 Página cargada desde cache - Re-verificando sesión');
+            }
+            if (!this.isLoginPage()) {
+                setTimeout(() => this.checkAuthentication(), 50);
+            }
+        });
+
+        // 2. Detectar cuando la página se hace visible
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !this.isLoginPage()) {
+                console.log('👀 Página visible - Verificando sesión');
+                setTimeout(() => this.checkAuthentication(), 50);
+            }
+        });
+
+        // 3. Verificación adicional cuando la página termina de cargar
+        window.addEventListener('load', () => {
+            if (!this.isLoginPage()) {
+                console.log('📄 Página completamente cargada - Verificación final');
+                this.checkAuthentication();
+            }
+        });
+
+        console.log('🎯 Eventos de navegación configurados');
+    }
+
+    // NUEVO: Verificación inmediata y más robusta
+    immediateAuthCheck() {
+        console.log('🔐 Ejecutando verificación INMEDIATA...');
+        const isValid = this.checkAuthentication();
+        
+        if (!isValid) {
+            console.log('🚫 Acceso denegado - Redirigiendo inmediatamente');
+            return false;
+        }
+        
+        console.log('✅ Verificación inmediata exitosa');
+        return true;
+    }
+
     isLoginPage() {
         const currentPath = window.location.pathname;
-        // Verificar si estamos en login.html (ignorando parámetros URL)
         const isLogin = currentPath.endsWith('login.html') || 
                        currentPath.includes('/login.html') ||
                        window.location.href.includes('login.html');
@@ -101,23 +150,18 @@ class AuthSystem {
         
         // Estrategia SIMPLE Y EFECTIVA basada en la ubicación
         if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
-            // estados/aguascalientes/opciones/perroso.html
             console.log('🎯 Desde opciones → ../../../login.html');
             return '../../../login.html';
         } else if (currentPath.includes('/estados/')) {
-            // estados/aguascalientes/aguascalientesindex.html
             console.log('🎯 Desde estado → ../../login.html');
             return '../../login.html';
         } else if (currentPath.includes('/datos_nacionales/') && currentPath.includes('/opcionesdatos/')) {
-            // datos_nacionales/opcionesdatos/estadofuerza.html
             console.log('🎯 Desde datos_nacionales/opciones → ../../login.html');
             return '../../login.html';
         } else if (currentPath.includes('/datos_nacionales/')) {
-            // datos_nacionales/datosindex.html
             console.log('🎯 Desde datos_nacionales → ../login.html');
             return '../login.html';
         } else {
-            // Raíz: index.html, login.html
             console.log('🎯 Desde raíz → login.html');
             return 'login.html';
         }
@@ -128,7 +172,6 @@ class AuthSystem {
             console.log('🚪 Cerrando sesión...');
             this.clearSession();
             
-            // Pequeño delay para que se vea el mensaje de confirmación
             setTimeout(() => {
                 this.redirectToLogin();
             }, 300);
@@ -151,16 +194,16 @@ class AuthSystem {
 }
 
 // Inicialización MEJORADA
-console.log('🔧 auth.js cargado - Iniciando sistema de autenticación');
+console.log('🔧 auth.js MEJORADO cargado - Iniciando sistema de autenticación');
 
 // Inicializar cuando el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('📄 DOM listo - Inicializando AuthSystem');
+        console.log('📄 DOM listo - Inicializando AuthSystem MEJORADO');
         new AuthSystem();
     });
 } else {
-    console.log('📄 DOM ya listo - Inicializando AuthSystem inmediatamente');
+    console.log('📄 DOM ya listo - Inicializando AuthSystem MEJORADO inmediatamente');
     new AuthSystem();
 }
 
