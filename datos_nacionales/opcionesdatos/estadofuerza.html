@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ESTADO FUERZA</title>
     <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
-    <link rel="stylesheet" href="../../estados/diseños/generaldoc.css">
+    <link rel="stylesheet" href="../../diseños/generaldoc.css">
     
-    <!-- Cargar el menú global -->
-    <script src="../../load-menu.js" defer></script>
+    <!-- Scripts de autenticación y menú -->
+    <script src="../../../auth.js" defer></script>   
+    <script src="../../../load-menu.js" defer></script>
 </head>
 
 <body class="mostrar-ubicaciones">
-    <!-- HEADER DE DOS LÍNEAS (igual que vehículos) -->
+    <!-- HEADER DE DOS LÍNEAS -->
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
@@ -25,7 +26,7 @@
         <div class="spinner"></div>
     </div>
     <div class="logo-container">
-        <img src="../../imagenes/inm logo.png" alt="Logo INM">
+        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
     
     <div class="pdf-container">
@@ -51,22 +52,20 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Botones flotantes -->
-    <div class="botones-flotantes">
-        <button class="regresar-btn" onclick="window.location.href='../datosindex.html'">
-            Regresar
-        </button>
-    </div>
+    <!-- Botón de regreso -->
+    <button class="regresar-btn" onclick="window.location.href='../datosindex.html'">
+        Regresar
+    </button>
 
 <script>
-    // CONFIGURACIÓN - MISMAS VARIABLES QUE VEHÍCULOS
+    // CONFIGURACIÓN
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
-    const ESTADO = 'datos-nacionales';           // Estado específico para Estado Fuerza
-    const TIPO_DOCUMENTO = 'estado_fuerza';      // Tipo de documento específico
-    const TITULO_DOCUMENTO = 'ANALÍTICO ESTADO FUERZA'; // Título específico
+    const ESTADO = 'datos-nacionales';
+    const TIPO_DOCUMENTO = 'estado_fuerza';
+    const TITULO_DOCUMENTO = 'ANALÍTICO ESTADO FUERZA';
 
-    // Configuración dinámica desde URL (igual que vehículos)
+    // Configuración dinámica desde URL
     const params = new URLSearchParams(window.location.search);
     const estadoFromURL = params.get('estado');
     const tipoFromURL = params.get('tipo');
@@ -80,18 +79,18 @@
     // Variables para controlar el estado del documento
     let documentoUrl = '';
 
-    // Detectar iOS (igual que vehículos)
+    // Detectar iOS
     function isIOS() {
         return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
 
-    // Mostrar/ocultar loading (igual que vehículos)
+    // Mostrar/ocultar loading
     function showLoading(show) {
         document.getElementById('loading').style.display = show ? 'flex' : 'none';
     }
 
-    // Mostrar mensaje de error (igual que vehículos)
+    // Mostrar mensaje de error
     function showError(message, target = 'both') {
         if (target === 'both' || target === 'pdf') {
             const pdfError = document.getElementById('pdf-error');
@@ -105,19 +104,19 @@
         }
     }
 
-    // Ocultar errores (igual que vehículos)
+    // Ocultar errores
     function hideErrors() {
         document.getElementById('pdf-error').style.display = 'none';
         document.getElementById('mobile-error').style.display = 'none';
     }
 
-    // Formatear fecha legible (igual que vehículos)
+    // Formatear fecha legible
     function formatDate(dateString) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
-    // Cargar PDF desde Cloudinary (función genérica - igual que vehículos)
+    // Cargar PDF desde Cloudinary
     async function cargarDocumentoPDF() {
         showLoading(true);
         hideErrors();
@@ -184,29 +183,12 @@
         }
     }
 
-    // Configurar eventos de descarga (específico para Estado Fuerza)
-    function configurarDescargas() {
-        const descargarBtn = document.getElementById('descargar-ubicaciones');
-        if (descargarBtn) {
-            descargarBtn.onclick = function() {
-                if (documentoUrl) {
-                    window.open(documentoUrl, '_blank');
-                } else {
-                    showError('No hay documento disponible para descargar', 'both');
-                }
-            };
-        }
-    }
-
-    // Inicialización (igual que vehículos)
+    // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
         // Cargar el documento PDF
         if (document.getElementById('pdf-viewer')) {
             cargarDocumentoPDF();
         }
-
-        // Configurar descargas después de cargar el documento
-        setTimeout(configurarDescargas, 1000);
 
         // Manejar clic en el enlace de iOS
         document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
@@ -218,8 +200,5 @@
         });
     });
 </script>
-
-<!-- Asegúrate de que esta ruta sea correcta para tu estructura de carpetas -->
-<script src="../../../carga.js"></script>
 </body>
 </html>
