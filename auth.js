@@ -127,8 +127,8 @@ class AuthSystem {
         localStorage.removeItem('authenticated');
         localStorage.removeItem('loginTime');
         localStorage.removeItem('userData');
-        localStorage.removeItem('loginAttempts');
-        localStorage.removeItem('lastAttempt');
+        //localStorage.removeItem('loginAttempts');
+        //localStorage.removeItem('lastAttempt');
     }
 
     redirectToLogin() {
