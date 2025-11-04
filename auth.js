@@ -146,7 +146,13 @@ class AuthSystem {
         const currentPath = window.location.pathname;
         console.log('📍 Ruta actual para login:', currentPath);
         
-        // Estrategia SIMPLE Y EFECTIVA basada en la ubicación
+        // Estrategia MEJORADA: Detectar automáticamente la profundidad
+        const pathParts = currentPath.split('/').filter(part => part !== '');
+        const depth = pathParts.length - 1; // -1 porque el primer elemento es vacío
+        
+        console.log('📊 Niveles de profundidad:', depth, 'Partes:', pathParts);
+        
+        // Casos específicos primero
         if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
             console.log('🎯 Desde opciones → ../../../login.html');
             return '../../../login.html';
@@ -159,9 +165,28 @@ class AuthSystem {
         } else if (currentPath.includes('/datos_nacionales/')) {
             console.log('🎯 Desde datos_nacionales → ../login.html');
             return '../login.html';
-        } else {
+        }
+        // NUEVO: Caso para gestor_archivos y otras carpetas
+        else if (currentPath.includes('/gestor_archivos/')) {
+            console.log('🎯 Desde gestor_archivos → ../login.html');
+            return '../login.html';
+        }
+        // CASO GENÉRICO para TODAS las subcarpetas
+        else if (depth === 0) {
             console.log('🎯 Desde raíz → login.html');
             return 'login.html';
+        } else if (depth === 1) {
+            console.log('🎯 Desde 1 nivel abajo → ../login.html');
+            return '../login.html';
+        } else if (depth === 2) {
+            console.log('🎯 Desde 2 niveles abajo → ../../login.html');
+            return '../../login.html';
+        } else if (depth === 3) {
+            console.log('🎯 Desde 3 niveles abajo → ../../../login.html');
+            return '../../../login.html';
+        } else {
+            console.log('🎯 Desde muchos niveles → ../../../../login.html');
+            return '../../../../login.html';
         }
     }
 
