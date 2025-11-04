@@ -161,11 +161,18 @@
         let currentCarpeta = '';
         let currentTipoDocumento = '';
 
-        // Mostrar/ocultar loading
-        function showLoading(show) {
-            const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = show ? 'flex' : 'none';
+        // Funciones para mostrar/ocultar el spinner NUEVO
+        function mostrarLoading() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) {
+                spinner.classList.add('active');
+            }
+        }
+
+        function ocultarLoading() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) {
+                spinner.classList.remove('active');
             }
         }
 
@@ -230,7 +237,7 @@
                 return;
             }
             
-            showLoading(true);
+            mostrarLoading();
             try {
                 // Añadir parámetro de versión para evitar caché del navegador
                 const cacheBuster = `?v=${Date.now()}`;
@@ -261,7 +268,7 @@
                 showStatus(document.getElementById('uploadStatus'), 'Error al cargar archivos', true);
                 document.getElementById('fileList').innerHTML = '<li>Error al cargar archivos. Intenta nuevamente.</li>';
             } finally {
-                showLoading(false);
+                ocultarLoading();
             }
         }
 
@@ -314,7 +321,7 @@
 
         // Eliminar archivo con invalidación de caché
         async function eliminarArchivo(publicId, estado, tipoDocumento) {
-            showLoading(true);
+            mostrarLoading();
             try {
                 const response = await fetch(`${BACKEND_URL}/delete`, {
                     method: 'DELETE',
@@ -340,7 +347,7 @@
                 console.error('Error al eliminar:', error);
                 showStatus(document.getElementById('uploadStatus'), error.message, true);
             } finally {
-                showLoading(false);
+                ocultarLoading();
             }
         }
 
@@ -355,7 +362,7 @@
             }
             
             try {
-                showLoading(true);
+                mostrarLoading();
                 const response = await fetch(`${BACKEND_URL}/guardar-titulo-global`, {
                     method: 'POST',
                     headers: {
@@ -377,7 +384,7 @@
                 console.error('Error al guardar título:', error);
                 showStatus(tituloStatus, error.message, true);
             } finally {
-                showLoading(false);
+                ocultarLoading();
             }
         }
 
@@ -495,7 +502,7 @@
                     if (file.size > 15 * 1024 * 1024) throw new Error('El archivo es muy grande (máx 15MB)');
                     if (!currentCarpeta || !currentTipoDocumento) throw new Error('Selecciona una opción y un tipo de documento');
                     
-                    showLoading(true);
+                    mostrarLoading();
                     uploadButton.disabled = true;
                     
                     const formData = new FormData();
@@ -529,7 +536,7 @@
                     console.error('Error al subir:', error);
                     showStatus(uploadStatus, error.message, true);
                 } finally {
-                    showLoading(false);
+                    ocultarLoading();
                     uploadButton.disabled = !currentCarpeta || !currentTipoDocumento;
                 }
             });
