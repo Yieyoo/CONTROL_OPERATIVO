@@ -791,3 +791,9 @@ h1::after {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* Solución directa para igualar selects */
+.filters select {
+    width: 100% !important;
+    height: 46px !important;
+    padding: 12px 14px !important;
+}
