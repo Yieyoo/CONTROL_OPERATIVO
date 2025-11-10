@@ -41,6 +41,25 @@
             color: white;
             border-color: #1e3d6f;
         }
+
+        .file-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #2c5aa0;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -135,27 +154,39 @@
 
     // Mostrar/ocultar loading
     function showLoading(show) {
-        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        const loading = document.getElementById('loading');
+        if (loading) {
+            loading.style.display = show ? 'flex' : 'none';
+        }
     }
 
     // Mostrar mensaje de error
     function showError(message, target = 'both') {
+        console.error('Error:', message);
+        
         if (target === 'both' || target === 'pdf') {
             const pdfError = document.getElementById('pdf-error');
-            pdfError.textContent = message;
-            pdfError.style.display = 'block';
+            if (pdfError) {
+                pdfError.textContent = message;
+                pdfError.style.display = 'block';
+            }
         }
         if (target === 'both' || target === 'mobile') {
             const mobileError = document.getElementById('mobile-error');
-            mobileError.textContent = message;
-            mobileError.style.display = 'block';
+            if (mobileError) {
+                mobileError.textContent = message;
+                mobileError.style.display = 'block';
+            }
         }
     }
 
     // Ocultar errores
     function hideErrors() {
-        document.getElementById('pdf-error').style.display = 'none';
-        document.getElementById('mobile-error').style.display = 'none';
+        const pdfError = document.getElementById('pdf-error');
+        const mobileError = document.getElementById('mobile-error');
+        
+        if (pdfError) pdfError.style.display = 'none';
+        if (mobileError) mobileError.style.display = 'none';
     }
 
     // Actualizar botones activos
@@ -166,17 +197,24 @@
         });
         
         // Agregar clase activo al botón seleccionado
-        if (tipoSeleccionado === TIPO_DOCUMENTO) {
-            document.getElementById('btn-plantilla-actual').classList.add('activo');
-        } else {
-            document.getElementById('btn-plantilla-eventual').classList.add('activo');
+        const btnActual = document.getElementById('btn-plantilla-actual');
+        const btnEventual = document.getElementById('btn-plantilla-eventual');
+        
+        if (tipoSeleccionado === TIPO_DOCUMENTO && btnActual) {
+            btnActual.classList.add('activo');
+        } else if (tipoSeleccionado === TIPO_DOCUMENTO_EVENTUAL && btnEventual) {
+            btnEventual.classList.add('activo');
         }
     }
 
     // Formatear fecha legible
     function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('es-MX', options);
+        try {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-MX', options);
+        } catch (error) {
+            return 'Fecha no disponible';
+        }
     }
 
     // Cargar PDF desde Cloudinary
@@ -197,7 +235,11 @@
         }
         
         document.title = tituloMostrar + ' - ' + ESTADO_FIJO.toUpperCase();
-        document.getElementById('titulo-documento').textContent = tituloMostrar;
+        
+        const tituloElemento = document.getElementById('titulo-documento');
+        if (tituloElemento) {
+            tituloElemento.textContent = tituloMostrar;
+        }
 
         try {
             console.log(`Consultando API para: ${ESTADO_FIJO}/${tipoDocumento}`);
@@ -221,14 +263,18 @@
                     new Date(b.uploaded_at) - new Date(a.uploaded_at)
                 )[0];
 
+                console.log('Documento encontrado:', latestPDF);
+
                 // Guardar URL para descarga
                 documentoUrl = latestPDF.url;
 
                 // Configuración normal para PC
-                pdfViewer.src = latestPDF.url;
+                if (pdfViewer) {
+                    pdfViewer.src = latestPDF.url;
+                }
                 
                 // Configuración para móviles (no iOS)
-                if (!isIOS()) {
+                if (mobileContainer && !isIOS()) {
                     mobileContainer.innerHTML = `
                         <div class="file-info">
                             <h3>${latestPDF.filename || tituloMostrar}</h3>
@@ -242,7 +288,7 @@
                 }
                 
                 // Configuración específica para iOS - Descarga directa
-                if (isIOS()) {
+                if (isIOS() && iosLink) {
                     iosLink.href = latestPDF.url;
                     const nombreArchivo = tipoDocumento === TIPO_DOCUMENTO ? 
                         'plantilla_personal.pdf' : 'plantilla_eventual_personal.pdf';
@@ -256,10 +302,21 @@
                     mensajeError = `No se encontraron documentos de plantilla eventual para ${ESTADO_FIJO}`;
                 }
                 showError(mensajeError, 'both');
+                
+                // Limpiar el visor PDF si no hay documentos
+                if (pdfViewer) {
+                    pdfViewer.src = '';
+                }
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error al cargar documento:', error);
             showError(`Error al cargar el documento: ${error.message}`, 'both');
+            
+            // Limpiar el visor PDF en caso de error
+            const pdfViewer = document.getElementById('pdf-viewer');
+            if (pdfViewer) {
+                pdfViewer.src = '';
+            }
         } finally {
             showLoading(false);
         }
@@ -267,28 +324,49 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        // Configurar event listeners para los botones
-        document.getElementById('btn-plantilla-actual').addEventListener('click', function() {
-            cargarDocumentoPDF(TIPO_DOCUMENTO);
-        });
+        console.log('Inicializando página de plantillas...');
         
-        document.getElementById('btn-plantilla-eventual').addEventListener('click', function() {
-            cargarDocumentoPDF(TIPO_DOCUMENTO_EVENTUAL);
-        });
+        // Configurar event listeners para los botones
+        const btnActual = document.getElementById('btn-plantilla-actual');
+        const btnEventual = document.getElementById('btn-plantilla-eventual');
+        
+        if (btnActual) {
+            btnActual.addEventListener('click', function() {
+                console.log('Cambiando a Plantilla Actual');
+                cargarDocumentoPDF(TIPO_DOCUMENTO);
+            });
+        }
+        
+        if (btnEventual) {
+            btnEventual.addEventListener('click', function() {
+                console.log('Cambiando a Plantilla Eventual');
+                cargarDocumentoPDF(TIPO_DOCUMENTO_EVENTUAL);
+            });
+        }
 
         // Cargar el documento PDF inicial
         if (document.getElementById('pdf-viewer')) {
+            console.log('Cargando documento inicial...');
             cargarDocumentoPDF(TIPO_DOC_FIJO);
         }
 
         // Manejar clic en el enlace de iOS
-        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
-            if (isIOS()) {
-                // Abrir en nueva pestaña sin restricciones
-                window.open(this.href, '_blank');
-                e.preventDefault();
-            }
-        });
+        const iosLink = document.getElementById('ios-pdf-link');
+        if (iosLink) {
+            iosLink.addEventListener('click', function(e) {
+                if (isIOS() && documentoUrl) {
+                    console.log('Abriendo PDF en iOS');
+                    window.open(documentoUrl, '_blank');
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+
+    // Manejar errores globales
+    window.addEventListener('error', (event) => {
+        console.error('Error global:', event.error);
+        showError('Error inesperado en la aplicación', 'both');
     });
 </script>
 </body>
