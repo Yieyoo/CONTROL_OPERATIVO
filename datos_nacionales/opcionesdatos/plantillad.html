@@ -251,7 +251,7 @@
         }
     }
 
-    // Cargar PDF desde Cloudinary
+    // Cargar PDF desde Cloudinary - VERSIÓN CORREGIDA
     async function cargarDocumentoPDF(tipoPlantilla = 'plantilla') {
         showLoading(true);
         hideErrors();
@@ -272,11 +272,13 @@
         document.getElementById('titulo-documento').textContent = tituloMostrar;
 
         try {
-            console.log(`Consultando API para: ${ESTADO_FIJO}/${tipoPlantilla}`);
+            console.log(`🔄 Consultando API para: ${ESTADO_FIJO}/${tipoPlantilla}`);
             
             // Agregar timestamp para evitar cache
             const timestamp = new Date().getTime();
             const url = `${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoPlantilla}?t=${timestamp}`;
+            
+            console.log(`📡 URL de consulta: ${url}`);
             
             const response = await fetch(url, {
                 headers: { 
@@ -286,19 +288,44 @@
                 cache: 'no-cache'
             });
 
+            console.log(`📊 Estado de respuesta: ${response.status} ${response.statusText}`);
+
             if (!response.ok) {
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
-            console.log('Respuesta API:', result);
+            console.log('📦 Respuesta API completa:', result);
 
-            if (!result || !result.success) {
-                throw new Error('Respuesta del servidor inválida');
-            }
-
-            if (!result.data || !Array.isArray(result.data)) {
-                throw new Error('Formato de datos inválido');
+            // VERIFICACIÓN FLEXIBLE - Acepta diferentes estructuras de respuesta
+            let archivos = [];
+            
+            if (result && Array.isArray(result)) {
+                // Caso 1: El API devuelve un array directamente
+                archivos = result;
+                console.log('✅ Estructura: Array directo');
+            } else if (result && result.data && Array.isArray(result.data)) {
+                // Caso 2: El API devuelve { data: [] }
+                archivos = result.data;
+                console.log('✅ Estructura: { data: array }');
+            } else if (result && result.success && Array.isArray(result.data)) {
+                // Caso 3: El API devuelve { success: true, data: [] }
+                archivos = result.data;
+                console.log('✅ Estructura: { success: true, data: array }');
+            } else if (result && result.archivos && Array.isArray(result.archivos)) {
+                // Caso 4: El API devuelve { archivos: [] }
+                archivos = result.archivos;
+                console.log('✅ Estructura: { archivos: array }');
+            } else {
+                console.warn('⚠️ Estructura de respuesta no reconocida:', result);
+                // Intentar extraer archivos de cualquier propiedad que sea array
+                for (const key in result) {
+                    if (Array.isArray(result[key])) {
+                        archivos = result[key];
+                        console.log(`✅ Encontrado array en propiedad: ${key}`);
+                        break;
+                    }
+                }
             }
 
             const pdfViewer = document.getElementById('pdf-viewer');
@@ -306,30 +333,46 @@
             const iosContainer = document.getElementById('ios-container');
             const iosLink = document.getElementById('ios-pdf-link');
 
-            if (result.data.length > 0) {
+            if (archivos.length > 0) {
+                console.log(`📄 Se encontraron ${archivos.length} archivos`);
+                
                 // Ordenar por fecha y obtener el más reciente
-                const latestPDF = result.data.sort((a, b) => 
-                    new Date(b.uploaded_at || 0) - new Date(a.uploaded_at || 0)
-                )[0];
+                const latestPDF = archivos.sort((a, b) => {
+                    const dateA = new Date(a.uploaded_at || a.created_at || a.fecha || 0);
+                    const dateB = new Date(b.uploaded_at || b.created_at || b.fecha || 0);
+                    return dateB - dateA;
+                })[0];
 
-                console.log('Documento encontrado:', latestPDF);
+                console.log('📋 Documento más reciente:', latestPDF);
+
+                // Obtener URL del documento (diferentes posibles propiedades)
+                const pdfUrl = latestPDF.url || latestPDF.secure_url || latestPDF.document_url || latestPDF.file_url;
+                
+                if (!pdfUrl) {
+                    throw new Error('El documento no tiene URL válida');
+                }
 
                 // Guardar URL para descarga
-                documentoUrl = latestPDF.url;
+                documentoUrl = pdfUrl;
 
                 // Configuración normal para PC
                 if (pdfViewer) {
-                    pdfViewer.src = latestPDF.url;
+                    pdfViewer.src = pdfUrl;
+                    console.log('✅ PDF cargado en iframe');
                 }
                 
                 // Configuración para móviles (no iOS)
                 if (mobileContainer && !isIOS()) {
+                    const filename = latestPDF.filename || latestPDF.original_filename || latestPDF.name || tituloMostrar;
+                    const uploadedAt = latestPDF.uploaded_at || latestPDF.created_at || latestPDF.fecha;
+                    const size = latestPDF.size || latestPDF.bytes;
+                    
                     mobileContainer.innerHTML = `
                         <div class="file-info">
-                            <h3>${latestPDF.filename || tituloMostrar}</h3>
-                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                            <p>Tamaño: ${formatFileSize(latestPDF.size)}</p>
-                            <a href="${latestPDF.url}" class="download-btn" download>
+                            <h3>${filename}</h3>
+                            <p>Actualizado: ${formatDate(uploadedAt)}</p>
+                            <p>Tamaño: ${formatFileSize(size)}</p>
+                            <a href="${pdfUrl}" class="download-btn" download>
                                 Descargar Documento
                             </a>
                         </div>
@@ -340,13 +383,18 @@
                 if (isIOS()) {
                     if (iosContainer) iosContainer.style.display = 'block';
                     if (iosLink) {
-                        iosLink.href = latestPDF.url;
-                        iosLink.setAttribute('download', latestPDF.filename || 
-                            (tipoPlantilla === 'plantilla' ? 'plantilla_personal.pdf' : 'plantilla_eventual_personal.pdf'));
+                        const filename = latestPDF.filename || latestPDF.original_filename || 
+                            (tipoPlantilla === 'plantilla' ? 'plantilla_personal.pdf' : 'plantilla_eventual_personal.pdf');
+                        
+                        iosLink.href = pdfUrl;
+                        iosLink.setAttribute('download', filename);
                     }
                 } else {
                     if (iosContainer) iosContainer.style.display = 'none';
                 }
+                
+                console.log('✅ Documento cargado exitosamente');
+                
             } else {
                 let mensajeError = '';
                 if (tipoPlantilla === 'plantilla') {
@@ -354,6 +402,7 @@
                 } else {
                     mensajeError = `No se encontraron documentos de plantilla eventual para ${ESTADO_FIJO}`;
                 }
+                console.warn('⚠️ ' + mensajeError);
                 showError(mensajeError, 'both');
                 
                 // Limpiar el visor PDF
@@ -361,7 +410,7 @@
                 if (pdfViewer) pdfViewer.src = '';
             }
         } catch (error) {
-            console.error('Error al cargar documento:', error);
+            console.error('❌ Error al cargar documento:', error);
             showError(`Error al cargar el documento: ${error.message}`, 'both');
             
             // Limpiar el visor PDF en caso de error
@@ -374,7 +423,7 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('Inicializando página de plantillas...');
+        console.log('🚀 Inicializando página de plantillas...');
         
         // Configurar event listeners para los botones de plantilla
         const btnActual = document.getElementById('btn-plantilla-actual');
@@ -382,28 +431,28 @@
         
         if (btnActual) {
             btnActual.addEventListener('click', function() {
-                console.log('Cambiando a Plantilla Actual');
+                console.log('🔄 Cambiando a Plantilla Actual');
                 cargarDocumentoPDF('plantilla');
             });
         }
         
         if (btnEventual) {
             btnEventual.addEventListener('click', function() {
-                console.log('Cambiando a Plantilla Eventual');
+                console.log('🔄 Cambiando a Plantilla Eventual');
                 cargarDocumentoPDF('plantilla_ne');
             });
         }
 
         // Cargar el documento PDF inicial
         if (document.getElementById('pdf-viewer')) {
-            console.log('Cargando documento inicial...');
+            console.log('📥 Cargando documento inicial...');
             cargarDocumentoPDF();
         }
 
         // Manejar clic en el enlace de iOS
         document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
             if (isIOS() && documentoUrl) {
-                console.log('Abriendo PDF en iOS');
+                console.log('📱 Abriendo PDF en iOS');
                 window.open(documentoUrl, '_blank');
                 e.preventDefault();
             }
@@ -412,7 +461,7 @@
 
     // Manejar errores globales
     window.addEventListener('error', (event) => {
-        console.error('Error global:', event.error);
+        console.error('💥 Error global:', event.error);
         showError('Error inesperado en la aplicación', 'both');
     });
 </script>
