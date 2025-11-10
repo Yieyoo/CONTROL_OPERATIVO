@@ -41,43 +41,6 @@
             color: white;
             border-color: #1e3d6f;
         }
-        
-        .info-plantilla {
-            text-align: center;
-            margin: 10px 0 20px;
-            color: #666;
-            font-style: italic;
-        }
-
-        /* Mejorar mensajes de error */
-        .error-message {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c00;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .file-info {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .download-btn {
-            display: inline-block;
-            background: #2c5aa0;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-top: 10px;
-            font-weight: bold;
-        }
     </style>
 </head>
 
@@ -94,23 +57,17 @@
     
     <!-- Selector de tipo de plantilla -->
     <div class="selector-plantilla">
-        <button id="btn-plantilla-actual" class="btn-plantilla activo" data-tipo="plantilla">
+        <button id="btn-plantilla-actual" class="btn-plantilla activo">
             PLANTILLA ACTUAL
         </button>
-        <button id="btn-plantilla-eventual" class="btn-plantilla" data-tipo="plantilla_ne">
+        <button id="btn-plantilla-eventual" class="btn-plantilla">
             PLANTILLA EVENTUAL
         </button>
     </div>
     
-    <div id="info-plantilla" class="info-plantilla">
-        Mostrando: Plantilla Actual
-    </div>
-    
     <div class="loading" id="loading">
         <div class="spinner"></div>
-        <p>Cargando documento...</p>
     </div>
-    
     <div class="logo-container">
         <img src="../../imagenes/inm logo.png" alt="Logo INM">
     </div>
@@ -126,7 +83,7 @@
     </div>
 
     <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
-    <div id="ios-container" class="ios-only" style="display: none;">
+    <div id="ios-container" class="ios-only">
         <p>Para visualizar el documento en tu dispositivo iOS:</p>
         <a href="#" id="ios-pdf-link" class="ios-pdf-link" download>
             <span>Descargar Documento</span>
@@ -148,7 +105,6 @@
     const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
     const API_KEY = 'Xhy2md57';
     const ESTADO = 'datos-nacionales';
-    const TIPO_DOCUMENTO = 'plantilla';
     const TITULO_DOCUMENTO = 'PLANTILLA DE PERSONAL';
 
     // Configuración dinámica desde URL
@@ -159,12 +115,11 @@
 
     // Valores finales (usa los de URL si existen, sino los definidos arriba)
     const ESTADO_FIJO = estadoFromURL || ESTADO;
-    const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
     const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
 
     // Variables para controlar el estado del documento
     let documentoUrl = '';
-    let tipoPlantillaActual = 'plantilla'; // Valor por defecto
+    let tipoDocumentoActual = 'plantilla'; // Por defecto plantilla actual
 
     // Detectar iOS
     function isIOS() {
@@ -174,57 +129,27 @@
 
     // Mostrar/ocultar loading
     function showLoading(show) {
-        const loading = document.getElementById('loading');
-        if (loading) {
-            loading.style.display = show ? 'flex' : 'none';
-        }
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
     }
 
     // Mostrar mensaje de error
     function showError(message, target = 'both') {
-        console.error('Error:', message);
-        
         if (target === 'both' || target === 'pdf') {
             const pdfError = document.getElementById('pdf-error');
-            if (pdfError) {
-                pdfError.textContent = message;
-                pdfError.style.display = 'block';
-            }
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
         }
         if (target === 'both' || target === 'mobile') {
             const mobileError = document.getElementById('mobile-error');
-            if (mobileError) {
-                mobileError.textContent = message;
-                mobileError.style.display = 'block';
-            }
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
         }
     }
 
     // Ocultar errores
     function hideErrors() {
-        const pdfError = document.getElementById('pdf-error');
-        const mobileError = document.getElementById('mobile-error');
-        
-        if (pdfError) pdfError.style.display = 'none';
-        if (mobileError) mobileError.style.display = 'none';
-    }
-
-    // Formatear fecha legible
-    function formatDate(dateString) {
-        try {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('es-MX', options);
-        } catch (error) {
-            return 'Fecha no disponible';
-        }
-    }
-
-    // Formatear tamaño de archivo
-    function formatFileSize(bytes) {
-        if (!bytes || bytes === 0) return 'Tamaño no disponible';
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(1024));
-        return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
     }
 
     // Actualizar botones activos
@@ -235,36 +160,33 @@
         });
         
         // Agregar clase activo al botón seleccionado
-        const botonSeleccionado = document.querySelector(`[data-tipo="${tipoSeleccionado}"]`);
-        if (botonSeleccionado) {
-            botonSeleccionado.classList.add('activo');
-        }
-        
-        // Actualizar información mostrada
-        const infoElement = document.getElementById('info-plantilla');
-        if (infoElement) {
-            if (tipoSeleccionado === 'plantilla') {
-                infoElement.textContent = 'Mostrando: Plantilla Actual';
-            } else {
-                infoElement.textContent = 'Mostrando: Plantilla Eventual';
-            }
+        if (tipoSeleccionado === 'plantilla') {
+            document.getElementById('btn-plantilla-actual').classList.add('activo');
+        } else {
+            document.getElementById('btn-plantilla-eventual').classList.add('activo');
         }
     }
 
-    // Cargar PDF desde Cloudinary - VERSIÓN SIMPLIFICADA SIN CORS
-    async function cargarDocumentoPDF(tipoPlantilla = 'plantilla') {
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
+
+    // Cargar PDF desde Cloudinary
+    async function cargarDocumentoPDF(tipoDocumento = 'plantilla') {
         showLoading(true);
         hideErrors();
-        
-        // Actualizar tipo de plantilla actual
-        tipoPlantillaActual = tipoPlantilla;
-        
+
+        // Actualizar tipo de documento actual
+        tipoDocumentoActual = tipoDocumento;
+
         // Actualizar botones activos
-        actualizarBotonesActivos(tipoPlantilla);
+        actualizarBotonesActivos(tipoDocumento);
 
         // Actualizar título de la página según el tipo de plantilla
         let tituloMostrar = TITULO_FINAL;
-        if (tipoPlantilla === 'plantilla_ne') {
+        if (tipoDocumento === 'plantilla_ne') {
             tituloMostrar = 'PLANTILLA EVENTUAL DE PERSONAL';
         }
         
@@ -272,149 +194,65 @@
         document.getElementById('titulo-documento').textContent = tituloMostrar;
 
         try {
-            console.log(`🔄 Consultando API para: ${ESTADO_FIJO}/${tipoPlantilla}`);
-            
-            // URL SIN headers complejos que causan CORS
-            const url = `${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoPlanto}`;
-            
-            console.log(`📡 URL de consulta: ${url}`);
-            
-            // Petición SIMPLIFICADA para evitar problemas de CORS
-            const response = await fetch(url, {
-                headers: { 
-                    'x-api-key': API_KEY
-                    // REMOVIMOS cache-control que causaba el error CORS
-                }
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${tipoDocumento}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumento}`, {
+                headers: { 'x-api-key': API_KEY }
             });
 
-            console.log(`📊 Estado de respuesta: ${response.status} ${response.statusText}`);
-
-            if (!response.ok) {
-                throw new Error(`Error ${response.status}: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
             const result = await response.json();
-            console.log('📦 Respuesta API completa:', result);
+            console.log('Respuesta API:', result);
 
-            // VERIFICACIÓN FLEXIBLE - Acepta diferentes estructuras de respuesta
-            let archivos = [];
-            
-            if (result && Array.isArray(result)) {
-                // Caso 1: El API devuelve un array directamente
-                archivos = result;
-                console.log('✅ Estructura: Array directo');
-            } else if (result && result.data && Array.isArray(result.data)) {
-                // Caso 2: El API devuelve { data: [] }
-                archivos = result.data;
-                console.log('✅ Estructura: { data: array }');
-            } else if (result && result.success && Array.isArray(result.data)) {
-                // Caso 3: El API devuelve { success: true, data: [] }
-                archivos = result.data;
-                console.log('✅ Estructura: { success: true, data: array }');
-            } else if (result && result.archivos && Array.isArray(result.archivos)) {
-                // Caso 4: El API devuelve { archivos: [] }
-                archivos = result.archivos;
-                console.log('✅ Estructura: { archivos: array }');
-            } else {
-                console.warn('⚠️ Estructura de respuesta no reconocida:', result);
-                // Intentar extraer archivos de cualquier propiedad que sea array
-                for (const key in result) {
-                    if (Array.isArray(result[key])) {
-                        archivos = result[key];
-                        console.log(`✅ Encontrado array en propiedad: ${key}`);
-                        break;
-                    }
-                }
-            }
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
 
             const pdfViewer = document.getElementById('pdf-viewer');
             const mobileContainer = document.querySelector('.mobile-images');
-            const iosContainer = document.getElementById('ios-container');
             const iosLink = document.getElementById('ios-pdf-link');
 
-            if (archivos.length > 0) {
-                console.log(`📄 Se encontraron ${archivos.length} archivos`);
-                
-                // Ordenar por fecha y obtener el más reciente
-                const latestPDF = archivos.sort((a, b) => {
-                    const dateA = new Date(a.uploaded_at || a.created_at || a.fecha || 0);
-                    const dateB = new Date(b.uploaded_at || b.created_at || b.fecha || 0);
-                    return dateB - dateA;
-                })[0];
-
-                console.log('📋 Documento más reciente:', latestPDF);
-
-                // Obtener URL del documento (diferentes posibles propiedades)
-                const pdfUrl = latestPDF.url || latestPDF.secure_url || latestPDF.document_url || latestPDF.file_url;
-                
-                if (!pdfUrl) {
-                    throw new Error('El documento no tiene URL válida');
-                }
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
 
                 // Guardar URL para descarga
-                documentoUrl = pdfUrl;
+                documentoUrl = latestPDF.url;
 
                 // Configuración normal para PC
-                if (pdfViewer) {
-                    pdfViewer.src = pdfUrl;
-                    console.log('✅ PDF cargado en iframe');
-                }
+                pdfViewer.src = latestPDF.url;
                 
                 // Configuración para móviles (no iOS)
-                if (mobileContainer && !isIOS()) {
-                    const filename = latestPDF.filename || latestPDF.original_filename || latestPDF.name || tituloMostrar;
-                    const uploadedAt = latestPDF.uploaded_at || latestPDF.created_at || latestPDF.fecha;
-                    const size = latestPDF.size || latestPDF.bytes;
-                    
+                if (!isIOS()) {
                     mobileContainer.innerHTML = `
                         <div class="file-info">
-                            <h3>${filename}</h3>
-                            <p>Actualizado: ${formatDate(uploadedAt)}</p>
-                            <p>Tamaño: ${formatFileSize(size)}</p>
-                            <a href="${pdfUrl}" class="download-btn" download>
+                            <h3>${latestPDF.filename || tituloMostrar}</h3>
+                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                            <a href="${latestPDF.url}" class="download-btn" download>
                                 Descargar Documento
                             </a>
                         </div>
                     `;
                 }
                 
-                // Configuración específica para iOS
+                // Configuración específica para iOS - Descarga directa
                 if (isIOS()) {
-                    if (iosContainer) iosContainer.style.display = 'block';
-                    if (iosLink) {
-                        const filename = latestPDF.filename || latestPDF.original_filename || 
-                            (tipoPlantilla === 'plantilla' ? 'plantilla_personal.pdf' : 'plantilla_eventual_personal.pdf');
-                        
-                        iosLink.href = pdfUrl;
-                        iosLink.setAttribute('download', filename);
-                    }
-                } else {
-                    if (iosContainer) iosContainer.style.display = 'none';
+                    iosLink.href = latestPDF.url;
+                    const nombreArchivo = tipoDocumento === 'plantilla' ? 'plantilla_personal.pdf' : 'plantilla_eventual_personal.pdf';
+                    iosLink.setAttribute('download', latestPDF.filename || nombreArchivo);
                 }
-                
-                console.log('✅ Documento cargado exitosamente');
-                
             } else {
                 let mensajeError = '';
-                if (tipoPlantilla === 'plantilla') {
+                if (tipoDocumento === 'plantilla') {
                     mensajeError = `No se encontraron documentos de plantilla actual para ${ESTADO_FIJO}`;
                 } else {
                     mensajeError = `No se encontraron documentos de plantilla eventual para ${ESTADO_FIJO}`;
                 }
-                console.warn('⚠️ ' + mensajeError);
                 showError(mensajeError, 'both');
-                
-                // Limpiar el visor PDF
-                const pdfViewer = document.getElementById('pdf-viewer');
-                if (pdfViewer) pdfViewer.src = '';
             }
         } catch (error) {
-            console.error('❌ Error al cargar documento:', error);
+            console.error('Error:', error);
             showError(`Error al cargar el documento: ${error.message}`, 'both');
-            
-            // Limpiar el visor PDF en caso de error
-            const pdfViewer = document.getElementById('pdf-viewer');
-            if (pdfViewer) pdfViewer.src = '';
         } finally {
             showLoading(false);
         }
@@ -422,46 +260,28 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 Inicializando página de plantillas...');
+        // Configurar event listeners para los botones
+        document.getElementById('btn-plantilla-actual').addEventListener('click', function() {
+            cargarDocumentoPDF('plantilla');
+        });
         
-        // Configurar event listeners para los botones de plantilla
-        const btnActual = document.getElementById('btn-plantilla-actual');
-        const btnEventual = document.getElementById('btn-plantilla-eventual');
-        
-        if (btnActual) {
-            btnActual.addEventListener('click', function() {
-                console.log('🔄 Cambiando a Plantilla Actual');
-                cargarDocumentoPDF('plantilla');
-            });
-        }
-        
-        if (btnEventual) {
-            btnEventual.addEventListener('click', function() {
-                console.log('🔄 Cambiando a Plantilla Eventual');
-                cargarDocumentoPDF('plantilla_ne');
-            });
-        }
+        document.getElementById('btn-plantilla-eventual').addEventListener('click', function() {
+            cargarDocumentoPDF('plantilla_ne');
+        });
 
-        // Cargar el documento PDF inicial
+        // Cargar el documento PDF inicial (plantilla actual)
         if (document.getElementById('pdf-viewer')) {
-            console.log('📥 Cargando documento inicial...');
-            cargarDocumentoPDF();
+            cargarDocumentoPDF('plantilla');
         }
 
         // Manejar clic en el enlace de iOS
         document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
-            if (isIOS() && documentoUrl) {
-                console.log('📱 Abriendo PDF en iOS');
-                window.open(documentoUrl, '_blank');
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
                 e.preventDefault();
             }
         });
-    });
-
-    // Manejar errores globales
-    window.addEventListener('error', (event) => {
-        console.error('💥 Error global:', event.error);
-        showError('Error inesperado en la aplicación', 'both');
     });
 </script>
 </body>
