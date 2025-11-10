@@ -10,6 +10,45 @@
     <!-- Scripts de autenticación y menú -->
     <script src="../../auth.js" defer></script>   
     <script src="../../load-menu.js" defer></script>
+    <style>
+        /* Estilos para el botón de cambio de plantilla */
+        .selector-plantilla {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-plantilla {
+            padding: 12px 24px;
+            background-color: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+        
+        .btn-plantilla:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        .btn-plantilla.activo {
+            background-color: #2c5aa0;
+            color: white;
+            border-color: #1e3d6f;
+        }
+        
+        .info-plantilla {
+            text-align: center;
+            margin: 10px 0 20px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
 </head>
 
 <body class="mostrar-ubicaciones">
@@ -22,6 +61,21 @@
     <!-- El menú se insertará automáticamente aquí por load-menu.js -->
     
     <h1 id="titulo-documento" class="titulo-personalizado">PLANTILLA DE PERSONAL</h1>       
+    
+    <!-- Selector de tipo de plantilla -->
+    <div class="selector-plantilla">
+        <button id="btn-plantilla-actual" class="btn-plantilla activo" data-tipo="plantilla">
+            PLANTILLA ACTUAL
+        </button>
+        <button id="btn-plantilla-eventual" class="btn-plantilla" data-tipo="plantilla_ne">
+            PLANTILLA EVENTUAL
+        </button>
+    </div>
+    
+    <div id="info-plantilla" class="info-plantilla">
+        Mostrando: Plantilla Actual
+    </div>
+    
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
@@ -78,6 +132,7 @@
 
     // Variables para controlar el estado del documento
     let documentoUrl = '';
+    let tipoPlantillaActual = 'plantilla'; // Valor por defecto
 
     // Detectar iOS
     function isIOS() {
@@ -116,18 +171,53 @@
         return new Date(dateString).toLocaleDateString('es-MX', options);
     }
 
+    // Actualizar botones activos
+    function actualizarBotonesActivos(tipoSeleccionado) {
+        // Remover clase activo de todos los botones
+        document.querySelectorAll('.btn-plantilla').forEach(btn => {
+            btn.classList.remove('activo');
+        });
+        
+        // Agregar clase activo al botón seleccionado
+        const botonSeleccionado = document.querySelector(`[data-tipo="${tipoSeleccionado}"]`);
+        if (botonSeleccionado) {
+            botonSeleccionado.classList.add('activo');
+        }
+        
+        // Actualizar información mostrada
+        const infoElement = document.getElementById('info-plantilla');
+        if (infoElement) {
+            if (tipoSeleccionado === 'plantilla') {
+                infoElement.textContent = 'Mostrando: Plantilla Actual';
+            } else {
+                infoElement.textContent = 'Mostrando: Plantilla Eventual';
+            }
+        }
+    }
+
     // Cargar PDF desde Cloudinary
-    async function cargarDocumentoPDF() {
+    async function cargarDocumentoPDF(tipoPlantilla = 'plantilla') {
         showLoading(true);
         hideErrors();
+        
+        // Actualizar tipo de plantilla actual
+        tipoPlantillaActual = tipoPlantilla;
+        
+        // Actualizar botones activos
+        actualizarBotonesActivos(tipoPlantilla);
 
-        // Actualizar título de la página
-        document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
-        document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+        // Actualizar título de la página según el tipo de plantilla
+        let tituloMostrar = TITULO_FINAL;
+        if (tipoPlantilla === 'plantilla_ne') {
+            tituloMostrar = 'PLANTILLA EVENTUAL DE PERSONAL';
+        }
+        
+        document.title = tituloMostrar + ' - ' + ESTADO_FIJO.toUpperCase();
+        document.getElementById('titulo-documento').textContent = tituloMostrar;
 
         try {
-            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
-            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${tipoPlantilla}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoPlantilla}`, {
                 headers: { 'x-api-key': API_KEY }
             });
 
@@ -157,7 +247,7 @@
                 if (!isIOS()) {
                     mobileContainer.innerHTML = `
                         <div class="file-info">
-                            <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                            <h3>${latestPDF.filename || tituloMostrar}</h3>
                             <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
                             <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
                             <a href="${latestPDF.url}" class="download-btn" download>
@@ -170,10 +260,17 @@
                 // Configuración específica para iOS - Descarga directa
                 if (isIOS()) {
                     iosLink.href = latestPDF.url;
-                    iosLink.setAttribute('download', latestPDF.filename || 'plantilla_personal.pdf');
+                    iosLink.setAttribute('download', latestPDF.filename || 
+                        (tipoPlantilla === 'plantilla' ? 'plantilla_personal.pdf' : 'plantilla_eventual_personal.pdf'));
                 }
             } else {
-                showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+                let mensajeError = '';
+                if (tipoPlantilla === 'plantilla') {
+                    mensajeError = `No se encontraron documentos de plantilla actual para ${ESTADO_FIJO}`;
+                } else {
+                    mensajeError = `No se encontraron documentos de plantilla eventual para ${ESTADO_FIJO}`;
+                }
+                showError(mensajeError, 'both');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -185,7 +282,16 @@
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-        // Cargar el documento PDF
+        // Configurar event listeners para los botones de plantilla
+        document.getElementById('btn-plantilla-actual').addEventListener('click', function() {
+            cargarDocumentoPDF('plantilla');
+        });
+        
+        document.getElementById('btn-plantilla-eventual').addEventListener('click', function() {
+            cargarDocumentoPDF('plantilla_ne');
+        });
+
+        // Cargar el documento PDF inicial
         if (document.getElementById('pdf-viewer')) {
             cargarDocumentoPDF();
         }
