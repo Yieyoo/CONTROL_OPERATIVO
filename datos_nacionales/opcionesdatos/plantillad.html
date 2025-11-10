@@ -251,7 +251,7 @@
         }
     }
 
-    // Cargar PDF desde Cloudinary - VERSIÓN CORREGIDA
+    // Cargar PDF desde Cloudinary - VERSIÓN SIMPLIFICADA SIN CORS
     async function cargarDocumentoPDF(tipoPlantilla = 'plantilla') {
         showLoading(true);
         hideErrors();
@@ -274,18 +274,17 @@
         try {
             console.log(`🔄 Consultando API para: ${ESTADO_FIJO}/${tipoPlantilla}`);
             
-            // Agregar timestamp para evitar cache
-            const timestamp = new Date().getTime();
-            const url = `${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoPlantilla}?t=${timestamp}`;
+            // URL SIN headers complejos que causan CORS
+            const url = `${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoPlanto}`;
             
             console.log(`📡 URL de consulta: ${url}`);
             
+            // Petición SIMPLIFICADA para evitar problemas de CORS
             const response = await fetch(url, {
                 headers: { 
-                    'x-api-key': API_KEY,
-                    'Cache-Control': 'no-cache'
-                },
-                cache: 'no-cache'
+                    'x-api-key': API_KEY
+                    // REMOVIMOS cache-control que causaba el error CORS
+                }
             });
 
             console.log(`📊 Estado de respuesta: ${response.status} ${response.statusText}`);
