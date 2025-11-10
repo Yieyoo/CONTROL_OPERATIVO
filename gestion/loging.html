@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - Gestor de Archivos INM</title>
+    <link rel="icon" type="image/png" href="../imagenes/descargar.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3d6f 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2c5aa0;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2c5aa0;
+        }
+
+        .login-button {
+            background: #2c5aa0;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .login-button:hover {
+            background: #1e3d6f;
+        }
+
+        .login-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            margin: 10px 0;
+            font-size: 14px;
+            display: none;
+        }
+
+        .security-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .loading {
+            display: none;
+            margin: 10px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2c5aa0;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="../imagenes/inm logo.png" alt="Logo INM" class="logo">
+        <h1>Gestor de Archivos INM</h1>
+        <p class="subtitle">Dirección General de Coordinación de Oficinas de Representación</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="password">Contraseña de Acceso:</label>
+                <input type="password" id="password" class="input-field" 
+                       placeholder="Ingresa la contraseña" required autocomplete="current-password">
+            </div>
+            
+            <div id="errorMessage" class="error-message">
+                Contraseña incorrecta. Intenta nuevamente.
+            </div>
+            
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Verificando...</p>
+            </div>
+            
+            <button type="submit" id="loginButton" class="login-button">
+                Ingresar al Sistema
+            </button>
+        </form>
+        
+        <div class="security-info">
+            <strong>⚠️ Acceso Restringido</strong><br>
+            Solo personal autorizado puede acceder a esta sección.
+        </div>
+    </div>
+
+    <script>
+        // CONTRASEÑA CONFIGURABLE - Cambia esta contraseña
+        const PASSWORD_CORRECTA = 'ADMIN2025'; // ← CAMBIA ESTA CONTRASEÑA
+
+        // Elementos del DOM
+        const loginForm = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+        const loginButton = document.getElementById('loginButton');
+
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+            loginButton.disabled = show;
+            loginButton.textContent = show ? 'Verificando...' : 'Ingresar al Sistema';
+        }
+
+        // Mostrar error
+        function showError(show) {
+            errorMessage.style.display = show ? 'block' : 'none';
+            if (show) {
+                passwordInput.style.borderColor = '#d32f2f';
+            } else {
+                passwordInput.style.borderColor = '#ddd';
+            }
+        }
+
+        // Verificar contraseña
+        function verificarPassword(password) {
+            return password === PASSWORD_CORRECTA;
+        }
+
+        // Manejar envío del formulario
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = passwordInput.value.trim();
+            
+            if (!password) {
+                showError(true);
+                errorMessage.textContent = 'Por favor ingresa la contraseña';
+                return;
+            }
+
+            showLoading(true);
+            showError(false);
+
+            // Simular verificación (puedes hacerla más robusta)
+            setTimeout(() => {
+                if (verificarPassword(password)) {
+                    // Contraseña correcta - Redirigir al gestor
+                    localStorage.setItem('gestor_autenticado', 'true');
+                    window.location.href = 'gestion.html';
+                } else {
+                    // Contraseña incorrecta
+                    showLoading(false);
+                    showError(true);
+                    errorMessage.textContent = 'Contraseña incorrecta. Intenta nuevamente.';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }, 1000);
+        });
+
+        // Enfocar el campo de contraseña al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            passwordInput.focus();
+        });
+
+        // Manejar la tecla Enter
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

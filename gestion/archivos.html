@@ -153,6 +153,14 @@
     </div>
 
     <script>
+        // VERIFICACIÓN DE AUTENTICACIÓN AL INICIO
+        (function() {
+            const autenticado = localStorage.getItem('gestor_autenticado');
+            if (!autenticado || autenticado !== 'true') {
+                window.location.href = 'loging.html';
+                return;
+            }
+        })();
         // Configuración global
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
