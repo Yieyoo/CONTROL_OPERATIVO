@@ -453,16 +453,16 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para listar archivos con cache busting - SOLO CAMBIÉ EL NOMBRE DEL PARÁMETRO
-router.get('/archivos/:estado/:tipo', authenticate, async (req, res, next) => {
+// Ruta para listar archivos con cache busting
+router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
-    const tipo = req.params.tipo || 'ficha_curricular'; // CAMBIÉ tipoDocumento por tipo
+    const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
 
     // Agregar timestamp para evitar caché
     const result = await cloudinary.api.resources({
       type: 'upload',
-      prefix: `${estado}/${tipo}/`,
+      prefix: `${estado}/${tipoDocumento}/`,
       resource_type: 'raw',
       max_results: 500,
       context: true,
@@ -479,7 +479,7 @@ router.get('/archivos/:estado/:tipo', authenticate, async (req, res, next) => {
         public_id: resource.public_id,
         filename: originalName,
         estado: estado,
-        tipo_documento: tipo, // CAMBIÉ tipoDocumento por tipo
+        tipo_documento: tipoDocumento,
         view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true&_=${Date.now()}`,
         download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
         uploaded_at: resource.created_at,
@@ -501,7 +501,7 @@ router.get('/archivos/:estado/:tipo', authenticate, async (req, res, next) => {
       data: archivos,
       count: archivos.length,
       estado: estado,
-      tipo_documento: tipo, // CAMBIÉ tipoDocumento por tipo
+      tipo_documento: tipoDocumento,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -651,3 +651,5 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = { app, server };
+
+a
