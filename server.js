@@ -309,6 +309,44 @@ router.get('/health', async (req, res) => {
   }
 });
 
+// ✅ NUEVA RUTA: Diagnóstico de Cloudinary - AGREGADA
+router.get('/debug-cloudinary', authenticate, async (req, res) => {
+  try {
+    console.log('🔍 Diagnosticando Cloudinary...');
+    
+    // Listar TODOS los archivos para ver la estructura real
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      resource_type: 'raw',
+      max_results: 100
+    });
+    
+    // Organizar por carpetas
+    const carpetas = {};
+    result.resources.forEach(resource => {
+      const pathParts = resource.public_id.split('/');
+      if (pathParts.length > 1) {
+        const carpeta = pathParts[0] + '/' + pathParts[1];
+        if (!carpetas[carpeta]) carpetas[carpeta] = [];
+        carpetas[carpeta].push(resource.public_id);
+      }
+    });
+    
+    res.json({
+      status: 'success',
+      total_archivos: result.resources.length,
+      carpetas_existentes: Object.keys(carpetas),
+      estructura: carpetas
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      error: error.message
+    });
+  }
+});
+
 // Función para subir archivos
 const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null) => {
   if (!file) throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
@@ -454,10 +492,10 @@ router.delete('/delete', authenticate, async (req, res, next) => {
 });
 
 // Ruta para listar archivos con cache busting
-router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
+router.get('/archivos/:estado/:tipo', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
-    const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
+    const tipoDocumento = req.params.tipo || 'ficha_curricular';
 
     // Agregar timestamp para evitar caché
     const result = await cloudinary.api.resources({
@@ -651,4 +689,3 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = { app, server };
-
