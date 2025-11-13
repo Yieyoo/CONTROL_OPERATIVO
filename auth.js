@@ -4,26 +4,26 @@ class AuthSystem {
             sessionDuration: 8 * 60 * 60 * 1000, // 8 horas
             loginPage: 'login.html'
         };
+        this.checkInProgress = false;
         this.init();
     }
 
     init() {
-        console.log('🔄 Sistema de autenticación MEJORADO iniciado');
+        console.log('🔄 Sistema de autenticación COMPLETO iniciado');
         
         this.setupNavigationEvents();
         
-        // LUEGO verificar autenticación
+        // VERIFICACIÓN INICIAL (igual que antes)
         if (!this.isLoginPage()) {
-            console.log('🔐 Verificación INMEDIATA de autenticación...');
-            this.immediateAuthCheck();
-            this.setupPeriodicCheck();
+            console.log('🔐 Verificación inicial de autenticación...');
+            setTimeout(() => this.safeAuthCheck(), 100);
         } else {
             console.log('📄 Página de login, omitiendo verificación');
             this.cleanExpiredSession();
         }
     }
 
-    // NUEVO: Configurar eventos para detectar navegación "Atrás"
+    // EVENTOS DE NAVEGACIÓN COMPLETOS (igual que antes)
     setupNavigationEvents() {
         // 1. Detectar cuando la página se muestra desde cache (navegación Atrás)
         window.addEventListener('pageshow', (event) => {
@@ -32,7 +32,7 @@ class AuthSystem {
                 console.log('📋 Página cargada desde cache - Re-verificando sesión');
             }
             if (!this.isLoginPage()) {
-                setTimeout(() => this.checkAuthentication(), 50);
+                setTimeout(() => this.safeAuthCheck(), 100);
             }
         });
 
@@ -40,33 +40,36 @@ class AuthSystem {
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && !this.isLoginPage()) {
                 console.log('👀 Página visible - Verificando sesión');
-                setTimeout(() => this.checkAuthentication(), 50);
+                setTimeout(() => this.safeAuthCheck(), 100);
             }
         });
 
-        // 3. Verificación adicional cuando la página termina de cargar
+        // 3. VERIFICACIÓN ADICIONAL CUANDO LA PÁGINA TERMINA DE CARGAR
+        // ¡ESTA ES LA QUE FALTABA PARA LOS LOGOUT EN SUBCARPETAS!
         window.addEventListener('load', () => {
+            console.log('📄 Página completamente cargada - Verificación final');
             if (!this.isLoginPage()) {
-                console.log('📄 Página completamente cargada - Verificación final');
-                this.checkAuthentication();
+                setTimeout(() => this.safeAuthCheck(), 150);
             }
         });
 
-        console.log('🎯 Eventos de navegación configurados');
+        // 4. Verificación periódica
+        this.setupPeriodicCheck();
+
+        console.log('🎯 Eventos de navegación COMPLETOS configurados');
     }
 
-    // NUEVO: Verificación inmediata y más robusta
-    immediateAuthCheck() {
-        console.log('🔐 Ejecutando verificación INMEDIATA...');
-        const isValid = this.checkAuthentication();
-        
-        if (!isValid) {
-            console.log('🚫 Acceso denegado - Redirigiendo inmediatamente');
-            return false;
+    // VERIFICACIÓN SEGURA (para evitar duplicados)
+    safeAuthCheck() {
+        if (this.checkInProgress) {
+            console.log('⏳ Verificación ya en progreso, omitiendo...');
+            return;
         }
         
-        console.log('✅ Verificación inmediata exitosa');
-        return true;
+        this.checkInProgress = true;
+        const result = this.checkAuthentication();
+        this.checkInProgress = false;
+        return result;
     }
 
     isLoginPage() {
@@ -101,10 +104,8 @@ class AuthSystem {
     }
 
     handleInvalidSession() {
-        // Limpiar sesión expirada
         this.clearSession();
         
-        // Solo redirigir si no estamos ya en login
         if (!this.isLoginPage()) {
             console.log('🔄 Redirigiendo al login...');
             this.redirectToLogin();
@@ -127,16 +128,12 @@ class AuthSystem {
         localStorage.removeItem('authenticated');
         localStorage.removeItem('loginTime');
         localStorage.removeItem('userData');
-        //localStorage.removeItem('loginAttempts');
-        //localStorage.removeItem('lastAttempt');
     }
 
     redirectToLogin() {
-        // Usar replace para evitar que quede en el historial
         const loginUrl = this.getLoginUrl();
         console.log('🚀 Redirigiendo a:', loginUrl);
         
-        // Pequeño delay para asegurar que se procesen los logs
         setTimeout(() => {
             window.location.replace(loginUrl);
         }, 100);
@@ -146,13 +143,12 @@ class AuthSystem {
         const currentPath = window.location.pathname;
         console.log('📍 Ruta actual para login:', currentPath);
         
-        // Estrategia MEJORADA: Detectar automáticamente la profundidad
         const pathParts = currentPath.split('/').filter(part => part !== '');
-        const depth = pathParts.length - 1; // -1 porque el primer elemento es vacío
+        const depth = pathParts.length - 1;
         
         console.log('📊 Niveles de profundidad:', depth, 'Partes:', pathParts);
         
-        // Casos específicos primero
+        // CASOS ESPECÍFICOS (tu lógica original)
         if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
             console.log('🎯 Desde opciones → ../../../login.html');
             return '../../../login.html';
@@ -165,13 +161,11 @@ class AuthSystem {
         } else if (currentPath.includes('/datos_nacionales/')) {
             console.log('🎯 Desde datos_nacionales → ../login.html');
             return '../login.html';
-        }
-        // NUEVO: Caso para gestor_archivos y otras carpetas
-        else if (currentPath.includes('/gestor_archivos/')) {
+        } else if (currentPath.includes('/gestor_archivos/')) {
             console.log('🎯 Desde gestor_archivos → ../login.html');
             return '../login.html';
         }
-        // CASO GENÉRICO para TODAS las subcarpetas
+        // CASO GENÉRICO
         else if (depth === 0) {
             console.log('🎯 Desde raíz → login.html');
             return 'login.html';
@@ -202,12 +196,11 @@ class AuthSystem {
     }
 
     setupPeriodicCheck() {
-        // Verificar cada 30 segundos
         setInterval(() => {
             if (!this.isLoginPage()) {
-                this.checkAuthentication();
+                this.safeAuthCheck();
             }
-        }, 30000);
+        }, 30000); // 30 segundos
     }
 
     // Método estático para usar en HTML
@@ -216,17 +209,17 @@ class AuthSystem {
     }
 }
 
-// Inicialización MEJORADA
-console.log('🔧 auth.js MEJORADO cargado - Iniciando sistema de autenticación');
+// INICIALIZACIÓN COMPLETA (igual que tu versión original)
+console.log('🔧 auth.js COMPLETO cargado - Iniciando sistema de autenticación');
 
 // Inicializar cuando el DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('📄 DOM listo - Inicializando AuthSystem MEJORADO');
+        console.log('📄 DOM listo - Inicializando AuthSystem COMPLETO');
         new AuthSystem();
     });
 } else {
-    console.log('📄 DOM ya listo - Inicializando AuthSystem MEJORADO inmediatamente');
+    console.log('📄 DOM ya listo - Inicializando AuthSystem COMPLETO inmediatamente');
     new AuthSystem();
 }
 
