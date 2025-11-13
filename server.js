@@ -453,58 +453,89 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para listar archivos con cache busting
+// Ruta para listar archivos - CORREGIDA PARA EVITAR ERROR 500
 router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
-    const estado = req.params.estado || 'aguascalientes';
-    const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
+    // DECODIFICAR y normalizar parámetros (CORRECCIÓN PARA ERROR 500)
+    let estado = decodeURIComponent(req.params.estado || 'aguascalientes');
+    let tipoDocumento = decodeURIComponent(req.params.tipoDocumento || 'ficha_curricular');
+    
+    // Normalizar caracteres (remover acentos, convertir a lowercase)
+    estado = estado.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    tipoDocumento = tipoDocumento.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    
+    // Reemplazar espacios por guiones para consistencia
+    estado = estado.replace(/\s+/g, '-');
+    tipoDocumento = tipoDocumento.replace(/\s+/g, '_');
+    
+    console.log(`📁 Buscando archivos para: ${estado}/${tipoDocumento}`);
 
-    // Agregar timestamp para evitar caché
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: `${estado}/${tipoDocumento}/`,
-      resource_type: 'raw',
-      max_results: 500,
-      context: true,
-      tags: true,
-      moderations: true,
-      timestamp: Date.now() // Cache busting
-    });
+    try {
+      const result = await cloudinary.api.resources({
+        type: 'upload',
+        prefix: `${estado}/${tipoDocumento}/`,
+        resource_type: 'raw',
+        max_results: 500,
+        context: true,
+        tags: true,
+        timestamp: Date.now() // Cache busting
+      });
 
-    const archivos = result.resources.map(resource => {
-      const originalName = resource.context?.custom?.original_filename || 
-                         path.parse(resource.public_id).name + '.pdf';
-      return {
-        url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
-        public_id: resource.public_id,
-        filename: originalName,
+      const archivos = result.resources.map(resource => {
+        const originalName = resource.context?.custom?.original_filename || 
+                           path.parse(resource.public_id).name + '.pdf';
+        return {
+          url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
+          public_id: resource.public_id,
+          filename: originalName,
+          estado: estado,
+          tipo_documento: tipoDocumento,
+          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true&_=${Date.now()}`,
+          download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
+          uploaded_at: resource.created_at,
+          size: resource.bytes,
+          format: resource.format,
+          width: resource.width,
+          height: resource.height,
+          etag: resource.etag,
+          tags: resource.tags,
+          ...(resource.context?.custom?.titulo_documento && { 
+            titulo_documento: resource.context.custom.titulo_documento 
+          })
+        };
+      });
+
+      res.json({
+        status: 'success',
+        data: archivos,
+        count: archivos.length,
         estado: estado,
         tipo_documento: tipoDocumento,
-        view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true&_=${Date.now()}`,
-        download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
-        uploaded_at: resource.created_at,
-        size: resource.bytes,
-        format: resource.format,
-        width: resource.width,
-        height: resource.height,
-        etag: resource.etag,
-        tags: resource.tags,
-        moderation: resource.moderation,
-        ...(resource.context?.custom?.titulo_documento && { 
-          titulo_documento: resource.context.custom.titulo_documento 
-        })
-      };
-    });
-
-    res.json({
-      status: 'success',
-      data: archivos,
-      count: archivos.length,
-      estado: estado,
-      tipo_documento: tipoDocumento,
-      timestamp: new Date().toISOString()
-    });
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (cloudinaryError) {
+      console.error('❌ Error de Cloudinary:', cloudinaryError);
+      
+      // Si no hay archivos, devolver array vacío en lugar de error 500
+      if (cloudinaryError.message.includes('No resources found') || cloudinaryError.http_code === 404) {
+        return res.json({
+          status: 'success',
+          data: [],
+          count: 0,
+          estado: estado,
+          tipo_documento: tipoDocumento,
+          timestamp: new Date().toISOString(),
+          message: 'No se encontraron archivos para esta combinación'
+        });
+      }
+      
+      // Para otros errores de Cloudinary, lanzar el error normal
+      throw new AppError(`Error de Cloudinary: ${cloudinaryError.message}`, 502, 'cloudinary_error');
+    }
+    
   } catch (error) {
+    console.error('❌ Error en /api/archivos:', error);
     next(error);
   }
 });
@@ -597,6 +628,24 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
   }
 });
 
+// Ruta de diagnóstico TEMPORAL para probar parámetros
+router.get('/debug-params/:estado/:tipoDocumento', (req, res) => {
+  const estado = req.params.estado;
+  const tipoDocumento = req.params.tipoDocumento;
+  
+  console.log('🔍 Parámetros recibidos:', { estado, tipoDocumento });
+  
+  res.json({
+    estado_recibido: estado,
+    tipoDocumento_recibido: tipoDocumento,
+    normalized: {
+      estado: estado.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(),
+      tipoDocumento: tipoDocumento.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 router.get('/render-ping', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.ip;
   console.log(`📡 Ping recibido desde IP: ${clientIP} - ${new Date().toLocaleString()}`);
@@ -651,4 +700,3 @@ process.on('uncaughtException', (err) => {
 });
 
 module.exports = { app, server };
-
