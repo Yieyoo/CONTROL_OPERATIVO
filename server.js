@@ -457,7 +457,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
 router.get('/archivos/:estado/:tipo', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
-    const tipoDocumento = req.params.tipoDocumento || 'ficha_curricular';
+    const tipoDocumento = req.params.tipo || 'ficha_curricular';
 
     // Agregar timestamp para evitar caché
     const result = await cloudinary.api.resources({
