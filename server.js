@@ -454,7 +454,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
 });
 
 // Ruta para listar archivos con cache busting
-router.get('/archivos/:estado/:tipo', authenticate, async (req, res, next) => {
+router.get('/archivos/:estado/tipo', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado || 'aguascalientes';
     const tipoDocumento = req.params.tipo || 'ficha_curricular';
