@@ -200,44 +200,60 @@ class AuthSystem {
         const currentPath = window.location.pathname;
         console.log('📍 Ruta actual para login:', currentPath);
         
-        const pathParts = currentPath.split('/').filter(part => part !== '');
-        const depth = pathParts.length - 1;
-        
-        console.log('📊 Niveles de profundidad:', depth, 'Partes:', pathParts);
-        
-        // CASOS ESPECÍFICOS
+        // ESTRATEGIA MEJORADA PARA TODAS LAS CARPETAS
         if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
-            console.log('🎯 Desde opciones → ../../../login.html');
+            // Ej: /CONTROL_OPERATIVO/estados/aguascalientes/opciones/unidad_canina.html
+            console.log('🎯 Desde opciones estado → ../../../login.html');
             return '../../../login.html';
         } else if (currentPath.includes('/estados/')) {
+            // Ej: /CONTROL_OPERATIVO/estados/aguascalientes/aguascalientesindex.html
             console.log('🎯 Desde estado → ../../login.html');
             return '../../login.html';
-        } else if (currentPath.includes('/datos_nacionales/') && currentPath.includes('/opcionesdatos/')) {
-            console.log('🎯 Desde datos_nacionales/opciones → ../../login.html');
+        } else if (currentPath.includes('/datos_nacionales/opcionesdatos/')) {
+            // Ej: /CONTROL_OPERATIVO/datos_nacionales/opcionesdatos/plantilla.html
+            console.log('🎯 Desde opciones datos → ../../login.html');
             return '../../login.html';
         } else if (currentPath.includes('/datos_nacionales/')) {
-            console.log('🎯 Desde datos_nacionales → ../login.html');
+            // Ej: /CONTROL_OPERATIVO/datos_nacionales/datosindex.html
+            console.log('🎯 Desde datos nacionales → ../login.html');
             return '../login.html';
-        } else if (currentPath.includes('/gestor_archivos/')) {
-            console.log('🎯 Desde gestor_archivos → ../login.html');
+        } else if (currentPath.includes('/gestion/') || currentPath.includes('/gestor_archivos/')) {
+            // CORRECCIÓN: Ambas posibles rutas para el gestor de archivos
+            // Ej: /CONTROL_OPERATIVO/gestion/archivos.html
+            // Ej: /CONTROL_OPERATIVO/gestor_archivos/archivos.html
+            console.log('🎯 Desde gestión/gestor_archivos → ../login.html');
+            return '../login.html';
+        } else if (currentPath.includes('/construccion/')) {
+            // Ej: /CONTROL_OPERATIVO/construccion/construccion.html
+            console.log('🎯 Desde construcción → ../login.html');
             return '../login.html';
         }
-        // CASO GENÉRICO MEJORADO
-        else if (depth === 0) {
-            console.log('🎯 Desde raíz → login.html');
-            return 'login.html';
-        } else if (depth === 1) {
-            console.log('🎯 Desde 1 nivel abajo → ../login.html');
-            return '../login.html';
-        } else if (depth === 2) {
-            console.log('🎯 Desde 2 niveles abajo → ../../login.html');
-            return '../../login.html';
-        } else if (depth === 3) {
-            console.log('🎯 Desde 3 niveles abajo → ../../../login.html');
-            return '../../../login.html';
-        } else {
-            console.log('🎯 Desde muchos niveles → ../../../../login.html');
-            return '../../../../login.html';
+        // CASO GENÉRICO MEJORADO - CALCULAR AUTOMÁTICAMENTE
+        else {
+            const pathParts = currentPath.split('/').filter(part => part !== '');
+            const depth = pathParts.length - 1;
+            
+            console.log('📊 Niveles de profundidad calculados:', depth);
+            
+            if (depth === 0) {
+                console.log('🎯 Desde raíz → login.html');
+                return 'login.html';
+            } else if (depth === 1) {
+                console.log('🎯 Desde 1 nivel abajo → ../login.html');
+                return '../login.html';
+            } else if (depth === 2) {
+                console.log('🎯 Desde 2 niveles abajo → ../../login.html');
+                return '../../login.html';
+            } else if (depth === 3) {
+                console.log('🎯 Desde 3 niveles abajo → ../../../login.html');
+                return '../../../login.html';
+            } else if (depth === 4) {
+                console.log('🎯 Desde 4 niveles abajo → ../../../../login.html');
+                return '../../../../login.html';
+            } else {
+                console.log('🎯 Desde muchos niveles → ../../../../../login.html');
+                return '../../../../../login.html';
+            }
         }
     }
 
@@ -319,18 +335,18 @@ class AuthSystem {
 }
 
 // INICIALIZACIÓN MEJORADA
-console.log('🔧 auth.js MEJORADO cargado - Iniciando sistema de autenticación');
+console.log('🔧 auth.js UNIVERSAL cargado - Iniciando sistema de autenticación');
 
 // Función de inicialización segura
 function initializeAuthSystem() {
     try {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('📄 DOM listo - Inicializando AuthSystem MEJORADO');
+                console.log('📄 DOM listo - Inicializando AuthSystem UNIVERSAL');
                 window.authSystem = new AuthSystem();
             });
         } else {
-            console.log('📄 DOM ya listo - Inicializando AuthSystem MEJORADO inmediatamente');
+            console.log('📄 DOM ya listo - Inicializando AuthSystem UNIVERSAL inmediatamente');
             window.authSystem = new AuthSystem();
         }
     } catch (error) {
