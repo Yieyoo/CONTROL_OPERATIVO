@@ -1,12 +1,12 @@
-// load-menu.js - VERSIÓN CORREGIDA
+// load-menu.js - VERSIÓN CORREGIDA DEFINITIVA
 class MenuLoader {
     static async loadMenu() {
         try {
             console.log('🔄 Iniciando carga del menú...');
             
-            // USAR SIEMPRE LA MISMA RUTA - CORRECCIÓN PRINCIPAL
+            // USAR RUTA FIJA - SIN BÚSQUEDA MÚLTIPLE
             const menuPath = this.getFixedMenuPath();
-            console.log(`📍 Usando ruta fija: ${menuPath}`);
+            console.log(`📍 Ruta calculada: ${menuPath}`);
             
             const response = await fetch(menuPath);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -27,10 +27,10 @@ class MenuLoader {
         }
     }
     
-    // NUEVO MÉTODO - RUTA FIJA PARA TODAS LAS PÁGINAS
+    // MÉTODO NUEVO - RUTA FIJA SIN BÚSQUEDA
     static getFixedMenuPath() {
         const currentPath = window.location.pathname;
-        console.log('📍 Ruta actual:', currentPath);
+        console.log('📍 Ruta actual detectada:', currentPath);
         
         // ESTRATEGIA MEJORADA - DETERMINAR NIVELES HACIA LA RAÍZ
         if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
@@ -60,10 +60,6 @@ class MenuLoader {
         }
     }
     
-    // ELIMINAR EL MÉTODO findMenuPath VIEJO (que causa los errores)
-    // static async findMenuPath() { ... } // ← QUITAR ESTE MÉTODO
-    
-    // ... EL RESTO DE TU CÓDIGO SE MANTIENE IGUAL ...
     static cleanExistingMenu() {
         const elementsToRemove = ['.menu', '.menu-overlay', '.menu-toggle', '.menu-container', 'nav.menu'];
         elementsToRemove.forEach(selector => {
@@ -85,7 +81,7 @@ class MenuLoader {
         
         console.log('✅ Elementos del menú encontrados');
         
-        // CORREGIR RUTAS - VERSIÓN MEJORADA
+        // CORREGIR RUTAS
         this.fixMenuLinks();
         
         // Configurar eventos básicos
@@ -176,7 +172,6 @@ class MenuLoader {
         return originalHref;
     }
     
-    // ... EL RESTO DE TUS MÉTODOS SE MANTIENEN IGUAL ...
     static setupBasicMenuEvents(menuToggle, menu, menuOverlay) {
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
