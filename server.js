@@ -12,10 +12,23 @@ const { promisify } = require('util');
 const zlib = require('zlib');
 const stream = require('stream');
 const pipeline = promisify(stream.pipeline);
+const compression = require('compression');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Middleware para medir tiempo de respuesta
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    if (duration > 1000) { // Log solo respuestas lentas
+      console.log(`🐌 Respuesta lenta: ${req.method} ${req.path} - ${duration}ms`);
+    }
+  });
+  next();
+});
 
 // Configuración de seguridad mejorada
 app.use(helmet({
@@ -23,12 +36,13 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
-      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
-      imgSrc: ["'self'", 'data:', 'res.cloudinary.com'],
-      connectSrc: ["'self'", 'https://api.cloudinary.com'],
-      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com', 'cdnjs.cloudflare.com'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'res.cloudinary.com'],
+      connectSrc: ["'self'", 'https://api.cloudinary.com', 'https://control-operativo-1.onrender.com'],
+      fontSrc: ["'self'", 'fonts.gstatic.com', 'cdnjs.cloudflare.com'],
       objectSrc: ["'none'"],
-      mediaSrc: ["'self'"]
+      mediaSrc: ["'self'"],
+      frameSrc: ["'self'", 'https://docs.google.com']
     }
   },
   hsts: {
@@ -41,11 +55,18 @@ app.use(helmet({
   },
   referrerPolicy: {
     policy: 'same-origin'
-  }
+  },
+  crossOriginEmbedderPolicy: false // Necesario para Cloudinary
 }));
 
-app.use(morgan('combined', {
-  skip: (req, res) => req.path === '/api/health' || req.path === '/favicon.ico',
+// Configuración de logs mejorada
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', {
+  skip: (req, res) => {
+    // No loguear health checks y favicon
+    return req.path === '/api/health' || 
+           req.path === '/favicon.ico' ||
+           req.path === '/api/render-ping';
+  },
   stream: process.env.NODE_ENV === 'production' 
     ? fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) 
     : process.stdout
@@ -123,6 +144,16 @@ app.use(express.urlencoded({
   inflate: true
 }));
 
+// Mejorar la compresión GZIP
+app.use(compression({
+  level: zlib.constants.Z_BEST_COMPRESSION,
+  threshold: 1024,
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
+  }
+}));
+
 // Configuración de Cloudinary
 const validateCloudinaryConfig = () => {
   const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
@@ -139,6 +170,7 @@ const validateCloudinaryConfig = () => {
       api_key: process.env.CLOUD_API_KEY,
       api_secret: process.env.CLOUD_API_SECRET,
       secure: true,
+      timeout: 60000, // 60 segundos timeout
       private_cdn: false,
       secure_distribution: null,
       cdn_subdomain: true,
@@ -156,14 +188,20 @@ const validateCloudinaryConfig = () => {
 
 validateCloudinaryConfig();
 
-// Rate Limiting
+// Rate Limiting mejorado
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: process.env.NODE_ENV === 'production' ? 100 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // No aplicar rate limiting a health checks
+    return req.path === '/api/health' || req.path === '/api/render-ping';
+  },
   keyGenerator: (req) => {
-    return req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip;
+    return req.headers['x-real-ip'] || 
+           req.headers['x-forwarded-for']?.split(',')[0] || 
+           req.ip;
   },
   handler: (req, res) => {
     res.status(429).json({
@@ -197,18 +235,6 @@ const pdfUpload = multer({
     cb(new Error('Solo se permiten archivos PDF (extensión .pdf)'), false);
   }
 }).single('file');
-
-// Compresión GZIP
-const shouldCompress = (req, res) => {
-  if (req.headers['x-no-compression']) return false;
-  return /json|text|javascript|pdf/.test(res.getHeader('Content-Type'));
-};
-
-app.use(require('compression')({
-  level: zlib.constants.Z_BEST_COMPRESSION,
-  threshold: 1024,
-  filter: shouldCompress
-}));
 
 // Middleware de autenticación
 const authenticate = (req, res, next) => {
@@ -453,10 +479,10 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para listar archivos - CORREGIDA PARA EVITAR ERROR 500
+// Ruta para listar archivos - MEJORADA
 router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
-    // DECODIFICAR y normalizar parámetros (CORRECCIÓN PARA ERROR 500)
+    // DECODIFICAR y normalizar parámetros
     let estado = decodeURIComponent(req.params.estado || 'aguascalientes');
     let tipoDocumento = decodeURIComponent(req.params.tipoDocumento || 'ficha_curricular');
     
@@ -515,7 +541,22 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
       });
       
     } catch (cloudinaryError) {
-      console.error('❌ Error de Cloudinary:', cloudinaryError);
+      console.error('❌ Error de Cloudinary:', {
+        message: cloudinaryError.message,
+        http_code: cloudinaryError.http_code,
+        name: cloudinaryError.name
+      });
+      
+      // Manejar específicamente el error de IP (por si vuelve a pasar)
+      if (cloudinaryError.message.includes('Source IP address') && cloudinaryError.http_code === 401) {
+        return res.status(502).json({
+          status: 'error',
+          error: 'cloudinary_ip_blocked',
+          message: 'Configuración de Cloudinary: La IP del servidor no está permitida',
+          solution: 'Verificar IP allowlist en Cloudinary Dashboard',
+          timestamp: new Date().toISOString()
+        });
+      }
       
       // Si no hay archivos, devolver array vacío en lugar de error 500
       if (cloudinaryError.message.includes('No resources found') || cloudinaryError.http_code === 404) {
@@ -676,17 +717,32 @@ const server = app.listen(PORT, () => {
   console.log(`✅ CORS configurado para los siguientes orígenes:`, allowedOrigins);
 });
 
-// Manejo de cierre
+// Manejo de cierre mejorado
 const shutdown = async (signal) => {
   console.log(`🛑 Recibido ${signal}, cerrando servidor...`);
-  try {
-    await new Promise((resolve) => server.close(resolve));
+  
+  // Evitar nuevas conexiones
+  server.close((err) => {
+    if (err) {
+      console.error('❌ Error al cerrar servidor:', err);
+      process.exit(1);
+    }
+    
     console.log('✅ Servidor cerrado correctamente');
+    
+    // Cerrar recursos (logs, etc)
+    if (process.env.NODE_ENV === 'production') {
+      process.stdout.write(''); // Force flush logs
+    }
+    
     process.exit(0);
-  } catch (err) {
-    console.error('❌ Error al cerrar el servidor:', err);
+  });
+  
+  // Timeout de 10 segundos para shutdown forzado
+  setTimeout(() => {
+    console.log('⚠️ Shutdown forzado después de timeout');
     process.exit(1);
-  }
+  }, 10000);
 };
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
