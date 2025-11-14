@@ -1,11 +1,12 @@
-// load-menu.js - VERSIÓN COMPLETA CON SUBMENÚS
+// load-menu.js - VERSIÓN CORREGIDA
 class MenuLoader {
     static async loadMenu() {
         try {
             console.log('🔄 Iniciando carga del menú...');
             
-            const menuPath = await this.findMenuPath();
-            console.log(`📍 Ruta encontrada: ${menuPath}`);
+            // USAR SIEMPRE LA MISMA RUTA - CORRECCIÓN PRINCIPAL
+            const menuPath = this.getFixedMenuPath();
+            console.log(`📍 Usando ruta fija: ${menuPath}`);
             
             const response = await fetch(menuPath);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -21,35 +22,48 @@ class MenuLoader {
             }, 150);
             
         } catch (error) {
-            console.error('❌ Error crítico:', error);
+            console.error('❌ Error cargando menú:', error);
             this.loadEmergencyMenu();
         }
     }
     
-    static async findMenuPath() {
-        const possiblePaths = [
-            'menu.html',
-            '../menu.html', 
-            '../../menu.html',
-            '../../../menu.html',
-            '/menu.html'
-        ];
+    // NUEVO MÉTODO - RUTA FIJA PARA TODAS LAS PÁGINAS
+    static getFixedMenuPath() {
+        const currentPath = window.location.pathname;
+        console.log('📍 Ruta actual:', currentPath);
         
-        for (const path of possiblePaths) {
-            try {
-                console.log(`🔍 Probando: ${path}`);
-                const response = await fetch(path, { method: 'HEAD' });
-                if (response.ok) {
-                    console.log(`✅ menu.html encontrado en: ${path}`);
-                    return path;
-                }
-            } catch (e) {
-                console.log(`❌ Falló: ${path}`);
-            }
+        // ESTRATEGIA MEJORADA - DETERMINAR NIVELES HACIA LA RAÍZ
+        if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
+            // Ej: /CONTROL_OPERATIVO/estados/aguascalientes/opciones/unidad_canina.html
+            console.log('🎯 Desde opciones estado → ../../../menu.html');
+            return '../../../menu.html';
+        } else if (currentPath.includes('/estados/')) {
+            // Ej: /CONTROL_OPERATIVO/estados/aguascalientes/aguascalientesindex.html
+            console.log('🎯 Desde estado → ../../menu.html');
+            return '../../menu.html';
+        } else if (currentPath.includes('/datos_nacionales/opcionesdatos/')) {
+            // Ej: /CONTROL_OPERATIVO/datos_nacionales/opcionesdatos/plantilla.html
+            console.log('🎯 Desde opciones datos → ../../menu.html');
+            return '../../menu.html';
+        } else if (currentPath.includes('/datos_nacionales/')) {
+            // Ej: /CONTROL_OPERATIVO/datos_nacionales/datosindex.html
+            console.log('🎯 Desde datos nacionales → ../menu.html');
+            return '../menu.html';
+        } else if (currentPath.includes('/gestion/')) {
+            // Ej: /CONTROL_OPERATIVO/gestion/archivos.html
+            console.log('🎯 Desde gestión → ../menu.html');
+            return '../menu.html';
+        } else {
+            // Raíz o casos no especificados
+            console.log('🎯 Desde raíz → menu.html');
+            return 'menu.html';
         }
-        throw new Error('No se pudo cargar menu.html desde ninguna ruta');
     }
     
+    // ELIMINAR EL MÉTODO findMenuPath VIEJO (que causa los errores)
+    // static async findMenuPath() { ... } // ← QUITAR ESTE MÉTODO
+    
+    // ... EL RESTO DE TU CÓDIGO SE MANTIENE IGUAL ...
     static cleanExistingMenu() {
         const elementsToRemove = ['.menu', '.menu-overlay', '.menu-toggle', '.menu-container', 'nav.menu'];
         elementsToRemove.forEach(selector => {
@@ -71,16 +85,16 @@ class MenuLoader {
         
         console.log('✅ Elementos del menú encontrados');
         
-        // 1. CORREGIR RUTAS - VERSIÓN MEJORADA
+        // CORREGIR RUTAS - VERSIÓN MEJORADA
         this.fixMenuLinks();
         
-        // 2. Configurar eventos básicos
+        // Configurar eventos básicos
         this.setupBasicMenuEvents(menuToggle, menu, menuOverlay);
         
-        // 3. Configurar submenús COMPLETOS
+        // Configurar submenús
         this.setupSubmenus();
         
-        // 4. Configurar logout
+        // Configurar logout
         this.setupLogout();
         
         console.log('🎉 Menú completamente configurado y listo');
@@ -116,12 +130,10 @@ class MenuLoader {
     
     static getCorrectedHref(originalHref) {
         const currentPath = window.location.pathname;
-        console.log(`📍 Desde: ${currentPath} | Enlace: ${originalHref}`);
         
         // ESTRATEGIA MEJORADA PARA TODAS LAS RUTAS
         if (currentPath.includes('/opciones/')) {
-            // Estamos en: /estados/aguascalientes/opciones/archivo.html
-            // Necesitamos: ../../../ para llegar a la raíz
+            // Desde: /estados/aguascalientes/opciones/archivo.html
             if (originalHref === 'index.html') return '../../../index.html';
             if (originalHref.startsWith('estados/')) return '../../../' + originalHref;
             if (originalHref.startsWith('datos_nacionales/')) return '../../../' + originalHref;
@@ -129,8 +141,7 @@ class MenuLoader {
             if (originalHref === 'gestion/archivos.html') return '../../../gestion/archivos.html';
             
         } else if (currentPath.includes('/estados/') && !currentPath.includes('/opciones/')) {
-            // Estamos en: /estados/aguascalientes/aguascalientesindex.html  
-            // Necesitamos: ../../ para llegar a la raíz
+            // Desde: /estados/aguascalientes/aguascalientesindex.html  
             if (originalHref === 'index.html') return '../../index.html';
             if (originalHref.startsWith('estados/')) return '../../' + originalHref;
             if (originalHref.startsWith('datos_nacionales/')) return '../../' + originalHref;
@@ -138,8 +149,7 @@ class MenuLoader {
             if (originalHref === 'gestion/archivos.html') return '../../gestion/archivos.html';
             
         } else if (currentPath.includes('/datos_nacionales/opcionesdatos/')) {
-            // Estamos en: /datos_nacionales/opcionesdatos/archivo.html
-            // Necesitamos: ../../ para llegar a la raíz
+            // Desde: /datos_nacionales/opcionesdatos/archivo.html
             if (originalHref === 'index.html') return '../../index.html';
             if (originalHref.startsWith('estados/')) return '../../' + originalHref;
             if (originalHref.startsWith('datos_nacionales/')) return '../../' + originalHref;
@@ -147,8 +157,7 @@ class MenuLoader {
             if (originalHref === 'gestion/archivos.html') return '../../gestion/archivos.html';
             
         } else if (currentPath.includes('/datos_nacionales/')) {
-            // Estamos en: /datos_nacionales/datosindex.html
-            // Necesitamos: ../ para llegar a la raíz
+            // Desde: /datos_nacionales/datosindex.html
             if (originalHref === 'index.html') return '../index.html';
             if (originalHref.startsWith('estados/')) return '../' + originalHref;
             if (originalHref.startsWith('datos_nacionales/')) return '../' + originalHref;
@@ -156,8 +165,7 @@ class MenuLoader {
             if (originalHref === 'gestion/archivos.html') return '../gestion/archivos.html';
             
         } else if (currentPath.includes('/gestion/')) {
-            // Estamos en: /gestion/archivos.html
-            // Necesitamos: ../ para llegar a la raíz
+            // Desde: /gestion/archivos.html
             if (originalHref === 'index.html') return '../index.html';
             if (originalHref.startsWith('estados/')) return '../' + originalHref;
             if (originalHref.startsWith('datos_nacionales/')) return '../' + originalHref;
@@ -165,12 +173,11 @@ class MenuLoader {
             if (originalHref === 'gestion/archivos.html') return 'archivos.html';
         }
         
-        // Para la raíz o casos no cubiertos, mantener original
         return originalHref;
     }
     
+    // ... EL RESTO DE TUS MÉTODOS SE MANTIENEN IGUAL ...
     static setupBasicMenuEvents(menuToggle, menu, menuOverlay) {
-        // Toggle del menú principal
         menuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             menu.classList.toggle('active');
@@ -178,19 +185,16 @@ class MenuLoader {
             console.log('🎯 Menú ' + (menu.classList.contains('active') ? 'abierto' : 'cerrado'));
         });
         
-        // Cerrar con overlay
         if (menuOverlay) {
             menuOverlay.addEventListener('click', () => {
                 this.closeMenu();
             });
         }
         
-        // Cerrar con ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.closeMenu();
         });
         
-        // Cerrar menú al hacer clic en un enlace (mobile)
         document.querySelectorAll('.menu a').forEach(link => {
             link.addEventListener('click', () => {
                 this.closeMenu();
@@ -203,7 +207,6 @@ class MenuLoader {
         console.log(`🎯 Configurando ${submenuToggles.length} submenús`);
         
         submenuToggles.forEach(toggle => {
-            // Remover event listeners anteriores
             const newToggle = toggle.cloneNode(true);
             toggle.parentNode.replaceChild(newToggle, toggle);
             
@@ -214,10 +217,8 @@ class MenuLoader {
                 const submenu = newToggle.parentElement;
                 const isActive = submenu.classList.contains('active');
                 
-                // Cerrar todos los submenús primero
                 this.closeAllSubmenus();
                 
-                // Abrir el submenú actual si no estaba activo
                 if (!isActive) {
                     submenu.classList.add('active');
                     console.log('📂 Submenú abierto:', newToggle.textContent);
@@ -225,14 +226,12 @@ class MenuLoader {
             });
         });
         
-        // Cerrar submenús al hacer clic fuera
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.submenu')) {
                 this.closeAllSubmenus();
             }
         });
         
-        // Cerrar submenús al presionar ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeAllSubmenus();
@@ -245,7 +244,6 @@ class MenuLoader {
         console.log(`🔍 Encontrados ${logoutLinks.length} enlaces de logout`);
         
         logoutLinks.forEach(link => {
-            // Remover event listeners anteriores
             const newLink = link.cloneNode(true);
             link.parentNode.replaceChild(newLink, link);
             
@@ -260,7 +258,6 @@ class MenuLoader {
                     if (typeof window.logout === 'function') {
                         window.logout();
                     } else {
-                        // Fallback
                         if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
                             localStorage.removeItem('authenticated');
                             localStorage.removeItem('loginTime');
@@ -318,7 +315,7 @@ class MenuLoader {
 }
 
 // Inicialización
-console.log('🚀 load-menu.js cargado - Sistema de menú global');
+console.log('🚀 load-menu.js CORREGIDO - Sistema de menú global');
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         MenuLoader.loadMenu();
@@ -327,7 +324,7 @@ if (document.readyState === 'loading') {
     MenuLoader.loadMenu();
 }
 
-// Función global para compatibilidad
+// Funciones globales
 window.toggleMenu = function() {
     const menu = document.querySelector('.menu');
     if (menu) {
@@ -337,7 +334,6 @@ window.toggleMenu = function() {
     }
 };
 
-// Función global para cerrar menú
 window.closeMenu = function() {
     MenuLoader.closeMenu();
 };
