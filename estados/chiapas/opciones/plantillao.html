@@ -25,6 +25,29 @@
             z-index: 1000;
         }
 
+        /* 🔵 Estilos para selector de plantillas */
+        .selector-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .selector-btn {
+            padding: 10px 14px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #dcdcdc;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .selector-btn.activo {
+            background-color: #004a94;
+            color: white;
+            transform: scale(1.05);
+        }
+
         @media (max-width: 768px) {
             #fecha-subida {
                 font-size: 10px;
@@ -38,13 +61,18 @@
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
     </div>
-    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
     <!-- Contenedor para el título personalizado -->
     <div id="tituloContainer" class="titulo-personalizado">
         Cargando título...
     </div>
-    
+
+    <!-- 🔵 SELECTOR DE PLANTILLAS -->
+    <div class="selector-container">
+        <button id="btn-personal" class="selector-btn activo">Plantilla Base</button>
+        <button id="btn-eventual" class="selector-btn">Plantilla Eventual</button>
+    </div>
+
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
@@ -78,7 +106,9 @@
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
         const ESTADO_FIJO = 'chiapas';
-        const TIPO_DOCUMENTO = 'plantilla_personal';
+
+        // 🔵 Tipo de documento dinámico
+        let tipoDocumentoActual = 'plantilla_personal'; 
 
         // Detectar iOS
         function isIOS() {
@@ -91,8 +121,7 @@
             const tituloContainer = document.getElementById('tituloContainer');
 
             try {
-                // 1. Obtener el archivo más reciente con título
-                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/plantilla_personal`, {
                     headers: { 'x-api-key': API_KEY }
                 });
 
@@ -110,7 +139,6 @@
                     }
                 }
 
-                // 2. Obtener desde endpoint de títulos
                 const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
                     headers: { 'x-api-key': API_KEY }
                 });
@@ -123,12 +151,11 @@
                     }
                 }
 
-                // 3. Título por defecto
-                tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+                tituloContainer.textContent = 'Plantilla de Personal - Chiapas';
 
             } catch (error) {
                 console.error('Error:', error);
-                tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
+                tituloContainer.textContent = 'Plantilla de Personal - Chiapas';
                 tituloContainer.style.color = 'red';
             }
         }
@@ -152,34 +179,31 @@
             }
         }
 
-        // Ocultar errores
         function hideErrors() {
             document.getElementById('pdf-error').style.display = 'none';
             document.getElementById('mobile-error').style.display = 'none';
         }
 
-        // Formatear fecha legible
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
             return new Date(dateString).toLocaleDateString('es-MX', options);
         }
 
-        // Cargar PDF de Plantilla de Personal de Aguascalientes
+        // 🔵 Cargar Plantilla (según el tipo seleccionado)
         async function loadPlantillaPersonal() {
             showLoading(true);
             hideErrors();
             const fechaElement = document.getElementById('fecha-texto');
 
             try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
+                const response = await fetch(
+                    `${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumentoActual}`,
+                    { headers: { 'x-api-key': API_KEY } }
+                );
 
                 if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
                 const result = await response.json();
-                console.log('Respuesta API:', result);
 
                 if (!result?.data) throw new Error('Formato de respuesta inválido');
 
@@ -191,17 +215,14 @@
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
 
-                    // Mostrar fecha de actualización
                     fechaElement.textContent = formatDate(latestPDF.uploaded_at);
-                    
-                    // Configuración normal para PC
+
                     pdfViewer.src = latestPDF.url;
                     
-                    // Configuración para móviles
                     if (!isIOS()) {
                         mobileContainer.innerHTML = `
                             <div class="file-info">
-                                <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
+                                <h3>${latestPDF.filename || 'Documento'}</h3>
                                 <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
                                 <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
                                 <a href="${latestPDF.url}" class="download-btn" download>
@@ -211,7 +232,7 @@
                         `;
                     }
                 } else {
-                    showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
+                    showError(`No se encontraron documentos para ${tipoDocumentoActual}`, 'both');
                     fechaElement.textContent = 'No disponible';
                 }
             } catch (error) {
@@ -223,12 +244,29 @@
             }
         }
 
+        // 🔵 Activar botón visualmente
+        function activarBoton(id) {
+            document.querySelectorAll(".selector-btn").forEach(btn => btn.classList.remove("activo"));
+            document.getElementById(id).classList.add("activo");
+        }
+
+        // 🔵 Eventos para los botones
+        document.getElementById("btn-personal").addEventListener("click", () => {
+            tipoDocumentoActual = "plantilla_personal";
+            activarBoton("btn-personal");
+            loadPlantillaPersonal();
+        });
+
+        document.getElementById("btn-eventual").addEventListener("click", () => {
+            tipoDocumentoActual = "plantilla_eventual";
+            activarBoton("btn-eventual");
+            loadPlantillaPersonal();
+        });
+
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             cargarTituloPersonalizado();
-            if (document.getElementById('pdf-viewer')) {
-                loadPlantillaPersonal();
-            }
+            loadPlantillaPersonal();
         });
     </script>
 </body>
