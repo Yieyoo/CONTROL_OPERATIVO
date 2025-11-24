@@ -25,41 +25,67 @@
             z-index: 1000;
         }
 
+        /* Estilos para el botón de cambio de plantilla */
+        .selector-plantilla {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-plantilla {
+            padding: 12px 24px;
+            background-color: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+        
+        .btn-plantilla:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        .btn-plantilla.activo {
+            background-color: #2c5aa0;
+            color: white;
+            border-color: #1e3d6f;
+        }
+
+        .file-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #691932;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             #fecha-subida {
                 font-size: 10px;
                 padding: 3px 6px;
             }
-        }
-
-        /* Estilos para el botón de alternar */
-        .toggle-container {
-            text-align: center;
-            margin: 15px 0;
-        }
-        
-        .toggle-btn {
-            background-color: #1a5276;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-        
-        .toggle-btn:hover {
-            background-color: #154360;
-        }
-        
-        .toggle-btn.active {
-            background-color: #2e86c1;
-            font-weight: bold;
-        }
-        
-        .toggle-btn:not(:last-child) {
-            margin-right: 10px;
+            
+            .btn-plantilla {
+                min-width: 140px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -75,13 +101,13 @@
         Cargando título...
     </div>
     
-    <!-- Botones para alternar entre tipos de documento -->
-    <div class="toggle-container">
-        <button id="btnPlantillaPersonal" class="toggle-btn active" onclick="cambiarTipoDocumento('plantilla_personal')">
-            Plantilla de Personal
+    <!-- Selector de tipo de plantilla -->
+    <div class="selector-plantilla">
+        <button id="btn-plantilla-actual" class="btn-plantilla activo">
+            PLANTILLA ESTRUCTURA
         </button>
-        <button id="btnPlantillaEventual" class="toggle-btn" onclick="cambiarTipoDocumento('plantilla_eventual')">
-            Plantilla Eventual
+        <button id="btn-plantilla-eventual" class="btn-plantilla">
+            PLANTILLA EVENTUAL
         </button>
     </div>
     
@@ -119,8 +145,17 @@
         const API_KEY = 'Xhy2md57';
         const ESTADO_FIJO = 'chiapas';
         
-        // Variable global para el tipo de documento actual
-        let tipoDocumentoActual = 'plantilla_personal';
+        // Configuración para tipos de plantilla
+        const TIPO_DOCUMENTO = 'plantilla_personal';           // Plantilla Estructural
+        const TIPO_DOCUMENTO_EVENTUAL = 'plantilla_eventual'; // Plantilla Eventual
+        
+        // Títulos para cada tipo
+        const TITULO_ESTRUCTURAL = 'PLANTILLA ESTRUCTURA - CHIAPAS';
+        const TITULO_EVENTUAL = 'PLANTILLA EVENTUAL - CHIAPAS';
+
+        // Variables para controlar el estado
+        let tipoDocumentoActual = TIPO_DOCUMENTO;
+        let documentoUrl = '';
 
         // Detectar iOS
         function isIOS() {
@@ -128,28 +163,19 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        // Función para cambiar entre tipos de documento
-        function cambiarTipoDocumento(nuevoTipo) {
-            // Actualizar estado de botones
-            document.getElementById('btnPlantillaPersonal').classList.remove('active');
-            document.getElementById('btnPlantillaEventual').classList.remove('active');
-            document.getElementById(`btn${nuevoTipo === 'plantilla_personal' ? 'PlantillaPersonal' : 'PlantillaEventual'}`).classList.add('active');
-            
-            // Actualizar tipo de documento
-            tipoDocumentoActual = nuevoTipo;
-            
-            // Recargar el documento
-            cargarTituloPersonalizado();
-            loadDocumento();
-        }
-
         // Función para obtener y cargar el título personalizado
-        async function cargarTituloPersonalizado() {
+        async function cargarTituloPersonalizado(tipoDocumento = TIPO_DOCUMENTO) {
             const tituloContainer = document.getElementById('tituloContainer');
+            
+            // Título por defecto según el tipo
+            let tituloPorDefecto = TITULO_ESTRUCTURAL;
+            if (tipoDocumento === TIPO_DOCUMENTO_EVENTUAL) {
+                tituloPorDefecto = TITULO_EVENTUAL;
+            }
 
             try {
                 // 1. Obtener el archivo más reciente con título
-                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumentoActual}`, {
+                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumento}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
 
@@ -180,19 +206,31 @@
                     }
                 }
 
-                // 3. Título por defecto basado en el tipo de documento
-                const tituloPorDefecto = tipoDocumentoActual === 'plantilla_personal' 
-                    ? 'Plantilla de Personal - Aguascalientes' 
-                    : 'Plantilla Eventual - Aguascalientes';
+                // 3. Título por defecto
                 tituloContainer.textContent = tituloPorDefecto;
 
             } catch (error) {
                 console.error('Error:', error);
-                const tituloPorDefecto = tipoDocumentoActual === 'plantilla_personal' 
-                    ? 'Plantilla de Personal - Aguascalientes' 
-                    : 'Plantilla Eventual - Aguascalientes';
                 tituloContainer.textContent = tituloPorDefecto;
                 tituloContainer.style.color = 'red';
+            }
+        }
+
+        // Actualizar botones activos
+        function actualizarBotonesActivos(tipoSeleccionado) {
+            // Remover clase activo de todos los botones
+            document.querySelectorAll('.btn-plantilla').forEach(btn => {
+                btn.classList.remove('activo');
+            });
+            
+            // Agregar clase activo al botón seleccionado
+            const btnActual = document.getElementById('btn-plantilla-actual');
+            const btnEventual = document.getElementById('btn-plantilla-eventual');
+            
+            if (tipoSeleccionado === TIPO_DOCUMENTO && btnActual) {
+                btnActual.classList.add('activo');
+            } else if (tipoSeleccionado === TIPO_DOCUMENTO_EVENTUAL && btnEventual) {
+                btnEventual.classList.add('activo');
             }
         }
 
@@ -227,15 +265,24 @@
             return new Date(dateString).toLocaleDateString('es-MX', options);
         }
 
-        // Cargar documento según el tipo seleccionado
-        async function loadDocumento() {
+        // Cargar PDF de Plantilla (Estructural o Eventual)
+        async function cargarDocumentoPDF(tipoDocumento = TIPO_DOCUMENTO) {
             showLoading(true);
             hideErrors();
             const fechaElement = document.getElementById('fecha-texto');
 
+            // Actualizar tipo de documento actual
+            tipoDocumentoActual = tipoDocumento;
+
+            // Actualizar botones activos
+            actualizarBotonesActivos(tipoDocumento);
+
+            // Actualizar título
+            await cargarTituloPersonalizado(tipoDocumento);
+
             try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}/${tipoDocumentoActual}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumentoActual}`, {
+                console.log(`Consultando API para: ${ESTADO_FIJO}/${tipoDocumento}`);
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumento}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
 
@@ -254,6 +301,9 @@
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
 
+                    // Guardar URL para descarga
+                    documentoUrl = latestPDF.url;
+
                     // Mostrar fecha de actualización
                     fechaElement.textContent = formatDate(latestPDF.uploaded_at);
                     
@@ -262,13 +312,9 @@
                     
                     // Configuración para móviles
                     if (!isIOS()) {
-                        const nombreDocumento = tipoDocumentoActual === 'plantilla_personal' 
-                            ? 'Plantilla de Personal' 
-                            : 'Plantilla Eventual';
-                            
                         mobileContainer.innerHTML = `
                             <div class="file-info">
-                                <h3>${latestPDF.filename || nombreDocumento}</h3>
+                                <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
                                 <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
                                 <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
                                 <a href="${latestPDF.url}" class="download-btn" download>
@@ -278,16 +324,28 @@
                         `;
                     }
                 } else {
-                    const mensajeError = tipoDocumentoActual === 'plantilla_personal'
-                        ? 'No se encontraron documentos de plantilla de personal para Aguascalientes'
-                        : 'No se encontraron documentos de plantilla eventual para Aguascalientes';
+                    let mensajeError = '';
+                    if (tipoDocumento === TIPO_DOCUMENTO) {
+                        mensajeError = 'No se encontraron documentos de plantilla estructural para Chiapas';
+                    } else {
+                        mensajeError = 'No se encontraron documentos de plantilla eventual para Chiapas';
+                    }
                     showError(mensajeError, 'both');
                     fechaElement.textContent = 'No disponible';
+                    
+                    // Limpiar el visor PDF
+                    pdfViewer.src = '';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError(`Error al cargar el documento: ${error.message}`, 'both');
+                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
                 fechaElement.textContent = 'Error al cargar';
+                
+                // Limpiar el visor PDF en caso de error
+                const pdfViewer = document.getElementById('pdf-viewer');
+                if (pdfViewer) {
+                    pdfViewer.src = '';
+                }
             } finally {
                 showLoading(false);
             }
@@ -295,9 +353,27 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            cargarTituloPersonalizado();
+            // Configurar event listeners para los botones
+            const btnActual = document.getElementById('btn-plantilla-actual');
+            const btnEventual = document.getElementById('btn-plantilla-eventual');
+            
+            if (btnActual) {
+                btnActual.addEventListener('click', function() {
+                    console.log('Cambiando a Plantilla Estructural');
+                    cargarDocumentoPDF(TIPO_DOCUMENTO);
+                });
+            }
+            
+            if (btnEventual) {
+                btnEventual.addEventListener('click', function() {
+                    console.log('Cambiando a Plantilla Eventual');
+                    cargarDocumentoPDF(TIPO_DOCUMENTO_EVENTUAL);
+                });
+            }
+
+            // Cargar el documento inicial (Plantilla Estructural)
             if (document.getElementById('pdf-viewer')) {
-                loadDocumento();
+                cargarDocumentoPDF(TIPO_DOCUMENTO);
             }
         });
     </script>
