@@ -2,224 +2,180 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional - Lcda. Selene Mandujano Figueroa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ficha Curricular</title>
     <link rel="icon" type="image/png" href="../../../imagenes/fichaicon.png">
-    <link rel="stylesheet" href="../../diseños/prueba.css">
+    <link rel="stylesheet" href="../../diseños/generaldoc.css">
+    <script src="../../../auth.js" defer></script>   
+    <script src="../../../load-menu.js" defer></script>
 </head>
-<style>
-    /* Estilos para el contenedor principal */
-    .container {
-        position: relative; /* Necesario para posicionar el logo internamente */
-        padding-top: 20px;
-    }
-    
-    /* Logo dentro del contenedor (arriba-derecha) */
-    .container-logo {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        width: 300px; /* Ajusta según necesidad */
-        z-index: 10;
-    }
-    
-    /* Ajuste para móviles */
-    @media (max-width: 768px) {
-        .container-logo {
-            width: 70px;
-            top: 10px;
-            right: 10px;
-        }
-    }
-</style>
 <body>
-    <header>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <nav class="menu">
-            <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">    
-            <ul>
-                <li><a href="../../../index.html">Inicio</a></li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                    <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="../../../construccion.html">Inmuebles</a></li>
-                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
-                    </ul>
-                </li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../../chiapas/chiapasindex.htmls">Chiapas</a></li>
-                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../nuevo_leon/nuevolindex.html">Nuevo León</a></li>
-                        <li><a href="../oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../../queretaro/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
-    <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
-
-<div class="container">
-    <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
-    <div class="profile-left">
-        <!-- Imagen, nombre y ocupación -->
-        <img src="../../../fotos/titularoax.png" alt="Foto de la Licenciada" class="foto-perfil">
-        <h1>Lcda. Selene Mandujano Figueroa</h1>
-        <p><strong>Titular de la Oficina de Representación del INM en Oaxaca</strong></p>
-
-        <!-- Formación Académica -->
-        <div class="formacion-academica">
-            <h3>Formación Académica</h3>
-            <ul>
-                <li><strong>▴ Licenciatura en Derecho</strong></li>
-            </ul>
-        </div>
-
-        <!-- Información de Contacto -->
-        <div class="contacto">
-            <h3>Información de Contacto</h3>
-            <ul>
-                <li><strong>Teléfono Personal:</strong> 9621822938</li>
-                <li><strong>Teléfono de Trabajo:</strong> 9515020004 Ext. 8490201</li>
-                <li><strong>Email Institucional:</strong> <a href="smandujano@inami.gob.mx">smandujano@inami.gob.mx</a></li>
-            </ul>
-        </div>
-    </div>  
-
-    <div class="profile-right">
-        <!-- Experiencia Laboral -->
-        <div class="experiencia-laboral">
-            <h3>Trayectoria INM</h3>
-            <p><strong>Año de Ingreso al INM:</strong> 2011/2023</p>
-            <p>Cuenta con una trayectoria de 13 años de experiencia en el Instituto Nacional de Migración, ocupando los siguientes puestos:</p>
-            <ul>
-                <li><strong>▴ Oficina de Representación en el Estado de Oaxaca</strong></li>
-                <ul>
-                    <li><strong>16/06/2023 - a la fecha:</strong> Titular de la Oficina de Representación.</li>
-                </ul>
-                <li><strong>▴ Oficina de Representación en el Estado de Chiapas</strong></li>
-                <ul>
-                    <li><strong>16/04/2022 – 16/10/2022:</strong> Sub Representante Federal Zona Sur.</li>
-                    <li><strong>16/10/2021 – 15/04/2022:</strong> Subdirectora de Regulación Migratoria.</li>
-                    <li><strong>12/07/2018 – 15/10/2021:</strong> Sub Representante Local en Boca Lacantún.</li>
-                    <li><strong>16/10/2011 – 11/07/2018:</strong> Agente Federal de Migración "B".</li>
-                </ul>
-            </ul>
-        </div>
-
-        <div style="text-align:center; margin-top: 20px;">
-            <a href="../../../documentacion/fichas_curriculares/oaxacaf/OAXACA-2025.pptx" download class="boton-descarga">Descargar Ficha</a>
-        </div>
+    <div class="header-lineas">
+        <div class="linea-superior"></div>
+        <div class="linea-inferior"></div>
     </div>
-</div>
+    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
-<script>
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const menuOverlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    }
+    <h1 id="titulo-documento" class="titulo-personalizado">Ficha Curricular</h1>       
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+    <div class="logo-container">
+        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
+    </div>
+    
+    <div class="pdf-container">
+        <iframe 
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+            title="Visualizador de PDF"
+        ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
+    </div>
 
-    // Cerrar el menú al hacer clic fuera de él (en el fondo oscuro)
-    const menuOverlay = document.querySelector('.menu-overlay');
-    menuOverlay.addEventListener('click', () => {
-        const menu = document.querySelector('.menu');
-        menu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
+    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
+    <div id="ios-container" class="ios-only">
+        <p>Para visualizar el documento en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" download>
+            <span>Descargar Documento</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para descargar el PDF a tu dispositivo</p>
+    </div>
 
-    // Función para cerrar todos los submenús
-    function closeAllSubmenus() {
-        const submenus = document.querySelectorAll('.submenu.active');
-        submenus.forEach(submenu => {
-            submenu.classList.remove('active');
-        });
-    }
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
+    </div>
 
-    // Función para mostrar/ocultar el submenú
-    function toggleSubmenu(event) {
-        event.preventDefault();
+    <button class="regresar-btn" onclick="window.location.href = '../oaxacaindex.html'">Regresar</button>
 
-        // Cerrar todos los submenús antes de abrir uno nuevo
-        closeAllSubmenus();
+    <script>
+        // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
+        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+        const API_KEY = 'Xhy2md57';
+        const ESTADO = 'oaxaca';
+        const TIPO_DOCUMENTO = 'ficha_curricular';
+        const TITULO_DOCUMENTO = 'Ficha Curricular';
 
-        // Abrir el submenú actual
-        const submenu = event.target.closest('.submenu');
-        submenu.classList.toggle('active');
-    }
+        // Configuración dinámica desde URL (opcional)
+        const params = new URLSearchParams(window.location.search);
+        const estadoFromURL = params.get('estado');
+        const tipoFromURL = params.get('tipo');
+        const tituloFromURL = params.get('titulo');
 
-    // Cerrar el submenú al hacer clic fuera de él
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.submenu')) {
-            closeAllSubmenus();
+        // Valores finales (usa los de URL si existen, sino los definidos arriba)
+        const ESTADO_FIJO = estadoFromURL || ESTADO;
+        const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+        const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+
+        // Detectar iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
-    });
 
-    // Cerrar el submenú al hacer clic en una opción
-    const submenuLinks = document.querySelectorAll('.submenu-list a');
-    submenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeAllSubmenus();
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        // Mostrar mensaje de error
+        function showError(message, target = 'both') {
+            if (target === 'both' || target === 'pdf') {
+                const pdfError = document.getElementById('pdf-error');
+                pdfError.textContent = message;
+                pdfError.style.display = 'block';
+            }
+            if (target === 'both' || target === 'mobile') {
+                const mobileError = document.getElementById('mobile-error');
+                mobileError.textContent = message;
+                mobileError.style.display = 'block';
+            }
+        }
+
+        // Ocultar errores
+        function hideErrors() {
+            document.getElementById('pdf-error').style.display = 'none';
+            document.getElementById('mobile-error').style.display = 'none';
+        }
+
+        // Formatear fecha legible
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-MX', options);
+        }
+
+        // Cargar PDF desde Cloudinary (función genérica)
+        async function cargarDocumentoPDF() {
+            showLoading(true);
+            hideErrors();
+
+            // Actualizar título de la página
+            document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+            document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+
+            try {
+                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+                const result = await response.json();
+                console.log('Respuesta API:', result);
+
+                if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+                const pdfViewer = document.getElementById('pdf-viewer');
+                const mobileContainer = document.querySelector('.mobile-images');
+                const iosLink = document.getElementById('ios-pdf-link');
+
+                if (result.data.length > 0) {
+                    const latestPDF = result.data.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+
+                    // Configuración normal para PC
+                    pdfViewer.src = latestPDF.url;
+                    
+                    // Configuración para móviles (no iOS)
+                    if (!isIOS()) {
+                        mobileContainer.innerHTML = `
+                            <div class="file-info">
+                                <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                                <a href="${latestPDF.url}" class="download-btn" download>
+                                    Descargar Documento
+                                </a>
+                            </div>
+                        `;
+                    }
+                    
+                    // Configuración específica para iOS - Descarga directa
+                    if (isIOS()) {
+                        iosLink.href = latestPDF.url;
+                        iosLink.setAttribute('download', latestPDF.filename || 'unidad_canina.pdf');
+                    }
+                } else {
+                    showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al cargar el documento: ${error.message}`, 'both');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar el documento PDF
+            if (document.getElementById('pdf-viewer')) {
+                cargarDocumentoPDF();
+            }
         });
-    });
-
-    // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-</script>
-
-<!-- Botón al final de tu documento HTML -->
-<button class="regresar-btn">Regresar</button>
-
-<script>
-    // Activar botón de regresar
-    const botonRegresar = document.querySelector('.regresar-btn');
-    if (botonRegresar) {
-        botonRegresar.addEventListener('click', function () {
-            window.history.back();
-        });
-    }
-</script>
-
+    </script>
 </body>
 </html>

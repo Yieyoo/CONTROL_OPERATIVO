@@ -2,175 +2,179 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha Profesional - Lic. Zaira Carrasco Flores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ficha Curricular</title>
     <link rel="icon" type="image/png" href="../../../imagenes/fichaicon.png">
-    <link rel="stylesheet" href="../../diseños/prueba.css">
-    <style>
-        /* Estilos para el contenedor principal */
-        .container {
-            position: relative; /* Necesario para posicionar el logo internamente */
-            padding-top: 20px;
-        }
-        
-        /* Logo dentro del contenedor (arriba-derecha) */
-        .container-logo {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 300px; /* Ajusta según necesidad */
-            z-index: 10;
-        }
-        
-        /* Ajuste para móviles */
-        @media (max-width: 768px) {
-            .container-logo {
-                width: 70px;
-                top: 10px;
-                right: 10px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../../diseños/generaldoc.css">
+    <script src="../../../auth.js" defer></script>   
+    <script src="../../../load-menu.js" defer></script>
 </head>
 <body>
-    <header>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <nav class="menu">
-            <img src="imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
-            <ul>
-                <li><a href="../../../index.html">Inicio</a></li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                    <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                    <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                    <li><a href="../../../construccion.html">Inmuebles</a></li>
-                    <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                    <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
-                    </ul>
-                </li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                         <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../../baja_california/baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../../chiapas/chiapasindex.htmls">Chiapas</a></li>
-                        <li><a href="../chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../nuevo_leon/nuevolindex.html">Nuevo León</a></li>
-                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../../queretaro/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
-    <img src="../../../imagenes/inm logo.png" class="logo-arriba-img" alt="Logo">
+    <div class="header-lineas">
+        <div class="linea-superior"></div>
+        <div class="linea-inferior"></div>
+    </div>
+    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
-    <!-- Contenedor principal con logo integrado -->
-    <div class="container">
-        <!-- Logo posicionado dentro del contenedor -->
-        <img src="../../../imagenes/unnamed.png" alt="Logo" class="container-logo">
-
-        <div class="profile-left">
-            <!-- Imagen, nombre y ocupación -->
-            <img src="../../../fotos/titularchi.png" alt="Foto de zaria carrasco" class="foto-perfil">
-            <h1>Lic. Zaira Carrasco Flores</h1>
-            <p><strong>Titular de la Oficina de Representación del INM en Chihuahua</strong></p>
-
-            <!-- Formación Académica -->
-            <div class="formacion-academica">
-                <h3>Formación Académica</h3>
-                <ul>
-                    <li><strong>▴Licenciatura en Derecho.</strong></li>
-                </ul>
-            </div>
-
-            <!-- Información de Contacto -->
-            <div class="contacto">
-                <h3>Información de Contacto</h3>
-                <ul>
-                    <li><strong>Teléfono Personal:</strong> (626) 106 3228                    </li>
-                    <li><strong>Teléfono de Trabajo:</strong>65 6611 7520 ext.8290200</li>
-                    <li><strong>Email Institucional:</strong> <a href="zcarrasco@inami.gob.mx">zcarrasco@inami.gob.mx</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="profile-right">
-            <!-- Experiencia Laboral -->
-            <div class="experiencia-laboral">
-                
-                <h3>Experiencia Laboral</h3>
-                <p><strong> Año de ingreso al INM:</strong> 2010</p>
-                <p>Cuenta con una trayectoria de 14 años de experiencia en el Instituto Nacional de Migración, ocupando los siguientes cargos:</p>
-                <ul>
-                    <li><strong>▴ Oficina de Representación en el Estado de Chihuahua:</strong>
-                        <ul>
-                            <li>01/02/2025 – a la fecha: Titular de la Oficina de Representación.</li>
-                            <li>01/03/2024 – 31/01/2025: Representante Local en Chihuahua.</li>
-                        </ul>
-                    </li>
-                    <li><strong>▴Encargada de la Subrepresentación Local en Ojinaga:</strong>
-                        <ul>
-                            <li>01/06/2017 – 29/02/2024: Subdirectora de Área.</li>
-                        </ul>
-                    </li>
-                    <li><strong>▴Agente Federal de Migración:</strong>
-                        <ul>
-                            <li>01/10/2010 – 31/05/2017.</li>
-                        </ul>
-                    </li>
-                </ul>
-            <div style="text-align:center; margin-top: 20px;">
-                <a href="../../../documentacion/fichas_curriculares/chihuahuaf/CHIHUAHUA-2025.pptx" download class="boton-descarga">Descargar Ficha</a>
-            </div>
-        </div>
+    <h1 id="titulo-documento" class="titulo-personalizado">Ficha Curricular</h1>       
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+    <div class="logo-container">
+        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
+    </div>
+    
+    <div class="pdf-container">
+        <iframe 
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+            title="Visualizador de PDF"
+        ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <!-- Botón de Regresar -->
-    <button class="regresar-btn">Regresar</button>
+    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
+    <div id="ios-container" class="ios-only">
+        <p>Para visualizar el documento en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" download>
+            <span>Descargar Documento</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para descargar el PDF a tu dispositivo</p>
+    </div>
+
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <button class="regresar-btn" onclick="window.location.href = '../chihuahuaindex.html'">Regresar</button>
 
     <script>
-        function toggleMenu() {
-            const menu = document.querySelector('.menu');
-            menu.classList.toggle('active');
+        // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
+        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+        const API_KEY = 'Xhy2md57';
+        const ESTADO = 'chiapas';
+        const TIPO_DOCUMENTO = 'ficha_curricular';
+        const TITULO_DOCUMENTO = 'Ficha Curricular';
+
+        // Configuración dinámica desde URL (opcional)
+        const params = new URLSearchParams(window.location.search);
+        const estadoFromURL = params.get('estado');
+        const tipoFromURL = params.get('tipo');
+        const tituloFromURL = params.get('titulo');
+
+        // Valores finales (usa los de URL si existen, sino los definidos arriba)
+        const ESTADO_FIJO = estadoFromURL || ESTADO;
+        const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+        const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+
+        // Detectar iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            const submenu = event.target.closest('.submenu');
-            submenu.classList.toggle('active');
+
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
         }
-        document.querySelector('.regresar-btn').addEventListener('click', function() {
-            window.history.back();
+
+        // Mostrar mensaje de error
+        function showError(message, target = 'both') {
+            if (target === 'both' || target === 'pdf') {
+                const pdfError = document.getElementById('pdf-error');
+                pdfError.textContent = message;
+                pdfError.style.display = 'block';
+            }
+            if (target === 'both' || target === 'mobile') {
+                const mobileError = document.getElementById('mobile-error');
+                mobileError.textContent = message;
+                mobileError.style.display = 'block';
+            }
+        }
+
+        // Ocultar errores
+        function hideErrors() {
+            document.getElementById('pdf-error').style.display = 'none';
+            document.getElementById('mobile-error').style.display = 'none';
+        }
+
+        // Formatear fecha legible
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-MX', options);
+        }
+
+        // Cargar PDF desde Cloudinary (función genérica)
+        async function cargarDocumentoPDF() {
+            showLoading(true);
+            hideErrors();
+
+            // Actualizar título de la página
+            document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+            document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+
+            try {
+                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+                const result = await response.json();
+                console.log('Respuesta API:', result);
+
+                if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+                const pdfViewer = document.getElementById('pdf-viewer');
+                const mobileContainer = document.querySelector('.mobile-images');
+                const iosLink = document.getElementById('ios-pdf-link');
+
+                if (result.data.length > 0) {
+                    const latestPDF = result.data.sort((a, b) => 
+                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                    )[0];
+
+                    // Configuración normal para PC
+                    pdfViewer.src = latestPDF.url;
+                    
+                    // Configuración para móviles (no iOS)
+                    if (!isIOS()) {
+                        mobileContainer.innerHTML = `
+                            <div class="file-info">
+                                <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                                <a href="${latestPDF.url}" class="download-btn" download>
+                                    Descargar Documento
+                                </a>
+                            </div>
+                        `;
+                    }
+                    
+                    // Configuración específica para iOS - Descarga directa
+                    if (isIOS()) {
+                        iosLink.href = latestPDF.url;
+                        iosLink.setAttribute('download', latestPDF.filename || 'unidad_canina.pdf');
+                    }
+                } else {
+                    showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Error al cargar el documento: ${error.message}`, 'both');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar el documento PDF
+            if (document.getElementById('pdf-viewer')) {
+                cargarDocumentoPDF();
+            }
         });
     </script>
 </body>
