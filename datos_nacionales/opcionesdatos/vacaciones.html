@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VACACIONES TITULARES</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/mapa.png">
+    <link rel="stylesheet" href="../../estados/diseños/generaldoc.css">
+    
+    <!-- Scripts de autenticación y menú -->
+    <script src="../../auth.js" defer></script>   
+    <script src="../../load-menu.js" defer></script>
+</head>
+
+<body class="mostrar-ubicaciones">
+    <!-- HEADER DE DOS LÍNEAS -->
+    <div class="header-lineas">
+        <div class="linea-superior"></div>
+        <div class="linea-inferior"></div>
+    </div>
+
+    <!-- El menú se insertará automáticamente aquí por load-menu.js -->
+    
+    <h1 id="titulo-documento" class="titulo-personalizado">VACACIONES TITULARES</h1>       
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+    <div class="logo-container">
+        <img src="../../imagenes/inm logo.png" alt="Logo INM">
+    </div>
+    
+    <div class="pdf-container">
+        <iframe 
+            id="pdf-viewer" 
+            class="pdf-embed"
+            frameborder="0"
+            title="Visualizador de PDF"
+        ></iframe>
+        <div id="pdf-error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
+    <div id="ios-container" class="ios-only">
+        <p>Para visualizar el documento en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" download>
+            <span>Descargar Documento</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para descargar el PDF a tu dispositivo</p>
+    </div>
+
+    <div class="mobile-images">
+        <div id="mobile-error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <!-- Botón de regreso -->
+    <button class="regresar-btn" onclick="window.location.href='../datosindex.html'">
+        Regresar
+    </button>
+
+<script>
+    // CONFIGURACIÓN
+    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
+    const API_KEY = 'Xhy2md57';
+    const ESTADO = 'datos-nacionales';
+    const TIPO_DOCUMENTO = 'vacaciones';
+    const TITULO_DOCUMENTO = 'Vacaciones de los Titulares de las ORs';
+
+    // Configuración dinámica desde URL
+    const params = new URLSearchParams(window.location.search);
+    const estadoFromURL = params.get('estado');
+    const tipoFromURL = params.get('tipo');
+    const tituloFromURL = params.get('titulo');
+
+    // Valores finales (usa los de URL si existen, sino los definidos arriba)
+    const ESTADO_FIJO = estadoFromURL || ESTADO;
+    const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
+    const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+
+    // Variables para controlar el estado del documento
+    let documentoUrl = '';
+
+    // Detectar iOS
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    // Mostrar/ocultar loading
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    // Mostrar mensaje de error
+    function showError(message, target = 'both') {
+        if (target === 'both' || target === 'pdf') {
+            const pdfError = document.getElementById('pdf-error');
+            pdfError.textContent = message;
+            pdfError.style.display = 'block';
+        }
+        if (target === 'both' || target === 'mobile') {
+            const mobileError = document.getElementById('mobile-error');
+            mobileError.textContent = message;
+            mobileError.style.display = 'block';
+        }
+    }
+
+    // Ocultar errores
+    function hideErrors() {
+        document.getElementById('pdf-error').style.display = 'none';
+        document.getElementById('mobile-error').style.display = 'none';
+    }
+
+    // Formatear fecha legible
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-MX', options);
+    }
+
+    // Cargar PDF desde Cloudinary
+    async function cargarDocumentoPDF() {
+        showLoading(true);
+        hideErrors();
+
+        // Actualizar título de la página
+        document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
+        document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+
+        try {
+            console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
+            const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                headers: { 'x-api-key': API_KEY }
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+            const result = await response.json();
+            console.log('Respuesta API:', result);
+
+            if (!result?.data) throw new Error('Formato de respuesta inválido');
+
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const iosLink = document.getElementById('ios-pdf-link');
+
+            if (result.data.length > 0) {
+                const latestPDF = result.data.sort((a, b) => 
+                    new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                )[0];
+
+                // Guardar URL para descarga
+                documentoUrl = latestPDF.url;
+
+                // Configuración normal para PC
+                pdfViewer.src = latestPDF.url;
+                
+                // Configuración para móviles (no iOS)
+                if (!isIOS()) {
+                    mobileContainer.innerHTML = `
+                        <div class="file-info">
+                            <h3>${latestPDF.filename || TITULO_FINAL}</h3>
+                            <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
+                            <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
+                            <a href="${latestPDF.url}" class="download-btn" download>
+                                Descargar Documento
+                            </a>
+                        </div>
+                    `;
+                }
+                
+                // Configuración específica para iOS - Descarga directa
+                if (isIOS()) {
+                    iosLink.href = latestPDF.url;
+                    iosLink.setAttribute('download', latestPDF.filename || 'estado_fuerza.pdf');
+                }
+            } else {
+                showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error al cargar el documento: ${error.message}`, 'both');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cargar el documento PDF
+        if (document.getElementById('pdf-viewer')) {
+            cargarDocumentoPDF();
+        }
+
+        // Manejar clic en el enlace de iOS
+        document.getElementById('ios-pdf-link')?.addEventListener('click', function(e) {
+            if (isIOS()) {
+                // Abrir en nueva pestaña sin restricciones
+                window.open(this.href, '_blank');
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+</body>
+</html>

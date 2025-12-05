@@ -88,10 +88,12 @@
             frameborder="0"
             title="Visualizador de PDF"
         ></iframe>
+        <!-- ✅ Elemento de error para PDF agregado -->
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
     <div class="mobile-images">
+        <!-- ✅ Elemento de error para móvil agregado -->
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
@@ -179,9 +181,10 @@
             }
         }
 
+        // ✅ FUNCIÓN CORREGIDA - Usando optional chaining
         function hideErrors() {
-            document.getElementById('pdf-error').style.display = 'none';
-            document.getElementById('mobile-error').style.display = 'none';
+            document.getElementById('pdf-error')?.style.display = 'none';
+            document.getElementById('mobile-error')?.style.display = 'none';
         }
 
         function formatDate(dateString) {
