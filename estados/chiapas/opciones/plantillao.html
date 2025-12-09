@@ -3,58 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - Chiapas</title>
+    <title>PLANTILLA DE PERSONAL - ORS</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
     
     <!-- ✅ SCRIPTS ESENCIALES -->
     <script src="../../../auth.js" defer></script>
     <script src="../../../load-menu.js" defer></script>
-    
-    <style>
-        /* Estilo para la fecha de actualización */
-        #fecha-subida {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 1000;
-        }
 
-        /* 🔵 Estilos para selector de plantillas */
-        .selector-container {
-            text-align: center;
-            margin: 15px 0;
-        }
-
-        .selector-btn {
-            padding: 10px 14px;
-            margin: 5px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background-color: #dcdcdc;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .selector-btn.activo {
-            background-color: #004a94;
-            color: white;
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            #fecha-subida {
-                font-size: 10px;
-                padding: 3px 6px;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="header-lineas">
@@ -67,10 +23,10 @@
         Cargando título...
     </div>
 
-    <!-- 🔵 SELECTOR DE PLANTILLAS -->
+    <!-- 🔵 SELECTOR DE PLANTILLAS MEJORADO -->
     <div class="selector-container">
-        <button id="btn-personal" class="selector-btn activo">Plantilla Base</button>
-        <button id="btn-eventual" class="selector-btn">Plantilla Eventual</button>
+        <button id="btn-personal" class="selector-btn activo">PLANTILLA BASE</button>
+        <button id="btn-eventual" class="selector-btn">PLANTILLA EVENTUAL</button>
     </div>
 
     <div class="loading" id="loading">
@@ -88,12 +44,21 @@
             frameborder="0"
             title="Visualizador de PDF"
         ></iframe>
-        <!-- ✅ Elemento de error para PDF agregado -->
+        <!-- ✅ Elemento de error para PDF -->
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
+    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
+    <div id="ios-container" class="ios-only" style="display: none;">
+        <p>Para visualizar el documento en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="download-btn" download>
+            <span>Descargar Documento</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para descargar el PDF a tu dispositivo</p>
+    </div>
+
     <div class="mobile-images">
-        <!-- ✅ Elemento de error para móvil agregado -->
+        <!-- ✅ Elemento de error para móvil -->
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
@@ -101,16 +66,21 @@
         Actualizado: <span id="fecha-texto">Cargando...</span>
     </div>
 
-    <button class="regresar-btn" onclick="window.location.href = '../chiapasindex.html'">Regresar</button>
+    <button class="regresar-btn" onclick="window.location.href = '../orsindex.html'">Regresar</button>
 
     <script>
-        // Configuración
+        // CONFIGURACIÓN
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
-        const ESTADO_FIJO = 'chiapas';
+        const ESTADO_FIJO = 'ors'; // Cambiado a ORS como solicitaste
 
-        // 🔵 Tipo de documento dinámico
-        let tipoDocumentoActual = 'plantilla_personal'; 
+        // 🔵 Tipos de documento
+        const TIPO_BASE = 'plantilla_personal';
+        const TIPO_EVENTUAL = 'plantilla_eventual';
+        
+        // Tipo de documento actual
+        let tipoDocumentoActual = TIPO_BASE;
+        let documentoUrl = ''; // Para guardar la URL actual
 
         // Detectar iOS
         function isIOS() {
@@ -119,11 +89,11 @@
         }
 
         // Función para obtener y cargar el título personalizado
-        async function cargarTituloPersonalizado() {
+        async function cargarTituloPersonalizado(tipo = TIPO_BASE) {
             const tituloContainer = document.getElementById('tituloContainer');
 
             try {
-                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/plantilla_personal`, {
+                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipo}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
 
@@ -135,30 +105,34 @@
                         )[0];
 
                         if (ultimoArchivo.titulo_documento) {
-                            tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                            // Actualizar título según el tipo
+                            let titulo = ultimoArchivo.titulo_documento;
+                            if (tipo === TIPO_EVENTUAL) {
+                                titulo += ' - EVENTUAL';
+                            }
+                            tituloContainer.textContent = titulo;
+                            document.title = titulo + ' - ORS';
                             return;
                         }
                     }
                 }
 
-                const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-
-                if (tituloResponse.ok) {
-                    const data = await tituloResponse.json();
-                    if (data.titulo) {
-                        tituloContainer.textContent = data.titulo;
-                        return;
-                    }
-                }
-
-                tituloContainer.textContent = 'Plantilla de Personal - Chiapas';
+                // Título por defecto según el tipo
+                let tituloDefault = tipo === TIPO_BASE 
+                    ? 'PLANTILLA BASE - ORS' 
+                    : 'PLANTILLA EVENTUAL - ORS';
+                
+                tituloContainer.textContent = tituloDefault;
+                document.title = tituloDefault;
 
             } catch (error) {
-                console.error('Error:', error);
-                tituloContainer.textContent = 'Plantilla de Personal - Chiapas';
+                console.error('Error cargando título:', error);
+                let tituloError = tipo === TIPO_BASE 
+                    ? 'PLANTILLA BASE - ORS' 
+                    : 'PLANTILLA EVENTUAL - ORS';
+                tituloContainer.textContent = tituloError;
                 tituloContainer.style.color = 'red';
+                document.title = tituloError;
             }
         }
 
@@ -169,34 +143,47 @@
 
         // Mostrar mensaje de error
         function showError(message, target = 'both') {
+            console.error('Error:', message);
+            
             if (target === 'both' || target === 'pdf') {
                 const pdfError = document.getElementById('pdf-error');
-                pdfError.textContent = message;
-                pdfError.style.display = 'block';
+                if (pdfError) {
+                    pdfError.textContent = message;
+                    pdfError.style.display = 'block';
+                }
             }
             if (target === 'both' || target === 'mobile') {
                 const mobileError = document.getElementById('mobile-error');
-                mobileError.textContent = message;
-                mobileError.style.display = 'block';
+                if (mobileError) {
+                    mobileError.textContent = message;
+                    mobileError.style.display = 'block';
+                }
             }
         }
 
-        // ✅ FUNCIÓN CORREGIDA - Usando optional chaining
+        // Ocultar errores
         function hideErrors() {
             document.getElementById('pdf-error')?.style.display = 'none';
             document.getElementById('mobile-error')?.style.display = 'none';
         }
 
+        // Formatear fecha
         function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('es-MX', options);
+            try {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('es-MX', options);
+            } catch (error) {
+                return 'Fecha no disponible';
+            }
         }
 
         // 🔵 Cargar Plantilla (según el tipo seleccionado)
-        async function loadPlantillaPersonal() {
+        async function loadPlantilla() {
             showLoading(true);
             hideErrors();
             const fechaElement = document.getElementById('fecha-texto');
+            const iosContainer = document.getElementById('ios-container');
+            const iosLink = document.getElementById('ios-pdf-link');
 
             try {
                 const response = await fetch(
@@ -218,14 +205,22 @@
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
 
+                    // Guardar URL para descarga
+                    documentoUrl = latestPDF.url;
+
+                    // Actualizar fecha
                     fechaElement.textContent = formatDate(latestPDF.uploaded_at);
 
-                    pdfViewer.src = latestPDF.url;
+                    // Configurar visor PDF
+                    if (pdfViewer) {
+                        pdfViewer.src = latestPDF.url;
+                    }
                     
-                    if (!isIOS()) {
+                    // Configuración para móviles (no iOS)
+                    if (!isIOS() && mobileContainer) {
                         mobileContainer.innerHTML = `
                             <div class="file-info">
-                                <h3>${latestPDF.filename || 'Documento'}</h3>
+                                <h3>${latestPDF.filename || (tipoDocumentoActual === TIPO_BASE ? 'Plantilla Base' : 'Plantilla Eventual')}</h3>
                                 <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
                                 <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
                                 <a href="${latestPDF.url}" class="download-btn" download>
@@ -234,14 +229,50 @@
                             </div>
                         `;
                     }
+                    
+                    // Configuración para iOS
+                    if (isIOS()) {
+                        // Mostrar contenedor iOS
+                        if (iosContainer) {
+                            iosContainer.style.display = 'block';
+                        }
+                        
+                        // Configurar enlace de descarga
+                        if (iosLink) {
+                            iosLink.href = latestPDF.url;
+                            const nombreArchivo = tipoDocumentoActual === TIPO_BASE 
+                                ? 'plantilla_base_ors.pdf' 
+                                : 'plantilla_eventual_ors.pdf';
+                            iosLink.setAttribute('download', latestPDF.filename || nombreArchivo);
+                        }
+                    } else if (iosContainer) {
+                        iosContainer.style.display = 'none';
+                    }
+                    
+                    // Actualizar título
+                    await cargarTituloPersonalizado(tipoDocumentoActual);
+                    
                 } else {
-                    showError(`No se encontraron documentos para ${tipoDocumentoActual}`, 'both');
+                    let mensajeError = tipoDocumentoActual === TIPO_BASE 
+                        ? 'No se encontraron documentos de plantilla base para ORS'
+                        : 'No se encontraron documentos de plantilla eventual para ORS';
+                    
+                    showError(mensajeError, 'both');
                     fechaElement.textContent = 'No disponible';
+                    
+                    // Limpiar visor si no hay documentos
+                    if (pdfViewer) pdfViewer.src = '';
+                    if (iosContainer) iosContainer.style.display = 'none';
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al cargar plantilla:', error);
                 showError(`Error al cargar la plantilla: ${error.message}`, 'both');
                 fechaElement.textContent = 'Error al cargar';
+                
+                // Limpiar visor en caso de error
+                const pdfViewer = document.getElementById('pdf-viewer');
+                if (pdfViewer) pdfViewer.src = '';
+                if (iosContainer) iosContainer.style.display = 'none';
             } finally {
                 showLoading(false);
             }
@@ -255,21 +286,38 @@
 
         // 🔵 Eventos para los botones
         document.getElementById("btn-personal").addEventListener("click", () => {
-            tipoDocumentoActual = "plantilla_personal";
+            tipoDocumentoActual = TIPO_BASE;
             activarBoton("btn-personal");
-            loadPlantillaPersonal();
+            loadPlantilla();
         });
 
         document.getElementById("btn-eventual").addEventListener("click", () => {
-            tipoDocumentoActual = "plantilla_eventual";
+            tipoDocumentoActual = TIPO_EVENTUAL;
             activarBoton("btn-eventual");
-            loadPlantillaPersonal();
+            loadPlantilla();
         });
 
-        // Inicialización
+        // Manejar clic en enlace iOS
         document.addEventListener('DOMContentLoaded', () => {
-            cargarTituloPersonalizado();
-            loadPlantillaPersonal();
+            const iosLink = document.getElementById('ios-pdf-link');
+            if (iosLink) {
+                iosLink.addEventListener('click', function(e) {
+                    if (isIOS() && documentoUrl) {
+                        console.log('Abriendo PDF en iOS');
+                        window.open(documentoUrl, '_blank');
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            // Inicializar
+            loadPlantilla();
+        });
+
+        // Manejar errores globales
+        window.addEventListener('error', (event) => {
+            console.error('Error global:', event.error);
+            showError('Error inesperado en la aplicación', 'both');
         });
     </script>
 </body>
