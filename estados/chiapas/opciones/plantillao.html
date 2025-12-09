@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - Ciudad de México</title>
+    <title>PLANTILLA DE PERSONAL - Chiapas</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
     
@@ -148,13 +148,13 @@
         Actualizado: <span id="fecha-texto">Cargando...</span>
     </div>
 
-    <button class="regresar-btn" onclick="window.location.href = '../cdmxindex.html'">Regresar</button>
+    <button class="regresar-btn" onclick="window.location.href = '../chiapasindex.html'">Regresar</button>
 
     <script>
         // CONFIGURACIÓN
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
-        const ESTADO_FIJO = 'ciudad-de-mexico';
+        const ESTADO_FIJO = 'chiapas';
         
         // 🔵 DEFINIMOS LOS DOS TIPOS DE PLANTILLAS
         const TIPO_BASE = 'plantilla';
@@ -169,11 +169,12 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        // Función para obtener y cargar el título personalizado
+        // Función para obtener y cargar el título personalizado DESDE CLOUDINARY
         async function cargarTituloPersonalizado(tipo = TIPO_BASE) {
             const tituloContainer = document.getElementById('tituloContainer');
 
             try {
+                // 1. Intentar obtener el título desde el archivo más reciente de Cloudinary
                 const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipo}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
@@ -186,19 +187,29 @@
                         )[0];
 
                         if (ultimoArchivo.titulo_documento) {
-                            // Agregar indicador del tipo si es eventual
-                            let titulo = ultimoArchivo.titulo_documento;
-                            if (tipo === TIPO_EVENTUAL) {
-                                titulo += ' - EVENTUAL';
-                            }
-                            tituloContainer.textContent = titulo;
-                            document.title = titulo + ' - Ciudad de México';
+                            // Usar el título del documento desde Cloudinary
+                            tituloContainer.textContent = ultimoArchivo.titulo_documento;
+                            document.title = ultimoArchivo.titulo_documento + ' - Ciudad de México';
                             return;
                         }
                     }
                 }
 
-                // Título por defecto según el tipo
+                // 2. Si no hay título en Cloudinary, intentar obtener desde endpoint global
+                const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+
+                if (tituloResponse.ok) {
+                    const data = await tituloResponse.json();
+                    if (data.titulo) {
+                        tituloContainer.textContent = data.titulo;
+                        document.title = data.titulo + ' - Ciudad de México';
+                        return;
+                    }
+                }
+
+                // 3. Título por defecto según el tipo
                 let tituloDefault = tipo === TIPO_BASE 
                     ? 'PLANTILLA BASE - Ciudad de México' 
                     : 'PLANTILLA EVENTUAL - Ciudad de México';
