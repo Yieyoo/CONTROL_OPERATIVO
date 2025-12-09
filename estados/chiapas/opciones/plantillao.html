@@ -118,6 +118,7 @@
         // Variables para controlar documentos alternativos
         let documentoActual = 'principal'; // 'principal' o 'alternativo'
         let documentosDisponibles = [];
+        let tituloGlobal = ''; // Para almacenar el título global
 
         // Detectar iOS
         function isIOS() {
@@ -125,32 +126,9 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        // Función para obtener y cargar el título personalizado
-        async function cargarTituloPersonalizado() {
-            const tituloContainer = document.getElementById('tituloContainer');
-
+        // Función para obtener el título global desde el backend
+        async function obtenerTituloGlobal() {
             try {
-                // 1. Obtener el archivo más reciente con título
-                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-
-                if (archivosResponse.ok) {
-                    const { data: archivos } = await archivosResponse.json();
-                    if (archivos.length > 0) {
-                        documentosDisponibles = archivos.sort((a, b) => 
-                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                        );
-                        
-                        const ultimoArchivo = documentosDisponibles[0];
-                        if (ultimoArchivo.titulo_documento) {
-                            tituloContainer.textContent = ultimoArchivo.titulo_documento;
-                            return;
-                        }
-                    }
-                }
-
-                // 2. Obtener desde endpoint de títulos
                 const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
                     headers: { 'x-api-key': API_KEY }
                 });
@@ -158,18 +136,34 @@
                 if (tituloResponse.ok) {
                     const data = await tituloResponse.json();
                     if (data.titulo) {
-                        tituloContainer.textContent = data.titulo;
-                        return;
+                        tituloGlobal = data.titulo;
+                        return data.titulo;
                     }
                 }
-
-                // 3. Título por defecto
-                tituloContainer.textContent = 'Plantilla de Personal - Chiapas';
-
             } catch (error) {
-                console.error('Error:', error);
-                tituloContainer.textContent = 'Plantilla de Personal - Chiapas';
-                tituloContainer.style.color = 'red';
+                console.error('Error al obtener título global:', error);
+            }
+            return null;
+        }
+
+        // Función para actualizar el título en la página
+        async function actualizarTituloPagina(tipoDocumento = 'principal') {
+            const tituloContainer = document.getElementById('tituloContainer');
+            
+            // Si tenemos título global, lo usamos como base
+            if (tituloGlobal) {
+                if (tipoDocumento === 'principal') {
+                    tituloContainer.textContent = `${tituloGlobal} - Estructura`;
+                } else {
+                    tituloContainer.textContent = `${tituloGlobal} - Eventual`;
+                }
+            } else {
+                // Si no hay título global, usar títulos por defecto
+                if (tipoDocumento === 'principal') {
+                    tituloContainer.textContent = 'Plantilla de Personal - Chiapas - Estructura';
+                } else {
+                    tituloContainer.textContent = 'Plantilla de Personal - Chiapas - Eventual';
+                }
             }
         }
 
@@ -235,9 +229,14 @@
                         );
                         
                         const documentoAlternativo = documentosAlternativos[0];
-                        cargarDocumento(documentoAlternativo, 'alternativo');
-                        document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Personal';
+                        await cargarDocumento(documentoAlternativo, 'alternativo');
+                        
+                        // Actualizar botón y estado
+                        document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Estructura';
                         documentoActual = 'alternativo';
+                        
+                        // Actualizar título de la página
+                        await actualizarTituloPagina('alternativo');
                     } else {
                         alert('No se encontró la Plantilla Eventual');
                     }
@@ -245,9 +244,14 @@
                     // Volver al documento principal (plantilla_personal)
                     if (documentosDisponibles.length > 0) {
                         const primerDocumento = documentosDisponibles[0];
-                        cargarDocumento(primerDocumento, 'principal');
+                        await cargarDocumento(primerDocumento, 'principal');
+                        
+                        // Actualizar botón y estado
                         document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Eventual';
                         documentoActual = 'principal';
+                        
+                        // Actualizar título de la página
+                        await actualizarTituloPagina('principal');
                     }
                 }
             } catch (error) {
@@ -259,13 +263,12 @@
         }
 
         // Función para cargar un documento específico
-        function cargarDocumento(documento, tipo) {
+        async function cargarDocumento(documento, tipo) {
             const pdfViewer = document.getElementById('pdf-viewer');
             const mobileContainer = document.querySelector('.mobile-images');
             const fechaElement = document.getElementById('fecha-texto');
-            const tituloContainer = document.getElementById('tituloContainer');
             
-            if (!pdfViewer || !fechaElement || !tituloContainer) {
+            if (!pdfViewer || !fechaElement) {
                 console.error('Elementos del DOM no encontrados');
                 return;
             }
@@ -278,10 +281,10 @@
             
             // Configurar para móviles
             if (!isIOS() && mobileContainer) {
-                const tipoTexto = tipo === 'principal' ? 'Plantilla Personal' : 'Plantilla Eventual';
+                const tipoTexto = tipo === 'principal' ? 'Estructura' : 'Eventual';
                 mobileContainer.innerHTML = `
                     <div class="file-info">
-                        <h3>${documento.filename || tipoTexto}</h3>
+                        <h3>${documento.filename || `Plantilla ${tipoTexto}`}</h3>
                         <p>Actualizado: ${formatDate(documento.uploaded_at)}</p>
                         <p>Tamaño: ${(documento.size / (1024*1024)).toFixed(2)} MB</p>
                         <p><em>${tipoTexto}</em></p>
@@ -290,17 +293,6 @@
                         </a>
                     </div>
                 `;
-            }
-            
-            // Actualizar título si está disponible
-            if (documento.titulo_documento) {
-                tituloContainer.textContent = 
-                    `${documento.titulo_documento} ${tipo === 'alternativo' ? '(Eventual)' : '(Personal)'}`;
-            } else {
-                // Título por defecto según el tipo
-                tituloContainer.textContent = tipo === 'principal' 
-                    ? 'Plantilla de Personal - Chiapas' 
-                    : 'Plantilla Eventual - Chiapas';
             }
         }
 
@@ -311,6 +303,10 @@
             const fechaElement = document.getElementById('fecha-texto');
 
             try {
+                // Primero obtener el título global
+                await obtenerTituloGlobal();
+                
+                // Luego cargar el documento principal
                 console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
                 const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
                     headers: { 'x-api-key': API_KEY }
@@ -330,7 +326,10 @@
                     
                     // Cargar el documento principal (más reciente)
                     const primerDocumento = documentosDisponibles[0];
-                    cargarDocumento(primerDocumento, 'principal');
+                    await cargarDocumento(primerDocumento, 'principal');
+                    
+                    // Actualizar título de la página
+                    await actualizarTituloPagina('principal');
                     
                     // Configurar botón de alternar
                     const toggleBtn = document.getElementById('toggle-doc-btn');
@@ -341,6 +340,9 @@
                     
                     const toggleBtn = document.getElementById('toggle-doc-btn');
                     if (toggleBtn) toggleBtn.style.display = 'none';
+                    
+                    // Aún así mostrar título
+                    await actualizarTituloPagina('principal');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -349,6 +351,9 @@
                 
                 const toggleBtn = document.getElementById('toggle-doc-btn');
                 if (toggleBtn) toggleBtn.style.display = 'none';
+                
+                // Mostrar título por defecto en caso de error
+                await actualizarTituloPagina('principal');
             } finally {
                 showLoading(false);
             }
@@ -356,14 +361,13 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            cargarTituloPersonalizado();
-            
             // Configurar evento para el botón de alternar
             const toggleBtn = document.getElementById('toggle-doc-btn');
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', alternarDocumento);
             }
             
+            // Cargar documento principal
             if (document.getElementById('pdf-viewer')) {
                 loadPlantillaPersonal();
             }
