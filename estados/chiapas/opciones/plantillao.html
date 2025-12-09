@@ -118,7 +118,7 @@
         // Variables para controlar documentos alternativos
         let documentoActual = 'principal'; // 'principal' o 'alternativo'
         let documentosDisponibles = [];
-        let tituloGlobal = ''; // Para almacenar el título global
+        let tituloPrincipal = ''; // Almacena el título del documento principal
 
         // Detectar iOS
         function isIOS() {
@@ -126,9 +126,28 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        // Función para obtener el título global desde el backend
-        async function obtenerTituloGlobal() {
+        // Función para obtener el título desde Cloudinary o global
+        async function obtenerTituloDesdeCloudinary(tipoDocumento) {
             try {
+                // Intentar obtener el título del documento específico
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumento}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+
+                if (response.ok) {
+                    const { data: archivos } = await response.json();
+                    if (archivos.length > 0) {
+                        const ultimoArchivo = archivos.sort((a, b) => 
+                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                        )[0];
+                        
+                        if (ultimoArchivo.titulo_documento) {
+                            return ultimoArchivo.titulo_documento;
+                        }
+                    }
+                }
+
+                // Si no tiene título en Cloudinary, intentar obtener título global
                 const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
                     headers: { 'x-api-key': API_KEY }
                 });
@@ -136,33 +155,45 @@
                 if (tituloResponse.ok) {
                     const data = await tituloResponse.json();
                     if (data.titulo) {
-                        tituloGlobal = data.titulo;
                         return data.titulo;
                     }
                 }
             } catch (error) {
-                console.error('Error al obtener título global:', error);
+                console.error('Error al obtener título:', error);
             }
-            return null;
+            
+            // Título por defecto según el tipo de documento
+            return tipoDocumento === 'plantilla_personal' 
+                ? 'Plantilla de Personal - Chiapas' 
+                : 'Plantilla Eventual - Chiapas';
         }
 
         // Función para actualizar el título en la página
         async function actualizarTituloPagina(tipoDocumento = 'principal') {
             const tituloContainer = document.getElementById('tituloContainer');
             
-            // Si tenemos título global, lo usamos como base
-            if (tituloGlobal) {
-                if (tipoDocumento === 'principal') {
-                    tituloContainer.textContent = `${tituloGlobal} - Estructura`;
-                } else {
-                    tituloContainer.textContent = `${tituloGlobal} - Eventual`;
-                }
+            if (tipoDocumento === 'principal') {
+                // Para documento principal: usar su título específico de Cloudinary
+                tituloPrincipal = await obtenerTituloDesdeCloudinary(TIPO_DOCUMENTO);
+                tituloContainer.textContent = tituloPrincipal;
             } else {
-                // Si no hay título global, usar títulos por defecto
-                if (tipoDocumento === 'principal') {
-                    tituloContainer.textContent = 'Plantilla de Personal - Chiapas - Estructura';
+                // Para documento eventual: primero intentar obtener su propio título
+                const tituloEventual = await obtenerTituloDesdeCloudinary(TIPO_DOCUMENTO_ALTERNATIVO);
+                
+                // Verificar si el título eventual es diferente del título por defecto
+                if (tituloEventual !== 'Plantilla Eventual - Chiapas' && 
+                    tituloEventual !== tituloPrincipal) {
+                    // Si tiene su propio título en Cloudinary, usarlo
+                    tituloContainer.textContent = tituloEventual;
                 } else {
-                    tituloContainer.textContent = 'Plantilla de Personal - Chiapas - Eventual';
+                    // Si no tiene título propio, usar el título principal + "Eventual"
+                    // Primero quitamos "Estructura" si existe en el título principal
+                    let tituloBase = tituloPrincipal;
+                    tituloBase = tituloBase.replace(/ - Estructura$/i, '');
+                    tituloBase = tituloBase.replace(/Estructura - /i, '');
+                    tituloBase = tituloBase.replace(/Estructura$/i, '');
+                    
+                    tituloContainer.textContent = `${tituloBase.trim()} - Eventual`;
                 }
             }
         }
@@ -303,10 +334,6 @@
             const fechaElement = document.getElementById('fecha-texto');
 
             try {
-                // Primero obtener el título global
-                await obtenerTituloGlobal();
-                
-                // Luego cargar el documento principal
                 console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
                 const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
                     headers: { 'x-api-key': API_KEY }
