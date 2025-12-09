@@ -25,10 +25,38 @@
             z-index: 1000;
         }
 
+        /* Estilos para el botón de alternar documento */
+        #toggle-doc-btn {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+
+        #toggle-doc-btn:hover {
+            background-color: #34495e;
+        }
+
         @media (max-width: 768px) {
             #fecha-subida {
                 font-size: 10px;
                 padding: 3px 6px;
+            }
+            
+            #toggle-doc-btn {
+                top: 80px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
             }
         }
     </style>
@@ -39,6 +67,9 @@
         <div class="linea-inferior"></div>
     </div>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
+
+    <!-- Botón para alternar documentos -->
+    <button id="toggle-doc-btn">Mostrar documento alternativo</button>
 
     <!-- Contenedor para el título personalizado -->
     <div id="tituloContainer" class="titulo-personalizado">
@@ -74,11 +105,20 @@
     <button class="regresar-btn" onclick="window.location.href = '../chiapasindex.html'">Regresar</button>
 
     <script>
+        // ================================================
+        // ✅ CAMBIO AQUÍ - AGREGA EL NOMBRE DE TU DOCUMENTO ALTERNATIVO
+        // ================================================
         // Configuración
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
         const ESTADO_FIJO = 'chiapas';
-        const TIPO_DOCUMENTO = 'plantilla_personal';
+        const TIPO_DOCUMENTO = 'plantilla_personal'; // Documento principal
+        // ↓↓↓ CAMBIA ESTA VARIABLE CON EL NOMBRE DE TU OTRO DOCUMENTO ↓↓↓
+        const TIPO_DOCUMENTO_ALTERNATIVO = 'plantilla_ne'; // <-- PON AQUÍ EL NOMBRE
+        
+        // Variables para controlar documentos alternativos
+        let documentoActual = 'principal'; // 'principal' o 'alternativo'
+        let documentosDisponibles = [];
 
         // Detectar iOS
         function isIOS() {
@@ -99,10 +139,11 @@
                 if (archivosResponse.ok) {
                     const { data: archivos } = await archivosResponse.json();
                     if (archivos.length > 0) {
-                        const ultimoArchivo = archivos.sort((a, b) => 
+                        documentosDisponibles = archivos.sort((a, b) => 
                             new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                        )[0];
-
+                        );
+                        
+                        const ultimoArchivo = documentosDisponibles[0];
                         if (ultimoArchivo.titulo_documento) {
                             tituloContainer.textContent = ultimoArchivo.titulo_documento;
                             return;
@@ -164,6 +205,89 @@
             return new Date(dateString).toLocaleDateString('es-MX', options);
         }
 
+        // Función para alternar entre documentos
+        async function alternarDocumento() {
+            showLoading(true);
+            hideErrors();
+            
+            try {
+                if (documentoActual === 'principal') {
+                    // ================================================
+                    // ✅ CAMBIO AQUÍ - CARGAR DOCUMENTO ALTERNATIVO
+                    // ================================================
+                    // Cargar documento alternativo desde Cloudinary
+                    console.log(`Consultando documento alternativo: ${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`);
+                    const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`, {
+                        headers: { 'x-api-key': API_KEY }
+                    });
+
+                    if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+                    const result = await response.json();
+                    
+                    if (result?.data && result.data.length > 0) {
+                        const documentosAlternativos = result.data.sort((a, b) => 
+                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                        );
+                        
+                        const documentoAlternativo = documentosAlternativos[0];
+                        cargarDocumento(documentoAlternativo, 'alternativo');
+                        document.getElementById('toggle-doc-btn').textContent = 'Mostrar documento principal';
+                        documentoActual = 'alternativo';
+                    } else {
+                        alert('No se encontró el documento alternativo');
+                    }
+                } else {
+                    // Volver al documento principal
+                    if (documentosDisponibles.length > 0) {
+                        const primerDocumento = documentosDisponibles[0];
+                        cargarDocumento(primerDocumento, 'principal');
+                        document.getElementById('toggle-doc-btn').textContent = 'Mostrar documento alternativo';
+                        documentoActual = 'principal';
+                    }
+                }
+            } catch (error) {
+                console.error('Error al alternar documento:', error);
+                alert(`Error al cargar documento alternativo: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Función para cargar un documento específico
+        function cargarDocumento(documento, tipo) {
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const fechaElement = document.getElementById('fecha-texto');
+            
+            // Actualizar fecha
+            fechaElement.textContent = formatDate(documento.uploaded_at);
+            
+            // Cargar PDF
+            pdfViewer.src = documento.url;
+            
+            // Configurar para móviles
+            if (!isIOS()) {
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${documento.filename || (tipo === 'principal' ? 'Documento Principal' : 'Documento Alternativo')}</h3>
+                        <p>Actualizado: ${formatDate(documento.uploaded_at)}</p>
+                        <p>Tamaño: ${(documento.size / (1024*1024)).toFixed(2)} MB</p>
+                        <p><em>${tipo === 'alternativo' ? 'Documento alternativo' : 'Documento principal'}</em></p>
+                        <a href="${documento.url}" class="download-btn" download>
+                            Descargar Documento
+                        </a>
+                    </div>
+                `;
+            }
+            
+            // Actualizar título si está disponible
+            if (documento.titulo_documento) {
+                document.getElementById('tituloContainer').textContent = 
+                    `${documento.titulo_documento} ${tipo === 'alternativo' ? '(Alternativo)' : ''}`;
+            }
+        }
+
         // Cargar PDF de Plantilla de Personal de Aguascalientes
         async function loadPlantillaPersonal() {
             showLoading(true);
@@ -183,41 +307,27 @@
 
                 if (!result?.data) throw new Error('Formato de respuesta inválido');
 
-                const pdfViewer = document.getElementById('pdf-viewer');
-                const mobileContainer = document.querySelector('.mobile-images');
-
                 if (result.data.length > 0) {
-                    const latestPDF = result.data.sort((a, b) => 
+                    documentosDisponibles = result.data.sort((a, b) => 
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                    )[0];
-
-                    // Mostrar fecha de actualización
-                    fechaElement.textContent = formatDate(latestPDF.uploaded_at);
+                    );
                     
-                    // Configuración normal para PC
-                    pdfViewer.src = latestPDF.url;
+                    // Cargar el documento principal (más reciente)
+                    const primerDocumento = documentosDisponibles[0];
+                    cargarDocumento(primerDocumento, 'principal');
                     
-                    // Configuración para móviles
-                    if (!isIOS()) {
-                        mobileContainer.innerHTML = `
-                            <div class="file-info">
-                                <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
-                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                                <a href="${latestPDF.url}" class="download-btn" download>
-                                    Descargar Documento
-                                </a>
-                            </div>
-                        `;
-                    }
+                    // Configurar botón de alternar (siempre visible ahora)
+                    document.getElementById('toggle-doc-btn').style.display = 'block';
                 } else {
                     showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
                     fechaElement.textContent = 'No disponible';
+                    document.getElementById('toggle-doc-btn').style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error:', error);
                 showError(`Error al cargar la plantilla: ${error.message}`, 'both');
                 fechaElement.textContent = 'Error al cargar';
+                document.getElementById('toggle-doc-btn').style.display = 'none';
             } finally {
                 showLoading(false);
             }
@@ -226,6 +336,10 @@
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             cargarTituloPersonalizado();
+            
+            // Configurar evento para el botón de alternar
+            document.getElementById('toggle-doc-btn').addEventListener('click', alternarDocumento);
+            
             if (document.getElementById('pdf-viewer')) {
                 loadPlantillaPersonal();
             }
