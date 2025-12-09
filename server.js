@@ -1,4 +1,4 @@
-// server.js
+// server.js - VERSIÓN MEJORADA PARA SERVER DE PAGO
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -13,6 +13,7 @@ const zlib = require('zlib');
 const stream = require('stream');
 const pipeline = promisify(stream.pipeline);
 const compression = require('compression');
+const os = require('os');
 require('dotenv').config();
 
 const app = express();
@@ -170,7 +171,7 @@ const validateCloudinaryConfig = () => {
       api_key: process.env.CLOUD_API_KEY,
       api_secret: process.env.CLOUD_API_SECRET,
       secure: true,
-      timeout: 60000, // 60 segundos timeout
+      timeout: 45000, // ⬅️ CAMBIADO: Reducido a 45 segundos (de 60000)
       private_cdn: false,
       secure_distribution: null,
       cdn_subdomain: true,
@@ -178,7 +179,7 @@ const validateCloudinaryConfig = () => {
       sign_url: true,
       api_proxy: process.env.PROXY_URL
     });
-    console.log('✅ Cloudinary configurado correctamente');
+    console.log('✅ Cloudinary configurado correctamente (timeout: 45s)');
     return true;
   } catch (error) {
     console.error('❌ Error configurando Cloudinary:', error);
@@ -213,12 +214,48 @@ const apiLimiter = rateLimit({
   }
 });
 
-// Configuración de Multer para PDFs
-const memoryStorage = multer.memoryStorage();
+// ================================================
+// ⬇️⬇️⬇️ CAMBIOS CRÍTICOS AQUÍ ⬇️⬇️⬇️
+// ================================================
+
+// 1. Crear directorio temporal para archivos
+const tmpDir = path.join(os.tmpdir(), 'pdf-uploads');
+if (!fs.existsSync(tmpDir)) {
+  fs.mkdirSync(tmpDir, { recursive: true });
+  console.log(`📁 Directorio temporal creado: ${tmpDir}`);
+}
+
+// 2. Función de limpieza de archivos temporales
+const cleanupTempFile = async (filePath) => {
+  if (!filePath) return;
+  
+  try {
+    if (fs.existsSync(filePath)) {
+      await fs.promises.unlink(filePath);
+      console.log(`🧹 Archivo temporal eliminado: ${path.basename(filePath)}`);
+    }
+  } catch (error) {
+    console.error('⚠️ Error limpiando archivo temporal:', error.message);
+  }
+};
+
+// 3. Configuración de Multer con DISK STORAGE (NO memory storage)
+const diskStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, tmpDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const safeName = file.originalname.replace(/[^\w.-]/g, '_');
+    cb(null, 'upload-' + uniqueSuffix + '-' + safeName);
+  }
+});
+
+// 4. Configurar Multer (MODIFICADO)
 const pdfUpload = multer({
-  storage: memoryStorage,
+  storage: diskStorage, // ⬅️ IMPORTANTE: Disk storage en lugar de memory
   limits: {
-    fileSize: 15 * 1024 * 1024,
+    fileSize: 20 * 1024 * 1024, // ⬅️ AUMENTADO a 20MB
     files: 1,
     fields: 5
   },
@@ -235,6 +272,10 @@ const pdfUpload = multer({
     cb(new Error('Solo se permiten archivos PDF (extensión .pdf)'), false);
   }
 }).single('file');
+
+// ================================================
+// ⬆️⬆️⬆️ FIN DE CAMBIOS CRÍTICOS ⬆️⬆️⬆️
+// ================================================
 
 // Middleware de autenticación
 const authenticate = (req, res, next) => {
@@ -335,15 +376,21 @@ router.get('/health', async (req, res) => {
   }
 });
 
-// Función para subir archivos
-const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null) => {
-  if (!file) throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
+// Función para subir archivos (MODIFICADA para usar disk storage)
+const processUpload = async (filePath, estado, tipoDocumento, tituloDocumento = null) => {
+  if (!filePath || !fs.existsSync(filePath)) {
+    throw new AppError('Archivo no encontrado en el servidor', 400, 'missing_file');
+  }
   
-  const originalName = path.parse(file.originalname).name.replace(/[^\w- ]/gi, '') + '.pdf';
-  if (!/^[\w- ]+\.pdf$/i.test(originalName)) {
-    throw new AppError('El nombre del archivo contiene caracteres no permitidos', 400, 'invalid_filename');
+  // Verificar tamaño del archivo
+  const stats = fs.statSync(filePath);
+  if (stats.size > 20 * 1024 * 1024) {
+    await cleanupTempFile(filePath);
+    throw new AppError('El archivo excede el límite de 20MB', 400, 'file_too_large');
   }
 
+  const originalName = path.basename(filePath).replace(/^upload-\d+-/, '');
+  
   const uploadOptions = {
     resource_type: 'raw',
     folder: `${estado}/${tipoDocumento}`,
@@ -354,6 +401,8 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
     filename_override: originalName,
     unique_filename: false,
     overwrite: true,
+    timeout: 40000, // ⬅️ Timeout específico de 40 segundos
+    chunk_size: 5 * 1024 * 1024, // Subir en chunks de 5MB
     context: {
       original_filename: originalName,
       uploaded_at: new Date().toISOString(),
@@ -363,56 +412,94 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
         uploaded_by: 'api',
         ...(tituloDocumento && { titulo_documento: tituloDocumento })
       }
-    },
-    responsive_breakpoints: {
-      create_derived: false,
-      bytes_step: 20000,
-      min_width: 200,
-      max_width: 1000,
-      transformation: { crop: 'limit' }
     }
   };
 
   try {
     return await new Promise((resolve, reject) => {
+      const startTime = Date.now();
+      
       const uploadStream = cloudinary.uploader.upload_stream(
         uploadOptions,
-        (error, result) => error ? reject(error) : resolve(result)
+        async (error, result) => {
+          const uploadTime = Date.now() - startTime;
+          console.log(`📤 Upload completado en ${uploadTime}ms para ${originalName}`);
+          
+          // LIMPIAR ARCHIVO TEMPORAL SIEMPRE
+          await cleanupTempFile(filePath);
+          
+          if (error) {
+            console.error('❌ Error Cloudinary:', error.message);
+            reject(new AppError(`Error al subir a Cloudinary: ${error.message}`, 502, 'cloudinary_error'));
+          } else {
+            resolve(result);
+          }
+        }
       );
       
-      pipeline(
-        stream.Readable.from(file.buffer),
-        uploadStream
-      ).catch(reject);
+      // Crear stream de lectura desde el archivo en disco
+      const readStream = fs.createReadStream(filePath);
+      
+      readStream.on('error', async (error) => {
+        await cleanupTempFile(filePath);
+        reject(new AppError(`Error leyendo archivo: ${error.message}`, 500, 'read_error'));
+      });
+      
+      readStream.on('end', () => {
+        console.log(`📖 Lectura completa del archivo: ${originalName}`);
+      });
+      
+      // Conectar los streams
+      readStream.pipe(uploadStream);
+      
+      // Timeout de seguridad
+      setTimeout(async () => {
+        if (!readStream.closed) {
+          readStream.destroy();
+          await cleanupTempFile(filePath);
+          reject(new AppError('Timeout en la subida (40 segundos)', 504, 'upload_timeout'));
+        }
+      }, 40000);
     });
   } catch (error) {
-    throw new AppError(`Error al subir a Cloudinary: ${error.message}`, 502, 'cloudinary_error');
+    // Asegurar limpieza en caso de error
+    await cleanupTempFile(filePath);
+    throw error;
   }
 };
 
-// Ruta para subir archivos
+// Ruta para subir archivos (MODIFICADA)
 router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
+    let tempFilePath = null;
+    
     try {
       if (err) {
         if (err.code === 'LIMIT_FILE_SIZE') {
-          throw new AppError('El archivo excede el límite de 15MB', 413, 'file_too_large');
+          throw new AppError('El archivo excede el límite de 20MB', 413, 'file_too_large');
         }
         throw new AppError(err.message, 400, 'upload_error');
       }
 
+      if (!req.file) {
+        throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
+      }
+
+      tempFilePath = req.file.path;
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
       const tituloDocumento = req.body.titulo_documento || null;
       
-      const result = await processUpload(req.file, estado, tipoDocumento, tituloDocumento);
+      console.log(`📤 Procesando upload: ${req.file.originalname} (${req.file.size} bytes)`);
+      
+      const result = await processUpload(tempFilePath, estado, tipoDocumento, tituloDocumento);
 
       res.status(201).json({
         status: 'success',
         data: {
           url: result.secure_url,
           public_id: result.public_id,
-          filename: result.original_filename,
+          filename: path.parse(req.file.originalname).name + '.pdf',
           estado: estado,
           tipo_documento: tipoDocumento,
           view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
@@ -426,12 +513,16 @@ router.post('/upload', authenticate, (req, res, next) => {
         }
       });
     } catch (error) {
+      // Asegurar limpieza en caso de error
+      if (tempFilePath) {
+        await cleanupTempFile(tempFilePath);
+      }
       next(error);
     }
   });
 });
 
-// Ruta para eliminar archivos
+// Ruta para eliminar archivos (SIN CAMBIOS)
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
     const { public_id, estado, tipo_documento } = req.body;
@@ -479,7 +570,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
   }
 });
 
-// Ruta para listar archivos - MEJORADA
+// Ruta para listar archivos - SIN CAMBIOS
 router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
     // DECODIFICAR y normalizar parámetros
@@ -714,12 +805,25 @@ app.use(handleError);
 const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`🌍 Modo: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📁 Directorio temporal: ${tmpDir}`);
   console.log(`✅ CORS configurado para los siguientes orígenes:`, allowedOrigins);
+  console.log(`⚡ Configuración optimizada para server de pago`);
 });
 
 // Manejo de cierre mejorado
 const shutdown = async (signal) => {
   console.log(`🛑 Recibido ${signal}, cerrando servidor...`);
+  
+  // Limpiar archivos temporales antes de cerrar
+  try {
+    const files = await fs.promises.readdir(tmpDir);
+    for (const file of files) {
+      await fs.promises.unlink(path.join(tmpDir, file));
+    }
+    console.log(`🧹 ${files.length} archivos temporales limpiados`);
+  } catch (cleanupError) {
+    console.error('Error limpiando archivos temporales:', cleanupError);
+  }
   
   // Evitar nuevas conexiones
   server.close((err) => {
