@@ -118,7 +118,7 @@
         // Variables para controlar documentos alternativos
         let documentoActual = 'principal'; // 'principal' o 'alternativo'
         let documentosDisponibles = [];
-        let tituloPrincipal = ''; // Almacena el título del documento principal
+        let tituloPrincipalCompleto = ''; // Almacena el título completo del documento principal
 
         // Detectar iOS
         function isIOS() {
@@ -126,11 +126,10 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
-        // Función para obtener el título desde Cloudinary o global
-        async function obtenerTituloDesdeCloudinary(tipoDocumento) {
+        // Función para obtener el título del documento principal desde Cloudinary
+        async function obtenerTituloPrincipal() {
             try {
-                // Intentar obtener el título del documento específico
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumento}`, {
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
 
@@ -146,55 +145,36 @@
                         }
                     }
                 }
-
-                // Si no tiene título en Cloudinary, intentar obtener título global
-                const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
-
-                if (tituloResponse.ok) {
-                    const data = await tituloResponse.json();
-                    if (data.titulo) {
-                        return data.titulo;
-                    }
-                }
             } catch (error) {
-                console.error('Error al obtener título:', error);
+                console.error('Error al obtener título principal:', error);
             }
             
-            // Título por defecto según el tipo de documento
-            return tipoDocumento === 'plantilla_personal' 
-                ? 'Plantilla de Personal - Chiapas' 
-                : 'Plantilla Eventual - Chiapas';
+            // Título por defecto
+            return 'Plantilla de Personal - Chiapas - Estructura';
         }
 
         // Función para actualizar el título en la página
-        async function actualizarTituloPagina(tipoDocumento = 'principal') {
+        function actualizarTituloPagina(tipoDocumento = 'principal') {
             const tituloContainer = document.getElementById('tituloContainer');
             
+            if (!tituloPrincipalCompleto) return;
+            
             if (tipoDocumento === 'principal') {
-                // Para documento principal: usar su título específico de Cloudinary
-                tituloPrincipal = await obtenerTituloDesdeCloudinary(TIPO_DOCUMENTO);
-                tituloContainer.textContent = tituloPrincipal;
+                // Mostrar el título principal exacto
+                tituloContainer.textContent = tituloPrincipalCompleto;
             } else {
-                // Para documento eventual: primero intentar obtener su propio título
-                const tituloEventual = await obtenerTituloDesdeCloudinary(TIPO_DOCUMENTO_ALTERNATIVO);
+                // Crear título eventual: reemplazar "Estructura" por "Eventual"
+                let tituloEventual = tituloPrincipalCompleto
+                    .replace(/Estructura/i, 'Eventual')  // Primero reemplazar cualquier "Estructura"
+                    .replace(/ - Estructura$/i, ' - Eventual')  // Luego específicamente al final
+                    .replace(/Estructura - /i, 'Eventual - ');  // O al principio
                 
-                // Verificar si el título eventual es diferente del título por defecto
-                if (tituloEventual !== 'Plantilla Eventual - Chiapas' && 
-                    tituloEventual !== tituloPrincipal) {
-                    // Si tiene su propio título en Cloudinary, usarlo
-                    tituloContainer.textContent = tituloEventual;
-                } else {
-                    // Si no tiene título propio, usar el título principal + "Eventual"
-                    // Primero quitamos "Estructura" si existe en el título principal
-                    let tituloBase = tituloPrincipal;
-                    tituloBase = tituloBase.replace(/ - Estructura$/i, '');
-                    tituloBase = tituloBase.replace(/Estructura - /i, '');
-                    tituloBase = tituloBase.replace(/Estructura$/i, '');
-                    
-                    tituloContainer.textContent = `${tituloBase.trim()} - Eventual`;
+                // Si no se encontró "Estructura", agregar " - Eventual" al final
+                if (tituloEventual === tituloPrincipalCompleto) {
+                    tituloEventual = tituloPrincipalCompleto.replace(/( - )?$/, ' - Eventual');
                 }
+                
+                tituloContainer.textContent = tituloEventual;
             }
         }
 
@@ -260,14 +240,14 @@
                         );
                         
                         const documentoAlternativo = documentosAlternativos[0];
-                        await cargarDocumento(documentoAlternativo, 'alternativo');
+                        cargarDocumento(documentoAlternativo, 'alternativo');
                         
                         // Actualizar botón y estado
                         document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Estructura';
                         documentoActual = 'alternativo';
                         
                         // Actualizar título de la página
-                        await actualizarTituloPagina('alternativo');
+                        actualizarTituloPagina('alternativo');
                     } else {
                         alert('No se encontró la Plantilla Eventual');
                     }
@@ -275,14 +255,14 @@
                     // Volver al documento principal (plantilla_personal)
                     if (documentosDisponibles.length > 0) {
                         const primerDocumento = documentosDisponibles[0];
-                        await cargarDocumento(primerDocumento, 'principal');
+                        cargarDocumento(primerDocumento, 'principal');
                         
                         // Actualizar botón y estado
                         document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Eventual';
                         documentoActual = 'principal';
                         
                         // Actualizar título de la página
-                        await actualizarTituloPagina('principal');
+                        actualizarTituloPagina('principal');
                     }
                 }
             } catch (error) {
@@ -294,7 +274,7 @@
         }
 
         // Función para cargar un documento específico
-        async function cargarDocumento(documento, tipo) {
+        function cargarDocumento(documento, tipo) {
             const pdfViewer = document.getElementById('pdf-viewer');
             const mobileContainer = document.querySelector('.mobile-images');
             const fechaElement = document.getElementById('fecha-texto');
@@ -353,10 +333,13 @@
                     
                     // Cargar el documento principal (más reciente)
                     const primerDocumento = documentosDisponibles[0];
-                    await cargarDocumento(primerDocumento, 'principal');
+                    cargarDocumento(primerDocumento, 'principal');
+                    
+                    // Obtener y guardar el título principal
+                    tituloPrincipalCompleto = await obtenerTituloPrincipal();
                     
                     // Actualizar título de la página
-                    await actualizarTituloPagina('principal');
+                    actualizarTituloPagina('principal');
                     
                     // Configurar botón de alternar
                     const toggleBtn = document.getElementById('toggle-doc-btn');
@@ -368,8 +351,9 @@
                     const toggleBtn = document.getElementById('toggle-doc-btn');
                     if (toggleBtn) toggleBtn.style.display = 'none';
                     
-                    // Aún así mostrar título
-                    await actualizarTituloPagina('principal');
+                    // Aún así mostrar título por defecto
+                    tituloPrincipalCompleto = 'Plantilla de Personal - Chiapas - Estructura';
+                    actualizarTituloPagina('principal');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -380,7 +364,8 @@
                 if (toggleBtn) toggleBtn.style.display = 'none';
                 
                 // Mostrar título por defecto en caso de error
-                await actualizarTituloPagina('principal');
+                tituloPrincipalCompleto = 'Plantilla de Personal - Chiapas - Estructura';
+                actualizarTituloPagina('principal');
             } finally {
                 showLoading(false);
             }
