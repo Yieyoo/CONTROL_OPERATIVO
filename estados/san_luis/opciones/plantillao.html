@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - San Luis Potosí</title>
+    <title>PLANTILLA DE PERSONAL - San Luis Potosi</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
     
@@ -44,8 +44,8 @@
 
         #toggle-doc-btn:hover {
             background-color: #34495e;
-        }
 
+        }
         @media (max-width: 768px) {
             #fecha-subida {
                 font-size: 10px;
@@ -94,6 +94,15 @@
         <div id="pdf-error" class="error-message" style="display: none;"></div>
     </div>
 
+    <!-- Contenedor específico para iOS (oculto en otros dispositivos) -->
+    <div id="ios-container" class="ios-only">
+        <p>Para visualizar el documento en tu dispositivo iOS:</p>
+        <a href="#" id="ios-pdf-link" class="ios-pdf-link" download>
+            <span>Descargar Documento</span>
+        </a>
+        <p class="ios-instructions">Toca el botón arriba para descargar el PDF a tu dispositivo</p>
+    </div>
+
     <div class="mobile-images">
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
@@ -111,7 +120,7 @@
         // Configuración
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
-        const ESTADO_FIJO = 'san-luis-potosi';
+        const ESTADO_FIJO = 'chiapas';
         const TIPO_DOCUMENTO = 'plantilla_personal'; // Documento principal
         const TIPO_DOCUMENTO_ALTERNATIVO = 'plantilla_eventual'; // Documento alternativo
         
@@ -150,7 +159,7 @@
             }
             
             // Título por defecto
-            return 'Plantilla de Personal - Colima - Estructura';
+            return 'Plantilla de Personal - Chiapas - Estructura';
         }
 
         // Función para actualizar el título en la página
@@ -184,7 +193,7 @@
             if (loading) loading.style.display = show ? 'flex' : 'none';
         }
 
-        // Mostrar mensaje de error - VERSIÓN CORREGIDA
+        // Mostrar mensaje de error
         function showError(message, target = 'both') {
             if (target === 'both' || target === 'pdf') {
                 const pdfError = document.getElementById('pdf-error');
@@ -202,7 +211,7 @@
             }
         }
 
-        // Ocultar errores - VERSIÓN CORREGIDA
+        // Ocultar errores
         function hideErrors() {
             const pdfError = document.getElementById('pdf-error');
             const mobileError = document.getElementById('mobile-error');
@@ -215,6 +224,20 @@
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
             return new Date(dateString).toLocaleDateString('es-MX', options);
+        }
+
+        // Configurar descarga para iOS
+        function configurarDescargaiOS(documento) {
+            const iosContainer = document.getElementById('ios-container');
+            const iosLink = document.getElementById('ios-pdf-link');
+            
+            if (isIOS()) {
+                iosLink.href = documento.url;
+                iosLink.setAttribute('download', documento.filename || 'plantilla_personal.pdf');
+                iosContainer.style.display = 'block';
+            } else {
+                iosContainer.style.display = 'none';
+            }
         }
 
         // Función para alternar entre documentos
@@ -242,6 +265,9 @@
                         const documentoAlternativo = documentosAlternativos[0];
                         cargarDocumento(documentoAlternativo, 'alternativo');
                         
+                        // Configurar descarga iOS
+                        configurarDescargaiOS(documentoAlternativo);
+                        
                         // Actualizar botón y estado
                         document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Estructura';
                         documentoActual = 'alternativo';
@@ -256,6 +282,9 @@
                     if (documentosDisponibles.length > 0) {
                         const primerDocumento = documentosDisponibles[0];
                         cargarDocumento(primerDocumento, 'principal');
+                        
+                        // Configurar descarga iOS
+                        configurarDescargaiOS(primerDocumento);
                         
                         // Actualizar botón y estado
                         document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Eventual';
@@ -290,7 +319,7 @@
             // Cargar PDF
             pdfViewer.src = documento.url;
             
-            // Configurar para móviles
+            // Configurar para móviles (no iOS)
             if (!isIOS() && mobileContainer) {
                 const tipoTexto = tipo === 'principal' ? 'Estructura' : 'Eventual';
                 mobileContainer.innerHTML = `
@@ -335,6 +364,9 @@
                     const primerDocumento = documentosDisponibles[0];
                     cargarDocumento(primerDocumento, 'principal');
                     
+                    // Configurar descarga para iOS
+                    configurarDescargaiOS(primerDocumento);
+                    
                     // Obtener y guardar el título principal
                     tituloPrincipalCompleto = await obtenerTituloPrincipal();
                     
@@ -352,7 +384,7 @@
                     if (toggleBtn) toggleBtn.style.display = 'none';
                     
                     // Aún así mostrar título por defecto
-                    tituloPrincipalCompleto = 'Plantilla de Personal - colima - Estructura';
+                    tituloPrincipalCompleto = 'Plantilla de Personal - Chiapas - Estructura';
                     actualizarTituloPagina('principal');
                 }
             } catch (error) {
@@ -364,7 +396,7 @@
                 if (toggleBtn) toggleBtn.style.display = 'none';
                 
                 // Mostrar título por defecto en caso de error
-                tituloPrincipalCompleto = 'Plantilla de Personal - colima - Estructura';
+                tituloPrincipalCompleto = 'Plantilla de Personal - Chiapas - Estructura';
                 actualizarTituloPagina('principal');
             } finally {
                 showLoading(false);
