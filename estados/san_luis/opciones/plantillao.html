@@ -120,7 +120,7 @@
         // Configuración
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
-        const ESTADO_FIJO = 'chiapas';
+        const ESTADO_FIJO = 'san-luis-potosi';
         const TIPO_DOCUMENTO = 'plantilla_personal'; // Documento principal
         const TIPO_DOCUMENTO_ALTERNATIVO = 'plantilla_eventual'; // Documento alternativo
         
@@ -159,7 +159,7 @@
             }
             
             // Título por defecto
-            return 'Plantilla de Personal - Chiapas - Estructura';
+            return 'Plantilla de Personal - San luis potosi - Estructura';
         }
 
         // Función para actualizar el título en la página
@@ -384,7 +384,7 @@
                     if (toggleBtn) toggleBtn.style.display = 'none';
                     
                     // Aún así mostrar título por defecto
-                    tituloPrincipalCompleto = 'Plantilla de Personal - Chiapas - Estructura';
+                    tituloPrincipalCompleto = 'Plantilla de Personal - san luis potosi - Estructura';
                     actualizarTituloPagina('principal');
                 }
             } catch (error) {
@@ -396,7 +396,7 @@
                 if (toggleBtn) toggleBtn.style.display = 'none';
                 
                 // Mostrar título por defecto en caso de error
-                tituloPrincipalCompleto = 'Plantilla de Personal - Chiapas - Estructura';
+                tituloPrincipalCompleto = 'Plantilla de Personal - san luis potosi - Estructura';
                 actualizarTituloPagina('principal');
             } finally {
                 showLoading(false);
