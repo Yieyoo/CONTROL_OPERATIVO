@@ -1,4 +1,4 @@
-// server.js - VERSIÓN MEJORADA PARA SERVER DE PAGO
+// server.js - VERSIÓN MEJORADA 1.1.0
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
