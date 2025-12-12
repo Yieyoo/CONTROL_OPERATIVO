@@ -3,11 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Organigrama</title>
-    <link rel="icon" type="image/png" href="../../../imagenes/organigrama.png">
+    <title>Organigrama - Aguascalientes</title>
+    <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
-    <script src="../../../auth.js" defer></script>   
+    
+    <!-- ✅ SCRIPTS ESENCIALES -->
+    <script src="../../../auth.js" defer></script>
     <script src="../../../load-menu.js" defer></script>
+    
+    <style>
+        /* Estilo para la fecha de actualización */
+        #fecha-subida {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        /* Estilos para el botón de alternar documento */
+        #toggle-doc-btn {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+
+        #toggle-doc-btn:hover {
+            background-color: #34495e;
+
+        }
+        @media (max-width: 768px) {
+            #fecha-subida {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+            
+            #toggle-doc-btn {
+                top: 80px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="header-lineas">
@@ -16,10 +68,18 @@
     </div>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
-    <h1 id="titulo-documento" class="titulo-personalizado">Organigrama</h1>       
+    <!-- Botón para alternar documentos -->
+    <button id="toggle-doc-btn">Mostrar Plantilla Eventual</button>
+
+    <!-- Contenedor para el título personalizado -->
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
+    </div>
+    
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
+
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
     </div>
@@ -47,26 +107,27 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
+    <div id="fecha-subida">
+        Actualizado: <span id="fecha-texto">Cargando...</span>
+    </div>
+
     <button class="regresar-btn" onclick="window.location.href = '../aguascalientesindex.html'">Regresar</button>
 
     <script>
-        // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
+        // ================================================
+        // ✅ CONFIGURACIÓN DE DOCUMENTOS
+        // ================================================
+        // Configuración
         const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
         const API_KEY = 'Xhy2md57';
-        const ESTADO = 'aguascalientes';
-        const TIPO_DOCUMENTO = 'organigrama';
-        const TITULO_DOCUMENTO = 'Organigrama';
-
-        // Configuración dinámica desde URL (opcional)
-        const params = new URLSearchParams(window.location.search);
-        const estadoFromURL = params.get('estado');
-        const tipoFromURL = params.get('tipo');
-        const tituloFromURL = params.get('titulo');
-
-        // Valores finales (usa los de URL si existen, sino los definidos arriba)
-        const ESTADO_FIJO = estadoFromURL || ESTADO;
-        const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
-        const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
+        const ESTADO_FIJO = 'organigrama';
+        const TIPO_DOCUMENTO = 'organigrama'; // Documento principal
+        const TIPO_DOCUMENTO_ALTERNATIVO = 'organigrama_or'; // Documento alternativo
+        
+        // Variables para controlar documentos alternativos
+        let documentoActual = 'principal'; // 'principal' o 'alternativo'
+        let documentosDisponibles = [];
+        let tituloPrincipalCompleto = ''; // Almacena el título completo del documento principal
 
         // Detectar iOS
         function isIOS() {
@@ -74,49 +135,216 @@
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         }
 
+        // Función para obtener el título del documento principal desde Cloudinary
+        async function obtenerTituloPrincipal() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+
+                if (response.ok) {
+                    const { data: archivos } = await response.json();
+                    if (archivos.length > 0) {
+                        const ultimoArchivo = archivos.sort((a, b) => 
+                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                        )[0];
+                        
+                        if (ultimoArchivo.titulo_documento) {
+                            return ultimoArchivo.titulo_documento;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error al obtener título principal:', error);
+            }
+            
+            // Título por defecto
+            return 'Plantilla de Personal - aguascalientes - Estructura';
+        }
+
+        // Función para actualizar el título en la página
+        function actualizarTituloPagina(tipoDocumento = 'principal') {
+            const tituloContainer = document.getElementById('tituloContainer');
+            
+            if (!tituloPrincipalCompleto) return;
+            
+            if (tipoDocumento === 'principal') {
+                // Mostrar el título principal exacto
+                tituloContainer.textContent = tituloPrincipalCompleto;
+            } else {
+                // Crear título eventual: reemplazar "Estructura" por "Eventual"
+                let tituloEventual = tituloPrincipalCompleto
+                    .replace(/Estructura/i, 'Eventual')  // Primero reemplazar cualquier "Estructura"
+                    .replace(/ - Estructura$/i, ' - Eventual')  // Luego específicamente al final
+                    .replace(/Estructura - /i, 'Eventual - ');  // O al principio
+                
+                // Si no se encontró "Estructura", agregar " - Eventual" al final
+                if (tituloEventual === tituloPrincipalCompleto) {
+                    tituloEventual = tituloPrincipalCompleto.replace(/( - )?$/, ' - Eventual');
+                }
+                
+                tituloContainer.textContent = tituloEventual;
+            }
+        }
+
         // Mostrar/ocultar loading
         function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+            const loading = document.getElementById('loading');
+            if (loading) loading.style.display = show ? 'flex' : 'none';
         }
 
         // Mostrar mensaje de error
         function showError(message, target = 'both') {
             if (target === 'both' || target === 'pdf') {
                 const pdfError = document.getElementById('pdf-error');
-                pdfError.textContent = message;
-                pdfError.style.display = 'block';
+                if (pdfError) {
+                    pdfError.textContent = message;
+                    pdfError.style.display = 'block';
+                }
             }
             if (target === 'both' || target === 'mobile') {
                 const mobileError = document.getElementById('mobile-error');
-                mobileError.textContent = message;
-                mobileError.style.display = 'block';
+                if (mobileError) {
+                    mobileError.textContent = message;
+                    mobileError.style.display = 'block';
+                }
             }
         }
 
         // Ocultar errores
         function hideErrors() {
-            document.getElementById('pdf-error').style.display = 'none';
-            document.getElementById('mobile-error').style.display = 'none';
+            const pdfError = document.getElementById('pdf-error');
+            const mobileError = document.getElementById('mobile-error');
+            
+            if (pdfError) pdfError.style.display = 'none';
+            if (mobileError) mobileError.style.display = 'none';
         }
 
         // Formatear fecha legible
         function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
             return new Date(dateString).toLocaleDateString('es-MX', options);
         }
 
-        // Cargar PDF desde Cloudinary (función genérica)
-        async function cargarDocumentoPDF() {
+        // Configurar descarga para iOS
+        function configurarDescargaiOS(documento) {
+            const iosContainer = document.getElementById('ios-container');
+            const iosLink = document.getElementById('ios-pdf-link');
+            
+            if (isIOS()) {
+                iosLink.href = documento.url;
+                iosLink.setAttribute('download', documento.filename || 'plantilla_personal.pdf');
+                iosContainer.style.display = 'block';
+            } else {
+                iosContainer.style.display = 'none';
+            }
+        }
+
+        // Función para alternar entre documentos
+        async function alternarDocumento() {
             showLoading(true);
             hideErrors();
+            
+            try {
+                if (documentoActual === 'principal') {
+                    // Cargar documento alternativo (plantilla_eventual)
+                    console.log(`Consultando documento alternativo: ${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`);
+                    const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`, {
+                        headers: { 'x-api-key': API_KEY }
+                    });
 
-            // Actualizar título de la página
-            document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
-            document.getElementById('titulo-documento').textContent = TITULO_FINAL;
+                    if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+                    const result = await response.json();
+                    
+                    if (result?.data && result.data.length > 0) {
+                        const documentosAlternativos = result.data.sort((a, b) => 
+                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                        );
+                        
+                        const documentoAlternativo = documentosAlternativos[0];
+                        cargarDocumento(documentoAlternativo, 'alternativo');
+                        
+                        // Configurar descarga iOS
+                        configurarDescargaiOS(documentoAlternativo);
+                        
+                        // Actualizar botón y estado
+                        document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Estructura';
+                        documentoActual = 'alternativo';
+                        
+                        // Actualizar título de la página
+                        actualizarTituloPagina('alternativo');
+                    } else {
+                        alert('No se encontró la Plantilla Eventual');
+                    }
+                } else {
+                    // Volver al documento principal (plantilla_personal)
+                    if (documentosDisponibles.length > 0) {
+                        const primerDocumento = documentosDisponibles[0];
+                        cargarDocumento(primerDocumento, 'principal');
+                        
+                        // Configurar descarga iOS
+                        configurarDescargaiOS(primerDocumento);
+                        
+                        // Actualizar botón y estado
+                        document.getElementById('toggle-doc-btn').textContent = 'Mostrar Plantilla Eventual';
+                        documentoActual = 'principal';
+                        
+                        // Actualizar título de la página
+                        actualizarTituloPagina('principal');
+                    }
+                }
+            } catch (error) {
+                console.error('Error al alternar documento:', error);
+                alert(`Error al cargar documento alternativo: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Función para cargar un documento específico
+        function cargarDocumento(documento, tipo) {
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const mobileContainer = document.querySelector('.mobile-images');
+            const fechaElement = document.getElementById('fecha-texto');
+            
+            if (!pdfViewer || !fechaElement) {
+                console.error('Elementos del DOM no encontrados');
+                return;
+            }
+            
+            // Actualizar fecha
+            fechaElement.textContent = formatDate(documento.uploaded_at);
+            
+            // Cargar PDF
+            pdfViewer.src = documento.url;
+            
+            // Configurar para móviles (no iOS)
+            if (!isIOS() && mobileContainer) {
+                const tipoTexto = tipo === 'principal' ? 'Estructura' : 'Eventual';
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${documento.filename || `Plantilla ${tipoTexto}`}</h3>
+                        <p>Actualizado: ${formatDate(documento.uploaded_at)}</p>
+                        <p>Tamaño: ${(documento.size / (1024*1024)).toFixed(2)} MB</p>
+                        <p><em>${tipoTexto}</em></p>
+                        <a href="${documento.url}" class="download-btn" download>
+                            Descargar Documento
+                        </a>
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar PDF de Plantilla de Personal
+        async function loadPlantillaPersonal() {
+            showLoading(true);
+            hideErrors();
+            const fechaElement = document.getElementById('fecha-texto');
 
             try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
+                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
                     headers: { 'x-api-key': API_KEY }
                 });
 
@@ -127,43 +355,49 @@
 
                 if (!result?.data) throw new Error('Formato de respuesta inválido');
 
-                const pdfViewer = document.getElementById('pdf-viewer');
-                const mobileContainer = document.querySelector('.mobile-images');
-                const iosLink = document.getElementById('ios-pdf-link');
-
                 if (result.data.length > 0) {
-                    const latestPDF = result.data.sort((a, b) => 
+                    documentosDisponibles = result.data.sort((a, b) => 
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                    )[0];
-
-                    // Configuración normal para PC
-                    pdfViewer.src = latestPDF.url;
+                    );
                     
-                    // Configuración para móviles (no iOS)
-                    if (!isIOS()) {
-                        mobileContainer.innerHTML = `
-                            <div class="file-info">
-                                <h3>${latestPDF.filename || TITULO_FINAL}</h3>
-                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                                <a href="${latestPDF.url}" class="download-btn" download>
-                                    Descargar Documento
-                                </a>
-                            </div>
-                        `;
-                    }
+                    // Cargar el documento principal (más reciente)
+                    const primerDocumento = documentosDisponibles[0];
+                    cargarDocumento(primerDocumento, 'principal');
                     
-                    // Configuración específica para iOS - Descarga directa
-                    if (isIOS()) {
-                        iosLink.href = latestPDF.url;
-                        iosLink.setAttribute('download', latestPDF.filename || 'unidad_canina.pdf');
-                    }
+                    // Configurar descarga para iOS
+                    configurarDescargaiOS(primerDocumento);
+                    
+                    // Obtener y guardar el título principal
+                    tituloPrincipalCompleto = await obtenerTituloPrincipal();
+                    
+                    // Actualizar título de la página
+                    actualizarTituloPagina('principal');
+                    
+                    // Configurar botón de alternar
+                    const toggleBtn = document.getElementById('toggle-doc-btn');
+                    if (toggleBtn) toggleBtn.style.display = 'block';
                 } else {
-                    showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+                    showError('No se encontraron documentos de plantilla de personal', 'both');
+                    if (fechaElement) fechaElement.textContent = 'No disponible';
+                    
+                    const toggleBtn = document.getElementById('toggle-doc-btn');
+                    if (toggleBtn) toggleBtn.style.display = 'none';
+                    
+                    // Aún así mostrar título por defecto
+                    tituloPrincipalCompleto = 'Plantilla de Personal - aguascalientes - Estructura';
+                    actualizarTituloPagina('principal');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError(`Error al cargar el documento: ${error.message}`, 'both');
+                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
+                if (fechaElement) fechaElement.textContent = 'Error al cargar';
+                
+                const toggleBtn = document.getElementById('toggle-doc-btn');
+                if (toggleBtn) toggleBtn.style.display = 'none';
+                
+                // Mostrar título por defecto en caso de error
+                tituloPrincipalCompleto = 'Plantilla de Personal - aguascalientes - Estructura';
+                actualizarTituloPagina('principal');
             } finally {
                 showLoading(false);
             }
@@ -171,9 +405,15 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            // Cargar el documento PDF
+            // Configurar evento para el botón de alternar
+            const toggleBtn = document.getElementById('toggle-doc-btn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', alternarDocumento);
+            }
+            
+            // Cargar documento principal
             if (document.getElementById('pdf-viewer')) {
-                cargarDocumentoPDF();
+                loadPlantillaPersonal();
             }
         });
     </script>
