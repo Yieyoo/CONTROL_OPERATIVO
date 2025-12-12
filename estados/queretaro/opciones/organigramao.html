@@ -47,6 +47,16 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
+    <!-- AGREGAR ESTOS ELEMENTOS QUE FALTAN -->
+    <div id="fecha-subida" style="position: fixed; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; z-index: 1000;">
+        Actualizado: <span id="fecha-texto">Cargando...</span>
+    </div>
+
+    <!-- BOTÓN PARA ALTERNAR DOCUMENTOS -->
+    <button id="toggle-doc-btn" style="position: fixed; top: 100px; right: 20px; background-color: #2c3e50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+        Mostrar Documento Alternativo
+    </button>
+
     <button class="regresar-btn" onclick="window.location.href = '../queretaroindex.html'">Regresar</button>
 
     <script>
@@ -56,6 +66,9 @@
         const ESTADO = 'queretaro';
         const TIPO_DOCUMENTO = 'organigrama';
         const TITULO_DOCUMENTO = 'Organigrama';
+        
+        // AÑADIR DOCUMENTO ALTERNATIVO
+        const TIPO_DOCUMENTO_ALTERNATIVO = 'organigrama_or'; // Cambia este nombre según necesites
 
         // Configuración dinámica desde URL (opcional)
         const params = new URLSearchParams(window.location.search);
@@ -68,6 +81,10 @@
         const TIPO_DOC_FIJO = tipoFromURL || TIPO_DOCUMENTO;
         const TITULO_FINAL = tituloFromURL || TITULO_DOCUMENTO;
 
+        // Variables para alternar documentos
+        let documentoActual = 'principal';
+        let documentoAlternativoDisponible = null;
+
         // Detectar iOS
         function isIOS() {
             return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
@@ -79,24 +96,28 @@
             document.getElementById('loading').style.display = show ? 'flex' : 'none';
         }
 
-        // Mostrar mensaje de error
+        // Mostrar mensaje de error - VERSIÓN SEGURA
         function showError(message, target = 'both') {
-            if (target === 'both' || target === 'pdf') {
-                const pdfError = document.getElementById('pdf-error');
+            const pdfError = document.getElementById('pdf-error');
+            const mobileError = document.getElementById('mobile-error');
+            
+            if ((target === 'both' || target === 'pdf') && pdfError) {
                 pdfError.textContent = message;
                 pdfError.style.display = 'block';
             }
-            if (target === 'both' || target === 'mobile') {
-                const mobileError = document.getElementById('mobile-error');
+            if ((target === 'both' || target === 'mobile') && mobileError) {
                 mobileError.textContent = message;
                 mobileError.style.display = 'block';
             }
         }
 
-        // Ocultar errores
+        // Ocultar errores - VERSIÓN SEGURA
         function hideErrors() {
-            document.getElementById('pdf-error').style.display = 'none';
-            document.getElementById('mobile-error').style.display = 'none';
+            const pdfError = document.getElementById('pdf-error');
+            const mobileError = document.getElementById('mobile-error');
+            
+            if (pdfError) pdfError.style.display = 'none';
+            if (mobileError) mobileError.style.display = 'none';
         }
 
         // Formatear fecha legible
@@ -105,14 +126,119 @@
             return new Date(dateString).toLocaleDateString('es-MX', options);
         }
 
-        // Cargar PDF desde Cloudinary (función genérica)
+        // Verificar si existe documento alternativo
+        async function verificarDocumentoAlternativo() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`, {
+                    headers: { 'x-api-key': API_KEY }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result?.data && result.data.length > 0) {
+                        const documentos = result.data.sort((a, b) => 
+                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
+                        );
+                        documentoAlternativoDisponible = documentos[0];
+                        
+                        const toggleBtn = document.getElementById('toggle-doc-btn');
+                        toggleBtn.disabled = false;
+                        toggleBtn.textContent = 'Mostrar Versión Completa';
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.log('No se encontró documento alternativo');
+            }
+            
+            // Si no hay documento alternativo, deshabilitar botón
+            const toggleBtn = document.getElementById('toggle-doc-btn');
+            toggleBtn.disabled = true;
+            toggleBtn.textContent = 'Versión Completa No Disponible';
+            return false;
+        }
+
+        // Función para alternar documentos
+        async function alternarDocumento() {
+            showLoading(true);
+            hideErrors(); // ¡AHORA ESTA FUNCIÓN ES SEGURA!
+            
+            const toggleBtn = document.getElementById('toggle-doc-btn');
+            
+            try {
+                if (documentoActual === 'principal') {
+                    // Intentar cargar documento alternativo
+                    if (documentoAlternativoDisponible) {
+                        cargarDocumento(documentoAlternativoDisponible, 'alternativo');
+                        
+                        // Configurar descarga iOS
+                        const iosLink = document.getElementById('ios-pdf-link');
+                        if (isIOS() && iosLink) {
+                            iosLink.href = documentoAlternativoDisponible.url;
+                            iosLink.setAttribute('download', documentoAlternativoDisponible.filename || 'organigrama_completo.pdf');
+                        }
+                        
+                        // Actualizar botón y estado
+                        toggleBtn.textContent = 'Organigrama';
+                        documentoActual = 'alternativo';
+                        document.getElementById('titulo-documento').textContent = 'Organigrama Or';
+                    } else {
+                        alert('La versión completa no está disponible.');
+                    }
+                } else {
+                    // Volver al documento principal (recargarlo)
+                    await cargarDocumentoPDF();
+                    documentoActual = 'principal';
+                    toggleBtn.textContent = 'Organigrama Or';
+                }
+            } catch (error) {
+                console.error('Error al alternar documento:', error);
+                alert(`Error: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Función para cargar un documento específico
+        function cargarDocumento(documento, tipo) {
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const fechaElement = document.getElementById('fecha-texto');
+            
+            if (!pdfViewer || !fechaElement) return;
+            
+            // Actualizar fecha
+            fechaElement.textContent = formatDate(documento.uploaded_at);
+            
+            // Actualizar título
+            const titulo = tipo === 'principal' ? 'Organigrama' : 'Organigrama Or';
+            document.title = titulo + ' - ' + ESTADO_FIJO.toUpperCase();
+            document.getElementById('titulo-documento').textContent = titulo;
+            
+            // Cargar PDF
+            pdfViewer.src = documento.url;
+            
+            // Configurar para móviles (no iOS)
+            const mobileContainer = document.querySelector('.mobile-images');
+            if (!isIOS() && mobileContainer) {
+                const tipoTexto = tipo === 'principal' ? 'Versión Básica' : 'Versión Completa';
+                mobileContainer.innerHTML = `
+                    <div class="file-info">
+                        <h3>${documento.filename || titulo}</h3>
+                        <p>Actualizado: ${formatDate(documento.uploaded_at)}</p>
+                        <p>Tamaño: ${(documento.size / (1024*1024)).toFixed(2)} MB</p>
+                        <p><em>${tipoTexto}</em></p>
+                        <a href="${documento.url}" class="download-btn" download>
+                            Descargar Documento
+                        </a>
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar PDF desde Cloudinary
         async function cargarDocumentoPDF() {
             showLoading(true);
             hideErrors();
-
-            // Actualizar título de la página
-            document.title = TITULO_FINAL + ' - ' + ESTADO_FIJO.toUpperCase();
-            document.getElementById('titulo-documento').textContent = TITULO_FINAL;
 
             try {
                 console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
@@ -128,7 +254,6 @@
                 if (!result?.data) throw new Error('Formato de respuesta inválido');
 
                 const pdfViewer = document.getElementById('pdf-viewer');
-                const mobileContainer = document.querySelector('.mobile-images');
                 const iosLink = document.getElementById('ios-pdf-link');
 
                 if (result.data.length > 0) {
@@ -136,30 +261,20 @@
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
 
-                    // Configuración normal para PC
-                    pdfViewer.src = latestPDF.url;
+                    // Cargar documento principal
+                    cargarDocumento(latestPDF, 'principal');
                     
-                    // Configuración para móviles (no iOS)
-                    if (!isIOS()) {
-                        mobileContainer.innerHTML = `
-                            <div class="file-info">
-                                <h3>${latestPDF.filename || TITULO_FINAL}</h3>
-                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                                <a href="${latestPDF.url}" class="download-btn" download>
-                                    Descargar Documento
-                                </a>
-                            </div>
-                        `;
-                    }
-                    
-                    // Configuración específica para iOS - Descarga directa
-                    if (isIOS()) {
+                    // Configuración específica para iOS
+                    if (isIOS() && iosLink) {
                         iosLink.href = latestPDF.url;
-                        iosLink.setAttribute('download', latestPDF.filename || 'unidad_canina.pdf');
+                        iosLink.setAttribute('download', latestPDF.filename || 'organigrama.pdf');
                     }
+                    
+                    // Verificar si hay documento alternativo
+                    await verificarDocumentoAlternativo();
+                    
                 } else {
-                    showError(`No se encontraron documentos de ${TITULO_FINAL.toLowerCase()} para ${ESTADO_FIJO}`, 'both');
+                    showError(`No se encontraron documentos para ${ESTADO_FIJO}`, 'both');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -171,6 +286,12 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
+            // Configurar evento para el botón de alternar
+            const toggleBtn = document.getElementById('toggle-doc-btn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', alternarDocumento);
+            }
+            
             // Cargar el documento PDF
             if (document.getElementById('pdf-viewer')) {
                 cargarDocumentoPDF();
