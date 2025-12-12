@@ -179,9 +179,9 @@
                         }
                         
                         // Actualizar botón y estado
-                        toggleBtn.textContent = 'Mostrar Versión Básica';
+                        toggleBtn.textContent = 'Organigrama';
                         documentoActual = 'alternativo';
-                        document.getElementById('titulo-documento').textContent = 'Organigrama Completo';
+                        document.getElementById('titulo-documento').textContent = 'Organigrama Or';
                     } else {
                         alert('La versión completa no está disponible.');
                     }
@@ -189,7 +189,7 @@
                     // Volver al documento principal (recargarlo)
                     await cargarDocumentoPDF();
                     documentoActual = 'principal';
-                    toggleBtn.textContent = 'Mostrar Versión Completa';
+                    toggleBtn.textContent = 'Organigrama Or';
                 }
             } catch (error) {
                 console.error('Error al alternar documento:', error);
@@ -210,7 +210,7 @@
             fechaElement.textContent = formatDate(documento.uploaded_at);
             
             // Actualizar título
-            const titulo = tipo === 'principal' ? 'Organigrama' : 'Organigrama Completo';
+            const titulo = tipo === 'principal' ? 'Organigrama' : 'Organigrama Or';
             document.title = titulo + ' - ' + ESTADO_FIJO.toUpperCase();
             document.getElementById('titulo-documento').textContent = titulo;
             
