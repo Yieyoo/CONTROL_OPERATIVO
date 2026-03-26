@@ -189,15 +189,20 @@ const validateCloudinaryConfig = () => {
 
 validateCloudinaryConfig();
 
-// Rate Limiting mejorado
+// ================================================
+// ⬇️⬇️⬇️ ÚNICO CAMBIO REALIZADO AQUÍ ⬇️⬇️⬇️
+// ================================================
+
+// Rate Limiting MEJORADO - SIN LÍMITES PARA TU USO
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: process.env.NODE_ENV === 'production' ? 100 : 1000,
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: process.env.NODE_ENV === 'production' ? 9999 : 99999, // ⬅️ LÍMITE MUY ALTO (prácticamente ilimitado)
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    // No aplicar rate limiting a health checks
-    return req.path === '/api/health' || req.path === '/api/render-ping';
+    // No aplicar rate limiting a NINGUNA ruta de API
+    // Esto permite subidas ilimitadas
+    return true; // ⬅️ ¡IMPORTANTE! Esto DESACTIVA el rate limiting para TODAS las rutas
   },
   keyGenerator: (req) => {
     return req.headers['x-real-ip'] || 
@@ -205,6 +210,7 @@ const apiLimiter = rateLimit({
            req.ip;
   },
   handler: (req, res) => {
+    // Este código NUNCA se ejecutará porque skip siempre devuelve true
     res.status(429).json({
       status: 'error',
       error: 'rate_limit_exceeded',
@@ -215,7 +221,7 @@ const apiLimiter = rateLimit({
 });
 
 // ================================================
-// ⬇️⬇️⬇️ CAMBIOS CRÍTICOS AQUÍ ⬇️⬇️⬇️
+// ⬆️⬆️⬆️ FIN DEL ÚNICO CAMBIO ⬆️⬆️⬆️
 // ================================================
 
 // 1. Crear directorio temporal para archivos
@@ -272,10 +278,6 @@ const pdfUpload = multer({
     cb(new Error('Solo se permiten archivos PDF (extensión .pdf)'), false);
   }
 }).single('file');
-
-// ================================================
-// ⬆️⬆️⬆️ FIN DE CAMBIOS CRÍTICOS ⬆️⬆️⬆️
-// ================================================
 
 // Middleware de autenticación
 const authenticate = (req, res, next) => {
