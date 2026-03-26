@@ -1,8 +1,7 @@
-// server.js - VERSIÓN MEJORADA 1.1.0
+// server.js - VERSIÓN SIN CLOUDINARY - ALMACENAMIENTO LOCAL
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -10,36 +9,67 @@ const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
 const zlib = require('zlib');
-const stream = require('stream');
-const pipeline = promisify(stream.pipeline);
 const compression = require('compression');
-const os = require('os');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ================================================
+// CONFIGURACIÓN DE ALMACENAMIENTO LOCAL
+// ================================================
+
+// Directorio principal para documentos
+const DOCS_DIR = path.join(__dirname, 'documentos');
+
+// Crear estructura de carpetas para estados y tipos de documentos
+const crearEstructuraDirectorios = () => {
+    const estados = ['aguascalientes', 'baja-california', 'cdmx', 'chihuahua', 'jalisco', 'nuevo-leon', 'sonora', 'veracruz', 'yucatan'];
+    const tipos = ['ficha_curricular', 'plantilla_personal', 'contrato', 'informe', 'oficio', 'solicitud'];
+    
+    estados.forEach(estado => {
+        tipos.forEach(tipo => {
+            const dirPath = path.join(DOCS_DIR, estado, tipo);
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath, { recursive: true });
+            }
+        });
+    });
+    
+    console.log('📁 Estructura de directorios creada en:', DOCS_DIR);
+};
+
+crearEstructuraDirectorios();
+
+// Archivo para título global
+const TITULO_GLOBAL_FILE = path.join(DOCS_DIR, 'titulo_global.json');
+if (!fs.existsSync(TITULO_GLOBAL_FILE)) {
+    fs.writeFileSync(TITULO_GLOBAL_FILE, JSON.stringify({ 
+        titulo: process.env.TITULO_GLOBAL_INICIAL || 'Plantilla de Personal - INM' 
+    }));
+}
 
 // Middleware para medir tiempo de respuesta
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    if (duration > 1000) { // Log solo respuestas lentas
+    if (duration > 1000) {
       console.log(`🐌 Respuesta lenta: ${req.method} ${req.path} - ${duration}ms`);
     }
   });
   next();
 });
 
-// Configuración de seguridad mejorada
+// Configuración de seguridad (sin Cloudinary)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
       styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com', 'cdnjs.cloudflare.com'],
-      imgSrc: ["'self'", 'data:', 'blob:', 'res.cloudinary.com'],
-      connectSrc: ["'self'", 'https://api.cloudinary.com', 'https://control-operativo-1.onrender.com'],
+      imgSrc: ["'self'", 'data:', 'blob:'],
+      connectSrc: ["'self'", 'https://control-operativo-1.onrender.com'],
       fontSrc: ["'self'", 'fonts.gstatic.com', 'cdnjs.cloudflare.com'],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
@@ -57,13 +87,12 @@ app.use(helmet({
   referrerPolicy: {
     policy: 'same-origin'
   },
-  crossOriginEmbedderPolicy: false // Necesario para Cloudinary
+  crossOriginEmbedderPolicy: false
 }));
 
 // Configuración de logs mejorada
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', {
   skip: (req, res) => {
-    // No loguear health checks y favicon
     return req.path === '/api/health' || 
            req.path === '/favicon.ico' ||
            req.path === '/api/render-ping';
@@ -111,7 +140,6 @@ const corsOptions = {
 
 // Middleware para deshabilitar caché globalmente
 app.use((req, res, next) => {
-  // Headers para evitar caché en TODAS las respuestas
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
@@ -123,7 +151,7 @@ app.get('/', cors({ origin: '*' }), (req, res) => {
   res.json({
     status: 'success',
     message: 'API de Gestión de Archivos PDF - INM',
-    version: '1.2.0'
+    version: '2.0.0-sin-cloudinary'
   });
 });
 
@@ -155,54 +183,17 @@ app.use(compression({
   }
 }));
 
-// Configuración de Cloudinary
-const validateCloudinaryConfig = () => {
-  const requiredVars = ['CLOUD_NAME', 'CLOUD_API_KEY', 'CLOUD_API_SECRET'];
-  const missingVars = requiredVars.filter(varName => !process.env[varName]);
-  
-  if (missingVars.length > 0) {
-    console.error('❌ Error: Faltan variables de entorno requeridas:', missingVars.join(', '));
-    process.exit(1);
-  }
+// Servir documentos estáticamente
+app.use('/documentos', express.static(DOCS_DIR));
 
-  try {
-    cloudinary.config({
-      cloud_name: process.env.CLOUD_NAME,
-      api_key: process.env.CLOUD_API_KEY,
-      api_secret: process.env.CLOUD_API_SECRET,
-      secure: true,
-      timeout: 45000, // ⬅️ CAMBIADO: Reducido a 45 segundos (de 60000)
-      private_cdn: false,
-      secure_distribution: null,
-      cdn_subdomain: true,
-      shorten: true,
-      sign_url: true,
-      api_proxy: process.env.PROXY_URL
-    });
-    console.log('✅ Cloudinary configurado correctamente (timeout: 45s)');
-    return true;
-  } catch (error) {
-    console.error('❌ Error configurando Cloudinary:', error);
-    process.exit(1);
-  }
-};
-
-validateCloudinaryConfig();
-
-// ================================================
-// ⬇️⬇️⬇️ ÚNICO CAMBIO REALIZADO AQUÍ ⬇️⬇️⬇️
-// ================================================
-
-// Rate Limiting MEJORADO - SIN LÍMITES PARA TU USO
+// Rate Limiting
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: process.env.NODE_ENV === 'production' ? 9999 : 99999, // ⬅️ LÍMITE MUY ALTO (prácticamente ilimitado)
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 9999 : 99999,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    // No aplicar rate limiting a NINGUNA ruta de API
-    // Esto permite subidas ilimitadas
-    return true; // ⬅️ ¡IMPORTANTE! Esto DESACTIVA el rate limiting para TODAS las rutas
+    return true;
   },
   keyGenerator: (req) => {
     return req.headers['x-real-ip'] || 
@@ -210,7 +201,6 @@ const apiLimiter = rateLimit({
            req.ip;
   },
   handler: (req, res) => {
-    // Este código NUNCA se ejecutará porque skip siempre devuelve true
     res.status(429).json({
       status: 'error',
       error: 'rate_limit_exceeded',
@@ -220,48 +210,30 @@ const apiLimiter = rateLimit({
   }
 });
 
-// ================================================
-// ⬆️⬆️⬆️ FIN DEL ÚNICO CAMBIO ⬆️⬆️⬆️
-// ================================================
-
-// 1. Crear directorio temporal para archivos
-const tmpDir = path.join(os.tmpdir(), 'pdf-uploads');
-if (!fs.existsSync(tmpDir)) {
-  fs.mkdirSync(tmpDir, { recursive: true });
-  console.log(`📁 Directorio temporal creado: ${tmpDir}`);
-}
-
-// 2. Función de limpieza de archivos temporales
-const cleanupTempFile = async (filePath) => {
-  if (!filePath) return;
-  
-  try {
-    if (fs.existsSync(filePath)) {
-      await fs.promises.unlink(filePath);
-      console.log(`🧹 Archivo temporal eliminado: ${path.basename(filePath)}`);
-    }
-  } catch (error) {
-    console.error('⚠️ Error limpiando archivo temporal:', error.message);
-  }
-};
-
-// 3. Configuración de Multer con DISK STORAGE (NO memory storage)
+// Configuración de Multer para guardar DIRECTAMENTE en la carpeta final
 const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, tmpDir);
+    const estado = req.body.estado || 'aguascalientes';
+    const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
+    const uploadPath = path.join(DOCS_DIR, estado, tipoDocumento);
+    
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const timestamp = Date.now();
     const safeName = file.originalname.replace(/[^\w.-]/g, '_');
-    cb(null, 'upload-' + uniqueSuffix + '-' + safeName);
+    cb(null, `${timestamp}-${safeName}`);
   }
 });
 
-// 4. Configurar Multer (MODIFICADO)
 const pdfUpload = multer({
-  storage: diskStorage, // ⬅️ IMPORTANTE: Disk storage en lugar de memory
+  storage: diskStorage,
   limits: {
-    fileSize: 20 * 1024 * 1024, // ⬅️ AUMENTADO a 20MB
+    fileSize: 20 * 1024 * 1024,
     files: 1,
     fields: 5
   },
@@ -342,139 +314,114 @@ const handleError = (error, req, res, next) => {
 // Rutas API
 const router = express.Router();
 
+// ================================================
+// FUNCIONES DE UTILERÍA PARA DOCUMENTOS LOCALES
+// ================================================
+
+// Obtener todos los documentos de una carpeta
+const getDocumentosFromFolder = (estado, tipoDocumento, req) => {
+  const folderPath = path.join(DOCS_DIR, estado, tipoDocumento);
+  
+  if (!fs.existsSync(folderPath)) {
+    return [];
+  }
+  
+  const files = fs.readdirSync(folderPath);
+  const documentos = [];
+  
+  files.forEach(file => {
+    if (file === 'metadata.json') return; // Saltar archivo de metadata
+    
+    const filePath = path.join(folderPath, file);
+    const stats = fs.statSync(filePath);
+    
+    // Extraer timestamp y nombre original
+    const match = file.match(/^(\d+)-(.*)$/);
+    const nombreOriginal = match ? match[2] : file;
+    const timestamp = match ? parseInt(match[1]) : stats.mtime.getTime();
+    
+    const fileUrl = `/documentos/${estado}/${tipoDocumento}/${file}`;
+    const fullUrl = `${req.protocol}://${req.get('host')}${fileUrl}`;
+    
+    documentos.push({
+      url: `${fileUrl}?_=${timestamp}`,
+      public_id: `${estado}/${tipoDocumento}/${file}`,
+      filename: nombreOriginal,
+      estado: estado,
+      tipo_documento: tipoDocumento,
+      view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true&_=${timestamp}`,
+      download_url: `${fileUrl}?_=${timestamp}`,
+      uploaded_at: stats.mtime.toISOString(),
+      size: stats.size,
+      format: 'pdf',
+      etag: stats.ino.toString()
+    });
+  });
+  
+  // Ordenar por fecha descendente
+  return documentos.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+};
+
+// Eliminar documento
+const deleteDocumento = (publicId) => {
+  const filePath = path.join(DOCS_DIR, publicId);
+  
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+    return { result: 'ok' };
+  }
+  
+  throw new Error('Archivo no encontrado');
+};
+
+// Funciones para título global
+const getTituloGlobal = () => {
+  try {
+    const data = fs.readFileSync(TITULO_GLOBAL_FILE, 'utf8');
+    return JSON.parse(data).titulo;
+  } catch (error) {
+    return 'Plantilla de Personal - INM';
+  }
+};
+
+const setTituloGlobal = (titulo) => {
+  fs.writeFileSync(TITULO_GLOBAL_FILE, JSON.stringify({ titulo }));
+};
+
+// ================================================
+// RUTAS DE LA API
+// ================================================
+
 // Ruta de salud
 router.get('/health', async (req, res) => {
   const healthcheck = {
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    version: '1.2.0',
+    version: '2.0.0-sin-cloudinary',
     checks: {
       memoryUsage: process.memoryUsage(),
-      cloudinary: 'active',
-      database: 'n/a',
+      storage: 'local',
+      documents_path: DOCS_DIR,
       diskSpace: {
-        free: promisify(fs.statfs || (() => {}))('/')
-          .then(stats => stats.bfree * stats.bsize)
-          .catch(() => 'n/a'),
-        total: promisify(fs.statfs || (() => {}))('/')
-          .then(stats => stats.blocks * stats.bsize)
-          .catch(() => 'n/a')
+        free: 'n/a',
+        total: 'n/a'
       }
     }
   };
 
-  try {
-    await cloudinary.api.ping();
-    res.json({
-      ...healthcheck,
-      status: 'healthy',
-      dbStatus: 'connected'
-    });
-  } catch (error) {
-    healthcheck.status = 'degraded';
-    healthcheck.dbStatus = 'disconnected';
-    healthcheck.error = error.message;
-    res.status(503).json(healthcheck);
-  }
+  // Verificar que la carpeta de documentos existe
+  const docsExists = fs.existsSync(DOCS_DIR);
+  
+  res.json({
+    ...healthcheck,
+    status: docsExists ? 'healthy' : 'degraded',
+    documents_available: docsExists
+  });
 });
 
-// Función para subir archivos (MODIFICADA para usar disk storage)
-const processUpload = async (filePath, estado, tipoDocumento, tituloDocumento = null) => {
-  if (!filePath || !fs.existsSync(filePath)) {
-    throw new AppError('Archivo no encontrado en el servidor', 400, 'missing_file');
-  }
-  
-  // Verificar tamaño del archivo
-  const stats = fs.statSync(filePath);
-  if (stats.size > 20 * 1024 * 1024) {
-    await cleanupTempFile(filePath);
-    throw new AppError('El archivo excede el límite de 20MB', 400, 'file_too_large');
-  }
-
-  const originalName = path.basename(filePath).replace(/^upload-\d+-/, '');
-  
-  const uploadOptions = {
-    resource_type: 'raw',
-    folder: `${estado}/${tipoDocumento}`,
-    format: 'pdf',
-    type: 'upload',
-    access_mode: 'public',
-    transformation: [{ quality: 'auto', fetch_format: 'auto' }],
-    filename_override: originalName,
-    unique_filename: false,
-    overwrite: true,
-    timeout: 40000, // ⬅️ Timeout específico de 40 segundos
-    chunk_size: 5 * 1024 * 1024, // Subir en chunks de 5MB
-    context: {
-      original_filename: originalName,
-      uploaded_at: new Date().toISOString(),
-      custom: {
-        estado: estado,
-        tipo_documento: tipoDocumento,
-        uploaded_by: 'api',
-        ...(tituloDocumento && { titulo_documento: tituloDocumento })
-      }
-    }
-  };
-
-  try {
-    return await new Promise((resolve, reject) => {
-      const startTime = Date.now();
-      
-      const uploadStream = cloudinary.uploader.upload_stream(
-        uploadOptions,
-        async (error, result) => {
-          const uploadTime = Date.now() - startTime;
-          console.log(`📤 Upload completado en ${uploadTime}ms para ${originalName}`);
-          
-          // LIMPIAR ARCHIVO TEMPORAL SIEMPRE
-          await cleanupTempFile(filePath);
-          
-          if (error) {
-            console.error('❌ Error Cloudinary:', error.message);
-            reject(new AppError(`Error al subir a Cloudinary: ${error.message}`, 502, 'cloudinary_error'));
-          } else {
-            resolve(result);
-          }
-        }
-      );
-      
-      // Crear stream de lectura desde el archivo en disco
-      const readStream = fs.createReadStream(filePath);
-      
-      readStream.on('error', async (error) => {
-        await cleanupTempFile(filePath);
-        reject(new AppError(`Error leyendo archivo: ${error.message}`, 500, 'read_error'));
-      });
-      
-      readStream.on('end', () => {
-        console.log(`📖 Lectura completa del archivo: ${originalName}`);
-      });
-      
-      // Conectar los streams
-      readStream.pipe(uploadStream);
-      
-      // Timeout de seguridad
-      setTimeout(async () => {
-        if (!readStream.closed) {
-          readStream.destroy();
-          await cleanupTempFile(filePath);
-          reject(new AppError('Timeout en la subida (40 segundos)', 504, 'upload_timeout'));
-        }
-      }, 40000);
-    });
-  } catch (error) {
-    // Asegurar limpieza en caso de error
-    await cleanupTempFile(filePath);
-    throw error;
-  }
-};
-
-// Ruta para subir archivos (MODIFICADA)
+// Ruta para subir archivos
 router.post('/upload', authenticate, (req, res, next) => {
   pdfUpload(req, res, async (err) => {
-    let tempFilePath = null;
-    
     try {
       if (err) {
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -487,44 +434,58 @@ router.post('/upload', authenticate, (req, res, next) => {
         throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
       }
 
-      tempFilePath = req.file.path;
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
       const tituloDocumento = req.body.titulo_documento || null;
       
-      console.log(`📤 Procesando upload: ${req.file.originalname} (${req.file.size} bytes)`);
+      console.log(`📤 Documento guardado: ${req.file.filename} en ${estado}/${tipoDocumento}`);
       
-      const result = await processUpload(tempFilePath, estado, tipoDocumento, tituloDocumento);
+      // Guardar metadata adicional
+      const metadataPath = path.join(DOCS_DIR, estado, tipoDocumento, 'metadata.json');
+      let metadata = {};
+      
+      if (fs.existsSync(metadataPath)) {
+        metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+      }
+      
+      metadata[req.file.filename] = {
+        titulo: tituloDocumento,
+        original_name: req.file.originalname,
+        uploaded_at: new Date().toISOString(),
+        size: req.file.size,
+        estado: estado,
+        tipo_documento: tipoDocumento
+      };
+      
+      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+      
+      const fileUrl = `/documentos/${estado}/${tipoDocumento}/${req.file.filename}`;
+      const fullUrl = `${req.protocol}://${req.get('host')}${fileUrl}`;
 
       res.status(201).json({
         status: 'success',
         data: {
-          url: result.secure_url,
-          public_id: result.public_id,
-          filename: path.parse(req.file.originalname).name + '.pdf',
+          url: fileUrl,
+          public_id: `${estado}/${tipoDocumento}/${req.file.filename}`,
+          filename: req.file.originalname,
           estado: estado,
           tipo_documento: tipoDocumento,
-          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
-          download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
-          uploaded_at: result.created_at,
-          size: result.bytes,
-          pages: result.pages,
-          format: result.format,
-          etag: result.etag,
+          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`,
+          download_url: fileUrl,
+          uploaded_at: new Date().toISOString(),
+          size: req.file.size,
+          format: 'pdf',
           ...(tituloDocumento && { titulo_documento: tituloDocumento })
         }
       });
+      
     } catch (error) {
-      // Asegurar limpieza en caso de error
-      if (tempFilePath) {
-        await cleanupTempFile(tempFilePath);
-      }
       next(error);
     }
   });
 });
 
-// Ruta para eliminar archivos (SIN CAMBIOS)
+// Ruta para eliminar archivos
 router.delete('/delete', authenticate, async (req, res, next) => {
   try {
     const { public_id, estado, tipo_documento } = req.body;
@@ -538,22 +499,15 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       throw new AppError('No tienes permiso para eliminar este archivo', 403, 'forbidden');
     }
 
-    try {
-      await cloudinary.api.resource(public_id, { resource_type: 'raw' });
-    } catch (error) {
-      if (error.http_code === 404) {
-        throw new AppError('Archivo no encontrado', 404, 'not_found');
-      }
-      throw error;
-    }
-
-    const result = await cloudinary.uploader.destroy(public_id, {
-      resource_type: 'raw',
-      invalidate: true
-    });
-
-    if (result.result !== 'ok') {
-      throw new AppError('Error al eliminar el archivo', 500, 'delete_failed');
+    const result = deleteDocumento(public_id);
+    
+    // También eliminar de metadata
+    const metadataPath = path.join(DOCS_DIR, estado, tipo_documento, 'metadata.json');
+    if (fs.existsSync(metadataPath)) {
+      let metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+      const filename = public_id.split('/').pop();
+      delete metadata[filename];
+      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
     }
 
     res.json({
@@ -563,121 +517,51 @@ router.delete('/delete', authenticate, async (req, res, next) => {
         public_id: public_id,
         estado: estado,
         tipo_documento: tipo_documento,
-        deleted_at: new Date().toISOString(),
-        deletion_result: result
+        deleted_at: new Date().toISOString()
       }
     });
+    
   } catch (error) {
     next(error);
   }
 });
 
-// Ruta para listar archivos - SIN CAMBIOS
+// Ruta para listar archivos
 router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, next) => {
   try {
-    // DECODIFICAR y normalizar parámetros
     let estado = decodeURIComponent(req.params.estado || 'aguascalientes');
     let tipoDocumento = decodeURIComponent(req.params.tipoDocumento || 'ficha_curricular');
     
-    // Normalizar caracteres (remover acentos, convertir a lowercase)
-    estado = estado.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-    tipoDocumento = tipoDocumento.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-    
-    // Reemplazar espacios por guiones para consistencia
-    estado = estado.replace(/\s+/g, '-');
-    tipoDocumento = tipoDocumento.replace(/\s+/g, '_');
+    // Normalizar caracteres
+    estado = estado.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, '-');
+    tipoDocumento = tipoDocumento.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, '_');
     
     console.log(`📁 Buscando archivos para: ${estado}/${tipoDocumento}`);
-
-    try {
-      const result = await cloudinary.api.resources({
-        type: 'upload',
-        prefix: `${estado}/${tipoDocumento}/`,
-        resource_type: 'raw',
-        max_results: 500,
-        context: true,
-        tags: true,
-        timestamp: Date.now() // Cache busting
+    
+    const documentos = getDocumentosFromFolder(estado, tipoDocumento, req);
+    
+    // Agregar título global si es plantilla_personal
+    if (tipoDocumento === 'plantilla_personal') {
+      const tituloGlobal = getTituloGlobal();
+      documentos.forEach(doc => {
+        doc.titulo_documento = tituloGlobal;
       });
-
-      const archivos = result.resources.map(resource => {
-        const originalName = resource.context?.custom?.original_filename || 
-                           path.parse(resource.public_id).name + '.pdf';
-        return {
-          url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
-          public_id: resource.public_id,
-          filename: originalName,
-          estado: estado,
-          tipo_documento: tipoDocumento,
-          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(resource.secure_url)}&embedded=true&_=${Date.now()}`,
-          download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
-          uploaded_at: resource.created_at,
-          size: resource.bytes,
-          format: resource.format,
-          width: resource.width,
-          height: resource.height,
-          etag: resource.etag,
-          tags: resource.tags,
-          ...(resource.context?.custom?.titulo_documento && { 
-            titulo_documento: resource.context.custom.titulo_documento 
-          })
-        };
-      });
-
-      res.json({
-        status: 'success',
-        data: archivos,
-        count: archivos.length,
-        estado: estado,
-        tipo_documento: tipoDocumento,
-        timestamp: new Date().toISOString()
-      });
-      
-    } catch (cloudinaryError) {
-      console.error('❌ Error de Cloudinary:', {
-        message: cloudinaryError.message,
-        http_code: cloudinaryError.http_code,
-        name: cloudinaryError.name
-      });
-      
-      // Manejar específicamente el error de IP (por si vuelve a pasar)
-      if (cloudinaryError.message.includes('Source IP address') && cloudinaryError.http_code === 401) {
-        return res.status(502).json({
-          status: 'error',
-          error: 'cloudinary_ip_blocked',
-          message: 'Configuración de Cloudinary: La IP del servidor no está permitida',
-          solution: 'Verificar IP allowlist en Cloudinary Dashboard',
-          timestamp: new Date().toISOString()
-        });
-      }
-      
-      // Si no hay archivos, devolver array vacío en lugar de error 500
-      if (cloudinaryError.message.includes('No resources found') || cloudinaryError.http_code === 404) {
-        return res.json({
-          status: 'success',
-          data: [],
-          count: 0,
-          estado: estado,
-          tipo_documento: tipoDocumento,
-          timestamp: new Date().toISOString(),
-          message: 'No se encontraron archivos para esta combinación'
-        });
-      }
-      
-      // Para otros errores de Cloudinary, lanzar el error normal
-      throw new AppError(`Error de Cloudinary: ${cloudinaryError.message}`, 502, 'cloudinary_error');
     }
+    
+    res.json({
+      status: 'success',
+      data: documentos,
+      count: documentos.length,
+      estado: estado,
+      tipo_documento: tipoDocumento,
+      timestamp: new Date().toISOString()
+    });
     
   } catch (error) {
     console.error('❌ Error en /api/archivos:', error);
     next(error);
   }
 });
-
-// ************ RUTAS PARA TÍTULO GLOBAL ************
-
-// Variable para almacenar el título global (en producción usa una base de datos)
-let tituloGlobal = process.env.TITULO_GLOBAL_INICIAL || 'Plantilla de Personal - INM';
 
 // Ruta para guardar título global
 router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
@@ -688,35 +572,31 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
       throw new AppError('Título válido es requerido', 400, 'missing_titulo');
     }
 
-    // Actualizar en memoria
-    tituloGlobal = titulo;
-
-    // También puedes guardar en Cloudinary como metadata si lo prefieres
-    // Buscar todos los archivos de plantilla de personal para actualizar su metadata
-    try {
-      const recursos = await cloudinary.api.resources({
-        type: 'upload',
-        resource_type: 'raw',
-        max_results: 500,
-        context: true
-      });
-
-      const plantillas = recursos.resources.filter(
-        res => res.public_id.includes('/plantilla_personal/')
-      );
-
-      // Actualizar metadata en cada archivo encontrado
-      await Promise.all(plantillas.map(async (resource) => {
-        const originalName = resource.context?.custom?.original_filename || 'plantilla.pdf';
-        await cloudinary.uploader.explicit(resource.public_id, {
-          type: 'upload',
-          resource_type: 'raw',
-          context: `titulo_documento=${titulo}|original_filename=${originalName}`
-        });
-      }));
-    } catch (cloudinaryError) {
-      console.warn('No se pudo actualizar metadata en Cloudinary:', cloudinaryError.message);
-    }
+    setTituloGlobal(titulo);
+    
+    // Opcional: actualizar metadata de todos los archivos de plantilla_personal
+    const estados = fs.readdirSync(DOCS_DIR);
+    estados.forEach(estado => {
+      const plantillaPath = path.join(DOCS_DIR, estado, 'plantilla_personal');
+      if (fs.existsSync(plantillaPath)) {
+        const metadataPath = path.join(plantillaPath, 'metadata.json');
+        if (fs.existsSync(metadataPath)) {
+          let metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+          let modified = false;
+          
+          Object.keys(metadata).forEach(filename => {
+            if (metadata[filename].titulo !== titulo) {
+              metadata[filename].titulo = titulo;
+              modified = true;
+            }
+          });
+          
+          if (modified) {
+            fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+          }
+        }
+      }
+    });
 
     res.json({
       status: 'success',
@@ -726,6 +606,7 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
         updated_at: new Date().toISOString()
       }
     });
+    
   } catch (error) {
     next(error);
   }
@@ -734,35 +615,21 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
 // Ruta para obtener título global
 router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
   try {
-    // Primero intenta obtener de Cloudinary (metadata del primer archivo de plantilla encontrado)
-    try {
-      const recursos = await cloudinary.api.resources({
-        type: 'upload',
-        resource_type: 'raw',
-        max_results: 1,
-        context: true,
-        timestamp: Date.now() // Cache busting
-      });
-
-      if (recursos.resources.length > 0 && recursos.resources[0].context?.custom?.titulo_documento) {
-        tituloGlobal = recursos.resources[0].context.custom.titulo_documento;
-      }
-    } catch (cloudinaryError) {
-      console.warn('Error al buscar en Cloudinary:', cloudinaryError.message);
-    }
-
+    const titulo = getTituloGlobal();
+    
     res.json({
       status: 'success',
-      titulo: tituloGlobal,
-      source: 'memory',
+      titulo: titulo,
+      source: 'local_file',
       timestamp: new Date().toISOString()
     });
+    
   } catch (error) {
     next(error);
   }
 });
 
-// Ruta de diagnóstico TEMPORAL para probar parámetros
+// Ruta de diagnóstico
 router.get('/debug-params/:estado/:tipoDocumento', (req, res) => {
   const estado = req.params.estado;
   const tipoDocumento = req.params.tipoDocumento;
@@ -773,8 +640,8 @@ router.get('/debug-params/:estado/:tipoDocumento', (req, res) => {
     estado_recibido: estado,
     tipoDocumento_recibido: tipoDocumento,
     normalized: {
-      estado: estado.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(),
-      tipoDocumento: tipoDocumento.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()
+      estado: estado.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, '-'),
+      tipoDocumento: tipoDocumento.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, '_')
     },
     timestamp: new Date().toISOString()
   });
@@ -788,7 +655,8 @@ router.get('/render-ping', (req, res) => {
     status: "active",
     timestamp: new Date().toISOString(),
     clientIP: clientIP,
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    storage: "local"
   });
 });
 
@@ -807,27 +675,15 @@ app.use(handleError);
 const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor en puerto ${PORT}`);
   console.log(`🌍 Modo: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📁 Directorio temporal: ${tmpDir}`);
+  console.log(`📁 Directorio de documentos: ${DOCS_DIR}`);
   console.log(`✅ CORS configurado para los siguientes orígenes:`, allowedOrigins);
-  console.log(`⚡ Configuración optimizada para server de pago`);
+  console.log(`⚡ SIN CLOUDINARY - Almacenamiento local activo`);
 });
 
-// Manejo de cierre mejorado
+// Manejo de cierre
 const shutdown = async (signal) => {
   console.log(`🛑 Recibido ${signal}, cerrando servidor...`);
   
-  // Limpiar archivos temporales antes de cerrar
-  try {
-    const files = await fs.promises.readdir(tmpDir);
-    for (const file of files) {
-      await fs.promises.unlink(path.join(tmpDir, file));
-    }
-    console.log(`🧹 ${files.length} archivos temporales limpiados`);
-  } catch (cleanupError) {
-    console.error('Error limpiando archivos temporales:', cleanupError);
-  }
-  
-  // Evitar nuevas conexiones
   server.close((err) => {
     if (err) {
       console.error('❌ Error al cerrar servidor:', err);
@@ -835,16 +691,9 @@ const shutdown = async (signal) => {
     }
     
     console.log('✅ Servidor cerrado correctamente');
-    
-    // Cerrar recursos (logs, etc)
-    if (process.env.NODE_ENV === 'production') {
-      process.stdout.write(''); // Force flush logs
-    }
-    
     process.exit(0);
   });
   
-  // Timeout de 10 segundos para shutdown forzado
   setTimeout(() => {
     console.log('⚠️ Shutdown forzado después de timeout');
     process.exit(1);
