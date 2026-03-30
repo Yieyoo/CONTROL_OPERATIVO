@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3000;
 // ================================================
 
 // Directorio principal para documentos
-const DOCS_DIR = path.join(__dirname, 'documentos');
+const DOCS_DIR = path.join(__dirname, '..', 'documentos');
 
 // Crear estructura de carpetas para estados y tipos de documentos
 const crearEstructuraDirectorios = () => {
