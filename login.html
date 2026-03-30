@@ -329,21 +329,32 @@
     </div>
 
     <script>
-        // Configuración mejorada
-        const CONFIG = {
-            credentials: {
-                username: 'admin',
-                password: 'dgcor01'
-            },
-            security: {
-                maxAttempts: 3,
-                lockoutTime: 0, // 10 minutos
-                sessionDuration: 8 * 60 * 60 * 1000 // 8 horas en lugar de 1
-            },
-            ui: {
-                loadingDelay: 800, // ms para simular verificación
-                redirectDelay: 1200 // ms antes de redirigir
-            }
+        // ================================================
+        // USAR CONFIGURACIÓN GLOBAL DE config.js
+        // ================================================
+        
+        // Verificar que config.js se cargó correctamente
+        if (typeof window.CONFIG === 'undefined') {
+            console.error('❌ config.js no cargado correctamente');
+            alert('Error de configuración. Contacte al administrador.');
+        }
+        
+        // Credenciales locales (no usar CONFIG para evitar duplicación)
+        const CREDENCIALES = {
+            username: 'admin',
+            password: 'dgcor01'
+        };
+        
+        // Configuración de seguridad
+        const SECURITY_CONFIG = {
+            maxAttempts: 3,
+            lockoutTime: 10 * 60 * 1000, // 10 minutos
+            sessionDuration: 8 * 60 * 60 * 1000 // 8 horas
+        };
+        
+        const UI_CONFIG = {
+            loadingDelay: 800,
+            redirectDelay: 1200
         };
 
         // Elementos del DOM
@@ -409,9 +420,9 @@
                 const lastAttempt = parseInt(localStorage.getItem('lastAttempt') || '0');
                 const now = Date.now();
                 
-                if (attempts >= CONFIG.security.maxAttempts && 
-                    (now - lastAttempt) < CONFIG.security.lockoutTime) {
-                    const remainingTime = Math.ceil((CONFIG.security.lockoutTime - (now - lastAttempt)) / 1000 / 60);
+                if (attempts >= SECURITY_CONFIG.maxAttempts && 
+                    (now - lastAttempt) < SECURITY_CONFIG.lockoutTime) {
+                    const remainingTime = Math.ceil((SECURITY_CONFIG.lockoutTime - (now - lastAttempt)) / 1000 / 60);
                     utils.showMessage(elements.lockout, 
                         `⏳ Demasiados intentos fallidos. Espere ${remainingTime} minuto(s) antes de intentar nuevamente.`);
                     this.disableForm();
@@ -425,9 +436,8 @@
                 localStorage.setItem('loginAttempts', attempts.toString());
                 localStorage.setItem('lastAttempt', Date.now().toString());
                 
-                // Mostrar información de intentos
                 elements.sessionInfo.textContent = 
-                    `Intento ${attempts} de ${CONFIG.security.maxAttempts}`;
+                    `Intento ${attempts} de ${SECURITY_CONFIG.maxAttempts}`;
                 elements.sessionInfo.style.display = 'block';
             },
 
@@ -457,7 +467,7 @@
                 const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
                 const now = Date.now();
                 
-                if (isAuthenticated && (now - loginTime) < CONFIG.security.sessionDuration) {
+                if (isAuthenticated && (now - loginTime) < SECURITY_CONFIG.sessionDuration) {
                     console.log('✅ Sesión activa encontrada, redirigiendo...');
                     setTimeout(() => {
                         window.location.replace('index.html');
@@ -505,10 +515,10 @@
             utils.setLoading(true);
             utils.hideMessages();
             
-            // Simular verificación
+            // Verificar credenciales
             setTimeout(() => {
-                if (username === CONFIG.credentials.username && 
-                    password === CONFIG.credentials.password) {
+                if (username === CREDENCIALES.username && 
+                    password === CREDENCIALES.password) {
                     
                     utils.showMessage(elements.success, 
                         '✅ Credenciales correctas. Accediendo al sistema...', false);
@@ -516,12 +526,12 @@
                     
                     setTimeout(() => {
                         window.location.replace('index.html');
-                    }, CONFIG.ui.redirectDelay);
+                    }, UI_CONFIG.redirectDelay);
                     
                 } else {
                     security.recordFailedAttempt();
                     const attempts = parseInt(localStorage.getItem('loginAttempts') || '0');
-                    const remaining = CONFIG.security.maxAttempts - attempts;
+                    const remaining = SECURITY_CONFIG.maxAttempts - attempts;
                     
                     if (remaining > 0) {
                         utils.showMessage(elements.error,
@@ -532,12 +542,13 @@
                     }
                     utils.setLoading(false);
                 }
-            }, CONFIG.ui.loadingDelay);
+            }, UI_CONFIG.loadingDelay);
         });
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Sistema de login INM cargado');
+            console.log('📡 Backend URL:', window.CONFIG ? window.CONFIG.BACKEND_URL : 'No disponible');
             
             // Limpiar y preparar formulario
             elements.username.value = '';
@@ -546,7 +557,6 @@
             
             // Verificar sesión existente
             if (!session.checkExisting()) {
-                // Verificar bloqueos de seguridad
                 security.checkLockout();
             }
             
@@ -579,8 +589,8 @@
         // Auto-completar solo en desarrollo
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             if (security.checkLockout()) {
-                elements.username.value = CONFIG.credentials.username;
-                elements.password.value = CONFIG.credentials.password;
+                elements.username.value = CREDENCIALES.username;
+                elements.password.value = CREDENCIALES.password;
             }
         }
     </script>
