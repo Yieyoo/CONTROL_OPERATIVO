@@ -34,6 +34,7 @@
     </style>
 </head>
 <body>
+    <script src="../../../config.js"></script>
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
@@ -75,8 +76,8 @@
 
     <script>
         // Configuración
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-        const API_KEY = 'Xhy2md57';
+        const BACKEND_URL = window.CONFIG.BACKEND_URL;
+        const API_KEY = window.CONFIG.API_KEY;
         const ESTADO_FIJO = 'guerrero';
         const TIPO_DOCUMENTO = 'plantilla_personal';
 

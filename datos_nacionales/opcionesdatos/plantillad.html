@@ -64,6 +64,7 @@
 </head>
 
 <body class="mostrar-ubicaciones">
+    <script src="../../config.js"></script>
     <!-- HEADER DE DOS LÍNEAS -->
     <div class="header-lineas">
         <div class="linea-superior"></div>
@@ -121,8 +122,8 @@
 
 <script>
     // CONFIGURACIÓN - PLANTILLA DE PERSONAL
-    const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-    const API_KEY = 'Xhy2md57';
+    const BACKEND_URL = window.CONFIG.BACKEND_URL;
+    const API_KEY = window.CONFIG.API_KEY;
     const ESTADO = 'datos-nacionales';
     const TIPO_DOCUMENTO = 'plantilla';
     const TITULO_DOCUMENTO = 'PLANTILLA ESTRUCTURA';

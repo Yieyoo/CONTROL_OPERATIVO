@@ -10,6 +10,7 @@
     <script src="../../../js/load-menu.js" defer></script>
 </head>
 <body>
+    <script src="../../../config.js"></script>
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
@@ -51,8 +52,8 @@
 
     <script>
         // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
-        const BACKEND_URL = 'https://control-operativo-1.onrender.com/api';
-        const API_KEY = 'Xhy2md57';
+        const BACKEND_URL = window.CONFIG.BACKEND_URL;
+        const API_KEY = window.CONFIG.API_KEY;
         const ESTADO = 'veracruz';
         const TIPO_DOCUMENTO = 'ficha_curricular';
         const TITULO_DOCUMENTO = 'Ficha Curricular';
