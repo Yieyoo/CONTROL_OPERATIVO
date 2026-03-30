@@ -5,7 +5,7 @@
 
 const CONFIG = {
     // === CAMBIA SOLO ESTO CUANDO MIGRES ===
-    BACKEND_URL: 'http://localhost:3000/api',  // ← AHORA: prueba local
+    BACKEND_URL: 'https://control-operativo-1.onrender.com/api',  // ← AHORA: prueba local
     // BACKEND_URL: 'https://control-operativo-1.onrender.com/api',  // ← RENDER (actual)
     // BACKEND_URL: 'http://IP-EMPRESA:3000/api',  // ← SERVIDOR EMPRESA (después)
     
