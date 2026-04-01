@@ -1,12 +1,10 @@
-// load-menu.js - VERSIÓN CORREGIDA DEFINITIVA
 class MenuLoader {
     static async loadMenu() {
         try {
-            console.log('🔄 Iniciando carga del menú...');
+            //console.log('🔄 Iniciando carga del menú...');
             
-            // USAR RUTA FIJA - SIN BÚSQUEDA MÚLTIPLE
             const menuPath = this.getFixedMenuPath();
-            console.log(`📍 Ruta calculada: ${menuPath}`);
+            //console.log(`📍 Ruta calculada: ${menuPath}`);
             
             const response = await fetch(menuPath);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -15,7 +13,7 @@ class MenuLoader {
             
             this.cleanExistingMenu();
             document.body.insertAdjacentHTML('afterbegin', menuHTML);
-            console.log('✅ Menú insertado en el DOM');
+            //console.log('✅ Menú insertado en el DOM');
             
             setTimeout(() => {
                 this.setupCompleteMenu();
@@ -27,41 +25,25 @@ class MenuLoader {
         }
     }
     
-    // MÉTODO NUEVO - RUTA FIJA SIN BÚSQUEDA
     static getFixedMenuPath() {
         const currentPath = window.location.pathname;
-        console.log('📍 Ruta actual detectada:', currentPath);
+        //console.log('📍 Ruta actual detectada:', currentPath);
         
-        // ESTRATEGIA MEJORADA - DETERMINAR NIVELES HACIA LA RAÍZ
-        if (currentPath.includes('/estados/') && currentPath.includes('/opciones/')) {
-            // Ej: /CONTROL_OPERATIVO/estados/aguascalientes/opciones/unidad_canina.html
-            console.log('🎯 Desde opciones estado → ../../../menu.html');
-            return '../../../menu.html';
-        } else if (currentPath.includes('/estados/')) {
-            // Ej: /CONTROL_OPERATIVO/estados/aguascalientes/aguascalientesindex.html
-            console.log('🎯 Desde estado → ../../menu.html');
-            return '../../menu.html';
-        } else if (currentPath.includes('/datos_nacionales/opcionesdatos/')) {
-            // Ej: /CONTROL_OPERATIVO/datos_nacionales/opcionesdatos/plantilla.html
-            console.log('🎯 Desde opciones datos → ../../menu.html');
-            return '../../menu.html';
-        } else if (currentPath.includes('/datos_nacionales/')) {
-            // Ej: /CONTROL_OPERATIVO/datos_nacionales/datosindex.html
-            console.log('🎯 Desde datos nacionales → ../menu.html');
-            return '../menu.html';
-        } else if (currentPath.includes('/gestion/')) {
-            // Ej: /CONTROL_OPERATIVO/gestion/archivos.html
-            console.log('🎯 Desde gestión → ../menu.html');
-            return '../menu.html';
-        } else {
-            // Raíz o casos no especificados
-            console.log('🎯 Desde raíz → menu.html');
-            return 'menu.html';
-        }
+        let depth = 0;
+        if (currentPath.includes('/opciones/')) depth = 3;
+        else if (currentPath.includes('/estados/') && !currentPath.includes('/opciones/')) depth = 2;
+        else if (currentPath.includes('/datos_nacionales/opcionesdatos/')) depth = 2;
+        else if (currentPath.includes('/datos_nacionales/')) depth = 1;
+        else if (currentPath.includes('/gestion/')) depth = 1;
+        else depth = 0;
+        
+        const menuPath = depth === 0 ? 'menu.html' : '../'.repeat(depth) + 'menu.html';
+        console.log(`🎯 Profundidad: ${depth}, Ruta: ${menuPath}`);
+        return menuPath;
     }
     
     static cleanExistingMenu() {
-        const elementsToRemove = ['.menu', '.menu-overlay', '.menu-toggle', '.menu-container', 'nav.menu'];
+        const elementsToRemove = ['.menu', '.menu-overlay', '.menu-toggle'];
         elementsToRemove.forEach(selector => {
             document.querySelectorAll(selector).forEach(el => el.remove());
         });
@@ -79,18 +61,12 @@ class MenuLoader {
             return;
         }
         
-        console.log('✅ Elementos del menú encontrados');
+        //console.log('✅ Elementos del menú encontrados');
         
-        // CORREGIR RUTAS
+        
         this.fixMenuLinks();
-        
-        // Configurar eventos básicos
         this.setupBasicMenuEvents(menuToggle, menu, menuOverlay);
-        
-        // Configurar submenús
         this.setupSubmenus();
-        
-        // Configurar logout
         this.setupLogout();
         
         console.log('🎉 Menú completamente configurado y listo');
@@ -100,76 +76,42 @@ class MenuLoader {
         const allLinks = document.querySelectorAll('.menu a[href]');
         console.log(`🔗 Corrigiendo ${allLinks.length} enlaces del menú`);
         
+        const currentPath = window.location.pathname;
+        let depth = 0;
+        if (currentPath.includes('/opciones/')) depth = 3;
+        else if (currentPath.includes('/estados/') && !currentPath.includes('/opciones/')) depth = 2;
+        else if (currentPath.includes('/datos_nacionales/opcionesdatos/')) depth = 2;
+        else if (currentPath.includes('/datos_nacionales/')) depth = 1;
+        else if (currentPath.includes('/gestion/')) depth = 1;
+        else depth = 0;
+        
+        const prefix = depth === 0 ? '' : '../'.repeat(depth);
+        
         allLinks.forEach(link => {
             const originalHref = link.getAttribute('href');
             
-            if (this.shouldFixLink(originalHref)) {
-                const correctedHref = this.getCorrectedHref(originalHref);
+            if (originalHref && !originalHref.startsWith('http') && !originalHref.startsWith('#') && originalHref !== '#') {
+                let newHref = originalHref;
                 
-                if (correctedHref !== originalHref) {
-                    link.setAttribute('href', correctedHref);
-                    console.log(`🔄 ${originalHref} → ${correctedHref}`);
+                // Corregir rutas
+                if (originalHref === 'index.html') {
+                    newHref = prefix + 'index.html';
+                } else if (originalHref.startsWith('datos_nacionales/')) {
+                    newHref = prefix + originalHref;
+                } else if (originalHref.startsWith('estados/')) {
+                    newHref = prefix + originalHref;
+                } else if (originalHref === 'construccion.html') {
+                    newHref = prefix + 'construccion.html';
+                } else if (originalHref === 'gestion/archivos.html') {
+                    newHref = prefix + 'gestion/archivos.html';
+                }
+                
+                if (newHref !== originalHref) {
+                    link.setAttribute('href', newHref);
+                    console.log(`🔄 ${originalHref} → ${newHref}`);
                 }
             }
         });
-    }
-    
-    static shouldFixLink(href) {
-        return href && 
-               !href.startsWith('http') && 
-               !href.startsWith('//') &&
-               !href.startsWith('#') && 
-               !href.startsWith('javascript:') &&
-               !href.startsWith('mailto:') &&
-               !href.startsWith('tel:');
-    }
-    
-    static getCorrectedHref(originalHref) {
-        const currentPath = window.location.pathname;
-        
-        // ESTRATEGIA MEJORADA PARA TODAS LAS RUTAS
-        if (currentPath.includes('/opciones/')) {
-            // Desde: /estados/aguascalientes/opciones/archivo.html
-            if (originalHref === 'index.html') return '../../../index.html';
-            if (originalHref.startsWith('estados/')) return '../../../' + originalHref;
-            if (originalHref.startsWith('datos_nacionales/')) return '../../../' + originalHref;
-            if (originalHref === 'construccion.html') return '../../../construccion.html';
-            if (originalHref === 'gestion/archivos.html') return '../../../gestion/archivos.html';
-            
-        } else if (currentPath.includes('/estados/') && !currentPath.includes('/opciones/')) {
-            // Desde: /estados/aguascalientes/aguascalientesindex.html  
-            if (originalHref === 'index.html') return '../../index.html';
-            if (originalHref.startsWith('estados/')) return '../../' + originalHref;
-            if (originalHref.startsWith('datos_nacionales/')) return '../../' + originalHref;
-            if (originalHref === 'construccion.html') return '../../construccion.html';
-            if (originalHref === 'gestion/archivos.html') return '../../gestion/archivos.html';
-            
-        } else if (currentPath.includes('/datos_nacionales/opcionesdatos/')) {
-            // Desde: /datos_nacionales/opcionesdatos/archivo.html
-            if (originalHref === 'index.html') return '../../index.html';
-            if (originalHref.startsWith('estados/')) return '../../' + originalHref;
-            if (originalHref.startsWith('datos_nacionales/')) return '../../' + originalHref;
-            if (originalHref === 'construccion.html') return '../../construccion.html';
-            if (originalHref === 'gestion/archivos.html') return '../../gestion/archivos.html';
-            
-        } else if (currentPath.includes('/datos_nacionales/')) {
-            // Desde: /datos_nacionales/datosindex.html
-            if (originalHref === 'index.html') return '../index.html';
-            if (originalHref.startsWith('estados/')) return '../' + originalHref;
-            if (originalHref.startsWith('datos_nacionales/')) return '../' + originalHref;
-            if (originalHref === 'construccion.html') return '../construccion.html';
-            if (originalHref === 'gestion/archivos.html') return '../gestion/archivos.html';
-            
-        } else if (currentPath.includes('/gestion/')) {
-            // Desde: /gestion/archivos.html
-            if (originalHref === 'index.html') return '../index.html';
-            if (originalHref.startsWith('estados/')) return '../' + originalHref;
-            if (originalHref.startsWith('datos_nacionales/')) return '../' + originalHref;
-            if (originalHref === 'construccion.html') return '../construccion.html';
-            if (originalHref === 'gestion/archivos.html') return 'archivos.html';
-        }
-        
-        return originalHref;
     }
     
     static setupBasicMenuEvents(menuToggle, menu, menuOverlay) {
@@ -223,12 +165,6 @@ class MenuLoader {
         
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.submenu')) {
-                this.closeAllSubmenus();
-            }
-        });
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
                 this.closeAllSubmenus();
             }
         });
@@ -319,7 +255,6 @@ if (document.readyState === 'loading') {
     MenuLoader.loadMenu();
 }
 
-// Funciones globales
 window.toggleMenu = function() {
     const menu = document.querySelector('.menu');
     if (menu) {
