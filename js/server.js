@@ -185,6 +185,8 @@ app.use(compression({
 
 // Servir documentos estáticamente
 app.use('/documentos', express.static(DOCS_DIR));
+// Servir archivos estáticos (HTML, CSS, JS) desde la raíz del proyecto
+app.use(express.static(path.join(__dirname, '..')));
 
 // Rate Limiting
 const apiLimiter = rateLimit({
