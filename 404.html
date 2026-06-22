@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página no encontrada | INM</title>
+    <link rel="icon" type="image/png" href="/imagenes/mapa.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { font-size: clamp(12px, 0.85vw, 16px); }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('/imagenes/fondo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; right: 0;
+            width: 45%; height: 100vh;
+            background-image: url('/imagenes/fondoderecha.jpg');
+            background-size: cover;
+            background-position: left center;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 3rem 3.5rem;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            border-top: 5px solid #691932;
+            animation: aparecer 0.5s ease;
+        }
+
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: clamp(120px, 14vw, 180px);
+            height: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .codigo {
+            font-size: 5rem;
+            font-weight: 800;
+            color: #691932;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+        }
+
+        .linea-dorada {
+            height: 3px;
+            width: 60px;
+            background: #A5852E;
+            margin: 0.8rem auto 1.2rem;
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+
+        p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .btn-inicio {
+            display: inline-block;
+            background: linear-gradient(135deg, #691932 0%, #4d1224 100%);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(105, 25, 50, 0.35);
+        }
+
+        .btn-inicio:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(105, 25, 50, 0.45);
+        }
+
+        .ruta {
+            margin-top: 1.5rem;
+            font-size: 0.78rem;
+            color: #999;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="/imagenes/inm logo.png" alt="Logo INM" class="logo">
+        <div class="codigo">404</div>
+        <div class="linea-dorada"></div>
+        <h1>Página no encontrada</h1>
+        <p>La ruta que buscas no existe o fue movida.<br>Verifica la dirección o regresa al inicio.</p>
+        <a href="/index.html" class="btn-inicio">← Volver al inicio</a>
+        <div class="ruta" id="ruta-actual"></div>
+    </div>
+    <script>
+        document.getElementById('ruta-actual').textContent = window.location.pathname;
+    </script>
+</body>
+</html>
