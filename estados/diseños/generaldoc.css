@@ -114,9 +114,9 @@ body::before {
 /* CONTENEDOR PDF       */
 /* ==================== */
 .pdf-container {
-    width: 96%;
-    max-width: 1500px;
-    margin: 20px auto 30px;
+    width: 62%;
+    max-width: 900px;
+    margin: 20px auto 25px;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: var(--doc-sombra);
@@ -127,8 +127,8 @@ body::before {
 .pdf-container iframe,
 .pdf-container embed {
     width: 100%;
-    height: calc(100vh - 130px);
-    min-height: 600px;
+    height: calc(100vh - 360px);
+    min-height: 420px;
     border: none;
     display: block;
 }
