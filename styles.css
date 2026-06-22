@@ -95,62 +95,50 @@ body { padding-top: 50px; }
   padding: 0;
   margin: 0;
   width: 100%;
-  background: #fff;
-  min-height: 58vh;
+  background: transparent;
+  min-height: 78vh;
   margin-bottom: 0;
   position: relative;
   overflow: hidden;
 }
 
 .portada .imagen-container {
-  width: 52%;
+  width: 50%;
   flex-shrink: 0;
-  background:
-    radial-gradient(ellipse at 30% 80%, rgba(180, 60, 90, 0.45) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 20%, rgba(100, 20, 27, 0.6) 0%, transparent 50%),
-    linear-gradient(160deg, #3d0e1a 0%, #691932 45%, #530f25 100%);
-  clip-path: polygon(0 0, 100% 0, 86% 100%, 0 100%);
+  background: transparent;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  padding: 0 5rem 0 3rem;
+  padding: 0 2rem 0 3rem;
   margin-bottom: 0;
   animation: fadeInLeft 0.8s ease;
   position: relative;
-  
 }
 
 /* línea dorada vertical decorativa en el panel */
 .portada .imagen-container::after {
-  content: '';
-  position: absolute;
-  top: 10%;
-  right: 16%;
-  width: 2px;
-  height: 70%;
-  background: linear-gradient(to bottom, transparent, rgba(165,133,46,0.5), transparent);
-  pointer-events: none;
+  display: none;
 }
 
 .portada .imagen-container img {
-  max-width: 70%;
+  max-width: 92%;
   height: 100%;
-  max-height: 380px;
+  max-height: none;
   object-fit: contain;
   object-position: bottom;
   display: block;
-  margin-left: clamp(0px, 4vw, 60px);
+  margin-left: 0;
   border: none;
   border-radius: 0;
   box-shadow: none;
-  filter: drop-shadow(4px 0 18px rgba(0,0,0,0.35));
+  filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4));
 }
 
 .portada .texto-container {
   flex: 1;
   text-align: right;
   animation: fadeInRight 0.8s ease;
-  padding: 5rem 3rem 3rem 2rem;
+  padding: 5rem 4rem 3rem 2rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -158,13 +146,17 @@ body { padding-top: 50px; }
   align-items: flex-end;
   margin-bottom: 0;
   overflow: visible;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .portada .texto-container h1 {
-  font-size: clamp(1.5rem, 2.5vw, 2.4rem);
+  font-size: clamp(2rem, 3.2vw, 3.4rem);
   font-weight: 800;
   color: #691932;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   text-shadow: none;
   line-height: 1.1;
   letter-spacing: 0.3px;
@@ -172,9 +164,9 @@ body { padding-top: 50px; }
 
 .portada .texto-container h2,
 .portada .texto-container h3 {
-  font-size: clamp(0.88rem, 1.2vw, 1.05rem);
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
   color: #555;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: 0;
@@ -183,11 +175,11 @@ body { padding-top: 50px; }
 .portada .texto-container h3 {
   font-weight: 600;
   color: #691932;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.5rem;
 }
 
 .portada .texto-container .fecha-actual {
-  font-size: clamp(0.88rem, 1.1vw, 1rem);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
   color: #555;
   font-style: italic;
 }
@@ -349,10 +341,10 @@ body { padding-top: 50px; }
 
 /* Línea dorada corta alineada a la derecha */
 .portada .texto-container .linea {
-  width: 60px !important;
+  width: 80px !important;
   height: 3px !important;
   background: linear-gradient(to left, #A5852E, #c49d3a) !important;
-  margin: 0.2rem 0 0.8rem auto !important;
+  margin: 0.4rem 0 1rem auto !important;
   animation: none !important;
   border-radius: 2px;
 }
@@ -421,14 +413,15 @@ body { padding-top: 50px; }
 @media (max-width: 992px) {
   .portada {
     flex-direction: column;
-    min-height: auto;
+    min-height: calc(100vh - 50px);
   }
 
   .portada .imagen-container {
     width: 100%;
-    clip-path: none;
+    border-right: none;
+    border-bottom: 3px solid #A5852E;
     padding: 2rem 2rem 0;
-    min-height: 260px;
+    min-height: 40vh;
     justify-content: center;
   }
 
@@ -436,11 +429,11 @@ body { padding-top: 50px; }
     width: 100%;
     text-align: center;
     align-items: center;
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
   }
 
   .portada .texto-container .linea {
-    margin: 0.2rem auto 0.8rem auto !important;
+    margin: 0.4rem auto 1rem auto !important;
     background: linear-gradient(to right, #A5852E, #c49d3a) !important;
   }
 
