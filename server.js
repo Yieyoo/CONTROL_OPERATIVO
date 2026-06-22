@@ -662,13 +662,17 @@ router.post('/ficha-datos/:estado', authenticate, async (req, res, next) => {
       delete fichaData.foto_base64;
     }
 
-    const jsonStr = JSON.stringify(fichaData);
-    const dataUri = `data:application/json;base64,${Buffer.from(jsonStr).toString('base64')}`;
-
-    await cloudinary.uploader.upload(dataUri, {
-      resource_type: 'raw',
-      public_id: `${estado}/ficha_datos/datos`,
-      overwrite: true
+    const jsonBuffer = Buffer.from(JSON.stringify(fichaData));
+    await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: 'raw', public_id: `${estado}/ficha_datos/datos`, overwrite: true },
+        (error, result) => error ? reject(error) : resolve(result)
+      );
+      const { Readable } = require('stream');
+      const readable = new Readable();
+      readable.push(jsonBuffer);
+      readable.push(null);
+      readable.pipe(uploadStream);
     });
 
     fichaCache[estado] = fichaData;
