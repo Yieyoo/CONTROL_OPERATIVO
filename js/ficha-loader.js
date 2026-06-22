@@ -131,7 +131,6 @@
                 <div class="ficha-der">
                     <div class="ficha-logos">
                         <img src="${PREFIX}imagenes/gobernacion.jpg" alt="Gobernación" onerror="this.style.display='none'">
-                        <img src="${PREFIX}imagenes/inm logo.png" alt="INM">
                     </div>
 
                     <div class="ficha-sec-der">
@@ -173,14 +172,13 @@
                 <div class="ficha-field">
                     <label>Foto</label>
                     <div class="ficha-foto-preview-wrap">
-                        ${d.foto_url ? `<img id="ficha-foto-preview" src="${d.foto_url}" style="object-position:${d.foto_position||'20% center'}">` : `<img id="ficha-foto-preview" src="" style="display:none">`}
-                        <input type="file" id="f-foto" accept="image/*" onchange="fichaPreviewFoto(this)">
-                    </div>
-                    <div class="ficha-field" style="margin-top:8px">
-                        <label>Posición vertical de la foto — <span id="pos-label">${Math.round(parseFloat(d.foto_position||'20') )}%</span></label>
-                        <input type="range" id="f-foto-pos" min="0" max="100" value="${parseFloat(d.foto_position||'20')}"
-                            oninput="fichaAjustarFoto(this.value)" style="width:100%">
-                        <small style="color:#888;font-size:0.7rem">0% = arriba &nbsp;·&nbsp; 50% = centro &nbsp;·&nbsp; 100% = abajo</small>
+                        ${d.foto_url
+                            ? `<img id="ficha-foto-preview" src="${d.foto_url}" style="object-position:${d.foto_position||'50% 20%'}">`
+                            : `<img id="ficha-foto-preview" src="" style="display:none">`}
+                        <div>
+                            <input type="file" id="f-foto" accept="image/*" onchange="fichaPreviewFoto(this)">
+                            <small style="color:#888;font-size:0.7rem;display:block;margin-top:4px">Arrastra la foto para reposicionarla</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -243,6 +241,7 @@
         (d.carrera_profesional || []).forEach(c => addFormRow('carrera', null, null, c));
 
         document.getElementById('fichaModalOverlay').classList.add('active');
+        setTimeout(setupFotoDrag, 50);
     };
 
     window.fichaCloseModal = function () {
@@ -262,12 +261,60 @@
         reader.readAsDataURL(file);
     };
 
-    window.fichaAjustarFoto = function (val) {
-        const prev = document.getElementById('ficha-foto-preview');
-        if (prev) prev.style.objectPosition = `center ${val}%`;
-        const lbl = document.getElementById('pos-label');
-        if (lbl) lbl.textContent = `${Math.round(val)}%`;
-    };
+    function setupFotoDrag() {
+        const preview = document.getElementById('ficha-foto-preview');
+        if (!preview || !preview.src || preview.style.display === 'none') return;
+
+        const wrap = preview.parentElement;
+        wrap.style.cursor = 'grab';
+        wrap.style.userSelect = 'none';
+
+        // Parse current position
+        let posX = 50, posY = 20;
+        const m = (preview.style.objectPosition || '').match(/([\d.]+)%\s+([\d.]+)%/);
+        if (m) { posX = parseFloat(m[1]); posY = parseFloat(m[2]); }
+
+        let dragging = false, lastX = 0, lastY = 0;
+
+        function sensitivity() {
+            const nW = preview.naturalWidth || 300;
+            const nH = preview.naturalHeight || 400;
+            const cW = wrap.clientWidth || 95;
+            const cH = wrap.clientHeight || 115;
+            const scale = Math.max(cW / nW, cH / nH);
+            const exX = Math.max(1, nW * scale - cW);
+            const exY = Math.max(1, nH * scale - cH);
+            return { x: 100 / exX, y: 100 / exY };
+        }
+
+        function start(e) {
+            dragging = true;
+            const t = e.touches?.[0] || e;
+            lastX = t.clientX; lastY = t.clientY;
+            wrap.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+        function move(e) {
+            if (!dragging) return;
+            const t = e.touches?.[0] || e;
+            const dx = t.clientX - lastX;
+            const dy = t.clientY - lastY;
+            lastX = t.clientX; lastY = t.clientY;
+            const s = sensitivity();
+            posX = Math.max(0, Math.min(100, posX - dx * s.x));
+            posY = Math.max(0, Math.min(100, posY - dy * s.y));
+            preview.style.objectPosition = `${posX}% ${posY}%`;
+            e.preventDefault();
+        }
+        function end() { dragging = false; wrap.style.cursor = 'grab'; }
+
+        wrap.addEventListener('mousedown', start);
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', end);
+        wrap.addEventListener('touchstart', start, { passive: false });
+        document.addEventListener('touchmove', move, { passive: false });
+        document.addEventListener('touchend', end);
+    }
 
     // ── Dynamic rows ────────────────────────────────────────
     window.fichaAddRow = function (type) {
@@ -353,12 +400,13 @@
                 return { org: inputs[0]?.value.trim(), cargo: inputs[1]?.value.trim() };
             }).filter(c => c.org || c.cargo);
 
-        const fotoPosVal = document.getElementById('f-foto-pos')?.value || '20';
+        const fotoPreview = document.getElementById('ficha-foto-preview');
+        const fotoPos = fotoPreview?.style.objectPosition || currentData?.foto_position || '50% 20%';
         return {
             cargo: document.getElementById('f-cargo')?.value.trim() || '',
             nombre: document.getElementById('f-nombre')?.value.trim() || '',
             foto_url: currentData?.foto_url || '',
-            foto_position: `center ${fotoPosVal}%`,
+            foto_position: fotoPos,
             formacion,
             contacto: {
                 personal: document.getElementById('f-tel-personal')?.value.trim() || '',
