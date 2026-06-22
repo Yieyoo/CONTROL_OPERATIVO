@@ -1,22 +1,10 @@
 /* ============ RESET Y VARIABLES ============ */
 :root {
-  --color-primario: #A5852E; /* Dorado principal */
-  --color-texto: #333; /* Texto oscuro */
-  --color-texto-claro: #691932; /* Texto blanco */
-  --color-fondo: #f4f4f4; /* Fondo gris claro */
-  --sombra: 0 4px 8px rgba(0, 0, 0, 0.1); /* Corrección: faltaba rgba */
-  --transicion: all 0.3s ease;
-}
-
-* {
-  margin: 0;
-  padding: 0;/* ============ RESET Y VARIABLES ============ */
-:root {
-  --color-primario: #A5852E; /* Dorado principal */
-  --color-texto: #333; /* Texto oscuro */
-  --color-texto-claro: #691932; /* Texto blanco */
-  --color-fondo: #f4f4f4; /* Fondo gris claro */
-  --sombra: 0 4px 8px rgba(0, 0, 0, 0.1); /* Corrección: faltaba rgba */
+  --color-primario: #A5852E;
+  --color-texto: #333;
+  --color-texto-claro: #691932;
+  --color-fondo: #f4f4f4;
+  --sombra: 0 4px 8px rgba(0, 0, 0, 0.1);
   --transicion: all 0.3s ease;
 }
 
@@ -26,7 +14,12 @@
   box-sizing: border-box;
 }
 
-/* ============ ESTILOS GENERALES ============ */
+html {
+  scroll-behavior: smooth;
+  font-size: clamp(12px, 0.85vw, 16px);
+}
+
+/* ============ BODY ============ */
 body {
   font-family: 'Arial', sans-serif;
   background-color: var(--color-fondo);
@@ -39,14 +32,18 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  padding-top: 50px;
+  opacity: 0;
+  animation: pageLoad 1s ease 0.3s forwards;
 }
-/* Fondo derecho fijo con tu imagen */
+
 body::before {
   content: '';
   position: fixed;
   top: 0;
   right: 0;
-  width: 45%; /* Ajusta según el ancho de tu imagen */
+  width: 45%;
   height: 100vh;
   background-image: url('imagenes/fondoderecha.jpg');
   background-size: cover;
@@ -56,32 +53,27 @@ body::before {
   pointer-events: none;
 }
 
-/* Asegurar que el contenido esté por encima */
-body {
-  position: relative;
+body.loaded .portada > * {
+  opacity: 1;
 }
 
+/* ============ ESTRUCTURA ============ */
 header {
   position: relative;
   z-index: 800;
   width: 100%;
 }
 
+header::before,
+header::after { display: none; }
+
+.contra-header { display: none; }
+
 main, footer {
   position: relative;
   z-index: 1;
   width: 100%;
 }
-
-/* ============ HEADER ============ */
-/* La barra superior la maneja nav.menu (menu.css) */
-header::before,
-header::after { display: none; }
-.contra-header {
-  display: none;
-}
-
-/* Menú lateral → ver menu.css (cargado por load-menu.js) */
 
 .logo-container {
   position: absolute;
@@ -96,9 +88,6 @@ header::after { display: none; }
   transition: var(--transicion);
 }
 
-/* Espacio para la barra fija */
-body { padding-top: 50px; }
-
 /* ============ PORTADA ============ */
 .portada {
   display: flex;
@@ -109,9 +98,16 @@ body { padding-top: 50px; }
   width: 100%;
   background: transparent;
   min-height: 78vh;
-  margin-bottom: 0;
   position: relative;
   overflow: hidden;
+}
+
+.portada::before { display: none; }
+
+.portada > * {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
 }
 
 .portada .imagen-container {
@@ -122,15 +118,11 @@ body { padding-top: 50px; }
   justify-content: center;
   align-items: flex-end;
   padding: 0 2rem 0 3rem;
-  margin-bottom: 0;
   animation: fadeInLeft 0.8s ease;
   position: relative;
 }
 
-/* línea dorada vertical decorativa en el panel */
-.portada .imagen-container::after {
-  display: none;
-}
+.portada .imagen-container::after { display: none; }
 
 .portada .imagen-container img {
   max-width: 92%;
@@ -139,11 +131,11 @@ body { padding-top: 50px; }
   object-fit: contain;
   object-position: bottom;
   display: block;
-  margin-left: 0;
   border: none;
   border-radius: 0;
   box-shadow: none;
   filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4));
+  animation: none;
 }
 
 .portada .texto-container {
@@ -156,7 +148,6 @@ body { padding-top: 50px; }
   flex-direction: column;
   justify-content: center;
   align-items: flex-end;
-  margin-bottom: 0;
   overflow: visible;
   gap: 0.4rem;
   background: rgba(255, 255, 255, 0.88);
@@ -172,167 +163,39 @@ body { padding-top: 50px; }
   text-shadow: none;
   line-height: 1.1;
   letter-spacing: 0.3px;
+  position: relative;
+  display: inline-block;
+  animation: fadeInUp 0.8s ease 0.2s both;
 }
 
-.portada .texto-container h2,
-.portada .texto-container h3 {
+.portada .texto-container h1::after { display: none; }
+
+.portada .texto-container h2 {
   font-size: clamp(1rem, 1.5vw, 1.3rem);
   color: #555;
   margin-bottom: 0.2rem;
   font-weight: 400;
   line-height: 1.4;
-  letter-spacing: 0;
+  animation: fadeInUp 0.8s ease 0.4s both;
 }
 
 .portada .texto-container h3 {
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
   font-weight: 600;
   color: #691932;
   margin-bottom: 0.5rem;
+  line-height: 1.4;
+  animation: fadeInUp 0.8s ease 0.6s both;
 }
 
 .portada .texto-container .fecha-actual {
   font-size: clamp(0.95rem, 1.2vw, 1.1rem);
   color: #555;
   font-style: italic;
-}
-/* Contenedor principal */
-.main-content {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem; /* Espacio entre secciones */
-    padding: 2rem 0;
-  }
-  
-  /* Estilo para la portada */
-  .portada {
-    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
-    padding: 0;
-    border-radius: px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Línea divisoria decorativa */
-  .separador {
-    height: 10px;
-    background: linear-gradient(to right, 
-                transparent, 
-                var(--color-primario), 
-                transparent);
-    margin: 2rem 0;
-    border: none;
-  }
-  
- /* ============ MAPA ============ */
-.mapa-container {
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-     padding: 2rem 2rem 6rem;
-    border-radius: 16px;
-    width: 62%;
-    height: 550px; /* ← ALARGADO: máximo 580px */
-    max-width: 950px;
-    margin: 2rem auto 3rem;
-    position: relative;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    overflow: hidden;
+  animation: fadeInUp 0.8s ease 1s both;
 }
 
-.mapa-container::before {
-    display: none;
-}
-
-.mapa-container #map {
-    width: 100%;
-    height: clamp(400px, 44vh, 488px);
-    position: relative;
-}
-
-#map svg {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100%;
-}
-
-/* Estilos para los elementos del SVG - versión estática */
-#map path {
-    stroke: #fff;
-    stroke-width: 1px;
-    fill: #691932;
-    cursor: pointer;
-    transition: fill 0.2s ease; /* Solo transición de color */
-}
-
-#map path:hover {
-    fill: #235B4E;
-    stroke-width: 1.5px;
-}
-
-#map text {
-    font-family: 'Arial', sans-serif;
-    font-size: 10px;
-    fill: #fff;
-    pointer-events: none;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-}
-
-.mapa-container .titulo-mapa {
-    font-size: clamp(1.4rem, 2vw, 2rem);
-    color: #691932;
-    margin-bottom: 1.2rem;
-    text-align: center;
-    position: relative;
-    padding-bottom: 0.8rem;
-    font-weight: 600;
-    text-shadow: 0 1px 3px rgba(255,255,255,0.8);
-}
-
-.mapa-container .titulo-mapa::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 3px;
-    background: #A5852E;
-    border-radius: 2px;
-}
-
-/* Responsive mapa */
-@media (max-width: 992px) {
-    .mapa-container {
-        width: 90%;
-    }
-}
-
-@media (max-width: 768px) {
-    .mapa-container {
-        width: 100%;
-        padding: 1.5rem;
-    }
-
-    .mapa-container #map {
-        height: 400px;
-    }
-
-    .mapa-container .titulo-mapa {
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .mapa-container #map {
-        height: 300px;
-    }
-
-    .mapa-container {
-        padding: 1rem;
-    }
-}
- 
-/* ============ LÍNEA SEPARADORA ============ */
+/* ============ LÍNEA DORADA ============ */
 .linea {
   height: 2px;
   background: linear-gradient(to right, transparent, #A5852E, transparent);
@@ -341,18 +204,12 @@ body { padding-top: 50px; }
 }
 
 /* ============ PORTADA — OVERRIDES FINALES ============ */
-
-/* Quitar la línea animada bajo h1 */
-.portada .texto-container h1::after { display: none; }
-
-/* Subtítulo largo (Dirección General...) */
 .portada .texto-container h2:first-of-type {
   font-size: clamp(0.88rem, 1.2vw, 1.05rem) !important;
   font-weight: 400 !important;
   color: #666 !important;
 }
 
-/* Línea dorada corta alineada a la derecha */
 .portada .texto-container .linea {
   width: 80px !important;
   height: 3px !important;
@@ -362,7 +219,6 @@ body { padding-top: 50px; }
   border-radius: 2px;
 }
 
-/* Etiqueta "Información de CO" */
 .portada .texto-container h2:last-of-type {
   font-size: clamp(0.7rem, 0.9vw, 0.82rem) !important;
   font-weight: 700 !important;
@@ -372,359 +228,20 @@ body { padding-top: 50px; }
   margin-bottom: 0.3rem;
 }
 
-/* ============ ANIMACIONES ============ */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ============ RESPONSIVE ============ */
-@media (max-width: 992px) {
-  .portada {
-    flex-direction: column;
-    min-height: calc(100vh - 50px);
-  }
-
-  .portada .imagen-container {
-    width: 100%;
-    border-right: none;
-    border-bottom: 3px solid #A5852E;
-    padding: 2rem 2rem 0;
-    min-height: 40vh;
-    justify-content: center;
-  }
-
-  .portada .texto-container {
-    width: 100%;
-    text-align: center;
-    align-items: center;
-    padding: 2.5rem 1.5rem;
-  }
-
-  .portada .texto-container .linea {
-    margin: 0.4rem auto 1rem auto !important;
-    background: linear-gradient(to right, #A5852E, #c49d3a) !important;
-  }
-
-  .mapa-container {
-    width: 95%;
-    padding: 1.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  header {
-    padding: 15px 20px;
-    flex-direction: column;
-    height: auto;
-  }
-
-  .menu-toggle {
-    align-self: flex-end;
-    margin-bottom: 1rem;
-  }
-
-  .portada {
-    padding: 1.5rem;
-  }
-  @media (max-width: 767px) {
-    .texto-container {
-      padding: 0.3rem;
-    }
-    
-    .texto-container h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.2rem;
-    }
-    
-    .texto-container h2,
-    .texto-container h3 {
-      font-size: 1rem;
-      margin-bottom: 0.1rem;
-    }
-    
-    .linea {
-      margin: 0.3rem 0;
-    }
-    
-    .fecha-actual {
-      margin-top: 0.3rem;
-      font-size: 0.8rem;
-    }
-  }
-  .mapa-container #map {
-    height: 400px;
-  }
-
-  .logo-container {
-    margin-top: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .portada .texto-container h1 {
-    font-size: 1.8rem;
-  }
-
-  .portada .texto-container h2 {
-    font-size: 1.1rem;
-  }
-
-  .mapa-container {
-    padding: 1rem;
-  }
-
-  .mapa-container #map {
-    height: 300px;
-  }
-}
-@media (max-width: 480px) {
-
-
-  .menu-toggle {
-    top: 20px;
-    left: 14px;
-    width: 38px;
-    height: 38px;
-    font-size: 18px;
-  }
-
-  .contra-header {
-    margin-top: -40px;
-    height: 30px;
-  }
-
-    /* ...lo demás igual... */
-  
-    .portada {
-      padding: 1rem;
-      flex-direction: column-reverse; /* <-- Cambiado aquí */
-      text-align: center;
-    }
-  
-
-  .portada .imagen-container {
-    margin-left: 0;
-    margin-bottom: 1rem;
-  }
-
-  .portada .imagen-container img {
-    margin-left: 0;
-    max-width: 100%;
-    height: auto;
-  }
-
-  .portada .texto-container {
-    width: 100%;
-    padding: 1rem;
-  }
-
-  .portada .texto-container h1 {
-    font-size: 1.5rem;
-    line-height: 1.2;
-  }
-
-  .portada .texto-container h2,
-  .portada .texto-container h3 {
-    font-size: 1rem;
-  }
-
-  .portada .texto-container .fecha-actual {
-    font-size: 0.9rem;
-  }
-
-  .mapa-container {
-    width: 100%;
-    padding: 1rem;
-  }
-
-  .mapa-container #map {
-    height: 210px;
-  }
-
-  .logo-container {
-    position: absolute;
-    top: 60px;
-    right: 10px; /* ⬅️ Ahora en el lado izquierdo */
-    z-index: 100;
-    margin: 0; /* Elimina márgenes innecesarios */
-  }
-  
-  .logo-container img {
-    width: 120px; /* ⬇️ Más pequeño */
-    height: auto;
-    margin: 0;
-  }
-  
-
-  nav.menu {
-    width: 200px;
-    padding-top: 70px;
-  }
-
-  nav.menu ul li a {
-    font-size: 13px;
-    padding: 10px;
-  }
-
-  .submenu-list li a {
-    font-size: 12px;
-    padding: 8px;
-  }
-}
-/* Por defecto en PC: oculta el h2 móvil */
-.titulo-movil {
-  display: none;
-}
-
-@media (max-width: 480px) {
-  .titulo-movil {
-    display: block;
-    font-size: 1.1rem;
-    color: #000;
-    text-align: center;
-    margin: 0;
-  }
-}
-/* ============ ANIMACIONES FALTANTES ============ */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pageLoad {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes expandLine {
-  to { width: 100%; }
-}
-
-/* ============ EFECTOS PRINCIPALES (LIMPIOS) ============ */
-
-/* Efecto de flotación sutil para la imagen */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.portada .imagen-container img {
-  animation: none;
-}
-
-/* Efecto de aparición escalonada para el texto */
-.portada .texto-container h1 {
-  animation: fadeInUp 0.8s ease 0.2s both;
-}
-
-.portada .texto-container h2 {
-  animation: fadeInUp 0.8s ease 0.4s both;
-}
-
-.portada .texto-container h3 {
-  animation: fadeInUp 0.8s ease 0.6s both;
-}
-
-.portada .texto-container .linea {
-  animation: fadeInUp 0.8s ease 0.8s both;
-}
-
-.portada .texto-container .fecha-actual {
-  animation: fadeInUp 0.8s ease 1s both;
-}
-
-/* Efecto de brillo en los títulos */
-.portada .texto-container h1 {
-  position: relative;
-  display: inline-block;
-}
-
-.portada .texto-container h1::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #A5852E, transparent);
-  animation: expandLine 2s ease 1s forwards;
-}
-
-/* FONDO LIMPIO (sin partículas) */
-.portada {
-  position: relative;
-  overflow: hidden;
-}
-
-/* ELIMINADO: el efecto de partículas que no te gusta */
-.portada::before {
-  display: none; /* Esto quita las partículas rectangulares */
-}
-
-.portada > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Suavizado general y escalado responsivo */
-html {
-  scroll-behavior: smooth;
-  font-size: clamp(12px, 0.85vw, 16px);
-}
-
-/* Animación al hacer scroll para las secciones */
+/* ============ MAPA ============ */
 .mapa-container {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 1.5rem 2rem 2rem;
+  border-radius: 16px;
+  width: 68%;
+  max-width: 860px;
+  margin: 2rem auto 3rem;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  overflow: hidden;
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.8s ease;
@@ -735,416 +252,97 @@ html {
   transform: translateY(0);
 }
 
-/* Transición de entrada para toda la página */
-body {
-  opacity: 0;
-  animation: pageLoad 1s ease 0.3s forwards;
+.mapa-container::before { display: none; }
+
+.mapa-container #map {
+  width: 100%;
+  height: clamp(360px, 40vw, 480px);
+  position: relative;
 }
 
-/* Efecto de carga para elementos principales */
-.portada > * {
-  opacity: 0;
+#map svg {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
 }
 
-body.loaded .portada > * {
-  opacity: 1;
-}
-  box-sizing: border-box;
+#map path {
+  stroke: #fff;
+  stroke-width: 1px;
+  fill: #691932;
+  cursor: pointer;
+  transition: fill 0.2s ease;
 }
 
-/* ============ ESTILOS GENERALES ============ */
-body {
+#map path:hover {
+  fill: #235B4E;
+  stroke-width: 1.5px;
+}
+
+#map text {
   font-family: 'Arial', sans-serif;
-  background-color: var(--color-fondo);
-  background-image: url('imagenes/fondo.jpg');
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center;
-  color: var(--color-texto);
-  line-height: 1.6;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-/* Fondo derecho fijo con tu imagen */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 45%; /* Ajusta según el ancho de tu imagen */
-  height: 100vh;
-  background-image: url('imagenes/fondoderecha.jpg');
-  background-size: cover;
-  background-position: left center;
-  background-repeat: no-repeat;
-  z-index: -1;
+  font-size: 10px;
+  fill: #fff;
   pointer-events: none;
-}
-
-/* Asegurar que el contenido esté por encima */
-body {
-  position: relative;
-}
-
-header {
-  position: relative;
-  z-index: 800;
-  width: 100%;
-}
-
-main, footer {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-}
-
-/* ============ HEADER ============ */
-/* La barra superior la maneja nav.menu (menu.css) */
-header::before,
-header::after { display: none; }
-.contra-header {
-  display: none;
-}
-
-/* Menú lateral → ver menu.css (cargado por load-menu.js) */
-
-.logo-container {
-  position: absolute;
-  top: 60px;
-  right: 3rem;
-  z-index: 100;
-}
-
-.logo-container img {
-  width: clamp(120px, 13vw, 220px);
-  height: auto;
-  transition: var(--transicion);
-}
-
-/* Espacio para la barra fija */
-body { padding-top: 50px; }
-
-/* ============ PORTADA ============ */
-.portada {
-  display: flex;
-  justify-content: flex-start;
-  align-items: stretch;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  background: transparent;
-  min-height: 78vh;
-  margin-bottom: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.portada .imagen-container {
-  width: 50%;
-  flex-shrink: 0;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  padding: 0 2rem 0 3rem;
-  margin-bottom: 0;
-  animation: fadeInLeft 0.8s ease;
-  position: relative;
-}
-
-/* línea dorada vertical decorativa en el panel */
-.portada .imagen-container::after {
-  display: none;
-}
-
-.portada .imagen-container img {
-  max-width: 92%;
-  height: 100%;
-  max-height: none;
-  object-fit: contain;
-  object-position: bottom;
-  display: block;
-  margin-left: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4));
-}
-
-.portada .texto-container {
-  flex: 1;
-  text-align: right;
-  animation: fadeInRight 0.8s ease;
-  padding: 2rem 4rem 0rem 2rem;  /* ← CAMBIADO: menos espacio arriba */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-  margin-bottom: 0;
-  overflow: visible;
-  gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.portada .texto-container h1 {
-  font-size: clamp(2rem, 3.2vw, 3.4rem);
-  font-weight: 800;
-  color: #691932;
-  margin-bottom: 0.4rem;
-  text-shadow: none;
-  line-height: 1.1;
-  letter-spacing: 0.3px;
-}
-
-.portada .texto-container h2,
-.portada .texto-container h3 {
-  font-size: clamp(1rem, 1.5vw, 1.3rem);
-  color: #555;
-  margin-bottom: 0.2rem;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: 0;
-}
-
-.portada .texto-container h3 {
-  font-weight: 600;
-  color: #691932;
-  margin-bottom: 0.5rem;
-}
-
-.portada .texto-container .fecha-actual {
-  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
-  color: #555;
-  font-style: italic;
-}
-/* Contenedor principal */
-.main-content {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem; /* Espacio entre secciones */
-    padding: 2rem 0;
-  }
-  
-  /* Estilo para la portada */
-  .portada {
-    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
-    padding: 0;
-    border-radius: px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Línea divisoria decorativa */
-  .separador {
-    height: 10px;
-    background: linear-gradient(to right, 
-                transparent, 
-                var(--color-primario), 
-                transparent);
-    margin: 2rem 0;
-    border: none;
-  }
-  
- /* ============ MAPA ============ */
-.mapa-container {
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    padding: 2rem;
-    border-radius: 16px;
-    width: 62%;
-    max-width: 950px;
-    margin: 2rem auto 3rem;
-    position: relative;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    overflow: hidden;
-}
-
-.mapa-container::before {
-    display: none;
-}
-
-.mapa-container #map {
-    width: 100%;
-    height: clamp(400px, 44vh, 488px);
-    position: relative;
-}
-
-#map svg {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100%;
-}
-
-/* Estilos para los elementos del SVG - versión estática */
-#map path {
-    stroke: #fff;
-    stroke-width: 1px;
-    fill: #691932;
-    cursor: pointer;
-    transition: fill 0.2s ease; /* Solo transición de color */
-}
-
-#map path:hover {
-    fill: #235B4E;
-    stroke-width: 1.5px;
-}
-
-#map text {
-    font-family: 'Arial', sans-serif;
-    font-size: 10px;
-    fill: #fff;
-    pointer-events: none;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 }
 
 .mapa-container .titulo-mapa {
-    font-size: clamp(1.4rem, 2vw, 2rem);
-    color: #691932;
-    margin-bottom: 1.2rem;
-    text-align: center;
-    position: relative;
-    padding-bottom: 0.8rem;
-    font-weight: 600;
-    text-shadow: 0 1px 3px rgba(255,255,255,0.8);
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  color: #691932;
+  margin-bottom: 1.2rem;
+  text-align: center;
+  position: relative;
+  padding-bottom: 0.8rem;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.8);
 }
 
 .mapa-container .titulo-mapa::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 3px;
-    background: #A5852E;
-    border-radius: 2px;
-}
-
-/* Responsive mapa */
-@media (max-width: 992px) {
-    .mapa-container {
-        width: 90%;
-    }
-}
-
-@media (max-width: 768px) {
-    .mapa-container {
-        width: 100%;
-        padding: 1.5rem;
-    }
-
-    .mapa-container #map {
-        height: 400px;
-    }
-
-    .mapa-container .titulo-mapa {
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .mapa-container #map {
-        height: 300px;
-    }
-
-    .mapa-container {
-        padding: 1rem;
-    }
-}
- 
-/* ============ LÍNEA SEPARADORA ============ */
-.linea {
-  height: 2px;
-  background: linear-gradient(to right, transparent, #A5852E, transparent);
-  margin: 2rem 0;
-  border: none;
-}
-
-/* ============ PORTADA — OVERRIDES FINALES ============ */
-
-/* Quitar la línea animada bajo h1 */
-.portada .texto-container h1::after { display: none; }
-
-/* Subtítulo largo (Dirección General...) */
-.portada .texto-container h2:first-of-type {
-  font-size: clamp(0.88rem, 1.2vw, 1.05rem) !important;
-  font-weight: 400 !important;
-  color: #666 !important;
-}
-
-/* Línea dorada corta alineada a la derecha */
-.portada .texto-container .linea {
-  width: 80px !important;
-  height: 3px !important;
-  background: linear-gradient(to left, #A5852E, #c49d3a) !important;
-  margin: 0.4rem 0 1rem auto !important;
-  animation: none !important;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 3px;
+  background: #A5852E;
   border-radius: 2px;
-}
-
-/* Etiqueta "Información de CO" */
-.portada .texto-container h2:last-of-type {
-  font-size: clamp(0.7rem, 0.9vw, 0.82rem) !important;
-  font-weight: 700 !important;
-  color: #A5852E !important;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  margin-bottom: 0.3rem;
 }
 
 /* ============ ANIMACIONES ============ */
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pageLoad {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes expandLine {
+  to { width: 100%; }
 }
 
 /* ============ RESPONSIVE ============ */
@@ -1156,7 +354,6 @@ body { padding-top: 50px; }
 
   .portada .imagen-container {
     width: 100%;
-    border-right: none;
     border-bottom: 3px solid #A5852E;
     padding: 2rem 2rem 0;
     min-height: 40vh;
@@ -1175,110 +372,25 @@ body { padding-top: 50px; }
     background: linear-gradient(to right, #A5852E, #c49d3a) !important;
   }
 
-  .mapa-container {
-    width: 95%;
-    padding: 1.5rem;
-  }
+  .mapa-container { width: 95%; }
 }
 
 @media (max-width: 768px) {
-  header {
-    padding: 15px 20px;
-    flex-direction: column;
-    height: auto;
-  }
+  .mapa-container { width: 100%; padding: 1.5rem; }
+  .mapa-container #map { height: 420px; }
+  .mapa-container .titulo-mapa { font-size: 1.5rem; }
+}
 
-  .menu-toggle {
-    align-self: flex-end;
-    margin-bottom: 1rem;
-  }
-
+@media (max-width: 480px) {
   .portada {
-    padding: 1.5rem;
-  }
-  @media (max-width: 767px) {
-    .texto-container {
-      padding: 0.3rem;
-    }
-    
-    .texto-container h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.2rem;
-    }
-    
-    .texto-container h2,
-    .texto-container h3 {
-      font-size: 1rem;
-      margin-bottom: 0.1rem;
-    }
-    
-    .linea {
-      margin: 0.3rem 0;
-    }
-    
-    .fecha-actual {
-      margin-top: 0.3rem;
-      font-size: 0.8rem;
-    }
-  }
-  .mapa-container #map {
-    height: 400px;
-  }
-
-  .logo-container {
-    margin-top: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .portada .texto-container h1 {
-    font-size: 1.8rem;
-  }
-
-  .portada .texto-container h2 {
-    font-size: 1.1rem;
-  }
-
-  .mapa-container {
+    flex-direction: column-reverse;
     padding: 1rem;
+    text-align: center;
   }
 
-  .mapa-container #map {
-    height: 300px;
-  }
-}
-@media (max-width: 480px) {
-
-
-  .menu-toggle {
-    top: 20px;
-    left: 14px;
-    width: 38px;
-    height: 38px;
-    font-size: 18px;
-  }
-
-  .contra-header {
-    margin-top: -40px;
-    height: 30px;
-  }
-
-    /* ...lo demás igual... */
-  
-    .portada {
-      padding: 1rem;
-      flex-direction: column-reverse; /* <-- Cambiado aquí */
-      text-align: center;
-    }
-  
-
-  .portada .imagen-container {
-    margin-left: 0;
-    margin-bottom: 1rem;
-  }
+  .portada .imagen-container { margin-bottom: 1rem; }
 
   .portada .imagen-container img {
-    margin-left: 0;
     max-width: 100%;
     height: auto;
   }
@@ -1288,63 +400,17 @@ body { padding-top: 50px; }
     padding: 1rem;
   }
 
-  .portada .texto-container h1 {
-    font-size: 1.5rem;
-    line-height: 1.2;
-  }
-
+  .portada .texto-container h1 { font-size: 1.5rem; line-height: 1.2; }
   .portada .texto-container h2,
-  .portada .texto-container h3 {
-    font-size: 1rem;
-  }
+  .portada .texto-container h3 { font-size: 1rem; }
+  .portada .texto-container .fecha-actual { font-size: 0.9rem; }
 
-  .portada .texto-container .fecha-actual {
-    font-size: 0.9rem;
-  }
-
-  .mapa-container {
-    width: 100%;
-    padding: 1rem;
-  }
-
-  .mapa-container #map {
-    height: 210px;
-  }
-
-  .logo-container {
-    position: absolute;
-    top: 60px;
-    right: 10px; /* ⬅️ Ahora en el lado izquierdo */
-    z-index: 100;
-    margin: 0; /* Elimina márgenes innecesarios */
-  }
-  
-  .logo-container img {
-    width: 120px; /* ⬇️ Más pequeño */
-    height: auto;
-    margin: 0;
-  }
-  
-
-  nav.menu {
-    width: 200px;
-    padding-top: 70px;
-  }
-
-  nav.menu ul li a {
-    font-size: 13px;
-    padding: 10px;
-  }
-
-  .submenu-list li a {
-    font-size: 12px;
-    padding: 8px;
-  }
+  .mapa-container { width: 100%; padding: 1rem; }
+  .mapa-container #map { height: 280px; }
 }
-/* Por defecto en PC: oculta el h2 móvil */
-.titulo-movil {
-  display: none;
-}
+
+/* Ocultar elemento móvil en escritorio */
+.titulo-movil { display: none; }
 
 @media (max-width: 480px) {
   .titulo-movil {
@@ -1354,123 +420,4 @@ body { padding-top: 50px; }
     text-align: center;
     margin: 0;
   }
-}
-/* ============ ANIMACIONES FALTANTES ============ */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pageLoad {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes expandLine {
-  to { width: 100%; }
-}
-
-/* ============ EFECTOS PRINCIPALES (LIMPIOS) ============ */
-
-/* Efecto de flotación sutil para la imagen */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.portada .imagen-container img {
-  animation: none;
-}
-
-/* Efecto de aparición escalonada para el texto */
-.portada .texto-container h1 {
-  animation: fadeInUp 0.8s ease 0.2s both;
-}
-
-.portada .texto-container h2 {
-  animation: fadeInUp 0.8s ease 0.4s both;
-}
-
-.portada .texto-container h3 {
-  animation: fadeInUp 0.8s ease 0.6s both;
-}
-
-.portada .texto-container .linea {
-  animation: fadeInUp 0.8s ease 0.8s both;
-}
-
-.portada .texto-container .fecha-actual {
-  animation: fadeInUp 0.8s ease 1s both;
-}
-
-/* Efecto de brillo en los títulos */
-.portada .texto-container h1 {
-  position: relative;
-  display: inline-block;
-}
-
-.portada .texto-container h1::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #A5852E, transparent);
-  animation: expandLine 2s ease 1s forwards;
-}
-
-/* FONDO LIMPIO (sin partículas) */
-.portada {
-  position: relative;
-  overflow: hidden;
-}
-
-/* ELIMINADO: el efecto de partículas que no te gusta */
-.portada::before {
-  display: none; /* Esto quita las partículas rectangulares */
-}
-
-.portada > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Suavizado general y escalado responsivo */
-html {
-  scroll-behavior: smooth;
-  font-size: clamp(12px, 0.85vw, 16px);
-}
-
-/* Animación al hacer scroll para las secciones */
-.mapa-container {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s ease;
-}
-
-.mapa-container.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Transición de entrada para toda la página */
-body {
-  opacity: 0;
-  animation: pageLoad 1s ease 0.3s forwards;
-}
-
-/* Efecto de carga para elementos principales */
-.portada > * {
-  opacity: 0;
-}
-
-body.loaded .portada > * {
-  opacity: 1;
 }
