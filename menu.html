@@ -1,9 +1,7 @@
-<!-- menu.html - MENÚ PRINCIPAL -->
-<div class="menu-overlay"></div>
-<button class="menu-toggle">☰</button>
+<!-- menu.html - BARRA DE NAVEGACIÓN SUPERIOR -->
 <nav class="menu">
     <ul>
-        <li><a href="index.html">Inicio</a></li>
+        <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
 
         <li class="submenu">
             <a href="#"><i class="fas fa-database"></i> Datos Nacionales</a>
@@ -22,9 +20,12 @@
             </ul>
         </li>
 
-        <li class="submenu">
+        <li class="submenu submenu-ors">
             <a href="#"><i class="fas fa-map-marker-alt"></i> Información de ORs</a>
             <ul class="submenu-list">
+                <li class="search-item">
+                    <input type="text" class="menu-search" placeholder="🔍 Buscar estado..." autocomplete="off">
+                </li>
                 <li><a href="estados/aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
                 <li><a href="estados/baja_california/baja_californiaindex.html">Baja California</a></li>
                 <li><a href="estados/baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
@@ -59,7 +60,12 @@
                 <li><a href="estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
             </ul>
         </li>
-        
+
+        <li class="nav-spacer"></li>
+        <li class="nav-user">
+            <i class="fas fa-user-circle"></i>
+            <span class="nav-username">—</span>
+        </li>
         <li><a href="#" class="logout-link"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
     </ul>
 </nav>

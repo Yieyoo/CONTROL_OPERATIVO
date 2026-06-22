@@ -10,6 +10,7 @@
     <title>Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="imagenes/iconom.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="js/load-menu.js" defer></script>
     
     <style>
@@ -39,13 +40,15 @@
             align-items: center;
             z-index: 99999;
             font-family: 'Segoe UI', Arial, sans-serif;
+            opacity: 1;
+            transition: opacity 0.45s ease;
         }
 
         .loading-spinner {
             width: 50px;
             height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #1a3e72;
+            border: 5px solid #f0e8eb;
+            border-top: 5px solid #691932;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
@@ -106,81 +109,25 @@
     <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
 
    <script>
-    // Sistema mejorado de autenticación
-    class AuthManager {
-        constructor() {
-            this.sessionDuration = 60 * 60 * 1000; // 1 hora
-            this.checkAuth();
-            this.setupNavigationHandlers();
+    // Verificar autenticación via localStorage
+    if (localStorage.getItem('authenticated') === 'true') {
+        var ls = document.getElementById('loadingScreen');
+        if (ls) {
+            ls.style.opacity = '0';
+            setTimeout(function() { ls.style.display = 'none'; }, 450);
         }
-
-        checkAuth() {
-            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
-            const now = Date.now();
-            
-            console.log('🔐 Verificando autenticación:', {
-                isAuthenticated,
-                loginTime: new Date(loginTime),
-                now: new Date(now),
-                diferencia: now - loginTime,
-                expirado: (now - loginTime) > this.sessionDuration
-            });
-
-            if (!isAuthenticated || (now - loginTime) > this.sessionDuration) {
-                console.log('❌ Sesión inválida o expirada, redirigiendo a login...');
-                this.redirectToLogin();
-                return false;
-            }
-
-            console.log('✅ Sesión válida, mostrando contenido...');
-            this.hideLoadingScreen();
-            return true;
-        }
-
-        redirectToLogin() {
-            // Limpiar el estado de autenticación
-            localStorage.removeItem('authenticated');
-            localStorage.removeItem('loginTime');
-            
-            // Redirigir al login de forma que no se pueda volver con el botón back
-            window.location.replace('login.html');
-        }
-
-        hideLoadingScreen() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.style.display = 'none';
-            }
-            document.body.style.overflow = 'auto';
-        }
-
-        setupNavigationHandlers() {
-            // Manejar el evento de página mostrada (back/forward)
-            window.addEventListener('pageshow', (event) => {
-                console.log('🔄 Página mostrada desde:', event.persisted ? 'cache' : 'nueva carga');
-                
-                if (event.persisted) {
-                    // La página viene del cache, verificar autenticación nuevamente
-                    if (!this.checkAuth()) {
-                        this.redirectToLogin();
-                    }
-                }
-            });
-        }
-
-        logout() {
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                console.log('🚪 Cerrando sesión...');
-                localStorage.removeItem('authenticated');
-                localStorage.removeItem('loginTime');
-                this.redirectToLogin();
-            }
-        }
+        document.body.style.overflow = 'auto';
+    } else {
+        window.location.replace('login.html');
     }
 
-    // Inicializar el sistema de autenticación
-    const authManager = new AuthManager();
+    function logout() {
+        if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            localStorage.removeItem('authenticated');
+            localStorage.removeItem('username');
+            window.location.replace('login.html');
+        }
+    }
 
     // Mostrar fecha actual
     document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
@@ -220,10 +167,6 @@
         mapas.forEach(mapa => observer.observe(mapa));
     });
 
-    // Función global para logout (para usar en el HTML)
-    function logout() {
-        authManager.logout();
-    }
 </script>
 </body>
 </html>

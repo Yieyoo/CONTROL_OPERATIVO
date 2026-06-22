@@ -16,6 +16,11 @@
     margin: 0;
     padding: 0;
   }
+
+  html {
+    font-size: clamp(12px, 0.85vw, 16px);
+    scroll-behavior: smooth;
+  }
   
   /* ==================== */
   /* ESTILOS GENERALES */
@@ -31,11 +36,11 @@
     background-attachment: fixed;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
     flex-direction: column;
-    padding: 20px;
+    padding: 50px 20px 20px;
     font-size: 14px;
     overflow-x: hidden;
   }
@@ -55,79 +60,74 @@
     pointer-events: none;
   }
   
-  html {
-    zoom: 1;
-  }
-  
   /* ==================== */
   /* ESTRUCTURA PRINCIPAL */
   /* ==================== */
   .contenedor-principal {
     width: 100%;
-    max-width: 900px;
+    max-width: 860px;
     margin: 0 auto;
-    padding: 30px 5px;
+    padding: 32px 24px;
     background-color: var(--color-blanco);
-    border-radius: 8px;
-    box-shadow: var(--sombra);
-    margin-top: 20px;
-    margin-bottom: 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+    margin-top: 28px;
+    margin-bottom: 48px;
     position: relative;
     z-index: 1;
   }
-  
+
   /* ==================== */
   /* COMPONENTE DE OPCIONES */
   /* ==================== */
   .opciones-container {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 20px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-top: 20px;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
     width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
   }
-  
+
   .opciones-grid {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
     font-family: 'Segoe UI', Roboto, sans-serif;
   }
-  
+
   .fila {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 14px;
     width: 100%;
     flex-wrap: wrap;
   }
-  
+
   /* ==================== */
   /* BOTONES */
   /* ==================== */
   .opciones-grid button {
-    font-size: 16px;
-    font-weight: 200;
-    letter-spacing: 0.5px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    letter-spacing: 0.4px;
     text-align: center;
     line-height: 1.4;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: 15px 20px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
     transition: var(--transicion);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
     color: var(--color-blanco);
     flex: 1;
     max-width: 100%;
   }
-  
+
   .opciones-grid button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 18px rgba(0,0,0,0.18);
   }
   
   /* Colores específicos para los botones */
@@ -168,221 +168,11 @@
     background-color: #3a7d60;
   }
   
-  /* ==================== */
-  /* MENÚ LATERAL MEJORADO */
-  /* ==================== */
-  nav.menu {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 300px;
-    height: 100%;
-    background: linear-gradient(135deg, var(--color-primario) 0%, #4d1224 100%);
-    padding-top: 100px;
-    transition: var(--transicion);
-    z-index: 1000;
-    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
-    border-top-right-radius: 25px;
-    border-bottom-right-radius: 25px;
-    overflow: hidden;
-  }
-  
-  /* Efecto de borde sutil */
-  nav.menu::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(to bottom, var(--color-secundario), #c49d3a);
-  }
-  
-  nav.menu.active {
-    left: 0;
-  }
-  
-  /* Logo del menú */
-  .logo-arriba-img {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 220px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-  }
-  
-/* Lista del menú */
-nav.menu ul {
-    list-style-type: none;
-    padding: 0 20px;
-    margin: 10; /* Remove margin-top here */
-}
+  /* Menú lateral → ver menu.css (cargado por load-menu.js) */
 
-/* Ajustar solo las principales */
-nav.menu > ul {
-    margin-top: 90px; /* Apply margin-top only to the main menu */
-}
-  
-  nav.menu ul li {
-    margin-bottom: 15px;
-    position: relative;
-  }
-  
-  nav.menu ul li a {
-    text-decoration: none;
-    color: var(--color-blanco);
-    font-size: 16px;
-    font-weight: 500;
-    display: block;
-    padding: 14px 20px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-left: 3px solid transparent;
-    transition: var(--transicion);
-    border-radius: 8px;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  nav.menu ul li a:hover {
-    background-color: rgba(255, 255, 255, 0.12);
-    transform: translateX(8px);
-    border-left: 3px solid var(--color-secundario);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Submenú */
-  .submenu-list {
-    display: none;
-    padding-left: 10px;
-    animation: slideDown 0.3s ease;
-    margin-top: 10px;
-    border-left: 2px dashed rgba(255, 255, 255, 0.1);
-  }
-  
-  .submenu.active .submenu-list {
-    display: block;
-  }
-  
-  .submenu-list li a {
-    padding: 12px 18px;
-    font-size: 14px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    margin-bottom: 8px;
-    transition: var(--transicion);
-  }
-  
-  .submenu-list li a:hover {
-    background-color: rgba(165, 133, 46, 0.2);
-    transform: translateX(5px);
-  }
-  
-  /* Indicador de submenú */
-  .submenu > a::after {
-    content: '›';
-    position: absolute;
-    right: 20px;
-    transform: rotate(90deg);
-    transition: transform 0.3s ease;
-  }
-  
-  .submenu.active > a::after {
-    transform: rotate(270deg);
-  }
-  
-  /* Botón de menú */
-  .menu-toggle {
-    background: linear-gradient(135deg, var(--color-secundario) 0%, #c49d3a 100%);
-    color: var(--color-blanco);
-    border: none;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-    cursor: pointer;
-    position: fixed;
-    top: 90px;
-    left: 20px;
-    border-radius: 50%;
-    z-index: 100000;
-    box-shadow: 0 8px 25px rgba(165, 133, 46, 0.4);
-    transition: var(--transicion);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .menu-toggle:hover {
-    transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
-  }
-  
-  /* Scroll del submenú */
-  .submenu {
-    max-height: 400px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-secundario) transparent;
-    padding-right: 5px;
-  }
-  
-  .submenu::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .submenu::-webkit-scrollbar-thumb {
-    background-color: var(--color-secundario);
-    border-radius: 4px;
-    background-clip: padding-box;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .submenu::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  /* Overlay del menú */
-  .menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-    z-index: 999;
-    animation: fadeIn 0.3s ease;
-  }
-  
-  .menu-overlay.active {
-    display: block;
-  }
-  
   /* ==================== */
   /* COMPONENTES ADICIONALES */
   /* ==================== */
-  /* Botón de regresar */
-  .regresar-btn {
-    background-color: var(--color-primario);
-    color: var(--color-blanco);
-    border: none;
-    padding: 12px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    border-radius: 5px;
-    z-index: 900;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease;
-  }
-  
-  .regresar-btn:hover {
-    background-color: #8e5c71;
-  }
-  
   /* Logos en esquina superior derecha */
   .logo-container {
     position: fixed;
@@ -400,78 +190,144 @@ nav.menu > ul {
     cursor: pointer;
   }
   
-  /* Fecha actual */
+  /* Fecha actual — vive dentro de .instituto-info, no es fixed */
   .fecha-actual {
-    position: fixed;
-    top: 90px;
-    right: 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--color-primario);
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 8px 12px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    z-index: 5;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #000000;
   }
   
-  /* Información del instituto */
-.instituto-info {
-    background: linear-gradient(to right, #6b1e3f, #320d1c);
-    color: var(--color-blanco);
-    text-align: center;
-    padding: 20px 0; /* Further increased padding for an even thicker background */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-    margin-top: 10%;
-    margin: 0;
+  /* === HEADER INSTITUCIONAL HORIZONTAL === */
+  .instituto-info {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--color-primario);
+    display: flex;
+    align-items: center;
+    padding: 0 48px 0 80px;
+    min-height: 114px;
     width: 100vw;
     position: relative;
-    left: 0%;
-    right: 0%;
     margin-left: -50vw;
     margin-right: -50vw;
     box-sizing: border-box;
-}
-  .instituto-info h1 {
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-transform: uppercase;
+    gap: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid var(--color-secundario);
+    overflow: hidden;
   }
-  
-  .instituto-info h2 {
-    font-size: 17px;
-    font-weight: 500;
-    margin-bottom: 8px;
+
+  .inst-sep {
+    width: 1px;
+    height: 68px;
+    background: rgba(105, 25, 50, 0.25);
+    flex-shrink: 0;
   }
-  
-  .instituto-info h3 {
-    font-size: 17px;
-    font-weight: 400;
+
+  .inst-logo-block {
+    display: flex;
+    align-items: center;
+    padding: 0 26px;
+    flex-shrink: 0;
   }
-  
-  /* Estado info */
-  .estado-info {
-    background-color: var(--color-secundario);
-    color: var(--color-blanco);
-    text-align: center;
-    padding: 0.8rem 0;
-    margin: 0;
-    width: 100vw;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: relative;
-    top: -1rem;
-    left: 0;
+
+  .inst-logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    display: block;
   }
-  
-  .estado-info h4 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    text-transform: uppercase;
+
+  .inst-title-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 0 0 0 26px;
+    min-width: 0;
+    text-align: left;
+  }
+
+  /* Estado — elemento principal */
+  .estado-badge {
+    order: 1;
+    display: block;
+    font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+    font-weight: 800;
+    color: var(--color-primario);
     letter-spacing: 1px;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    padding: 0;
     margin: 0;
-    position: relative;
+    align-self: auto;
   }
+
+  /* Subtítulo — "Opciones de la OR" */
+  .inst-subtitle {
+    order: 2;
+    font-size: clamp(0.72rem, 1vw, 0.85rem);
+    font-weight: 700;
+    color: var(--color-secundario);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  /* INM — referencia secundaria pequeña */
+  .instituto-info h1 {
+    order: 3;
+    font-size: clamp(0.65rem, 0.9vw, 0.78rem);
+    font-weight: 400;
+    color: #888;
+    letter-spacing: 0.3px;
+    margin: 0;
+    text-transform: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .instituto-info h2 { display: none; }
+  .instituto-info h3 { display: none; }
+
+  .inst-date-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 26px;
+    flex-shrink: 0;
+  }
+
+  .inst-cal-icon {
+    font-size: 1.15rem;
+    color: var(--color-secundario);
+    flex-shrink: 0;
+  }
+
+  .instituto-info .fecha-actual {
+    position: static;
+    background: none;
+    box-shadow: none;
+    color: #555;
+    font-size: 1rem;
+    font-weight: 400;
+    padding: 0;
+    border-radius: 0;
+    white-space: nowrap;
+    top: auto;
+    right: auto;
+    z-index: auto;
+  }
+
+  /* El div.estado-info ya no se usa — el estado se muestra como badge dentro del header */
+  .estado-info { display: none; }
+
+  /* Ocultar el header vacío */
+  header { display: none; }
   
   /* ==================== */
   /* ANIMACIONES */
@@ -503,9 +359,13 @@ nav.menu > ul {
     }
     
     /* Contenedores */
-    .contenedor-principal,
+    .contenedor-principal {
+      padding: 20px 14px;
+      width: 100%;
+      margin-top: 16px;
+    }
     .opciones-container {
-      padding: 15px;
+      padding: 0;
       width: 100%;
     }
     
@@ -569,59 +429,28 @@ nav.menu > ul {
     }
 }
     
-    /* Fecha actual */
-    .fecha-actual {
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 10px;
-      padding: 4px 5px;
+    /* Header institucional responsive */
+    .instituto-info {
+      padding: 14px 14px 14px 68px;
+      min-height: auto;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    
+    .inst-sep { display: none; }
+    .inst-logo-block { padding: 0 10px 0 0; }
+    .inst-logo { height: 36px; }
+    .inst-title-block { padding: 0; }
+    .instituto-info h1 { font-size: 0.76rem; white-space: normal; }
+    .inst-subtitle { display: none; }
+    .estado-badge { font-size: 0.58rem; padding: 2px 8px; letter-spacing: 2px; }
+    .inst-date-block { padding-left: 0; width: 100%; }
+    .instituto-info .fecha-actual { font-size: 0.73rem; }
+
     /* Botón regresar */
     .regresar-btn {
       font-size: 7px;
       padding: 8px 10px;
-      top: 1%;
-    }
-    
-    /* Estado info */
-    .estado-info {
-      font-size: 20px;
-      margin-top: -30px;
-    }
-    
-    /* Instituto info */
-    .instituto-info {
-      padding: 25px 15px;
-    }
-    
-    .instituto-info h1 {
-      font-size: 1rem;
-    }
-    
-    .instituto-info h1,
-    .instituto-info h2,
-    .instituto-info h3 {
-      margin: 5px 0;
-      padding: 0;
-    }
-    
-    .instituto-info {
-      padding: 5px 1px;
-      margin-top: 0px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
-    
-    .estado-info {
-      top: -0.5rem;
-      padding: 0.6rem 0;
-    }
-    
-    .estado-info h4 {
-      font-size: 1rem;
+      top: 62px;
     }
   }
     /* SOLO ESTILOS ESPECÍFICOS PARA COAHUILA - MÍNIMOS */
@@ -648,19 +477,19 @@ nav.menu > ul {
         opacity: 1;
     }
 
-    /* === ELIMINAR ÍCONOS SOLO DEL MENÚ LATERAL === */
-    .menu i,
-    .menu .fas,
-    .menu .fa {
-        display: none !important;
+    /* Iconos del menú lateral */
+    .menu .fas, .menu .fa {
+        display: inline-block;
+        width: 18px;
+        text-align: center;
+        color: rgba(165, 133, 46, 0.9);
+        font-size: 13px;
+        margin-right: 2px;
     }
-    
-    /* Ajustar el espaciado del menú sin íconos */
-    .menu ul li a {
-        padding-left: 20px !important;
-    }
-    
-    /* Asegurar que los submenús también se vean bien */
-    .menu .submenu-list li a {
-        padding-left: 30px !important;
+
+    /* Separador visual antes de Cerrar Sesión */
+    .menu-divider {
+        height: 1px;
+        background: rgba(165, 133, 46, 0.3);
+        margin: 6px 8px;
     }

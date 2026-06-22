@@ -1,4 +1,9 @@
 /* --- Estilo general para el cuerpo --- */
+html {
+    font-size: clamp(12px, 0.85vw, 16px);
+    scroll-behavior: smooth;
+}
+
 body {
     background-image: url('../imagenes/fondo.jpg'); /* Fondo de la página */
     background-size: cover;

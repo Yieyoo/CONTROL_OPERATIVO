@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -17,29 +17,28 @@
     <script src="../../config.js"></script>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ -->
 
-    <header>
-        <!-- EL BOTÓN DEL MENÚ SE INSERTA AUTOMÁTICAMENTE -->
-        <!-- SOLO MANTENEMOS EL LOGO EN EL HEADER -->
-        <div class="logo-container">
-            <img src="../../imagenes/unnamed.png" alt="Gobernación" class="logo">
-        </div>
-    </header>
+    <header></header>
 
     <!-- Información del instituto -->
     <section class="instituto-info">
-        <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
-        <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
-        <h3>Dirección de Control Operativo</h3>
-        <div class="fecha-actual" id="fechaActual"></div>
+        <div class="inst-logo-block">
+            <img src="../../imagenes/unnamed.png" alt="INM" class="inst-logo">
+        </div>
+        <div class="inst-sep"></div>
+        <div class="inst-title-block">
+            <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
+            <p class="inst-subtitle">Dirección de Control Operativo</p>
+            <span class="estado-badge">Durango</span>
+        </div>
+        <div class="inst-sep"></div>
+        <div class="inst-date-block">
+            <i class="fas fa-calendar-alt inst-cal-icon"></i>
+            <div class="fecha-actual" id="fechaActual"></div>
+        </div>
         <button class="regresar-btn" onclick="window.location.href='../../index.html'">
             <i class="fas fa-arrow-left"></i> Regresar
         </button>
     </section>
-
-    <!-- Agregamos el nombre del estado aquí -->
-    <div class="estado-info">
-        <h4>Durango</h4>
-    </div>
 
     <!-- Contenedor solo para las opciones -->
     <div class="contenedor-principal">
@@ -86,11 +85,6 @@
         </div>
     </div>
 
-    <!-- Contenedor de logos -->
-    <div class="logo-container">
-        <img src="../../imagenes/inm logo.png" alt="Logo INM">
-    </div>
-
     <script>
         // Mostrar la fecha actual
         document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
@@ -125,11 +119,6 @@
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s ease;
-        }
-
-        /* Color específico para Aguascalientes */
-        .estado-info {
-            background: linear-gradient(135deg, #a08d2d, #a08d2d);
         }
 
         /* Efecto de carga de la página */
