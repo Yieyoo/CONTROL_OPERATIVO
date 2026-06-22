@@ -1,0 +1,449 @@
+/* --- Fondo de la página --- */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-image: url('../../imagenes/fondo.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 14px;
+    overflow-x: hidden;
+}
+
+/* --- Header mejorado --- */
+header {
+    background-color: #691932;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-weight: bold;
+    border-bottom: 4px solid #A5852E;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+/* --- Menú lateral mejorado --- */
+nav.menu {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background-color: #691932;
+    padding-top: 70px;
+    transition: left 0.3s ease;
+    z-index: 999;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
+}
+
+nav.menu.active {
+    left: 0;
+}
+
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+.menu-overlay.active {
+    display: block;
+}
+
+nav.menu ul {
+    list-style-type: none;
+    padding: 0 15px;
+}
+
+nav.menu ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    display: block;
+    padding: 12px 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+nav.menu ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+/* --- Submenú refinado --- */
+.submenu-list {
+    display: none;
+    padding-left: 10px;
+    border-radius: 4px;
+    animation: fadeIn 0.3s ease;
+    max-height: 200px; /* Altura máxima del submenú */
+}
+
+.submenu.active .submenu-list {
+    display: block;
+}
+
+.submenu-list li a {
+    padding: 8px 15px;
+    font-size: 13px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.submenu-list li a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Botón de menú mejorado --- */
+.menu-toggle {
+    background-color: #A5852E;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    border-radius: 50%;
+    z-index: 1001;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-toggle:hover {
+    background-color: #c49d3a;
+    transform: scale(1.05);
+}
+
+
+.submenu {
+    max-height: 400px; /* Ajusta la altura máxima según necesites */
+    overflow-y: auto; /* Muestra la barra de desplazamiento solo si es necesario */
+    scrollbar-width: thin; /* Para navegadores como Firefox */
+    scrollbar-color: #c09404 transparent; /* Color de la barra y el fondo */
+}
+
+/* Personalización del scrollbar en navegadores basados en WebKit (Chrome, Edge, Safari) */
+.submenu::-webkit-scrollbar {
+    width: 6px; /* Ancho de la barra */
+}
+
+.submenu::-webkit-scrollbar-thumb {
+    background-color: #c09404; /* Color de la barra */
+    border-radius: 3px; /* Bordes redondeados */
+}
+
+.submenu::-webkit-scrollbar-track {
+    background: transparent; /* Fondo de la barra */
+}
+
+/* --- Logos en la esquina superior derecha --- */
+.logo-container {
+    position: fixed;
+    top: 200px;
+    right: 20px;
+    display: flex;
+    gap: 20px;
+    z-index: 100;
+}
+
+.logo-container img {
+    margin-top: 30%;
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+/* --- Fecha debajo del logo --- */
+.fecha-actual {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #691932;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+/* --- Estilos Responsivos (Móviles) --- */
+@media screen and (max-width: 1024px) {
+}
+    .logo-container {
+        top: 10px;
+        right: 10px;
+        gap: 15px;
+    }
+
+    .fecha-actual {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 15px;
+        padding: 4px 5px;
+    }
+
+@media screen and (max-width: 768px) {
+    .logo-container {
+        top: 5px;
+        right: 5px;
+        gap: 10px;
+    }
+
+    .fecha-actual {
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    .logo-arriba-img {
+        width: 100px;
+    }
+
+    /* Ajuste específico para PDF en móviles */
+    .pdf-viewer {
+        height: 60vh;
+        min-height: 300px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    @supports (-webkit-touch-callout: none) {
+        .pdf-viewer {
+            height: calc(100vh - 150px);
+        }
+    }
+
+    /* Ajuste contenedor PDF en dispositivos pequeños */
+    .pdf-container {
+        width: 95%;
+        max-width: 100%;
+        margin: 10px auto;
+        display: none;
+    }
+
+    .pdf-viewer iframe {
+        height: 100%;
+        width: 100%;
+    }
+}
+
+/* --- Logo en la parte superior --- */
+.logo-arriba-img {
+    width: 145px;
+    height: auto;
+}
+
+/* --- Estilo para los botones --- */
+form button, #deleteButton, .file-button, .upload-button {
+    background-color: #691932;
+    color: #fff;
+    padding: 12px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+form button:hover, #deleteButton:hover, .file-button:hover, .upload-button:hover {
+    background-color: #8e5c71;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Estilo para el selector de archivo --- */
+#pdfInput {
+    background-color: #691932;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 300px;
+}
+
+#pdfInput:hover {
+    background-color: #8e5c71;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+#pdfInput::file-selector-button {
+    display: none;
+}
+
+/* --- Estilos generales --- */
+html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* --- Contenedor principal del PDF (con márgenes) --- */
+.pdf-container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* --- Visor del PDF (estético y responsive) --- */
+.pdf-viewer {
+    width: 100%;
+    height: 75vh;
+    min-height: 500px;
+    border: none;
+    display: block;
+}
+.pdf-embed {
+    width: 100%;
+    height: 80vh;
+    min-height: 600px;
+    border: 1px solid #691932;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Iframe del PDF (ajuste perfecto) */
+.pdf-viewer iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+/* --- Botón de regresar --- */
+.regresar-btn {
+    background-color: #691932;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    position: fixed;
+    top: 20px;         /* Posición desde la parte superior */
+    left: 20px;        /* Posición desde la parte izquierda */
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+.regresar-btn:hover {
+    background-color: #8e5c71;
+}
+
+/* --- Header con título --- */
+/* Estilo general para el título */
+.header-container h1 {
+    text-align: center; /* Centra el título */
+    padding-top: 50px; /* Agrega espacio arriba del encabezado */
+    padding-bottom: 20px; /* Espacio debajo del encabezado */
+    font-size: 2rem; /* Tamaño de fuente normal para pantallas grandes */
+}
+
+/* Estilos específicos para dispositivos móviles */
+@media screen and (max-width: 768px) {
+    .header-container h1 {
+        padding-top: 80px; /* Aumenta el espacio superior en móviles */
+        font-size: 1rem; /* Tamaño de fuente más pequeño en móviles */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .header-container h1 {
+        font-size: 1rem; /* Tamaño de fuente aún más pequeño en pantallas muy pequeñas */
+    }
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.logo-arriba-img {
+    width: 150px;
+    height: auto;
+}
+/* Estilos para las imágenes dentro del contenedor */
+.mobile-images img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para ocultar las imágenes en pantallas grandes */
+.mobile-images {
+    display: none;  /* Ocultar el contenedor en pantallas grandes */
+}
+
+/* Estilos específicos para dispositivos móviles */
+@media screen and (max-width: 768px) {
+    /* Mostrar el contenedor de imágenes solo en pantallas pequeñas */
+    .mobile-images {
+        display: block;
+    }
+
+    /* Ajuste del tamaño y margen de las imágenes para que se acomoden bien en pantallas pequeñas */
+    .mobile-images img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+}
+
+/* Ajuste para pantallas aún más pequeñas */
+@media screen and (max-width: 480px) {
+    .mobile-images img {
+        width: 300px;  /* Reduce el tamaño */
+        height: auto; /* Mantiene la proporción */
+        margin-bottom: 15px;
+    }
+}
