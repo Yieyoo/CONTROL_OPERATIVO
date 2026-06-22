@@ -15,8 +15,8 @@
 }
 
 .ficha-admin-bar {
-    width: 90%;
-    max-width: 1100px;
+    width: 96%;
+    max-width: 1300px;
     margin: 14px auto 0;
     display: flex;
     justify-content: center;
@@ -44,11 +44,11 @@
 
 /* ---- CARD ---- */
 .ficha-card {
-    width: 90%;
-    max-width: 1100px;
+    width: 96%;
+    max-width: 1300px;
     margin: 0 auto;
     display: flex;
-    min-height: 950px;
+    min-height: 0;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 6px 28px rgba(0,0,0,0.18);
@@ -228,8 +228,8 @@
 
 /* ---- EMPTY STATE ---- */
 .ficha-empty {
-    width: 90%;
-    max-width: 1100px;
+    width: 96%;
+    max-width: 1300px;
     background: rgba(255,255,255,0.92);
     border-radius: 10px;
     padding: 50px 30px;
