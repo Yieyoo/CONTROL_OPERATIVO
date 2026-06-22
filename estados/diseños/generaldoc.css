@@ -127,7 +127,7 @@ body::before {
 .pdf-container iframe,
 .pdf-container embed {
     width: 100%;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 55px);
     min-height: 500px;
     border: none;
     display: block;
