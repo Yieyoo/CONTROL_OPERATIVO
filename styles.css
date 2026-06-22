@@ -256,7 +256,7 @@ main, footer {
 
 .mapa-container #map {
   width: 100%;
-  height: clamp(360px, 40vw, 480px);
+  height: clamp(360px, 40vw, 450px);
   position: relative;
 }
 
