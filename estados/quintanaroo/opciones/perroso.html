@@ -138,7 +138,7 @@
                     )[0];
 
                     // Configuración normal para PC
-                    pdfViewer.src = latestPDF.view_url || latestPDF.url;
+                    pdfViewer.src = latestPDF.url;
                     
                     // Configuración para móviles (no iOS)
                     if (!isIOS()) {
@@ -180,3 +180,4 @@
     </script>
 </body>
 </html>
+
