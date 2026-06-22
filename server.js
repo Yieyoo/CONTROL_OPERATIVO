@@ -597,6 +597,87 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
   }
 });
 
+// ========== FICHA CURRICULAR DATA ==========
+const fichaCache = {};
+
+router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
+  try {
+    const estado = req.params.estado;
+
+    if (fichaCache[estado]) {
+      return res.json({ status: 'success', data: fichaCache[estado] });
+    }
+
+    try {
+      const resources = await cloudinary.api.resources({
+        type: 'upload',
+        prefix: `${estado}/ficha_datos/`,
+        resource_type: 'raw',
+        max_results: 1
+      });
+
+      if (resources.resources.length > 0) {
+        const url = resources.resources[0].secure_url;
+        const https = require('https');
+
+        const data = await new Promise((resolve, reject) => {
+          https.get(url, (response) => {
+            let body = '';
+            response.on('data', chunk => body += chunk);
+            response.on('end', () => {
+              try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
+            });
+          }).on('error', reject);
+        });
+
+        fichaCache[estado] = data;
+        return res.json({ status: 'success', data });
+      }
+    } catch (e) {
+      // No data yet
+    }
+
+    res.json({ status: 'success', data: null });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/ficha-datos/:estado', authenticate, async (req, res, next) => {
+  try {
+    const estado = req.params.estado;
+    const fichaData = req.body;
+
+    if (!fichaData || typeof fichaData !== 'object') {
+      throw new AppError('Datos requeridos', 400, 'missing_data');
+    }
+
+    if (fichaData.foto_base64) {
+      const photoResult = await cloudinary.uploader.upload(fichaData.foto_base64, {
+        resource_type: 'image',
+        public_id: `${estado}/ficha_foto/foto`,
+        overwrite: true
+      });
+      fichaData.foto_url = photoResult.secure_url;
+      delete fichaData.foto_base64;
+    }
+
+    const jsonStr = JSON.stringify(fichaData);
+    const dataUri = `data:application/json;base64,${Buffer.from(jsonStr).toString('base64')}`;
+
+    await cloudinary.uploader.upload(dataUri, {
+      resource_type: 'raw',
+      public_id: `${estado}/ficha_datos/datos`,
+      overwrite: true
+    });
+
+    fichaCache[estado] = fichaData;
+    res.json({ status: 'success', data: fichaData });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/render-ping', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.ip;
   console.log(`📡 Ping recibido desde IP: ${clientIP} - ${new Date().toLocaleString()}`);
