@@ -17,10 +17,10 @@
 .ficha-admin-bar {
     width: 85%;
     max-width: 1100px;
+    margin: 14px auto 0;
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 14px;
 }
 
 .ficha-btn {
@@ -46,6 +46,7 @@
 .ficha-card {
     width: 85%;
     max-width: 1100px;
+    margin: 0 auto;
     display: flex;
     min-height: 520px;
     border-radius: 10px;
