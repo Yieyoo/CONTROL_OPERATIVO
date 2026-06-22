@@ -22,12 +22,12 @@
         if (!root) return;
         root.innerHTML = `
             <div class="ficha-wrapper" id="ficha-wrapper">
+                <div id="ficha-card-area"></div>
                 <div class="ficha-admin-bar" id="ficha-admin-bar" style="display:${IS_ADMIN ? 'flex' : 'none'}">
                     <button class="ficha-btn ficha-btn-editar" onclick="fichaOpenModal()">
                         <i class="fas fa-edit"></i> Editar ficha
                     </button>
                 </div>
-                <div id="ficha-card-area"></div>
             </div>
 
             <!-- Modal -->
