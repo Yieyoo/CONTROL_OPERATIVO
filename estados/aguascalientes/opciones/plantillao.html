@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -194,7 +194,7 @@
                     fechaElement.textContent = formatDate(latestPDF.uploaded_at);
                     
                     // Configuración normal para PC
-                    pdfViewer.src = latestPDF.url;
+                    pdfViewer.src = latestPDF.view_url || latestPDF.url;
                     
                     // Configuración para móviles
                     if (!isIOS()) {

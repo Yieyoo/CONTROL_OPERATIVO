@@ -9,6 +9,14 @@ class MenuLoader {
             link.href = href;
             document.head.appendChild(link);
         }
+
+        const faHref = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        if (!document.querySelector(`link[href="${faHref}"]`)) {
+            const fa = document.createElement('link');
+            fa.rel = 'stylesheet';
+            fa.href = faHref;
+            document.head.appendChild(fa);
+        }
     }
 
     static async loadMenu() {
