@@ -172,9 +172,9 @@
                 <div class="ficha-field">
                     <label>Foto</label>
                     <div class="ficha-foto-preview-wrap">
-                        ${d.foto_url
-                            ? `<img id="ficha-foto-preview" src="${d.foto_url}" style="object-position:${d.foto_position||'50% 20%'}">`
-                            : `<img id="ficha-foto-preview" src="" style="display:none">`}
+                        <div class="ficha-drag-wrap" id="ficha-drag-wrap">
+                            <img id="ficha-foto-preview" src="${d.foto_url || ''}" ${!d.foto_url ? 'style="display:none"' : ''}>
+                        </div>
                         <div>
                             <input type="file" id="f-foto" accept="image/*" onchange="fichaPreviewFoto(this)">
                             <small style="color:#888;font-size:0.7rem;display:block;margin-top:4px">Arrastra la foto para reposicionarla</small>
@@ -256,54 +256,79 @@
         reader.onload = e => {
             pendingFotoBase64 = e.target.result;
             const prev = document.getElementById('ficha-foto-preview');
-            if (prev) { prev.src = e.target.result; prev.style.display = ''; }
+            if (prev) {
+                prev.style.left = '';
+                prev.style.top = '';
+                prev.style.width = '';
+                prev.style.height = '';
+                prev.src = e.target.result;
+                prev.style.display = '';
+                prev.addEventListener('load', setupFotoDrag, { once: true });
+            }
         };
         reader.readAsDataURL(file);
     };
 
     function setupFotoDrag() {
         const preview = document.getElementById('ficha-foto-preview');
-        if (!preview || !preview.src || preview.style.display === 'none') return;
+        const wrap = document.getElementById('ficha-drag-wrap');
+        if (!wrap || !preview || !preview.src || preview.style.display === 'none') return;
 
-        const wrap = preview.parentElement;
-        wrap.style.cursor = 'grab';
-        wrap.style.userSelect = 'none';
+        const cW = wrap.clientWidth;
+        const cH = wrap.clientHeight;
 
-        // Parse current position
-        let posX = 50, posY = 20;
-        const m = (preview.style.objectPosition || '').match(/([\d.]+)%\s+([\d.]+)%/);
-        if (m) { posX = parseFloat(m[1]); posY = parseFloat(m[2]); }
-
-        let dragging = false, lastX = 0, lastY = 0;
-
-        function sensitivity() {
+        function initPos() {
             const nW = preview.naturalWidth || 300;
             const nH = preview.naturalHeight || 400;
-            const cW = wrap.clientWidth || 95;
-            const cH = wrap.clientHeight || 115;
-            const scale = Math.max(cW / nW, cH / nH);
-            const exX = Math.max(1, nW * scale - cW);
-            const exY = Math.max(1, nH * scale - cH);
-            return { x: 100 / exX, y: 100 / exY };
+            // Scale 1.4x over the minimum cover-scale so there's excess in BOTH axes
+            const scale = Math.max(cW / nW, cH / nH) * 1.4;
+            const iW = nW * scale;
+            const iH = nH * scale;
+            preview.style.width  = iW + 'px';
+            preview.style.height = iH + 'px';
+
+            let left, top;
+            const saved = currentData?.foto_position;
+            if (saved) {
+                const pm = saved.match(/([\d.]+)%\s+([\d.]+)%/);
+                if (pm) {
+                    left = -((parseFloat(pm[1]) / 100) * (iW - cW));
+                    top  = -((parseFloat(pm[2]) / 100) * (iH - cH));
+                }
+            }
+            if (left === undefined) left = (cW - iW) / 2;
+            if (top  === undefined) top  = (cH - iH) * 0.2;
+
+            preview.style.left = Math.max(cW - iW, Math.min(0, left)) + 'px';
+            preview.style.top  = Math.max(cH - iH, Math.min(0, top))  + 'px';
         }
+
+        if (preview.complete && preview.naturalWidth) {
+            initPos();
+        } else {
+            preview.addEventListener('load', initPos, { once: true });
+            return;
+        }
+
+        let dragging = false, lx = 0, ly = 0;
 
         function start(e) {
             dragging = true;
             const t = e.touches?.[0] || e;
-            lastX = t.clientX; lastY = t.clientY;
+            lx = t.clientX; ly = t.clientY;
             wrap.style.cursor = 'grabbing';
             e.preventDefault();
         }
         function move(e) {
             if (!dragging) return;
             const t = e.touches?.[0] || e;
-            const dx = t.clientX - lastX;
-            const dy = t.clientY - lastY;
-            lastX = t.clientX; lastY = t.clientY;
-            const s = sensitivity();
-            posX = Math.max(0, Math.min(100, posX - dx * s.x));
-            posY = Math.max(0, Math.min(100, posY - dy * s.y));
-            preview.style.objectPosition = `${posX}% ${posY}%`;
+            const dx = t.clientX - lx;
+            const dy = t.clientY - ly;
+            lx = t.clientX; ly = t.clientY;
+            const iW = parseFloat(preview.style.width);
+            const iH = parseFloat(preview.style.height);
+            preview.style.left = Math.max(cW - iW, Math.min(0, parseFloat(preview.style.left) + dx)) + 'px';
+            preview.style.top  = Math.max(cH - iH, Math.min(0, parseFloat(preview.style.top)  + dy)) + 'px';
             e.preventDefault();
         }
         function end() { dragging = false; wrap.style.cursor = 'grab'; }
@@ -314,6 +339,21 @@
         wrap.addEventListener('touchstart', start, { passive: false });
         document.addEventListener('touchmove', move, { passive: false });
         document.addEventListener('touchend', end);
+    }
+
+    function getFotoPosition() {
+        const preview = document.getElementById('ficha-foto-preview');
+        const wrap = document.getElementById('ficha-drag-wrap');
+        if (!preview || !wrap || !preview.style.left) return currentData?.foto_position || '50% 20%';
+        const cW = wrap.clientWidth;
+        const cH = wrap.clientHeight;
+        const iW = parseFloat(preview.style.width)  || cW;
+        const iH = parseFloat(preview.style.height) || cH;
+        const exW = Math.max(1, iW - cW);
+        const exH = Math.max(1, iH - cH);
+        const pctX = ((-parseFloat(preview.style.left)) / exW * 100).toFixed(1);
+        const pctY = ((-parseFloat(preview.style.top))  / exH * 100).toFixed(1);
+        return `${pctX}% ${pctY}%`;
     }
 
     // ── Dynamic rows ────────────────────────────────────────
@@ -400,8 +440,7 @@
                 return { org: inputs[0]?.value.trim(), cargo: inputs[1]?.value.trim() };
             }).filter(c => c.org || c.cargo);
 
-        const fotoPreview = document.getElementById('ficha-foto-preview');
-        const fotoPos = fotoPreview?.style.objectPosition || currentData?.foto_position || '50% 20%';
+        const fotoPos = getFotoPosition();
         return {
             cargo: document.getElementById('f-cargo')?.value.trim() || '',
             nombre: document.getElementById('f-nombre')?.value.trim() || '',
