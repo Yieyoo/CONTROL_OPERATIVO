@@ -96,8 +96,9 @@
                 <span class="org">${c.org}</span> ${c.cargo}
             </div>`).join('');
 
+        const fotoPos = d.foto_position || '20% center';
         const fotoTag = d.foto_url
-            ? `<img class="ficha-foto" src="${d.foto_url}" alt="Foto">`
+            ? `<img class="ficha-foto" src="${d.foto_url}" alt="Foto" style="object-position:${fotoPos}">`
             : `<span class="ficha-foto-placeholder">👤</span>`;
 
         area.innerHTML = `
@@ -172,8 +173,14 @@
                 <div class="ficha-field">
                     <label>Foto</label>
                     <div class="ficha-foto-preview-wrap">
-                        ${d.foto_url ? `<img id="ficha-foto-preview" src="${d.foto_url}">` : `<img id="ficha-foto-preview" src="" style="display:none">`}
+                        ${d.foto_url ? `<img id="ficha-foto-preview" src="${d.foto_url}" style="object-position:${d.foto_position||'20% center'}">` : `<img id="ficha-foto-preview" src="" style="display:none">`}
                         <input type="file" id="f-foto" accept="image/*" onchange="fichaPreviewFoto(this)">
+                    </div>
+                    <div class="ficha-field" style="margin-top:8px">
+                        <label>Posición vertical de la foto — <span id="pos-label">${Math.round(parseFloat(d.foto_position||'20') )}%</span></label>
+                        <input type="range" id="f-foto-pos" min="0" max="100" value="${parseFloat(d.foto_position||'20')}"
+                            oninput="fichaAjustarFoto(this.value)" style="width:100%">
+                        <small style="color:#888;font-size:0.7rem">0% = arriba &nbsp;·&nbsp; 50% = centro &nbsp;·&nbsp; 100% = abajo</small>
                     </div>
                 </div>
             </div>
@@ -253,6 +260,13 @@
             if (prev) { prev.src = e.target.result; prev.style.display = ''; }
         };
         reader.readAsDataURL(file);
+    };
+
+    window.fichaAjustarFoto = function (val) {
+        const prev = document.getElementById('ficha-foto-preview');
+        if (prev) prev.style.objectPosition = `center ${val}%`;
+        const lbl = document.getElementById('pos-label');
+        if (lbl) lbl.textContent = `${Math.round(val)}%`;
     };
 
     // ── Dynamic rows ────────────────────────────────────────
@@ -339,10 +353,12 @@
                 return { org: inputs[0]?.value.trim(), cargo: inputs[1]?.value.trim() };
             }).filter(c => c.org || c.cargo);
 
+        const fotoPosVal = document.getElementById('f-foto-pos')?.value || '20';
         return {
             cargo: document.getElementById('f-cargo')?.value.trim() || '',
             nombre: document.getElementById('f-nombre')?.value.trim() || '',
             foto_url: currentData?.foto_url || '',
+            foto_position: `center ${fotoPosVal}%`,
             formacion,
             contacto: {
                 personal: document.getElementById('f-tel-personal')?.value.trim() || '',
