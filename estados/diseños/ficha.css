@@ -2,6 +2,10 @@
    FICHA CURRICULAR - CARD
    ============================ */
 
+#ficha-root {
+    width: 100%;
+}
+
 .ficha-wrapper {
     width: 100%;
     display: flex;
