@@ -196,7 +196,7 @@
                     fechaElement.textContent = formatDate(latestPDF.uploaded_at);
                     
                     // Configuración normal para PC
-                    pdfViewer.src = latestPDF.view_url || latestPDF.url;
+                    pdfViewer.src = latestPDF.url;
                     
                     // Configuración para móviles
                     if (!isIOS()) {
@@ -234,3 +234,4 @@
     </script>
 </body>
 </html>
+
