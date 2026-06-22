@@ -49,379 +49,146 @@ body {
   position: relative;
 }
 
-header, main, footer {
+header {
+  position: relative;
+  z-index: 800;
+  width: 100%;
+}
+
+main, footer {
   position: relative;
   z-index: 1;
+  width: 100%;
 }
 
 /* ============ HEADER ============ */
-/* Línea superior vino */
-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 40px; /* Altura del bloque vino */
-  background-color: #691932;
-  z-index: 2; /* Mayor que el ::after */
-}
-
-/* Línea divisoria amarilla (delgada) */
-header::after {
-  content: '';
-  position: absolute;
-  top: 40px; /* Justo debajo del ::before */
-  left: 0;
-  width: 100%;
-  height: 20px; /* Grosor de la línea */
-  background-color: #c09404;
-  z-index: 2;
-}
+/* La barra superior la maneja nav.menu (menu.css) */
+header::before,
+header::after { display: none; }
 .contra-header {
-height: 48px;
-background-color: #691932;
-width: 100%;
-margin-top: -50px;   /* 🔽 Más cerca del contenido de arriba */
-margin-bottom: 20px;
-}
-
-/* --- Menú lateral estilizado --- *//* Menú principal - Diseño mejorado */
-nav.menu {
-  position: fixed;
-  top: 0;
-  left: -300px;
-  width: 300px;
-  height: 100%;
-  background: linear-gradient(135deg, #691932 0%, #4d1224 100%);
-  padding-top: 100px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1000;
-  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
-  border-top-right-radius: 25px;
-  border-bottom-right-radius: 25px;
-  overflow: hidden;
-}
-
-/* Efecto de borde sutil */
-nav.menu::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 3px;
-  height: 100%;
-  background: linear-gradient(to bottom, #A5852E, #c49d3a);
-}
-
-nav.menu.active {
-  left: 0;
-}
-
-/* Fondo overlay con efecto de difuminado */
-.menu-overlay {
   display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
-  z-index: 999;
-  animation: fadeIn 0.3s ease;
 }
 
-.menu-overlay.active {
-  display: block;
-}
-
-/* Logo del menú */
-.logo-arriba-img {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-}
-
-/* Lista del menú - Diseño premium */
-nav.menu ul {
-  list-style-type: none;
-  padding: 0 20px;
-  margin-top: 70px;
-}
-
-nav.menu > ul {
-  margin-top: 70px; /* Solo afecta a las ideas principales */
-}
-
-nav.menu ul ul {
-  margin-top: 5%; /* Ajusta el margen para evitar que se baje demasiado */
-}
-
-nav.menu ul li {
-  margin-bottom: 15px;
-  position: relative;
-}
-
-nav.menu ul li a {
-  text-decoration: none;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  display: block;
-  padding: 14px 20px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-left: 3px solid transparent;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 8px;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-nav.menu ul li a:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-  transform: translateX(8px);
-  border-left: 3px solid #A5852E;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Submenú - Diseño acordeón mejorado */
-.submenu-list {
-  display: none;
-  padding-left: 10px;
-  animation: slideDown 0.3s ease;
-  margin-top: 10px;
-  border-left: 2px dashed rgba(255, 255, 255, 0.1);
-}
-
-.submenu.active .submenu-list {
-  display: block;
-}
-
-.submenu-list li a {
-  padding: 12px 18px;
-  font-size: 14px;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.submenu-list li a:hover {
-  background-color: rgba(165, 133, 46, 0.2);
-  transform: translateX(5px);
-}
-
-/* Indicador de submenú */
-.submenu > a::after {
-  content: '›';
-  position: absolute;
-  right: 20px;
-  transform: rotate(90deg);
-  transition: transform 0.3s ease;
-}
-
-.submenu.active > a::after {
-  transform: rotate(270deg);
-}
-
-/* Botón de menú - Diseño premium */
-.menu-toggle {
-  background: linear-gradient(135deg, #A5852E 0%, #c49d3a 100%);
-  color: white;
-  border: none;
-  width: 50px;
-  height: 50px;
-  font-size: 24px;
-  cursor: pointer;
-  position: fixed;
-  top: 80px;
-  left: 20px;
-  border-radius: 50%;
-  z-index: 100000;
-  box-shadow: 0 8px 25px rgba(165, 133, 46, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-toggle:hover {
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
-}
-
-/* Scroll del submenú - Estilo mejorado */
-.submenu {
-  max-height: 400px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #A5852E transparent;
-  padding-right: 5px;
-}
-
-.submenu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.submenu::-webkit-scrollbar-thumb {
-  background-color: #A5852E;
-  border-radius: 4px;
-  background-clip: padding-box;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.submenu::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Animaciones */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideDown {
-  from { 
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Efecto de iluminación para items activos */
-nav.menu ul li a.active {
-  background-color: rgba(165, 133, 46, 0.3);
-  border-left: 3px solid #A5852E;
-  font-weight: 600;
-}
-
-/* Responsive para móviles */
-@media (max-width: 768px) {
-  nav.menu {
-    width: 260px;
-    left: -260px;
-  }
-  
-  .menu-toggle {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-}
-@media (max-width: 768px) {
-  nav.menu ul {
-    margin-top: 5px; /* o el valor que veas apropiado */
-  }
-}
-
-.logo-arriba-img {
-  height: 50px;
-  margin-right: 10px;
-  filter: brightness(0) invert(1);
-}
+/* Menú lateral → ver menu.css (cargado por load-menu.js) */
 
 .logo-container {
-  position: absolute; /* Posicionamiento absoluto respecto al header */
-  margin-top: 70px;
-  right: 20px; /* Distancia desde el borde derecho */
-  top: 10px; /* Distancia desde el borde superior */
-  z-index: 100; /* Asegura que esté por encima de otros elementos */
+  position: absolute;
+  top: 60px;
+  right: 3rem;
+  z-index: 100;
 }
 
 .logo-container img {
-  width: 300px; /* Ancho que especificaste */
-  height: auto; /* Mantiene la proporción */
+  width: clamp(120px, 13vw, 220px);
+  height: auto;
   transition: var(--transicion);
 }
+
+/* Espacio para la barra fija */
+body { padding-top: 50px; }
 
 /* ============ PORTADA ============ */
 .portada {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3rem;
-  background: linear-gradient(135deg, var(--color-secundario) 0%, #4d1225 100%);
-  color: var(--color-texto-claro);
-  min-height: 50vh; /* Asegura que la portada ocupe toda la altura visible */
-  margin-bottom: 0; /* Evita márgenes adicionales */
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  background: #fff;
+  min-height: 58vh;
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-
 .portada .imagen-container {
-  width: 45%;
-  animation: fadeInLeft 0.8s ease;
+  width: 52%;
+  flex-shrink: 0;
+  background:
+    radial-gradient(ellipse at 30% 80%, rgba(180, 60, 90, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(100, 20, 27, 0.6) 0%, transparent 50%),
+    linear-gradient(160deg, #3d0e1a 0%, #691932 45%, #530f25 100%);
+  clip-path: polygon(0 0, 100% 0, 86% 100%, 0 100%);
   display: flex;
   justify-content: center;
-  align-items: flex-end; /* Asegura que la imagen esté alineada al fondo */
-  margin-bottom: 0; /* Elimina margen inferior */
+  align-items: flex-end;
+  padding: 0 5rem 0 3rem;
+  margin-bottom: 0;
+  animation: fadeInLeft 0.8s ease;
+  position: relative;
+  
+}
+
+/* línea dorada vertical decorativa en el panel */
+.portada .imagen-container::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 16%;
+  width: 2px;
+  height: 70%;
+  background: linear-gradient(to bottom, transparent, rgba(165,133,46,0.5), transparent);
+  pointer-events: none;
 }
 
 .portada .imagen-container img {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 70%;
+  height: 100%;
+  max-height: 380px;
   object-fit: contain;
+  object-position: bottom;
+  display: block;
+  margin-left: clamp(0px, 4vw, 60px);
   border: none;
   border-radius: 0;
   box-shadow: none;
-  transition: none;
-  margin-top: 0;
-  margin-bottom: 0;
-  display: block;
-  margin-top: 10;
-  z-index: 1;
-  margin-left: 300px; /* Ajusta el valor según lo necesites */
+  filter: drop-shadow(4px 0 18px rgba(0,0,0,0.35));
 }
 
-
 .portada .texto-container {
-  width: 50%;
+  flex: 1;
   text-align: right;
   animation: fadeInRight 0.8s ease;
-  padding: 2rem;
-}
-.portada .texto-container {
-  width: 50%;
-  text-align: right;
-  animation: fadeInRight 0.8s ease;
-  padding: 2rem;
+  padding: 5rem 3rem 3rem 2rem;
   box-sizing: border-box;
-  overflow: hidden;
-  margin-bottom: 0; /* Elimina margen inferior */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 0;
+  overflow: visible;
 }
-
 
 .portada .texto-container h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: var(--color-texto-claro);
-  margin-bottom: 0.8rem; /* Reducido de 1.5rem */
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  line-height: 1.1; /* Ajustado de 1.2 */
-  letter-spacing: -0.5px; /* Reduce espacio entre letras */
+  font-size: clamp(1.5rem, 2.5vw, 2.4rem);
+  font-weight: 800;
+  color: #691932;
+  margin-bottom: 0.5rem;
+  text-shadow: none;
+  line-height: 1.1;
+  letter-spacing: 0.3px;
 }
 
 .portada .texto-container h2,
 .portada .texto-container h3 {
-  font-size: 1.5rem;
-  color: var(--color-texto-claro);
-  margin-bottom: 0.6rem; /* Reducido de 1.5rem */
-  font-weight: normal;
-  line-height: 1.2; /* Añadido para consistencia */
-  letter-spacing: -0.3px; /* Reduce espacio entre letras */
+  font-size: clamp(0.88rem, 1.2vw, 1.05rem);
+  color: #555;
+  margin-bottom: 0.25rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
 }
 
+.portada .texto-container h3 {
+  font-weight: 600;
+  color: #691932;
+  margin-bottom: 0.7rem;
+}
 
 .portada .texto-container .fecha-actual {
-  font-size: 1.1rem;
-  color: rgba(0, 0, 0, 0.8);
+  font-size: clamp(0.88rem, 1.1vw, 1rem);
+  color: #555;
   font-style: italic;
 }
 /* Contenedor principal */
@@ -435,8 +202,8 @@ nav.menu ul li a.active {
   /* Estilo para la portada */
   .portada {
     background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
-    padding: 3rem;
-    border-radius: 10px;
+    padding: 0;
+    border-radius: px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   
@@ -453,35 +220,28 @@ nav.menu ul li a.active {
   
  /* ============ MAPA ============ */
 .mapa-container {
-    background-color: #fff;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     padding: 2rem;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 1400px;
-    margin: 3rem auto;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
+    border-radius: 16px;
+    width: 62%;
+    max-width: 950px;
+    margin: 2rem auto 3rem;
     position: relative;
-    border: 1px solid #e0e0e0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    overflow: hidden;
 }
 
 .mapa-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 5px;
-    background: linear-gradient(to right, #691932, #A5852E);
+    display: none;
 }
 
 .mapa-container #map {
     width: 100%;
-    height: 750px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    border: 1px solid #e0e0e0;
-    overflow: hidden;
+    height: clamp(400px, 44vh, 488px);
+    position: relative;
 }
 
 #map svg {
@@ -513,13 +273,14 @@ nav.menu ul li a.active {
 }
 
 .mapa-container .titulo-mapa {
-    font-size: 2rem;
+    font-size: clamp(1.4rem, 2vw, 2rem);
     color: #691932;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
     text-align: center;
     position: relative;
     padding-bottom: 0.8rem;
     font-weight: 600;
+    text-shadow: 0 1px 3px rgba(255,255,255,0.8);
 }
 
 .mapa-container .titulo-mapa::after {
@@ -534,17 +295,23 @@ nav.menu ul li a.active {
     border-radius: 2px;
 }
 
-/* Responsive */
+/* Responsive mapa */
+@media (max-width: 992px) {
+    .mapa-container {
+        width: 90%;
+    }
+}
+
 @media (max-width: 768px) {
     .mapa-container {
         width: 100%;
         padding: 1.5rem;
     }
-    
+
     .mapa-container #map {
-        height: 900px; /* Añadido "px" y aumentado a 900px */
+        height: 400px;
     }
-    
+
     .mapa-container .titulo-mapa {
         font-size: 1.5rem;
     }
@@ -552,9 +319,9 @@ nav.menu ul li a.active {
 
 @media (max-width: 480px) {
     .mapa-container #map {
-        height: 750px; /* Aumentado de 500px a 750px */
+        height: 300px;
     }
-    
+
     .mapa-container {
         padding: 1rem;
     }
@@ -563,9 +330,41 @@ nav.menu ul li a.active {
 /* ============ LÍNEA SEPARADORA ============ */
 .linea {
   height: 2px;
-  background: linear-gradient(to right, transparent, var(--color-secundario), transparent);
+  background: linear-gradient(to right, transparent, #A5852E, transparent);
   margin: 2rem 0;
   border: none;
+}
+
+/* ============ PORTADA — OVERRIDES FINALES ============ */
+
+/* Quitar la línea animada bajo h1 */
+.portada .texto-container h1::after { display: none; }
+
+/* Subtítulo largo (Dirección General...) */
+.portada .texto-container h2:first-of-type {
+  font-size: clamp(0.88rem, 1.2vw, 1.05rem) !important;
+  font-weight: 400 !important;
+  color: #666 !important;
+}
+
+/* Línea dorada corta alineada a la derecha */
+.portada .texto-container .linea {
+  width: 60px !important;
+  height: 3px !important;
+  background: linear-gradient(to left, #A5852E, #c49d3a) !important;
+  margin: 0.2rem 0 0.8rem auto !important;
+  animation: none !important;
+  border-radius: 2px;
+}
+
+/* Etiqueta "Información de CO" */
+.portada .texto-container h2:last-of-type {
+  font-size: clamp(0.7rem, 0.9vw, 0.82rem) !important;
+  font-weight: 700 !important;
+  color: #A5852E !important;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
 }
 
 /* ============ ANIMACIONES ============ */
@@ -622,19 +421,27 @@ nav.menu ul li a.active {
 @media (max-width: 992px) {
   .portada {
     flex-direction: column;
-    padding: 2rem;
     min-height: auto;
   }
 
-  .portada .imagen-container,
-  .portada .texto-container {
+  .portada .imagen-container {
     width: 100%;
-    text-align: center;
+    clip-path: none;
+    padding: 2rem 2rem 0;
+    min-height: 260px;
+    justify-content: center;
   }
 
   .portada .texto-container {
-    margin-top: 2rem;
-    padding: 1rem;
+    width: 100%;
+    text-align: center;
+    align-items: center;
+    padding: 2rem 1.5rem;
+  }
+
+  .portada .texto-container .linea {
+    margin: 0.2rem auto 0.8rem auto !important;
+    background: linear-gradient(to right, #A5852E, #c49d3a) !important;
   }
 
   .mapa-container {
@@ -714,9 +521,9 @@ nav.menu ul li a.active {
 
   .menu-toggle {
     top: 20px;
-    left: 15px;
-    width: 35px;
-    height: 35px;
+    left: 14px;
+    width: 38px;
+    height: 38px;
     font-size: 18px;
   }
 
@@ -790,7 +597,7 @@ nav.menu ul li a.active {
 
   nav.menu {
     width: 200px;
-    padding-top: 100px;
+    padding-top: 70px;
   }
 
   nav.menu ul li a {
@@ -847,7 +654,7 @@ nav.menu ul li a.active {
 }
 
 .portada .imagen-container img {
-  animation: float 6s ease-in-out infinite;
+  animation: none;
 }
 
 /* Efecto de aparición escalonada para el texto */
@@ -904,9 +711,10 @@ nav.menu ul li a.active {
   z-index: 1;
 }
 
-/* Suavizado general para todo el sitio */
+/* Suavizado general y escalado responsivo */
 html {
   scroll-behavior: smooth;
+  font-size: clamp(12px, 0.85vw, 16px);
 }
 
 /* Animación al hacer scroll para las secciones */

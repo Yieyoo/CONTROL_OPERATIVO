@@ -1,8 +1,13 @@
-/* ===== RESET MODERNO ===== */
+﻿/* ===== RESET MODERNO ===== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+html {
+    font-size: clamp(12px, 0.85vw, 16px);
+    scroll-behavior: smooth;
 }
 
 body {
@@ -20,7 +25,7 @@ body {
     align-items: center;
     text-align: center;
     flex-direction: column;
-    padding: 20px;
+    padding: 50px 20px 20px;
     font-size: 14px;
     overflow-x: hidden;
     font-weight: 400;
@@ -65,241 +70,7 @@ body::before {
     width: 100%;
 }
 
-/* --- Menú lateral estilizado --- *//* Menú principal - Diseño mejorado */
-nav.menu {
-  position: fixed;
-  top: 0;
-  left: -300px;
-  width: 300px;
-  height: 100%;
-  background: linear-gradient(135deg, #691932 0%, #4d1224 100%);
-  padding-top: 100px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1000;
-  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.4);
-  border-top-right-radius: 25px;
-  border-bottom-right-radius: 25px;
-  overflow: hidden;
-}
-
-/* Efecto de borde sutil */
-nav.menu::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 3px;
-  height: 100%;
-  background: linear-gradient(to bottom, #A5852E, #c49d3a);
-}
-
-nav.menu.active {
-  left: 0;
-}
-
-/* Fondo overlay con efecto de difuminado */
-.menu-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
-  z-index: 999;
-  animation: fadeIn 0.3s ease;
-}
-
-.menu-overlay.active {
-  display: block;
-}
-
-/* Logo del menú */
-.logo-arriba-img {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-}
-
-/* Lista del menú - Diseño premium */
-nav.menu ul {
-  list-style-type: none;
-  padding: 0 20px;
-  margin-top: 70px;
-}
-
-nav.menu > ul {
-  margin-top: 70px; /* Solo afecta a las ideas principales */
-}
-
-nav.menu ul ul {
-  margin-top: 5%; /* Ajusta el margen para evitar que se baje demasiado */
-}
-
-nav.menu ul li {
-  margin-bottom: 15px;
-  position: relative;
-}
-
-nav.menu ul li a {
-  text-decoration: none;
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  display: block;
-  padding: 14px 20px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-left: 3px solid transparent;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 8px;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-nav.menu ul li a:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-  transform: translateX(8px);
-  border-left: 3px solid #A5852E;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Submenú - Diseño acordeón mejorado */
-.submenu-list {
-  display: none;
-  padding-left: 10px;
-  animation: slideDown 0.3s ease;
-  margin-top: 10px;
-  border-left: 2px dashed rgba(255, 255, 255, 0.1);
-}
-
-.submenu.active .submenu-list {
-  display: block;
-}
-
-.submenu-list li a {
-  padding: 12px 18px;
-  font-size: 14px;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.submenu-list li a:hover {
-  background-color: rgba(165, 133, 46, 0.2);
-  transform: translateX(5px);
-}
-
-/* Indicador de submenú */
-.submenu > a::after {
-  content: '›';
-  position: absolute;
-  right: 20px;
-  transform: rotate(90deg);
-  transition: transform 0.3s ease;
-}
-
-.submenu.active > a::after {
-  transform: rotate(270deg);
-}
-
-/* Botón de menú - Diseño premium */
-.menu-toggle {
-  background: linear-gradient(135deg, #A5852E 0%, #c49d3a 100%);
-  color: white;
-  border: none;
-  width: 50px;
-  height: 50px;
-  font-size: 24px;
-  cursor: pointer;
-  position: fixed;
-  top: 80px;
-  left: 20px;
-  border-radius: 50%;
-  z-index: 100000;
-  box-shadow: 0 8px 25px rgba(165, 133, 46, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-toggle:hover {
-  transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 10px 30px rgba(165, 133, 46, 0.6);
-}
-
-/* Scroll del submenú - Estilo mejorado */
-.submenu {
-  max-height: 400px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #A5852E transparent;
-  padding-right: 5px;
-}
-
-.submenu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.submenu::-webkit-scrollbar-thumb {
-  background-color: #A5852E;
-  border-radius: 4px;
-  background-clip: padding-box;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.submenu::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Animaciones */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideDown {
-  from { 
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Efecto de iluminación para items activos */
-nav.menu ul li a.active {
-  background-color: rgba(165, 133, 46, 0.3);
-  border-left: 3px solid #A5852E;
-  font-weight: 600;
-}
-
-/* Responsive para móviles */
-@media (max-width: 768px) {
-  nav.menu {
-    width: 260px;
-    left: -260px;
-  }
-  
-  .menu-toggle {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-}
-@media (max-width: 768px) {
-  nav.menu ul {
-    margin-top: 5px; /* o el valor que veas apropiado */
-  }
-}
+/* Menú lateral → ver menu.css (cargado por load-menu.js) */
 /* ===== CONTENIDO PRINCIPAL ELEGANTE ===== */
 .gestion-archivos {
     width: 88%;
@@ -680,19 +451,24 @@ h1::after {
     background: #691932;
     color: white;
     border: none;
-    padding: 10px 16px;
+    padding: 7px 16px 7px 12px;
     font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
     cursor: pointer;
     position: fixed;
-    top: 35px;
-    left: 20px;
-    border-radius: 6px;
+    top: 64px;
+    left: 14px;
+    border-radius: 20px;
     z-index: 900;
-    transition: all 0.2s ease;
+    box-shadow: 0 3px 10px rgba(105, 25, 50, 0.35);
+    transition: all 0.25s ease;
 }
 
 .regresar-btn:hover {
     background: #8e5c71;
+    transform: translateX(-2px);
+    box-shadow: 0 4px 14px rgba(105, 25, 50, 0.45);
 }
 
 /* ===== RESPONSIVE ELEGANTE ===== */
@@ -737,17 +513,17 @@ h1::after {
     }
     
     .menu-toggle {
-        width: 42px;
-        height: 42px;
-        top: 80px;
-        left: 15px;
+        width: 40px;
+        height: 40px;
+        top: 12px;
+        left: 14px;
     }
-    
+
     .regresar-btn {
         padding: 8px 12px;
         font-size: 12px;
-        top: 30px;
-        left: 15px;
+        top: 62px;
+        left: 14px;
     }
 }
 /* ===== VOLITA DE CARGA (SPINNER) ===== */

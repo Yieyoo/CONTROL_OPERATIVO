@@ -1,0 +1,252 @@
+/* ==================== */
+/* BARRA DE NAVEGACIÓN SUPERIOR */
+/* ==================== */
+
+:root {
+    --menu-primario: #691932;
+    --menu-dorado: #A5852E;
+    --menu-dorado-dark: #c49d3a;
+    --menu-blanco: #fff;
+}
+
+nav.menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 46px;
+    background: linear-gradient(to right, #6b1e3f, #320d1c);
+    border-bottom: 4px solid var(--menu-dorado);
+    z-index: 10000;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: stretch;
+}
+
+nav.menu > ul {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    list-style: none;
+    margin: 0;
+    padding: 0 0.5rem;
+    width: 100%;
+    height: 100%;
+}
+
+nav.menu ul li {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: 0;
+}
+
+nav.menu > ul > li > a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    padding: 0 1.1rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 3px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+}
+
+nav.menu > ul > li > a:hover,
+nav.menu > ul > li.submenu.active > a {
+    background: rgba(255, 255, 255, 0.08);
+    border-bottom-color: var(--menu-dorado);
+    color: #fff;
+}
+
+nav.menu > ul > li > a.active {
+    border-bottom-color: var(--menu-dorado);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Iconos */
+nav.menu .fas,
+nav.menu .fa {
+    color: var(--menu-dorado);
+    font-size: 0.78rem;
+}
+
+/* Flecha submenú */
+.submenu > a::after {
+    content: '▾';
+    font-size: 0.7rem;
+    margin-left: 4px;
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+    transform: rotate(0deg);
+}
+
+.submenu.active > a::after {
+    transform: rotate(180deg);
+}
+
+/* Espaciador — empuja Cerrar Sesión al extremo derecho */
+.nav-spacer {
+    flex: 1;
+}
+
+/* Usuario activo */
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 0.8rem 0 1rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.78rem;
+    border-left: 1px solid rgba(165, 133, 46, 0.25);
+    border-right: 1px solid rgba(165, 133, 46, 0.25);
+    height: 100%;
+    white-space: nowrap;
+}
+
+.nav-user .fas {
+    font-size: 1rem;
+    color: var(--menu-dorado);
+}
+
+.nav-username {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.3px;
+}
+
+/* Cerrar Sesión */
+.logout-link {
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-size: 0.8rem !important;
+    gap: 5px;
+    padding: 0 1rem !important;
+}
+
+.logout-link:hover {
+    color: #fff !important;
+    background: rgba(220, 50, 50, 0.15) !important;
+    border-bottom-color: rgba(220, 50, 50, 0.6) !important;
+}
+
+/* ==================== */
+/* DROPDOWN SUBMENÚ     */
+/* ==================== */
+.submenu-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 220px;
+    background: #320d1c;
+    border-top: 2px solid var(--menu-dorado);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 10001;
+    max-height: 420px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--menu-dorado) transparent;
+    padding: 0.3rem 0;
+    animation: dropDown 0.2s ease;
+}
+
+.submenu-list::-webkit-scrollbar { width: 4px; }
+.submenu-list::-webkit-scrollbar-thumb { background: var(--menu-dorado); border-radius: 3px; }
+
+.submenu.active .submenu-list {
+    display: block;
+}
+
+.submenu-list li {
+    display: block;
+    width: 100%;
+}
+
+.submenu-list li a {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 0.8rem !important;
+    padding: 0.55rem 1.1rem !important;
+    display: block !important;
+    height: auto !important;
+    border-bottom: none !important;
+    border-left: 3px solid transparent;
+    border-radius: 0 !important;
+    background: transparent !important;
+    transition: background 0.15s ease, border-color 0.15s ease !important;
+    white-space: nowrap;
+}
+
+.submenu-list li a:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border-left-color: var(--menu-dorado) !important;
+    color: #fff !important;
+}
+
+/* Buscador de estados */
+.search-item {
+    padding: 0.4rem 0.6rem;
+    position: sticky;
+    top: 0;
+    background: #320d1c;
+    z-index: 10;
+    border-bottom: 1px solid rgba(165, 133, 46, 0.2);
+    margin-bottom: 0.2rem;
+}
+
+.menu-search {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid rgba(165, 133, 46, 0.35);
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 0.78rem;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.menu-search::placeholder { color: rgba(255,255,255,0.4); }
+.menu-search:focus { border-color: var(--menu-dorado); }
+
+/* Botón regresar en el nav */
+.nav-back-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    border-right: 1px solid rgba(165, 133, 46, 0.3);
+    padding-right: 1.2rem !important;
+    gap: 6px;
+}
+
+.nav-back-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    border-bottom-color: var(--menu-dorado) !important;
+}
+
+.nav-back-link .fas {
+    color: var(--menu-dorado);
+    font-size: 0.75rem;
+}
+
+/* Ocultar botón físico regresar (reemplazado por el nav) */
+.regresar-btn { display: none !important; }
+
+/* Animación dropdown */
+@keyframes dropDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive — ocultar texto, dejar solo iconos */
+@media (max-width: 768px) {
+    nav.menu > ul > li > a {
+        padding: 0 0.7rem;
+        font-size: 0.75rem;
+    }
+}

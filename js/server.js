@@ -1,4 +1,4 @@
-// server.js - VERSIÓN SIN CLOUDINARY - ALMACENAMIENTO LOCAL
+// server.js - CON CLOUDINARY
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -10,7 +10,28 @@ const fs = require('fs');
 const { promisify } = require('util');
 const zlib = require('zlib');
 const compression = require('compression');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
+});
+
+// Helper: subir buffer a Cloudinary
+function uploadToCloudinary(buffer, folder, publicId) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'raw', folder: `INM/${folder}`, public_id: publicId, overwrite: true },
+      (err, result) => { if (err) reject(err); else resolve(result); }
+    );
+    stream.end(buffer);
+  });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -61,19 +82,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Configuración de seguridad (sin Cloudinary)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com', 'cdnjs.cloudflare.com'],
-      imgSrc: ["'self'", 'data:', 'blob:'],
-      connectSrc: ["'self'", 'https://control-operativo-1.onrender.com'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'res.cloudinary.com'],
+      connectSrc: ["'self'", 'https://control-operativo-1.onrender.com', 'https://api.cloudinary.com'],
       fontSrc: ["'self'", 'fonts.gstatic.com', 'cdnjs.cloudflare.com'],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'self'", 'https://docs.google.com']
+      objectSrc: ["'self'", 'res.cloudinary.com', 'blob:'],
+      mediaSrc: ["'self'", 'res.cloudinary.com'],
+      frameSrc: ["'self'", 'https://docs.google.com', 'res.cloudinary.com', 'blob:']
     }
   },
   hsts: {
@@ -88,6 +109,21 @@ app.use(helmet({
     policy: 'same-origin'
   },
   crossOriginEmbedderPolicy: false
+}));
+
+app.use(cookieParser());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'inm-fallback-secret',
+  resave: false,
+  saveUninitialized: false,
+  name: 'inm.sid',
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    maxAge: 8 * 60 * 60 * 1000
+  }
 }));
 
 // Configuración de logs mejorada
@@ -191,12 +227,9 @@ app.use(express.static(path.join(__dirname, '..')));
 // Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: process.env.NODE_ENV === 'production' ? 9999 : 99999,
+  max: process.env.NODE_ENV === 'production' ? 200 : 99999,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => {
-    return true;
-  },
   keyGenerator: (req) => {
     return req.headers['x-real-ip'] || 
            req.headers['x-forwarded-for']?.split(',')[0] || 
@@ -212,19 +245,9 @@ const apiLimiter = rateLimit({
   }
 });
 
-// Configuración de Multer para guardar DIRECTAMENTE en la carpeta final
+// Multer con memoria (Cloudinary recibe el buffer)
 const diskStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const estado = req.body.estado || 'aguascalientes';
-    const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
-    const uploadPath = path.join(DOCS_DIR, estado, tipoDocumento);
-    
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    
-    cb(null, uploadPath);
-  },
+  destination: (req, file, cb) => { cb(null, require('os').tmpdir()); },
   filename: (req, file, cb) => {
     const timestamp = Date.now();
     const safeName = file.originalname.replace(/[^\w.-]/g, '_');
@@ -394,6 +417,58 @@ const setTituloGlobal = (titulo) => {
 // RUTAS DE LA API
 // ================================================
 
+// Rate limiter estricto para login (5 intentos por 10 minutos)
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { status: 'error', message: 'Demasiados intentos. Espere 10 minutos.' }
+});
+
+// Login
+router.post('/login', loginLimiter, async (req, res) => {
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
+    return res.status(400).json({ status: 'error', message: 'Campos requeridos' });
+  }
+
+  const validUser = username === process.env.LOGIN_USERNAME;
+  let validPass = false;
+
+  try {
+    validPass = validUser && await bcrypt.compare(password, process.env.LOGIN_PASSWORD_HASH);
+  } catch (_) {
+    // hash inválido en .env
+  }
+
+  if (validUser && validPass) {
+    req.session.authenticated = true;
+    req.session.loginTime = Date.now();
+    req.session.username = username;
+    return res.json({ status: 'success' });
+  }
+
+  return res.status(401).json({ status: 'error', message: 'Usuario o contraseña incorrectos' });
+});
+
+// Logout
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie('inm.sid');
+    res.json({ status: 'success' });
+  });
+});
+
+// Verificar sesión
+router.get('/check-session', (req, res) => {
+  if (req.session && req.session.authenticated) {
+    return res.json({ authenticated: true, username: req.session.username });
+  }
+  res.status(401).json({ authenticated: false });
+});
+
 // Ruta de salud
 router.get('/health', async (req, res) => {
   const healthcheck = {
@@ -439,41 +514,29 @@ router.post('/upload', authenticate, (req, res, next) => {
       const estado = req.body.estado || 'aguascalientes';
       const tipoDocumento = req.body.tipo_documento || 'ficha_curricular';
       const tituloDocumento = req.body.titulo_documento || null;
-      
-      console.log(`📤 Documento guardado: ${req.file.filename} en ${estado}/${tipoDocumento}`);
-      
-      // Guardar metadata adicional
-      const metadataPath = path.join(DOCS_DIR, estado, tipoDocumento, 'metadata.json');
-      let metadata = {};
-      
-      if (fs.existsSync(metadataPath)) {
-        metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-      }
-      
-      metadata[req.file.filename] = {
-        titulo: tituloDocumento,
-        original_name: req.file.originalname,
-        uploaded_at: new Date().toISOString(),
-        size: req.file.size,
-        estado: estado,
-        tipo_documento: tipoDocumento
-      };
-      
-      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
-      
-      const fileUrl = `/documentos/${estado}/${tipoDocumento}/${req.file.filename}`;
-      const fullUrl = `${req.protocol}://${req.get('host')}${fileUrl}`;
+
+      // Leer el archivo temporal y subirlo a Cloudinary
+      const fileBuffer = fs.readFileSync(req.file.path);
+      const publicId = req.file.filename.replace('.pdf', '');
+      const folder = `${estado}/${tipoDocumento}`;
+
+      const result = await uploadToCloudinary(fileBuffer, folder, publicId);
+
+      // Limpiar archivo temporal
+      fs.unlink(req.file.path, () => {});
+
+      console.log(`☁️ Subido a Cloudinary: ${result.public_id}`);
 
       res.status(201).json({
         status: 'success',
         data: {
-          url: fileUrl,
-          public_id: `${estado}/${tipoDocumento}/${req.file.filename}`,
+          url: result.secure_url,
+          public_id: result.public_id,
           filename: req.file.originalname,
-          estado: estado,
+          estado,
           tipo_documento: tipoDocumento,
-          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`,
-          download_url: fileUrl,
+          view_url: `https://docs.google.com/viewer?url=${encodeURIComponent(result.secure_url)}&embedded=true`,
+          download_url: result.secure_url,
           uploaded_at: new Date().toISOString(),
           size: req.file.size,
           format: 'pdf',
@@ -501,16 +564,8 @@ router.delete('/delete', authenticate, async (req, res, next) => {
       throw new AppError('No tienes permiso para eliminar este archivo', 403, 'forbidden');
     }
 
-    const result = deleteDocumento(public_id);
-    
-    // También eliminar de metadata
-    const metadataPath = path.join(DOCS_DIR, estado, tipo_documento, 'metadata.json');
-    if (fs.existsSync(metadataPath)) {
-      let metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-      const filename = public_id.split('/').pop();
-      delete metadata[filename];
-      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
-    }
+    await cloudinary.uploader.destroy(public_id, { resource_type: 'raw' });
+    console.log(`🗑️ Eliminado de Cloudinary: ${public_id}`);
 
     res.json({
       status: 'success',
@@ -538,8 +593,20 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
     estado = estado.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, '-');
     tipoDocumento = tipoDocumento.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, '_');
     
+    // Validar contra lista blanca de estados
+    const ESTADOS_VALIDOS = new Set([
+      'aguascalientes','baja_california','baja_california_s','campeche','cdmx',
+      'chiapas','chihuahua','coahuila','colima','durango','edomex','guanajuato',
+      'guerrero','hidalgo','jalisco','michoacan','morelos','nayarit','nuevo_leon',
+      'oaxaca','puebla','queretaro','quintanaroo','san_luis','sinaloa','sonora',
+      'tabasco','tamaulipas','tlaxcala','veracruz','yucatan','zacatecas'
+    ]);
+    if (!ESTADOS_VALIDOS.has(estado)) {
+      return res.status(400).json({ status: 'error', message: 'Estado no válido' });
+    }
+
     console.log(`📁 Buscando archivos para: ${estado}/${tipoDocumento}`);
-    
+
     const documentos = getDocumentosFromFolder(estado, tipoDocumento, req);
     
     // Agregar título global si es plantilla_personal
@@ -667,6 +734,10 @@ app.use('/api', apiLimiter, router);
 
 // Manejo de rutas no encontradas
 app.use((req, res, next) => {
+  const acceptsHTML = req.accepts('html');
+  if (acceptsHTML && req.method === 'GET') {
+    return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  }
   next(new AppError(`Ruta no encontrada: ${req.method} ${req.path}`, 404, 'not_found'));
 });
 
