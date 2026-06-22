@@ -346,17 +346,27 @@
     gap: 14px;
     margin-top: 4px;
 }
-#ficha-foto-preview {
+.ficha-drag-wrap {
     width: 95px;
     height: 115px;
-    object-fit: cover;
     border-radius: 4px;
     border: 2px solid #691932;
-    cursor: grab;
-    display: block;
+    overflow: hidden;
+    position: relative;
     flex-shrink: 0;
+    cursor: grab;
+    background: #f0e8ec;
 }
-#ficha-foto-preview:active { cursor: grabbing; }
+.ficha-drag-wrap:active { cursor: grabbing; }
+#ficha-foto-preview {
+    position: absolute;
+    max-width: none;
+    max-height: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    display: block;
+}
 .ficha-foto-preview-wrap input[type="file"] {
     font-size: 0.78rem;
 }
