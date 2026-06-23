@@ -1,3 +1,15 @@
+// Barra placeholder visible de inmediato, sin esperar fetch
+(function () {
+    if (document.querySelector('nav.menu') || document.getElementById('nav-ph')) return;
+    const ph = document.createElement('div');
+    ph.id = 'nav-ph';
+    ph.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:50px;' +
+        'background:linear-gradient(to right,#6b1e3f,#320d1c);' +
+        'border-bottom:4px solid #A5852E;box-shadow:0 2px 20px rgba(0,0,0,.35);' +
+        'z-index:9999;pointer-events:none';
+    document.body.insertBefore(ph, document.body.firstChild);
+})();
+
 class MenuLoader {
     static injectMenuCSS() {
         const depth = this.getDepth();
@@ -26,6 +38,8 @@ class MenuLoader {
             const response = await fetch(menuPath);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const menuHTML = await response.text();
+            const ph = document.getElementById('nav-ph');
+            if (ph) ph.remove();
             this.cleanExistingMenu();
             document.body.insertAdjacentHTML('afterbegin', menuHTML);
             setTimeout(() => {
