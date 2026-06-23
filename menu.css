@@ -60,12 +60,12 @@ nav.menu > ul > li > a {
 nav.menu > ul > li > a:hover,
 nav.menu > ul > li.submenu.active > a {
     background: transparent;
-    border-bottom-color: var(--menu-dorado);
+    border-bottom-color: transparent;
     color: #fff;
 }
 
 nav.menu > ul > li > a.active {
-    border-bottom-color: var(--menu-dorado);
+    border-bottom-color: transparent;
     color: #fff;
     background: transparent;
 }
