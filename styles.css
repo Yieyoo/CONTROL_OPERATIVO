@@ -67,7 +67,23 @@ header {
 header::before,
 header::after { display: none; }
 
-.contra-header { display: none; }
+.contra-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 4rem;
+  margin: 10px 0;
+}
+.contra-header::before,
+.contra-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #A5852E, transparent);
+  display: block;
+}
+.contra-header::before { background: linear-gradient(to right, transparent, #A5852E); }
+.contra-header::after  { background: linear-gradient(to left,  transparent, #A5852E); }
 
 main, footer {
   position: relative;
