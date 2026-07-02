@@ -23,10 +23,15 @@
         root.innerHTML = `
             <div class="ficha-wrapper" id="ficha-wrapper">
                 <div id="ficha-card-area"></div>
-                <div class="ficha-admin-bar" id="ficha-admin-bar" style="display:${IS_ADMIN ? 'flex' : 'none'}">
-                    <button class="ficha-btn ficha-btn-editar" onclick="fichaOpenModal()">
+                <div class="ficha-admin-bar" id="ficha-admin-bar" style="display:flex">
+                    <div id="ficha-btn-descarga"></div>
+                    ${IS_ADMIN ? `<button class="ficha-btn ficha-btn-editar" onclick="fichaOpenModal()">
                         <i class="fas fa-edit"></i> Editar ficha
                     </button>
+                    <label class="ficha-btn ficha-btn-subir" title="Subir documento (PDF, PPTX, Excel...)">
+                        <i class="fas fa-upload"></i> Subir documento
+                        <input type="file" id="ficha-doc-input" accept=".pdf,.pptx,.xlsx,.xls,.docx,.ppt" style="display:none" onchange="fichaUploadDocumento(this)">
+                    </label>` : ''}
                 </div>
             </div>
 
@@ -66,6 +71,7 @@
             currentData = null;
         }
         renderCard(currentData);
+        renderDescarga(currentData);
     }
 
     // ── Render Card ─────────────────────────────────────────
@@ -148,6 +154,19 @@
                     </div>` : ''}
                 </div>
             </div>`;
+    }
+
+    function renderDescarga(d) {
+        const wrap = document.getElementById('ficha-btn-descarga');
+        if (!wrap) return;
+        if (d?.documento_url) {
+            const nombre = d.documento_nombre || 'Documento';
+            wrap.innerHTML = `<a class="ficha-btn ficha-btn-descargar" href="${d.documento_url}" download="${nombre}" target="_blank">
+                <i class="fas fa-download"></i> Descargar documento
+            </a>`;
+        } else {
+            wrap.innerHTML = '';
+        }
     }
 
     // ── Modal Open ──────────────────────────────────────────
@@ -417,6 +436,7 @@
             pendingFotoBase64 = null;
             fichaCloseModal();
             renderCard(currentData);
+            renderDescarga(currentData);
         } catch (e) {
             alert('❌ Error al guardar: ' + e.message);
         } finally {
@@ -459,6 +479,34 @@
             carrera_profesional
         };
     }
+
+    // ── Upload documento ────────────────────────────────────
+    window.fichaUploadDocumento = async function (input) {
+        const file = input.files[0];
+        if (!file) return;
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('documento', file);
+            const res = await fetch(`${BACKEND}/ficha-documento/${ESTADO}`, {
+                method: 'POST',
+                headers: { 'x-api-key': KEY },
+                body: formData
+            });
+            if (!res.ok) throw new Error('Error al subir');
+            const result = await res.json();
+            if (!currentData) currentData = {};
+            currentData.documento_url = result.url;
+            currentData.documento_nombre = result.nombre;
+            renderDescarga(currentData);
+            alert('✅ Documento subido correctamente');
+        } catch (e) {
+            alert('❌ Error al subir: ' + e.message);
+        } finally {
+            setLoading(false);
+            input.value = '';
+        }
+    };
 
     function setLoading(on) {
         const el = document.getElementById('fichaLoading');
