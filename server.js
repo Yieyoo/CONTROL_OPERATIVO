@@ -603,41 +603,46 @@ const fichaCache = {};
 router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
   try {
     const estado = req.params.estado;
+    const https = require('https');
 
-    if (fichaCache[estado]) {
-      return res.json({ status: 'success', data: fichaCache[estado] });
+    // Helper to fetch latest Cloudinary raw resource in a folder
+    async function latestRaw(prefix) {
+      try {
+        const r = await cloudinary.api.resources({ type: 'upload', prefix, resource_type: 'raw', max_results: 1 });
+        return r.resources[0] || null;
+      } catch (e) { return null; }
     }
 
-    try {
-      const resources = await cloudinary.api.resources({
-        type: 'upload',
-        prefix: `${estado}/ficha_datos/`,
-        resource_type: 'raw',
-        max_results: 1
-      });
+    // Use cache for ficha JSON
+    let fichaData = fichaCache[estado] || null;
 
-      if (resources.resources.length > 0) {
-        const url = resources.resources[0].secure_url;
-        const https = require('https');
-
-        const data = await new Promise((resolve, reject) => {
-          https.get(url, (response) => {
+    if (!fichaData) {
+      const r = await latestRaw(`${estado}/ficha_datos/`);
+      if (r) {
+        fichaData = await new Promise((resolve, reject) => {
+          https.get(r.secure_url, (response) => {
             let body = '';
             response.on('data', chunk => body += chunk);
-            response.on('end', () => {
-              try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
-            });
+            response.on('end', () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
           }).on('error', reject);
         });
-
-        fichaCache[estado] = data;
-        return res.json({ status: 'success', data });
+        fichaCache[estado] = fichaData;
       }
-    } catch (e) {
-      // No data yet
     }
 
-    res.json({ status: 'success', data: null });
+    // Always check Cloudinary for the latest ficha_curricular document
+    const docResource = await latestRaw(`${estado}/ficha_curricular/`);
+    if (docResource) {
+      const nombre = docResource.public_id.split('/').pop();
+      if (fichaData) {
+        fichaData.documento_url = docResource.secure_url;
+        fichaData.documento_nombre = nombre;
+      } else {
+        fichaData = { documento_url: docResource.secure_url, documento_nombre: nombre };
+      }
+    }
+
+    res.json({ status: 'success', data: fichaData || null });
   } catch (error) {
     next(error);
   }
