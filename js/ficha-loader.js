@@ -198,15 +198,6 @@
                 </div>
             </div>
 
-                <div class="ficha-field">
-                    <label>URL del documento (pega el enlace del archivo subido en Gestión)</label>
-                    <input id="f-doc-url" type="text" value="${d.documento_url || ''}" placeholder="https://res.cloudinary.com/...">
-                </div>
-                <div class="ficha-field">
-                    <label>Nombre del documento (ej: Ficha Curricular.pdf)</label>
-                    <input id="f-doc-nombre" type="text" value="${d.documento_nombre || ''}" placeholder="Ficha Curricular.pdf">
-                </div>
-
             <!-- Formación académica -->
             <div class="ficha-form-section">
                 <h3>Formación Académica</h3>
@@ -470,8 +461,6 @@
             cargo: document.getElementById('f-cargo')?.value.trim() || '',
             nombre: document.getElementById('f-nombre')?.value.trim() || '',
             foto_url: currentData?.foto_url || '',
-            documento_url: document.getElementById('f-doc-url')?.value.trim() || '',
-            documento_nombre: document.getElementById('f-doc-nombre')?.value.trim() || '',
             foto_position: fotoPos,
             formacion,
             contacto: {
