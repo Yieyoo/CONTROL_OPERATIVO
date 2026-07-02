@@ -682,6 +682,41 @@ router.post('/ficha-datos/:estado', authenticate, async (req, res, next) => {
   }
 });
 
+// ========== FICHA DOCUMENTO ==========
+const docUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024, files: 1 }
+});
+
+router.post('/ficha-documento/:estado', authenticate, docUpload.single('documento'), async (req, res, next) => {
+  try {
+    const estado = req.params.estado;
+    if (!req.file) return res.status(400).json({ status: 'error', message: 'No se recibió archivo' });
+
+    const ext = req.file.originalname.split('.').pop().toLowerCase();
+    const nombre = req.file.originalname;
+
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: 'raw', public_id: `${estado}/ficha_documento/doc.${ext}`, overwrite: true },
+        (error, result) => error ? reject(error) : resolve(result)
+      );
+      const { Readable } = require('stream');
+      const readable = new Readable();
+      readable.push(req.file.buffer);
+      readable.push(null);
+      readable.pipe(uploadStream);
+    });
+
+    if (fichaCache[estado]) {
+      fichaCache[estado].documento_url = result.secure_url;
+      fichaCache[estado].documento_nombre = nombre;
+    }
+
+    res.json({ status: 'success', url: result.secure_url, nombre });
+  } catch (error) { next(error); }
+});
+
 router.get('/render-ping', (req, res) => {
   const clientIP = req.headers['x-forwarded-for'] || req.ip;
   console.log(`📡 Ping recibido desde IP: ${clientIP} - ${new Date().toLocaleString()}`);

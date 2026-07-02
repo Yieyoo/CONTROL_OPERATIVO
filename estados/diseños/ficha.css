@@ -46,6 +46,10 @@ html {
 .ficha-btn-guardar:hover { background: #2d7a67; }
 .ficha-btn-cancelar{ background: #888;    color: #fff; }
 .ficha-btn-cancelar:hover{ background: #666; }
+.ficha-btn-descargar { background: #1a5fa8; color: #fff; text-decoration: none; }
+.ficha-btn-descargar:hover { background: #1e75d0; }
+.ficha-btn-subir { background: #5a5a5a; color: #fff; cursor: pointer; }
+.ficha-btn-subir:hover { background: #3a3a3a; }
 
 /* ---- CARD ---- */
 .ficha-card {
