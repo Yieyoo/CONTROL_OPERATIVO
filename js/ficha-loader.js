@@ -27,11 +27,7 @@
                     <div id="ficha-btn-descarga"></div>
                     ${IS_ADMIN ? `<button class="ficha-btn ficha-btn-editar" onclick="fichaOpenModal()">
                         <i class="fas fa-edit"></i> Editar ficha
-                    </button>
-                    <label class="ficha-btn ficha-btn-subir" title="Subir documento (PDF, PPTX, Excel...)">
-                        <i class="fas fa-upload"></i> Subir documento
-                        <input type="file" id="ficha-doc-input" accept=".pdf,.pptx,.xlsx,.xls,.docx,.ppt" style="display:none" onchange="fichaUploadDocumento(this)">
-                    </label>` : ''}
+                    </button>` : ''}
                 </div>
             </div>
 
@@ -201,6 +197,15 @@
                     </div>
                 </div>
             </div>
+
+                <div class="ficha-field">
+                    <label>URL del documento (pega el enlace del archivo subido en Gestión)</label>
+                    <input id="f-doc-url" type="text" value="${d.documento_url || ''}" placeholder="https://res.cloudinary.com/...">
+                </div>
+                <div class="ficha-field">
+                    <label>Nombre del documento (ej: Ficha Curricular.pdf)</label>
+                    <input id="f-doc-nombre" type="text" value="${d.documento_nombre || ''}" placeholder="Ficha Curricular.pdf">
+                </div>
 
             <!-- Formación académica -->
             <div class="ficha-form-section">
@@ -465,6 +470,8 @@
             cargo: document.getElementById('f-cargo')?.value.trim() || '',
             nombre: document.getElementById('f-nombre')?.value.trim() || '',
             foto_url: currentData?.foto_url || '',
+            documento_url: document.getElementById('f-doc-url')?.value.trim() || '',
+            documento_nombre: document.getElementById('f-doc-nombre')?.value.trim() || '',
             foto_position: fotoPos,
             formacion,
             contacto: {
@@ -479,34 +486,6 @@
             carrera_profesional
         };
     }
-
-    // ── Upload documento ────────────────────────────────────
-    window.fichaUploadDocumento = async function (input) {
-        const file = input.files[0];
-        if (!file) return;
-        setLoading(true);
-        try {
-            const formData = new FormData();
-            formData.append('documento', file);
-            const res = await fetch(`${BACKEND}/ficha-documento/${ESTADO}`, {
-                method: 'POST',
-                headers: { 'x-api-key': KEY },
-                body: formData
-            });
-            if (!res.ok) throw new Error('Error al subir');
-            const result = await res.json();
-            if (!currentData) currentData = {};
-            currentData.documento_url = result.url;
-            currentData.documento_nombre = result.nombre;
-            renderDescarga(currentData);
-            alert('✅ Documento subido correctamente');
-        } catch (e) {
-            alert('❌ Error al subir: ' + e.message);
-        } finally {
-            setLoading(false);
-            input.value = '';
-        }
-    };
 
     function setLoading(on) {
         const el = document.getElementById('fichaLoading');
