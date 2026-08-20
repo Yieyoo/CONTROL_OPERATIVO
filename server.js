@@ -408,15 +408,15 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
     filename_override: originalName,
     unique_filename: false,
     overwrite: true,
+    // El contexto de Cloudinary solo acepta pares clave=valor de texto
+    // plano - un objeto anidado bajo "custom" se descarta en silencio.
     context: {
       original_filename: originalName,
       uploaded_at: new Date().toISOString(),
-      custom: {
-        estado: estado,
-        tipo_documento: tipoDocumento,
-        uploaded_by: 'api',
-        ...(tituloDocumento && { titulo_documento: tituloDocumento })
-      }
+      estado: estado,
+      tipo_documento: tipoDocumento,
+      uploaded_by: 'api',
+      ...(tituloDocumento && { titulo_documento: tituloDocumento })
     },
     responsive_breakpoints: {
       create_derived: false,
@@ -1176,15 +1176,17 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             public_id: publicId,
             format: 'xlsx',
             overwrite: true,
+            // El contexto de Cloudinary solo acepta pares clave=valor de
+            // texto plano - anidar un objeto bajo "custom" hace que esa
+            // clave se descarte en silencio. Cloudinary igual devuelve todo
+            // agrupado bajo context.custom.* al leerlo de vuelta.
             context: {
               original_filename: filenamePretty,
               uploaded_at: new Date().toISOString(),
-              custom: {
-                estado: slug,
-                tipo_documento: 'plantilla_personal_excel',
-                quincena, mes, anio,
-                ...(previewPdfUrl && { preview_pdf_url: previewPdfUrl })
-              }
+              estado: slug,
+              tipo_documento: 'plantilla_personal_excel',
+              quincena, mes, anio,
+              ...(previewPdfUrl && { preview_pdf_url: previewPdfUrl })
             }
           });
 
