@@ -45,21 +45,6 @@ body {
   overflow-x: hidden;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 45%;
-  height: 100vh;
-  background-image: url('../../imagenes/fondoderecha.jpg');
-  background-size: cover;
-  background-position: left center;
-  background-repeat: no-repeat;
-  z-index: -1;
-  pointer-events: none;
-}
-
 /* ======================================================================================================*/
 /*                                           COMPONENTES DE CABECERA                                     */
 /* ======================================================================================================*/
