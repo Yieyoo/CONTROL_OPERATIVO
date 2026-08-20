@@ -194,7 +194,7 @@
                     fechaElement.textContent = formatDate(ultimo.uploaded_at);
 
                     // PDF se muestra directo; Excel se previsualiza con el visor de Google Docs
-                    pdfViewer.src = esPdf ? ultimo.url : ultimo.view_url;
+                    pdfViewer.src = esPdf ? ultimo.url : (ultimo.preview_pdf_url || ultimo.view_url);
 
                     // Configuración para móviles
                     if (!isIOS()) {
