@@ -123,6 +123,7 @@
         const ESTADO_FIJO = 'tlaxcala';
         const TIPO_DOCUMENTO = 'plantilla_personal'; // Documento principal
         const TIPO_DOCUMENTO_ALTERNATIVO = 'plantilla_eventual'; // Documento alternativo
+        const TIPO_DOCUMENTO_EXCEL = 'plantilla_personal_excel';
         
         // Variables para controlar documentos alternativos
         let documentoActual = 'principal'; // 'principal' o 'alternativo'
@@ -316,8 +317,8 @@
             // Actualizar fecha
             fechaElement.textContent = formatDate(documento.uploaded_at);
             
-            // Cargar PDF
-            pdfViewer.src = documento.url;
+            // PDF se muestra directo; Excel se previsualiza con el visor de Google Docs
+            pdfViewer.src = documento.format === 'pdf' ? documento.url : documento.view_url;
             
             // Configurar para móviles (no iOS)
             if (!isIOS() && mobileContainer) {
@@ -328,7 +329,7 @@
                         <p>Actualizado: ${formatDate(documento.uploaded_at)}</p>
                         <p>Tamaño: ${(documento.size / (1024*1024)).toFixed(2)} MB</p>
                         <p><em>${tipoTexto}</em></p>
-                        <a href="${documento.url}" class="download-btn" download>
+                        <a href="${documento.download_url || documento.url}" class="download-btn" download>
                             Descargar Documento
                         </a>
                     </div>
@@ -343,17 +344,14 @@
             const fechaElement = document.getElementById('fecha-texto');
 
             try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
+                const [pdfResponse, excelResponse] = await Promise.all([
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, { headers: { 'x-api-key': API_KEY } }),
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_EXCEL}`, { headers: { 'x-api-key': API_KEY } })
+                ]);
 
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-
-                const result = await response.json();
-                console.log('Respuesta API:', result);
-
-                if (!result?.data) throw new Error('Formato de respuesta inválido');
+                const pdfData = pdfResponse.ok ? ((await pdfResponse.json()).data || []) : [];
+                const excelData = excelResponse.ok ? ((await excelResponse.json()).data || []) : [];
+                const result = { data: [...pdfData, ...excelData] };
 
                 if (result.data.length > 0) {
                     documentosDisponibles = result.data.sort((a, b) => 
