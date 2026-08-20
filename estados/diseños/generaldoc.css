@@ -27,7 +27,7 @@ html {
 body {
     font-family: 'Arial', sans-serif;
     color: var(--doc-texto);
-    background-image: url('../../imagenes/fondo.jpg');
+    background-image: url('../../imagenes/fondo-nuevo.png');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;

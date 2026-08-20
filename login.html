@@ -21,7 +21,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background-image: url('imagenes/fondo.jpg');
+            background-image: url('imagenes/fondo-nuevo.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -421,6 +421,7 @@
                 if (username === 'admin' && password === 'dgcor01') {
                     localStorage.setItem('authenticated', 'true');
                     localStorage.setItem('username', username);
+                    localStorage.setItem('loginTime', Date.now().toString());
                     showSuccess('✅ Acceso correcto. Entrando al sistema...');
                     setTimeout(function () { window.location.replace('index.html'); }, 900);
                 } else {
@@ -438,8 +439,16 @@
             hideMessages();
             elements.username.focus();
 
-            if (localStorage.getItem('authenticated') === 'true') {
+            const loginTime = parseInt(localStorage.getItem('loginTime'), 10);
+            const sessionValid = localStorage.getItem('authenticated') === 'true' &&
+                loginTime && (Date.now() - loginTime) < 8 * 60 * 60 * 1000;
+
+            if (sessionValid) {
                 window.location.replace('index.html');
+            } else {
+                localStorage.removeItem('authenticated');
+                localStorage.removeItem('username');
+                localStorage.removeItem('loginTime');
             }
         });
 

@@ -110,7 +110,11 @@
 
    <script>
     // Verificar autenticación via localStorage
-    if (localStorage.getItem('authenticated') === 'true') {
+    var loginTime = parseInt(localStorage.getItem('loginTime'), 10);
+    var sessionValid = localStorage.getItem('authenticated') === 'true' &&
+        loginTime && (Date.now() - loginTime) < 8 * 60 * 60 * 1000;
+
+    if (sessionValid) {
         var ls = document.getElementById('loadingScreen');
         if (ls) {
             ls.style.opacity = '0';
@@ -118,6 +122,9 @@
         }
         document.body.style.overflow = 'auto';
     } else {
+        localStorage.removeItem('authenticated');
+        localStorage.removeItem('username');
+        localStorage.removeItem('loginTime');
         window.location.replace('login.html');
     }
 
@@ -125,6 +132,7 @@
         if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
             localStorage.removeItem('authenticated');
             localStorage.removeItem('username');
+            localStorage.removeItem('loginTime');
             window.location.replace('login.html');
         }
     }
