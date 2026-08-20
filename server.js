@@ -552,7 +552,7 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
     });
 
     const archivos = result.resources
-      .filter(resource => !resource.public_id.endsWith('_preview')) // companero interno del PDF de vista previa, no es un documento propio
+      .filter(resource => !/_preview\.[a-z0-9]+$/i.test(resource.public_id)) // companero interno del PDF de vista previa, no es un documento propio
       .map(resource => {
       const originalName = resource.context?.custom?.original_filename ||
                          path.parse(resource.public_id).name + '.pdf';
@@ -566,7 +566,9 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
         download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
         uploaded_at: resource.created_at,
         size: resource.bytes,
-        format: resource.format,
+        // Cloudinary no siempre devuelve "format" al listar recursos raw -
+        // se deriva de la extension del nombre de archivo como respaldo.
+        format: resource.format || path.extname(originalName).replace(/^\./, '').toLowerCase(),
         width: resource.width,
         height: resource.height,
         etag: resource.etag,
