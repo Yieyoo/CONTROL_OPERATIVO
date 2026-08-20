@@ -11,7 +11,14 @@ class AuthSystem {
     }
 
     verify() {
-        if (localStorage.getItem('authenticated') !== 'true') {
+        const loginTime = parseInt(localStorage.getItem('loginTime'), 10);
+        const sessionValid = localStorage.getItem('authenticated') === 'true' &&
+            loginTime && (Date.now() - loginTime) < 8 * 60 * 60 * 1000;
+
+        if (!sessionValid) {
+            localStorage.removeItem('authenticated');
+            localStorage.removeItem('username');
+            localStorage.removeItem('loginTime');
             this.redirectToLogin();
         } else {
             const ls = document.getElementById('loadingScreen');
@@ -28,6 +35,7 @@ class AuthSystem {
         const doLogout = () => {
             localStorage.removeItem('authenticated');
             localStorage.removeItem('username');
+            localStorage.removeItem('loginTime');
             window.location.replace('/login.html');
         };
 
