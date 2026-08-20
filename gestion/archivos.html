@@ -91,6 +91,7 @@
                             <option value="inmuebles">Inmuebles</option>
                             <option value="unidad_canina">Unidad Canina</option>
                             <option value="plantilla_personal">Plantilla de Personal</option>
+                            <option value="plantilla_personal_excel">Plantilla de Personal (Excel)</option>
                             <option value="plantilla_eventual">Plantilla Eventual</option>
                             <option value="acuerdos_visita">Acuerdos de Visita</option>
                             <option value="visita_supervision">Última Visita de Supervisión</option>
@@ -115,12 +116,16 @@
                     <!-- Contenedor para el título personalizado GLOBAL -->
                     <div class="titulo-container" id="tituloContainer" style="display: none;">
                         <label for="tituloDocumento">Título GLOBAL para pantallas de Plantilla de Personal:</label>
-                        <input type="text" id="tituloDocumento" name="tituloDocumento" 
+                        <input type="text" id="tituloDocumento" name="tituloDocumento"
                                placeholder="Ej: Plantilla Oficial 2024 - INM">
                         <button type="button" id="guardarTituloBtn">Guardar Título Global</button>
                         <p id="tituloStatus"></p>
                     </div>
-                    
+
+                    <p id="plantillaExcelNota" style="display: none;">
+                        Estos archivos se generan desde el panel "Procesar plantilla nacional" (más abajo), no se suben aquí manualmente.
+                    </p>
+
                     <button type="submit" id="uploadButton" disabled>Subir</button>
                     <p id="uploadStatus"></p>
                 </form>
@@ -136,6 +141,50 @@
                     <li>Por favor selecciona una opción y un tipo de documento para ver los archivos disponibles</li>
                 </ul>
             </div>
+        </div>
+
+        <!-- Procesar plantilla nacional -->
+        <div class="plantilla-nacional">
+            <h3>Procesar plantilla nacional</h3>
+            <p class="plantilla-nacional-ayuda">
+                Sube el Excel nacional de personal (todas las Oficinas de Representación juntas) y el sistema
+                genera automáticamente un Excel independiente por cada estado detectado, conservando el formato
+                de la plantilla original.
+            </p>
+            <form id="plantillaNacionalForm">
+                <input type="file" id="archivoNacional" name="archivoNacional" accept=".xlsx" required>
+
+                <div class="filters">
+                    <select id="quincenaSelect" required>
+                        <option value="" disabled selected>Quincena</option>
+                        <option value="1">1ra Quincena</option>
+                        <option value="2">2da Quincena</option>
+                    </select>
+
+                    <select id="mesSelect" required>
+                        <option value="" disabled selected>Mes</option>
+                        <option value="ENERO">Enero</option>
+                        <option value="FEBRERO">Febrero</option>
+                        <option value="MARZO">Marzo</option>
+                        <option value="ABRIL">Abril</option>
+                        <option value="MAYO">Mayo</option>
+                        <option value="JUNIO">Junio</option>
+                        <option value="JULIO">Julio</option>
+                        <option value="AGOSTO">Agosto</option>
+                        <option value="SEPTIEMBRE">Septiembre</option>
+                        <option value="OCTUBRE">Octubre</option>
+                        <option value="NOVIEMBRE">Noviembre</option>
+                        <option value="DICIEMBRE">Diciembre</option>
+                    </select>
+
+                    <input type="number" id="anioInput" name="anio" placeholder="Año" min="2000" max="2100" required>
+                </div>
+
+                <button type="submit" id="procesarPlantillaBtn">Procesar y generar plantillas por estado</button>
+                <p id="plantillaNacionalStatus"></p>
+            </form>
+
+            <div id="plantillaNacionalResultados"></div>
         </div>
     </div>
 
@@ -297,7 +346,7 @@
                         <span class="file-meta">${formatFileSize(file.size)} • ${formatDate(file.uploaded_at)}</span>
                     </div>
                     <div class="file-actions">
-                        <button class="btn-view" data-url="${file.url}">Ver</button>
+                        <button class="btn-view" data-url="${file.url}" data-download-url="${file.download_url || file.url}" data-format="${file.format || ''}">Ver</button>
                         <button class="btn-delete" data-id="${file.public_id}">Eliminar</button>
                     </div>
                 `;
@@ -307,7 +356,12 @@
             // Eventos para los botones
             document.querySelectorAll('.btn-view').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    mostrarPdf(btn.dataset.url, btn.closest('li').querySelector('.filename').textContent);
+                    if (btn.dataset.format && btn.dataset.format !== 'pdf') {
+                        // Los navegadores no pueden previsualizar Excel dentro del iframe: se descarga/abre en pestaña nueva
+                        window.open(btn.dataset.downloadUrl, '_blank');
+                    } else {
+                        mostrarPdf(btn.dataset.url, btn.closest('li').querySelector('.filename').textContent);
+                    }
                 });
             });
 
@@ -464,17 +518,25 @@
             currentTipoDocumento = this.value;
             const tituloContainer = document.getElementById('tituloContainer');
             const uploadButton = document.getElementById('uploadButton');
-            
+            const fileInput = document.getElementById('file');
+            const plantillaExcelNota = document.getElementById('plantillaExcelNota');
+
             // Mostrar solo para plantilla de personal
             tituloContainer.style.display = currentTipoDocumento === 'plantilla_personal' ? 'block' : 'none';
-            
+
             if (currentTipoDocumento === 'plantilla_personal') {
                 cargarTituloPersonalizado();
             }
-            
+
+            // Plantilla de Personal (Excel) se genera desde el panel de abajo, no se sube manualmente aquí
+            const esPlantillaExcel = currentTipoDocumento === 'plantilla_personal_excel';
+            plantillaExcelNota.style.display = esPlantillaExcel ? 'block' : 'none';
+            fileInput.disabled = esPlantillaExcel;
+            fileInput.required = !esPlantillaExcel;
+
             // Habilitar/deshabilitar botón de subir según selección
-            uploadButton.disabled = !currentCarpeta || !currentTipoDocumento;
-            
+            uploadButton.disabled = esPlantillaExcel || !currentCarpeta || !currentTipoDocumento;
+
             // Cargar archivos si ambos selectores tienen valores
             if (currentCarpeta && currentTipoDocumento) {
                 cargarListaArchivos();
@@ -540,6 +602,78 @@
                 } finally {
                     ocultarLoading();
                     uploadButton.disabled = !currentCarpeta || !currentTipoDocumento;
+                }
+            });
+
+            // Evento para procesar el Excel nacional y generar plantillas por estado
+            document.getElementById('plantillaNacionalForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const archivo = document.getElementById('archivoNacional')?.files[0];
+                const quincena = document.getElementById('quincenaSelect').value;
+                const mes = document.getElementById('mesSelect').value;
+                const anio = document.getElementById('anioInput').value;
+                const procesarBtn = document.getElementById('procesarPlantillaBtn');
+                const status = document.getElementById('plantillaNacionalStatus');
+                const resultados = document.getElementById('plantillaNacionalResultados');
+
+                resultados.innerHTML = '';
+
+                try {
+                    if (!archivo) throw new Error('Selecciona el Excel nacional (.xlsx)');
+                    if (!quincena || !mes || !anio) throw new Error('Selecciona quincena, mes y año');
+
+                    mostrarLoading();
+                    procesarBtn.disabled = true;
+                    showStatus(status, 'Procesando...');
+
+                    const formData = new FormData();
+                    formData.append('file', archivo);
+                    formData.append('quincena', quincena);
+                    formData.append('mes', mes);
+                    formData.append('anio', anio);
+
+                    const response = await fetch(`${BACKEND_URL}/plantilla-nacional/procesar`, {
+                        method: 'POST',
+                        headers: { 'x-api-key': API_KEY },
+                        body: formData
+                    });
+
+                    const respuesta = await response.json();
+                    if (!response.ok) throw new Error(respuesta.message || 'Error al procesar el archivo');
+
+                    const { resultados: porEstado, errores } = respuesta.data;
+
+                    let html = '<h4>Plantillas generadas</h4><ul class="plantilla-nacional-lista">';
+                    porEstado.forEach(r => {
+                        if (r.status === 'ok') {
+                            html += `<li>✅ ${r.estado}: ${r.count} empleados — <a href="${r.url}" target="_blank">${r.filename}</a></li>`;
+                        } else {
+                            html += `<li>❌ ${r.estado}: ${r.message}</li>`;
+                        }
+                    });
+                    html += '</ul>';
+
+                    if (errores && errores.length > 0) {
+                        html += '<h4>Filas con advertencias (no incluidas)</h4><ul class="plantilla-nacional-lista">';
+                        errores.forEach(er => {
+                            const motivo = er.motivo === 'adscripcion_no_reconocida'
+                                ? `ADSCRIPCION no reconocida: "${er.valor_adscripcion}"`
+                                : 'NOMBRE vacío';
+                            html += `<li>⚠️ Fila ${er.row}: ${motivo}</li>`;
+                        });
+                        html += '</ul>';
+                    }
+
+                    resultados.innerHTML = html;
+                    showStatus(status, 'Procesamiento completado');
+                    document.getElementById('plantillaNacionalForm').reset();
+
+                } catch (error) {
+                    console.error('Error al procesar plantilla nacional:', error);
+                    showStatus(status, error.message, true);
+                } finally {
+                    ocultarLoading();
+                    procesarBtn.disabled = false;
                 }
             });
 

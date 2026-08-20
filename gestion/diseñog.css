@@ -244,6 +244,94 @@ body {
     background: #e74c3c;
 }
 
+/* ===== PROCESAR PLANTILLA NACIONAL ===== */
+.plantilla-nacional {
+    margin-top: 20px;
+    background: rgba(248, 249, 250, 0.8);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px dashed rgba(105, 25, 50, 0.3);
+}
+
+.plantilla-nacional h3 {
+    color: #2d3748;
+    margin: 0 0 10px 0;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.plantilla-nacional-ayuda {
+    color: #64748b;
+    font-size: 13px;
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+}
+
+#plantillaNacionalForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#plantillaNacionalForm input, #plantillaNacionalForm select {
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#plantillaNacionalForm input:focus, #plantillaNacionalForm select:focus {
+    outline: none;
+    border-color: #A5852E;
+    box-shadow: 0 0 0 2px rgba(165, 133, 46, 0.1);
+}
+
+#plantillaNacionalForm button {
+    background: #691932;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+#plantillaNacionalForm button:hover:not(:disabled) {
+    background: #8a2142;
+    transform: translateY(-1px);
+}
+
+#plantillaNacionalForm button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.plantilla-nacional-lista {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.plantilla-nacional-lista li {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    font-size: 13px;
+    color: #2d3748;
+}
+
+.plantilla-nacional-lista li:last-child {
+    border-bottom: none;
+}
+
+.plantilla-nacional-lista a {
+    color: #691932;
+    font-weight: 500;
+}
+
 /* ===== VISOR PDF ELEGANTE ===== */
 .pdf-viewer-container {
     width: 90%;

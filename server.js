@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+const ExcelJS = require('exceljs');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -269,6 +270,82 @@ const handleError = (error, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
   });
 };
+
+// ========== DICCIONARIO DE ESTADOS (Plantilla Nacional) ==========
+// slug = valor usado por #carpetaSelect en gestion/archivos.html (y por Cloudinary/estado)
+// nombre = nombre canónico en mayúsculas sin acentos, tal como aparece en ADSCRIPCION/título
+const ESTADOS_OR = [
+  { slug: 'aguascalientes', nombre: 'AGUASCALIENTES' },
+  { slug: 'baja-california', nombre: 'BAJA CALIFORNIA' },
+  { slug: 'baja-california-sur', nombre: 'BAJA CALIFORNIA SUR' },
+  { slug: 'campeche', nombre: 'CAMPECHE' },
+  { slug: 'chiapas', nombre: 'CHIAPAS' },
+  { slug: 'chihuahua', nombre: 'CHIHUAHUA' },
+  { slug: 'ciudad-de-mexico', nombre: 'CIUDAD DE MEXICO' },
+  { slug: 'coahuila', nombre: 'COAHUILA' },
+  { slug: 'colima', nombre: 'COLIMA' },
+  { slug: 'durango', nombre: 'DURANGO' },
+  { slug: 'estado-de-mexico', nombre: 'ESTADO DE MEXICO' },
+  { slug: 'guanajuato', nombre: 'GUANAJUATO' },
+  { slug: 'guerrero', nombre: 'GUERRERO' },
+  { slug: 'hidalgo', nombre: 'HIDALGO' },
+  { slug: 'jalisco', nombre: 'JALISCO' },
+  { slug: 'michoacan', nombre: 'MICHOACAN' },
+  { slug: 'morelos', nombre: 'MORELOS' },
+  { slug: 'nayarit', nombre: 'NAYARIT' },
+  { slug: 'nuevo-leon', nombre: 'NUEVO LEON' },
+  { slug: 'oaxaca', nombre: 'OAXACA' },
+  { slug: 'puebla', nombre: 'PUEBLA' },
+  { slug: 'queretaro', nombre: 'QUERETARO' },
+  { slug: 'quintana-roo', nombre: 'QUINTANA ROO' },
+  { slug: 'san-luis-potosi', nombre: 'SAN LUIS POTOSI' },
+  { slug: 'sinaloa', nombre: 'SINALOA' },
+  { slug: 'sonora', nombre: 'SONORA' },
+  { slug: 'tabasco', nombre: 'TABASCO' },
+  { slug: 'tamaulipas', nombre: 'TAMAULIPAS' },
+  { slug: 'tlaxcala', nombre: 'TLAXCALA' },
+  { slug: 'veracruz', nombre: 'VERACRUZ' },
+  { slug: 'yucatan', nombre: 'YUCATAN' },
+  { slug: 'zacatecas', nombre: 'ZACATECAS' }
+];
+
+// Alias frecuentes de captura -> nombre canónico
+const ALIAS_ESTADOS = {
+  'CDMX': 'CIUDAD DE MEXICO',
+  'DISTRITO FEDERAL': 'CIUDAD DE MEXICO',
+  'DF': 'CIUDAD DE MEXICO',
+  'EDOMEX': 'ESTADO DE MEXICO',
+  'MEXICO': 'ESTADO DE MEXICO',
+  'ESTADO DE MEXICO': 'ESTADO DE MEXICO',
+  'BC': 'BAJA CALIFORNIA',
+  'BCS': 'BAJA CALIFORNIA SUR',
+  'NL': 'NUEVO LEON',
+  'QROO': 'QUINTANA ROO',
+  'SLP': 'SAN LUIS POTOSI'
+};
+
+const MESES_VALIDOS = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
+  'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+
+const quitarAcentos = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+// Recibe el valor crudo de la columna ADSCRIPCION y devuelve la entrada de
+// ESTADOS_OR que le corresponde, o null si no se pudo reconocer.
+function normalizarAdscripcion(valorCrudo) {
+  if (valorCrudo === undefined || valorCrudo === null) return null;
+  let texto = quitarAcentos(String(valorCrudo)).toUpperCase().trim();
+  if (!texto) return null;
+
+  texto = texto.replace(/^O\.?\s*R\.?\s*/, '');
+  texto = texto.replace(/^OFICINA\s+DE\s+REPRESENTACION\s+(EN\s+)?/, '');
+  texto = texto.replace(/^REPRESENTACION\s+LOCAL\s+(EN\s+)?/, '');
+  texto = texto.replace(/[.]/g, ' ');
+  texto = texto.replace(/\s+/g, ' ').trim();
+
+  if (ALIAS_ESTADOS[texto]) texto = ALIAS_ESTADOS[texto];
+
+  return ESTADOS_OR.find(e => e.nombre === texto) || null;
+}
 
 // Rutas API
 const router = express.Router();
@@ -720,6 +797,285 @@ router.post('/ficha-documento/:estado', authenticate, docUpload.single('document
 
     res.json({ status: 'success', url: result.secure_url, nombre });
   } catch (error) { next(error); }
+});
+
+// ========== PLANTILLA NACIONAL DE PERSONAL ==========
+// Sube un Excel nacional (multiples estados en una hoja), lo separa por
+// estado usando la columna ADSCRIPCION, y genera un .xlsx por estado
+// conservando el formato de la plantilla original.
+const xlsxUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 20 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => {
+    const validMimeTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/octet-stream'
+    ];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext === '.xlsx' && validMimeTypes.includes(file.mimetype)) {
+      return cb(null, true);
+    }
+    cb(new Error('Solo se permiten archivos Excel (.xlsx)'), false);
+  }
+}).single('file');
+
+const uploadRawBuffer = (buffer, options) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: 'raw', ...options },
+      (error, result) => error ? reject(error) : resolve(result)
+    );
+    const { Readable } = require('stream');
+    const readable = new Readable();
+    readable.push(buffer);
+    readable.push(null);
+    readable.pipe(uploadStream);
+  });
+};
+
+router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
+  xlsxUpload(req, res, async (err) => {
+    try {
+      if (err) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          throw new AppError('El archivo excede el límite de 20MB', 413, 'file_too_large');
+        }
+        throw new AppError(err.message, 400, 'upload_error');
+      }
+      if (!req.file) {
+        throw new AppError('No se recibió ningún archivo', 400, 'missing_file');
+      }
+
+      const quincena = String(req.body.quincena || '');
+      const mes = String(req.body.mes || '').toUpperCase().trim();
+      const anio = String(req.body.anio || '');
+
+      if (!['1', '2'].includes(quincena)) {
+        throw new AppError('Quincena inválida (usa 1 o 2)', 400, 'missing_fields');
+      }
+      if (!MESES_VALIDOS.includes(mes)) {
+        throw new AppError('Mes inválido', 400, 'missing_fields');
+      }
+      if (!/^\d{4}$/.test(anio)) {
+        throw new AppError('Año inválido', 400, 'missing_fields');
+      }
+
+      const originalBuffer = req.file.buffer;
+
+      let workbookInspeccion;
+      try {
+        workbookInspeccion = new ExcelJS.Workbook();
+        await workbookInspeccion.xlsx.load(originalBuffer);
+      } catch (e) {
+        throw new AppError('El archivo no es un Excel válido (.xlsx)', 400, 'invalid_excel');
+      }
+
+      const hojaInspeccion = workbookInspeccion.worksheets[0];
+      if (!hojaInspeccion) {
+        throw new AppError('El Excel no tiene hojas', 400, 'invalid_excel');
+      }
+
+      const COL_NUMERO = 1;       // A
+      const COL_ADSCRIPCION = 4;  // D
+      const COL_NOMBRE = 8;       // H
+      const ULTIMA_COLUMNA = 16;  // P
+      const FILA_ENCABEZADOS = 8;
+      const FILA_INICIO_DATOS = 9;
+
+      const celdaVacia = (valor) => valor === null || valor === undefined || String(valor).trim() === '';
+
+      const headerAdscripcion = String(hojaInspeccion.getRow(FILA_ENCABEZADOS).getCell(COL_ADSCRIPCION).value || '').toUpperCase().trim();
+      const headerNombre = String(hojaInspeccion.getRow(FILA_ENCABEZADOS).getCell(COL_NOMBRE).value || '').toUpperCase().trim();
+      if (headerAdscripcion !== 'ADSCRIPCION' || headerNombre !== 'NOMBRE') {
+        throw new AppError('La estructura del Excel no coincide con la plantilla esperada (encabezados en la fila 8)', 400, 'invalid_headers');
+      }
+
+      // Determinar el último renglón real de datos (para no confiar en rowCount a ciegas)
+      let ultimaFila = FILA_INICIO_DATOS - 1;
+      for (let r = FILA_INICIO_DATOS; r <= hojaInspeccion.rowCount; r++) {
+        const fila = hojaInspeccion.getRow(r);
+        if (celdaVacia(fila.getCell(COL_ADSCRIPCION).value) && celdaVacia(fila.getCell(COL_NOMBRE).value)) break;
+        ultimaFila = r;
+      }
+
+      if (ultimaFila < FILA_INICIO_DATOS) {
+        throw new AppError('El Excel no tiene filas de datos', 400, 'no_matching_states');
+      }
+
+      // Clasificar filas por estado
+      const filasPorEstado = new Map(); // slug -> [numeroDeFila,...]
+      const errores = [];
+
+      for (let r = FILA_INICIO_DATOS; r <= ultimaFila; r++) {
+        const fila = hojaInspeccion.getRow(r);
+        const adscripcionValor = fila.getCell(COL_ADSCRIPCION).value;
+        const nombreValor = fila.getCell(COL_NOMBRE).value;
+
+        if (celdaVacia(adscripcionValor) && celdaVacia(nombreValor)) continue; // fila en blanco intermedia
+
+        const estado = normalizarAdscripcion(adscripcionValor);
+        if (!estado) {
+          errores.push({ row: r, valor_adscripcion: String(adscripcionValor ?? ''), motivo: 'adscripcion_no_reconocida' });
+          continue;
+        }
+        if (celdaVacia(nombreValor)) {
+          errores.push({ row: r, valor_adscripcion: String(adscripcionValor ?? ''), motivo: 'nombre_vacio' });
+          continue;
+        }
+
+        if (!filasPorEstado.has(estado.slug)) filasPorEstado.set(estado.slug, []);
+        filasPorEstado.get(estado.slug).push(r);
+      }
+
+      if (filasPorEstado.size === 0) {
+        throw new AppError('No se reconoció ningún estado en la columna ADSCRIPCION', 400, 'no_matching_states');
+      }
+
+      const quincenaTexto = quincena === '1' ? 'Primera' : 'Segunda';
+      const quincenaArchivo = quincena === '1' ? '1RA' : '2DA';
+      const mesNum2 = String(MESES_VALIDOS.indexOf(mes) + 1).padStart(2, '0');
+      const procesadoEn = new Date().toISOString();
+
+      const resultados = [];
+      const estadosResumen = [];
+
+      for (const [slug, filas] of filasPorEstado.entries()) {
+        const estadoInfo = ESTADOS_OR.find(e => e.slug === slug);
+        try {
+          const workbookEstado = new ExcelJS.Workbook();
+          await workbookEstado.xlsx.load(originalBuffer);
+          const hoja = workbookEstado.worksheets[0];
+
+          const registros = [];
+
+          filas.forEach((filaOriginal, indice) => {
+            const filaOrigenData = hoja.getRow(filaOriginal);
+            const valoresPorColumna = {};
+            for (let c = 1; c <= ULTIMA_COLUMNA; c++) {
+              valoresPorColumna[c] = filaOrigenData.getCell(c).value;
+            }
+
+            const filaDestino = FILA_INICIO_DATOS + indice;
+            const filaDestinoRow = hoja.getRow(filaDestino);
+            for (let c = 1; c <= ULTIMA_COLUMNA; c++) {
+              filaDestinoRow.getCell(c).value = c === COL_NUMERO ? (indice + 1) : valoresPorColumna[c];
+            }
+
+            registros.push({
+              no: indice + 1,
+              status: valoresPorColumna[2],
+              tipo_plaza: valoresPorColumna[3],
+              adscripcion: valoresPorColumna[4],
+              codigo_plaza: valoresPorColumna[5],
+              nivel_actual: valoresPorColumna[6],
+              num_emp: valoresPorColumna[7],
+              nombre: valoresPorColumna[8],
+              tipo_movimiento: valoresPorColumna[9],
+              fecha_ing_inm: valoresPorColumna[10],
+              fecha_ing_plaza: valoresPorColumna[11],
+              vig_inicio_mov: valoresPorColumna[12],
+              vig_termino_mov: valoresPorColumna[13],
+              puesto_especifico: valoresPorColumna[14],
+              sueldo_bruto: valoresPorColumna[15],
+              sueldo_neto: valoresPorColumna[16]
+            });
+          });
+
+          const filaFinDestino = FILA_INICIO_DATOS + filas.length - 1;
+          if (ultimaFila > filaFinDestino) {
+            // worksheet.spliceRows no reduce nada cuando el rango a quitar
+            // llega hasta la ultima fila real de la hoja (no tiene filas de
+            // abajo que recorrer hacia arriba) - se limpia manualmente valor
+            // y estilo de las filas sobrantes para que no queden renglones
+            // vacios con bordes/relleno heredados de la plantilla.
+            for (let r = filaFinDestino + 1; r <= ultimaFila; r++) {
+              const filaSobrante = hoja.getRow(r);
+              for (let c = 1; c <= ULTIMA_COLUMNA; c++) {
+                const celdaSobrante = filaSobrante.getCell(c);
+                celdaSobrante.value = null;
+                celdaSobrante.style = {};
+              }
+              filaSobrante.height = undefined;
+            }
+          }
+
+          hoja.getCell('B5').value = `PLANTILLA OR ${estadoInfo.nombre}`;
+          hoja.getCell('B6').value = `Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`;
+
+          try {
+            hoja.name = estadoInfo.nombre.slice(0, 31);
+          } catch (e) { /* nombre de hoja invalido, se deja el original */ }
+
+          if (hoja.pageSetup) {
+            hoja.pageSetup.printArea = `A1:Q${FILA_ENCABEZADOS + filas.length}`;
+          }
+
+          const bufferSalida = await workbookEstado.xlsx.writeBuffer();
+
+          const filenamePretty = `PLANTILLA OR ${estadoInfo.nombre} ${quincenaArchivo} QUINCENA ${mes} ${anio}.xlsx`;
+          const publicId = `${slug}/plantilla_personal_excel/plantilla_${anio}_${mesNum2}_q${quincena}`;
+
+          const resultadoCloudinary = await uploadRawBuffer(bufferSalida, {
+            public_id: publicId,
+            format: 'xlsx',
+            overwrite: true,
+            context: {
+              original_filename: filenamePretty,
+              uploaded_at: new Date().toISOString(),
+              custom: {
+                estado: slug,
+                tipo_documento: 'plantilla_personal_excel',
+                quincena, mes, anio
+              }
+            }
+          });
+
+          resultados.push({
+            estado: slug,
+            tipo_documento: 'plantilla_personal_excel',
+            filename: filenamePretty,
+            url: resultadoCloudinary.secure_url,
+            public_id: resultadoCloudinary.public_id,
+            count: filas.length,
+            status: 'ok'
+          });
+
+          estadosResumen.push({ estado: slug, registros });
+        } catch (errorEstado) {
+          resultados.push({ estado: slug, status: 'error', message: errorEstado.message });
+        }
+      }
+
+      let resumenJson = null;
+      try {
+        const jsonBuffer = Buffer.from(JSON.stringify({
+          quincena, mes, anio, procesado_en: procesadoEn,
+          estados: estadosResumen
+        }));
+        const publicIdJson = `datos-nacionales/plantilla_personal_excel_datos/datos_${anio}_${mesNum2}_q${quincena}`;
+        const resultadoJson = await uploadRawBuffer(jsonBuffer, {
+          public_id: publicIdJson,
+          overwrite: true
+        });
+        resumenJson = { public_id: resultadoJson.public_id, url: resultadoJson.secure_url };
+      } catch (errorJson) {
+        console.error('Error al guardar el resumen JSON de plantilla nacional:', errorJson.message);
+      }
+
+      res.status(201).json({
+        status: 'success',
+        data: {
+          quincena, mes, anio,
+          procesado_en: procesadoEn,
+          resultados,
+          errores,
+          resumen_json: resumenJson
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
 });
 
 router.get('/render-ping', (req, res) => {
