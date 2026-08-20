@@ -339,6 +339,8 @@ function normalizarAdscripcion(valorCrudo) {
   texto = texto.replace(/^O\.?\s*R\.?\s*/, '');
   texto = texto.replace(/^OFICINA\s+DE\s+REPRESENTACION\s+(EN\s+)?/, '');
   texto = texto.replace(/^REPRESENTACION\s+LOCAL\s+(EN\s+)?/, '');
+  // Variantes tipo "O.R. EN LA CIUDAD DE MEXICO" / "O.R. EN EL ESTADO DE MEXICO"
+  texto = texto.replace(/^EN\s+(LA\s+|EL\s+)?/, '');
   texto = texto.replace(/[.]/g, ' ');
   texto = texto.replace(/\s+/g, ' ').trim();
 
