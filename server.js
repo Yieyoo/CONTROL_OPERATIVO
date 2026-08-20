@@ -918,7 +918,7 @@ const formatCeldaPdf = (key, valor) => {
   return String(valor);
 };
 
-function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, columnas }) {
+function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, columnas, logo }) {
   const margin = 30;
   const rowHeight = 20;
   const headerRowHeight = 28;
@@ -930,6 +930,14 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, 
   const doc = new PDFDocument({ size: [pageWidth, pageHeight], margin });
   const chunks = [];
   doc.on('data', (c) => chunks.push(c));
+
+  if (logo && logo.buffer) {
+    try {
+      // Mismo logo del membrete original; pdfkit calcula el alto solo,
+      // conservando la proporcion, con solo darle el ancho.
+      doc.image(logo.buffer, margin, margin, { width: 150 });
+    } catch (e) { /* si el logo no se puede dibujar, se sigue sin el */ }
+  }
 
   doc.fontSize(11).font('Helvetica-Bold').text('INSTITUTO NACIONAL DE MIGRACION', margin, margin, { width: tableWidth, align: 'center' });
   doc.fontSize(9).font('Helvetica').text('DIRECCION GENERAL DE ADMINISTRACION', { width: tableWidth, align: 'center' });
@@ -1059,6 +1067,11 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
         .filter(col => !col.sensible)
         .map(col => ({ key: col.key, label: col.header, width: col.pdfWidth, align: col.pdfAlign }));
 
+      // Logo del membrete original, para que la vista previa en PDF se
+      // parezca al Excel real (mismo logo en todos los estados).
+      const logoOriginal = (workbookInspeccion.model.media || []).find(m => m.type === 'image');
+      const logoPdf = logoOriginal ? { buffer: logoOriginal.buffer } : null;
+
       // Determinar el último renglón real de datos (para no confiar en rowCount a ciegas)
       let ultimaFila = FILA_INICIO_DATOS - 1;
       for (let r = FILA_INICIO_DATOS; r <= hojaInspeccion.rowCount; r++) {
@@ -1129,6 +1142,9 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             for (let c = 1; c <= ULTIMA_COLUMNA; c++) {
               filaDestinoRow.getCell(c).value = c === COL_NUMERO ? (indice + 1) : valoresPorColumna[c];
             }
+            // El Excel nacional trae las filas de datos ocultas de origen -
+            // se fuerza a visible, si no el archivo generado se ve vacio.
+            filaDestinoRow.hidden = false;
 
             const registro = {};
             columnasDetectadas.forEach(col => {
@@ -1190,7 +1206,8 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
               registros,
               quincenaTexto,
               mes, anio,
-              columnas: columnasPdf
+              columnas: columnasPdf,
+              logo: logoPdf
             });
             const resultadoPdf = await uploadRawBuffer(bufferPdf, {
               public_id: `${publicId}_preview`,
