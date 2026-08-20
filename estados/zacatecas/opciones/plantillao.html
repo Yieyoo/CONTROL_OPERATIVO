@@ -79,6 +79,7 @@
         const API_KEY = window.CONFIG.API_KEY;
         const ESTADO_FIJO = 'zacatecas';
         const TIPO_DOCUMENTO = 'plantilla_personal';
+        const TIPO_DOCUMENTO_EXCEL = 'plantilla_personal_excel';
 
         // Detectar iOS
         function isIOS() {
@@ -171,40 +172,38 @@
             const fechaElement = document.getElementById('fecha-texto');
 
             try {
-                console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOCUMENTO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'x-api-key': API_KEY }
-                });
+                const [pdfResponse, excelResponse] = await Promise.all([
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, { headers: { 'x-api-key': API_KEY } }),
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_EXCEL}`, { headers: { 'x-api-key': API_KEY } })
+                ]);
 
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-
-                const result = await response.json();
-                console.log('Respuesta API:', result);
-
-                if (!result?.data) throw new Error('Formato de respuesta inválido');
+                const pdfData = pdfResponse.ok ? ((await pdfResponse.json()).data || []) : [];
+                const excelData = excelResponse.ok ? ((await excelResponse.json()).data || []) : [];
+                const todos = [...pdfData, ...excelData];
 
                 const pdfViewer = document.getElementById('pdf-viewer');
                 const mobileContainer = document.querySelector('.mobile-images');
 
-                if (result.data.length > 0) {
-                    const latestPDF = result.data.sort((a, b) => 
+                if (todos.length > 0) {
+                    const ultimo = todos.sort((a, b) =>
                         new Date(b.uploaded_at) - new Date(a.uploaded_at)
                     )[0];
+                    const esPdf = ultimo.format === 'pdf';
 
                     // Mostrar fecha de actualización
-                    fechaElement.textContent = formatDate(latestPDF.uploaded_at);
-                    
-                    // Configuración normal para PC
-                    pdfViewer.src = latestPDF.url;
-                    
+                    fechaElement.textContent = formatDate(ultimo.uploaded_at);
+
+                    // PDF se muestra directo; Excel se previsualiza con el visor de Google Docs
+                    pdfViewer.src = esPdf ? ultimo.url : ultimo.view_url;
+
                     // Configuración para móviles
                     if (!isIOS()) {
                         mobileContainer.innerHTML = `
                             <div class="file-info">
-                                <h3>${latestPDF.filename || 'Plantilla de Personal'}</h3>
-                                <p>Actualizado: ${formatDate(latestPDF.uploaded_at)}</p>
-                                <p>Tamaño: ${(latestPDF.size / (1024*1024)).toFixed(2)} MB</p>
-                                <a href="${latestPDF.url}" class="download-btn" download>
+                                <h3>${ultimo.filename || 'Plantilla de Personal'}</h3>
+                                <p>Actualizado: ${formatDate(ultimo.uploaded_at)}</p>
+                                <p>Tamaño: ${(ultimo.size / (1024*1024)).toFixed(2)} MB</p>
+                                <a href="${ultimo.download_url || ultimo.url}" class="download-btn" download>
                                     Descargar Documento
                                 </a>
                             </div>
