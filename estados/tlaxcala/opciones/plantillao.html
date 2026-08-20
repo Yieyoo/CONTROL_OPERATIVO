@@ -290,7 +290,7 @@
             fechaElement.textContent = formatDate(documento.uploaded_at);
             
             // PDF se muestra directo; Excel se previsualiza con el visor de Google Docs
-            pdfViewer.src = documento.format === 'pdf' ? documento.url : documento.view_url;
+            pdfViewer.src = documento.format === 'pdf' ? documento.url : (documento.preview_pdf_url || documento.view_url);
             
             // Configurar para móviles
             if (!isIOS() && mobileContainer) {

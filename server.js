@@ -4,6 +4,7 @@ const cors = require('cors');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -550,8 +551,10 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
       timestamp: Date.now() // Cache busting
     });
 
-    const archivos = result.resources.map(resource => {
-      const originalName = resource.context?.custom?.original_filename || 
+    const archivos = result.resources
+      .filter(resource => !resource.public_id.endsWith('_preview')) // companero interno del PDF de vista previa, no es un documento propio
+      .map(resource => {
+      const originalName = resource.context?.custom?.original_filename ||
                          path.parse(resource.public_id).name + '.pdf';
       return {
         url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
@@ -569,8 +572,11 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
         etag: resource.etag,
         tags: resource.tags,
         moderation: resource.moderation,
-        ...(resource.context?.custom?.titulo_documento && { 
-          titulo_documento: resource.context.custom.titulo_documento 
+        ...(resource.context?.custom?.titulo_documento && {
+          titulo_documento: resource.context.custom.titulo_documento
+        }),
+        ...(resource.context?.custom?.preview_pdf_url && {
+          preview_pdf_url: resource.context.custom.preview_pdf_url
         })
       };
     });
@@ -835,6 +841,101 @@ const uploadRawBuffer = (buffer, options) => {
   });
 };
 
+// Vista previa en PDF de la plantilla generada (columnas fijas, una sola
+// pagina por estado). El .xlsx sigue siendo el archivo fuente/descargable;
+// este PDF solo existe para poder visualizarla sin depender de un visor
+// externo (Google Docs / Office Online) que puede estar bloqueado en
+// ciertas redes corporativas.
+const COLUMNAS_PDF = [
+  { key: 'no', label: 'NO.', width: 28, align: 'center' },
+  { key: 'status', label: 'STATUS', width: 55, align: 'center' },
+  { key: 'tipo_plaza', label: 'TIPO DE PLAZA', width: 70, align: 'center' },
+  { key: 'adscripcion', label: 'ADSCRIPCION', width: 110, align: 'left' },
+  { key: 'codigo_plaza', label: 'CODIGO-PLAZA NUEVO', width: 90, align: 'center' },
+  { key: 'nivel_actual', label: 'NIVEL ACTUAL', width: 55, align: 'center' },
+  { key: 'num_emp', label: 'NUM EMP', width: 55, align: 'center' },
+  { key: 'nombre', label: 'NOMBRE', width: 160, align: 'left' },
+  { key: 'tipo_movimiento', label: 'TIPO DE MOVIMIENTO', width: 75, align: 'center' },
+  { key: 'fecha_ing_inm', label: 'FECHA DE ING. INM', width: 62, align: 'center' },
+  { key: 'fecha_ing_plaza', label: 'FECHA DE ING A LA PLAZA', width: 62, align: 'center' },
+  { key: 'vig_inicio_mov', label: 'VIG. DE INICIO MOV.', width: 62, align: 'center' },
+  { key: 'vig_termino_mov', label: 'VIG. DE TERMINO MOV.', width: 62, align: 'center' },
+  { key: 'puesto_especifico', label: 'PUESTO ESPECIFICO', width: 260, align: 'left' }
+  // SUELDO BRUTO y SUELDO NETO se omiten a proposito en la vista previa
+  // (son datos sensibles) - siguen intactos en el .xlsx, solo ocultos ahi.
+];
+
+const formatCeldaPdf = (key, valor) => {
+  if (valor === null || valor === undefined || valor === '') return '';
+  if (valor instanceof Date) {
+    // Las fechas de la plantilla son solo fecha (sin hora) - se formatean en
+    // UTC para no correrse un dia segun la zona horaria del servidor.
+    const dia = String(valor.getUTCDate()).padStart(2, '0');
+    const mesN = String(valor.getUTCMonth() + 1).padStart(2, '0');
+    return `${dia}/${mesN}/${valor.getUTCFullYear()}`;
+  }
+  return String(valor);
+};
+
+function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio }) {
+  const margin = 30;
+  const rowHeight = 20;
+  const headerRowHeight = 28;
+  const topBlockHeight = 110;
+  const tableWidth = COLUMNAS_PDF.reduce((s, c) => s + c.width, 0);
+  const pageWidth = tableWidth + margin * 2;
+  const pageHeight = topBlockHeight + headerRowHeight + Math.max(registros.length, 1) * rowHeight + margin * 2;
+
+  const doc = new PDFDocument({ size: [pageWidth, pageHeight], margin });
+  const chunks = [];
+  doc.on('data', (c) => chunks.push(c));
+
+  doc.fontSize(11).font('Helvetica-Bold').text('INSTITUTO NACIONAL DE MIGRACION', margin, margin, { width: tableWidth, align: 'center' });
+  doc.fontSize(9).font('Helvetica').text('DIRECCION GENERAL DE ADMINISTRACION', { width: tableWidth, align: 'center' });
+  doc.text('DIRECCION DE ADMINISTRACION DE PERSONAL', { width: tableWidth, align: 'center' });
+  doc.moveDown(0.5);
+  doc.fontSize(14).font('Helvetica-Bold').fillColor('#691932').text(`PLANTILLA OR ${nombreEstado}`, { width: tableWidth, align: 'center' });
+  doc.fontSize(10).font('Helvetica').fillColor('#000').text(`Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`, { width: tableWidth, align: 'center' });
+
+  let y = margin + topBlockHeight;
+  let x = margin;
+
+  doc.fontSize(6.5).font('Helvetica-Bold');
+  COLUMNAS_PDF.forEach(col => {
+    doc.rect(x, y, col.width, headerRowHeight).fillAndStroke('#D4C19C', '#999');
+    doc.fillColor('#56242A').text(col.label, x + 2, y + 4, { width: col.width - 4, height: headerRowHeight - 4, align: 'center' });
+    x += col.width;
+  });
+
+  y += headerRowHeight;
+  doc.font('Helvetica').fontSize(6.5);
+
+  registros.forEach((registro, i) => {
+    x = margin;
+    const bg = i % 2 === 0 ? '#FFFFFF' : '#F7F3EE';
+    COLUMNAS_PDF.forEach(col => {
+      doc.rect(x, y, col.width, rowHeight).fillAndStroke(bg, '#ccc');
+      const texto = formatCeldaPdf(col.key, registro[col.key]);
+      doc.fillColor('#222').text(texto, x + 2, y + 5, {
+        width: col.width - 4,
+        height: rowHeight - 4,
+        align: col.align,
+        ellipsis: true,
+        lineBreak: false
+      });
+      x += col.width;
+    });
+    y += rowHeight;
+  });
+
+  doc.end();
+
+  return new Promise((resolve, reject) => {
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+  });
+}
+
 router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
   xlsxUpload(req, res, async (err) => {
     try {
@@ -1012,10 +1113,33 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             hoja.pageSetup.printArea = `A1:Q${FILA_ENCABEZADOS + filas.length}`;
           }
 
+          // Ocultar (no borrar) las columnas de sueldo - siguen en el archivo
+          // pero no se ven a menos que alguien las des-oculte manualmente.
+          hoja.getColumn(15).hidden = true; // O - SUELDO BRUTO
+          hoja.getColumn(16).hidden = true; // P - SUELDO NETO
+
           const bufferSalida = await workbookEstado.xlsx.writeBuffer();
 
           const filenamePretty = `PLANTILLA OR ${estadoInfo.nombre} ${quincenaArchivo} QUINCENA ${mes} ${anio}.xlsx`;
           const publicId = `${slug}/plantilla_personal_excel/plantilla_${anio}_${mesNum2}_q${quincena}`;
+
+          let previewPdfUrl = null;
+          try {
+            const bufferPdf = await generarPdfPreview({
+              nombreEstado: estadoInfo.nombre,
+              registros,
+              quincenaTexto,
+              mes, anio
+            });
+            const resultadoPdf = await uploadRawBuffer(bufferPdf, {
+              public_id: `${publicId}_preview`,
+              format: 'pdf',
+              overwrite: true
+            });
+            previewPdfUrl = resultadoPdf.secure_url;
+          } catch (errorPdf) {
+            console.error(`No se pudo generar la vista previa PDF de ${slug}:`, errorPdf.message);
+          }
 
           const resultadoCloudinary = await uploadRawBuffer(bufferSalida, {
             public_id: publicId,
@@ -1027,7 +1151,8 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
               custom: {
                 estado: slug,
                 tipo_documento: 'plantilla_personal_excel',
-                quincena, mes, anio
+                quincena, mes, anio,
+                ...(previewPdfUrl && { preview_pdf_url: previewPdfUrl })
               }
             }
           });
@@ -1038,6 +1163,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             filename: filenamePretty,
             url: resultadoCloudinary.secure_url,
             public_id: resultadoCloudinary.public_id,
+            preview_pdf_url: previewPdfUrl,
             count: filas.length,
             status: 'ok'
           });
