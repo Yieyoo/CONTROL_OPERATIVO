@@ -5,6 +5,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
+const JSZip = require('jszip');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -871,6 +872,30 @@ const REGISTRO_COLUMNAS = [
 
 const normalizarHeader = (valor) => String(valor || '').toUpperCase().replace(/\s+/g, ' ').trim();
 
+// ExcelJS no conserva bien el tamaño/recorte de imagenes embebidas al
+// releer y volver a guardar un .xlsx (las deja en 0x0, invisibles) - se
+// reemplaza el/los drawing*.xml generados por los del archivo original,
+// que ya traen las medidas correctas y no cambian entre estados (la
+// imagen y su celda de anclaje son las mismas para todos).
+async function repararImagenesPlantilla(bufferGenerado, bufferOriginal) {
+  const [zipGenerado, zipOriginal] = await Promise.all([
+    JSZip.loadAsync(bufferGenerado),
+    JSZip.loadAsync(bufferOriginal)
+  ]);
+
+  const rutasDrawing = Object.keys(zipOriginal.files).filter(f => /^xl\/drawings\/drawing\d+\.xml$/.test(f));
+  if (rutasDrawing.length === 0) return bufferGenerado; // la plantilla no trae imagenes
+
+  for (const ruta of rutasDrawing) {
+    if (zipGenerado.file(ruta)) {
+      const xmlOriginal = await zipOriginal.file(ruta).async('nodebuffer');
+      zipGenerado.file(ruta, xmlOriginal);
+    }
+  }
+
+  return zipGenerado.generateAsync({ type: 'nodebuffer' });
+}
+
 const columnaALetra = (n) => {
   let letra = '';
   while (n > 0) {
@@ -1148,7 +1173,12 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             hoja.getColumn(col.index).hidden = true;
           });
 
-          const bufferSalida = await workbookEstado.xlsx.writeBuffer();
+          let bufferSalida = await workbookEstado.xlsx.writeBuffer();
+          try {
+            bufferSalida = await repararImagenesPlantilla(bufferSalida, originalBuffer);
+          } catch (errorImagen) {
+            console.error(`No se pudo reparar la imagen de la plantilla de ${slug}:`, errorImagen.message);
+          }
 
           const filenamePretty = `PLANTILLA OR ${estadoInfo.nombre} ${quincenaArchivo} QUINCENA ${mes} ${anio}.xlsx`;
           const publicId = `${slug}/plantilla_personal_excel/plantilla_${anio}_${mesNum2}_q${quincena}`;
