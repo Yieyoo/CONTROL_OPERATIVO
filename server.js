@@ -841,29 +841,43 @@ const uploadRawBuffer = (buffer, options) => {
   });
 };
 
-// Vista previa en PDF de la plantilla generada (columnas fijas, una sola
-// pagina por estado). El .xlsx sigue siendo el archivo fuente/descargable;
-// este PDF solo existe para poder visualizarla sin depender de un visor
-// externo (Google Docs / Office Online) que puede estar bloqueado en
-// ciertas redes corporativas.
-const COLUMNAS_PDF = [
-  { key: 'no', label: 'NO.', width: 28, align: 'center' },
-  { key: 'status', label: 'STATUS', width: 55, align: 'center' },
-  { key: 'tipo_plaza', label: 'TIPO DE PLAZA', width: 70, align: 'center' },
-  { key: 'adscripcion', label: 'ADSCRIPCION', width: 110, align: 'left' },
-  { key: 'codigo_plaza', label: 'CODIGO-PLAZA NUEVO', width: 90, align: 'center' },
-  { key: 'nivel_actual', label: 'NIVEL ACTUAL', width: 55, align: 'center' },
-  { key: 'num_emp', label: 'NUM EMP', width: 55, align: 'center' },
-  { key: 'nombre', label: 'NOMBRE', width: 160, align: 'left' },
-  { key: 'tipo_movimiento', label: 'TIPO DE MOVIMIENTO', width: 75, align: 'center' },
-  { key: 'fecha_ing_inm', label: 'FECHA DE ING. INM', width: 62, align: 'center' },
-  { key: 'fecha_ing_plaza', label: 'FECHA DE ING A LA PLAZA', width: 62, align: 'center' },
-  { key: 'vig_inicio_mov', label: 'VIG. DE INICIO MOV.', width: 62, align: 'center' },
-  { key: 'vig_termino_mov', label: 'VIG. DE TERMINO MOV.', width: 62, align: 'center' },
-  { key: 'puesto_especifico', label: 'PUESTO ESPECIFICO', width: 260, align: 'left' }
-  // SUELDO BRUTO y SUELDO NETO se omiten a proposito en la vista previa
-  // (son datos sensibles) - siguen intactos en el .xlsx, solo ocultos ahi.
+// Diccionario de columnas conocidas de la plantilla. La posicion real de
+// cada una en el Excel subido se detecta leyendo la fila 8 (no se asume un
+// orden fijo), porque distintas versiones del Excel nacional han traido
+// columnas de mas (ej. CURP) que corren todo lo que sigue.
+const REGISTRO_COLUMNAS = [
+  { header: 'NO.', key: 'no', pdfWidth: 28, pdfAlign: 'center' },
+  { header: 'STATUS', key: 'status', pdfWidth: 55, pdfAlign: 'center' },
+  { header: 'TIPO DE PLAZA', key: 'tipo_plaza', pdfWidth: 70, pdfAlign: 'center' },
+  { header: 'ADSCRIPCION', key: 'adscripcion', pdfWidth: 110, pdfAlign: 'left' },
+  { header: 'CODIGO-PLAZA NUEVO', key: 'codigo_plaza', pdfWidth: 90, pdfAlign: 'center' },
+  { header: 'NIVEL ACTUAL', key: 'nivel_actual', pdfWidth: 55, pdfAlign: 'center' },
+  { header: 'NUM EMP', key: 'num_emp', pdfWidth: 55, pdfAlign: 'center' },
+  { header: 'NOMBRE', key: 'nombre', pdfWidth: 160, pdfAlign: 'left' },
+  { header: 'CURP', key: 'curp', pdfWidth: 100, pdfAlign: 'center' },
+  { header: 'TIPO DE MOVIMIENTO', key: 'tipo_movimiento', pdfWidth: 75, pdfAlign: 'center' },
+  { header: 'FECHA DE ING. INM', key: 'fecha_ing_inm', pdfWidth: 62, pdfAlign: 'center' },
+  { header: 'FECHA DE ING A LA PLAZA', key: 'fecha_ing_plaza', pdfWidth: 62, pdfAlign: 'center' },
+  { header: 'VIG. DE INICIO MOV.', key: 'vig_inicio_mov', pdfWidth: 62, pdfAlign: 'center' },
+  { header: 'VIG. DE TERMINO MOV.', key: 'vig_termino_mov', pdfWidth: 62, pdfAlign: 'center' },
+  { header: 'PUESTO ESPECIFICO', key: 'puesto_especifico', pdfWidth: 220, pdfAlign: 'left' },
+  // Datos sensibles: se ocultan (no se borran) en el .xlsx y se omiten
+  // por completo de la vista previa en PDF.
+  { header: 'SUELDO BRUTO', key: 'sueldo_bruto', pdfWidth: 70, pdfAlign: 'right', sensible: true },
+  { header: 'SUELDO NETO', key: 'sueldo_neto', pdfWidth: 70, pdfAlign: 'right', sensible: true }
 ];
+
+const normalizarHeader = (valor) => String(valor || '').toUpperCase().replace(/\s+/g, ' ').trim();
+
+const columnaALetra = (n) => {
+  let letra = '';
+  while (n > 0) {
+    const resto = (n - 1) % 26;
+    letra = String.fromCharCode(65 + resto) + letra;
+    n = Math.floor((n - 1) / 26);
+  }
+  return letra;
+};
 
 const formatCeldaPdf = (key, valor) => {
   if (valor === null || valor === undefined || valor === '') return '';
@@ -877,12 +891,12 @@ const formatCeldaPdf = (key, valor) => {
   return String(valor);
 };
 
-function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio }) {
+function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, columnas }) {
   const margin = 30;
   const rowHeight = 20;
   const headerRowHeight = 28;
   const topBlockHeight = 110;
-  const tableWidth = COLUMNAS_PDF.reduce((s, c) => s + c.width, 0);
+  const tableWidth = columnas.reduce((s, c) => s + c.width, 0);
   const pageWidth = tableWidth + margin * 2;
   const pageHeight = topBlockHeight + headerRowHeight + Math.max(registros.length, 1) * rowHeight + margin * 2;
 
@@ -901,7 +915,7 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio }
   let x = margin;
 
   doc.fontSize(6.5).font('Helvetica-Bold');
-  COLUMNAS_PDF.forEach(col => {
+  columnas.forEach(col => {
     doc.rect(x, y, col.width, headerRowHeight).fillAndStroke('#D4C19C', '#999');
     doc.fillColor('#56242A').text(col.label, x + 2, y + 4, { width: col.width - 4, height: headerRowHeight - 4, align: 'center' });
     x += col.width;
@@ -913,7 +927,7 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio }
   registros.forEach((registro, i) => {
     x = margin;
     const bg = i % 2 === 0 ? '#FFFFFF' : '#F7F3EE';
-    COLUMNAS_PDF.forEach(col => {
+    columnas.forEach(col => {
       doc.rect(x, y, col.width, rowHeight).fillAndStroke(bg, '#ccc');
       const texto = formatCeldaPdf(col.key, registro[col.key]);
       doc.fillColor('#222').text(texto, x + 2, y + 5, {
@@ -978,20 +992,45 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
         throw new AppError('El Excel no tiene hojas', 400, 'invalid_excel');
       }
 
-      const COL_NUMERO = 1;       // A
-      const COL_ADSCRIPCION = 4;  // D
-      const COL_NOMBRE = 8;       // H
-      const ULTIMA_COLUMNA = 16;  // P
       const FILA_ENCABEZADOS = 8;
       const FILA_INICIO_DATOS = 9;
 
       const celdaVacia = (valor) => valor === null || valor === undefined || String(valor).trim() === '';
 
-      const headerAdscripcion = String(hojaInspeccion.getRow(FILA_ENCABEZADOS).getCell(COL_ADSCRIPCION).value || '').toUpperCase().trim();
-      const headerNombre = String(hojaInspeccion.getRow(FILA_ENCABEZADOS).getCell(COL_NOMBRE).value || '').toUpperCase().trim();
-      if (headerAdscripcion !== 'ADSCRIPCION' || headerNombre !== 'NOMBRE') {
-        throw new AppError('La estructura del Excel no coincide con la plantilla esperada (encabezados en la fila 8)', 400, 'invalid_headers');
+      // Detectar columnas por su encabezado (fila 8) en vez de asumir una
+      // posicion fija - distintas versiones del Excel nacional han traido
+      // columnas de mas (ej. CURP) que corren todo lo que sigue.
+      const columnasDetectadas = [];
+      for (let c = 1; c <= 60; c++) {
+        const headerNorm = normalizarHeader(hojaInspeccion.getRow(FILA_ENCABEZADOS).getCell(c).value);
+        if (!headerNorm) {
+          if (columnasDetectadas.length > 0) break;
+          continue;
+        }
+        const conocida = REGISTRO_COLUMNAS.find(r => r.header === headerNorm);
+        columnasDetectadas.push(conocida ? { ...conocida, index: c } : {
+          header: headerNorm, key: `col_${c}`, pdfWidth: 80, pdfAlign: 'left', index: c
+        });
       }
+
+      const colAdscripcion = columnasDetectadas.find(c => c.key === 'adscripcion');
+      const colNombre = columnasDetectadas.find(c => c.key === 'nombre');
+      if (!colAdscripcion || !colNombre) {
+        throw new AppError('La estructura del Excel no coincide con la plantilla esperada (no se encontraron las columnas ADSCRIPCION y NOMBRE en la fila 8)', 400, 'invalid_headers');
+      }
+      const COL_ADSCRIPCION = colAdscripcion.index;
+      const COL_NOMBRE = colNombre.index;
+      const COL_NUMERO = (columnasDetectadas.find(c => c.key === 'no') || {}).index || 1;
+      const ULTIMA_COLUMNA = columnasDetectadas[columnasDetectadas.length - 1].index;
+
+      // El titulo/vigencia puede estar anclado en A5/A6 o B5/B6 segun la
+      // version de la plantilla (la celda esta fusionada hasta la Q).
+      const anclaTitulo = !celdaVacia(hojaInspeccion.getCell('A5').value) ? 'A' : 'B';
+
+      // Columnas que se muestran en la vista previa PDF (todas menos las sensibles)
+      const columnasPdf = columnasDetectadas
+        .filter(col => !col.sensible)
+        .map(col => ({ key: col.key, label: col.header, width: col.pdfWidth, align: col.pdfAlign }));
 
       // Determinar el último renglón real de datos (para no confiar en rowCount a ciegas)
       let ultimaFila = FILA_INICIO_DATOS - 1;
@@ -1064,24 +1103,12 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
               filaDestinoRow.getCell(c).value = c === COL_NUMERO ? (indice + 1) : valoresPorColumna[c];
             }
 
-            registros.push({
-              no: indice + 1,
-              status: valoresPorColumna[2],
-              tipo_plaza: valoresPorColumna[3],
-              adscripcion: valoresPorColumna[4],
-              codigo_plaza: valoresPorColumna[5],
-              nivel_actual: valoresPorColumna[6],
-              num_emp: valoresPorColumna[7],
-              nombre: valoresPorColumna[8],
-              tipo_movimiento: valoresPorColumna[9],
-              fecha_ing_inm: valoresPorColumna[10],
-              fecha_ing_plaza: valoresPorColumna[11],
-              vig_inicio_mov: valoresPorColumna[12],
-              vig_termino_mov: valoresPorColumna[13],
-              puesto_especifico: valoresPorColumna[14],
-              sueldo_bruto: valoresPorColumna[15],
-              sueldo_neto: valoresPorColumna[16]
+            const registro = {};
+            columnasDetectadas.forEach(col => {
+              registro[col.key] = valoresPorColumna[col.index];
             });
+            registro.no = indice + 1;
+            registros.push(registro);
           });
 
           const filaFinDestino = FILA_INICIO_DATOS + filas.length - 1;
@@ -1102,21 +1129,22 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             }
           }
 
-          hoja.getCell('B5').value = `PLANTILLA OR ${estadoInfo.nombre}`;
-          hoja.getCell('B6').value = `Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`;
+          hoja.getCell(`${anclaTitulo}5`).value = `PLANTILLA OR ${estadoInfo.nombre}`;
+          hoja.getCell(`${anclaTitulo}6`).value = `Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`;
 
           try {
             hoja.name = estadoInfo.nombre.slice(0, 31);
           } catch (e) { /* nombre de hoja invalido, se deja el original */ }
 
           if (hoja.pageSetup) {
-            hoja.pageSetup.printArea = `A1:Q${FILA_ENCABEZADOS + filas.length}`;
+            hoja.pageSetup.printArea = `A1:${columnaALetra(ULTIMA_COLUMNA)}${FILA_ENCABEZADOS + filas.length}`;
           }
 
-          // Ocultar (no borrar) las columnas de sueldo - siguen en el archivo
-          // pero no se ven a menos que alguien las des-oculte manualmente.
-          hoja.getColumn(15).hidden = true; // O - SUELDO BRUTO
-          hoja.getColumn(16).hidden = true; // P - SUELDO NETO
+          // Ocultar (no borrar) las columnas sensibles (sueldo) - siguen en
+          // el archivo pero no se ven a menos que alguien las des-oculte.
+          columnasDetectadas.filter(col => col.sensible).forEach(col => {
+            hoja.getColumn(col.index).hidden = true;
+          });
 
           const bufferSalida = await workbookEstado.xlsx.writeBuffer();
 
@@ -1129,7 +1157,8 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
               nombreEstado: estadoInfo.nombre,
               registros,
               quincenaTexto,
-              mes, anio
+              mes, anio,
+              columnas: columnasPdf
             });
             const resultadoPdf = await uploadRawBuffer(bufferPdf, {
               public_id: `${publicId}_preview`,
