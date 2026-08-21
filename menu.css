@@ -1,5 +1,5 @@
 /* ==================== */
-/* BARRA DE NAVEGACIÓN SUPERIOR */
+/* BARRA SUPERIOR + SIDEBAR */
 /* ==================== */
 
 :root {
@@ -7,15 +7,19 @@
     --menu-dorado: #A5852E;
     --menu-dorado-dark: #c49d3a;
     --menu-blanco: #fff;
+    --menu-topbar-h: 46px;
+    --menu-sidebar-w: 260px;
 }
 
-
-nav.menu {
+/* ==================== */
+/* BARRA SUPERIOR        */
+/* ==================== */
+.topbar {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 46px;
+    height: var(--menu-topbar-h);
     background: linear-gradient(to right, #6b1e3f, #320d1c);
     border-bottom: 4px solid var(--menu-dorado);
     z-index: 10000;
@@ -24,77 +28,42 @@ nav.menu {
     align-items: stretch;
 }
 
-nav.menu > ul {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    list-style: none;
-    margin: 0;
-    padding: 0 0.5rem;
-    width: 100%;
-    height: 100%;
-}
-
-nav.menu ul li {
+.nav-hamburger {
     display: flex;
     align-items: center;
-    position: relative;
-    margin-bottom: 0;
+    justify-content: center;
+    width: 44px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
-nav.menu > ul > li > a {
-    color: rgba(255, 255, 255, 0.9);
+.topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
     text-decoration: none;
-    font-size: 0.82rem;
-    font-weight: 500;
+    font-weight: 700;
+    font-size: 0.85rem;
     letter-spacing: 0.3px;
-    padding: 0 1.1rem;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    border-bottom: 3px solid transparent;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    padding: 0 0.8rem;
     white-space: nowrap;
 }
 
-nav.menu > ul > li > a:hover,
-nav.menu > ul > li.submenu.active > a {
-    background: transparent;
-    border-bottom-color: transparent;
-    color: #fff;
-}
-
-nav.menu > ul > li > a.active {
-    border-bottom-color: transparent;
-    color: #fff;
-    background: transparent;
-}
-
-/* Iconos */
-nav.menu .fas,
-nav.menu .fa {
+.topbar-brand .fas {
     color: var(--menu-dorado);
-    font-size: 0.78rem;
+    font-size: 1.05rem;
 }
 
-/* Flecha submenú */
-.submenu > a::after {
-    content: '▾';
-    font-size: 0.7rem;
-    margin-left: 4px;
-    opacity: 0.7;
-    transition: transform 0.2s ease;
-    transform: rotate(0deg);
-}
-
-.submenu.active > a::after {
-    transform: rotate(180deg);
-}
-
-/* Espaciador — empuja Cerrar Sesión al extremo derecho */
-.nav-spacer {
-    flex: 1;
+.topbar-user {
+    display: flex;
+    align-items: stretch;
+    margin-left: auto;
 }
 
 /* Usuario activo */
@@ -106,7 +75,6 @@ nav.menu .fa {
     color: rgba(255, 255, 255, 0.75);
     font-size: 0.78rem;
     border-left: 1px solid rgba(165, 133, 46, 0.25);
-    border-right: 1px solid rgba(165, 133, 46, 0.25);
     height: 100%;
     white-space: nowrap;
 }
@@ -122,38 +90,154 @@ nav.menu .fa {
     letter-spacing: 0.3px;
 }
 
-/* Cerrar Sesión */
-.logout-link {
+/* Cerrar Sesión (topbar) */
+.topbar .logout-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     color: rgba(255, 255, 255, 0.75) !important;
     font-size: 0.8rem !important;
-    gap: 5px;
     padding: 0 1rem !important;
+    text-decoration: none;
+    border-left: 1px solid rgba(165, 133, 46, 0.25);
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.logout-link:hover {
+.topbar .logout-link:hover {
     color: #fff !important;
     background: rgba(220, 50, 50, 0.15) !important;
-    border-bottom-color: rgba(220, 50, 50, 0.6) !important;
 }
 
 /* ==================== */
-/* DROPDOWN SUBMENÚ     */
+/* OVERLAY (móvil)       */
+/* ==================== */
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+}
+
+.menu-overlay.active {
+    display: block;
+}
+
+/* ==================== */
+/* SIDEBAR                */
+/* ==================== */
+nav.menu {
+    position: fixed;
+    top: var(--menu-topbar-h);
+    left: 0;
+    width: var(--menu-sidebar-w);
+    height: calc(100vh - var(--menu-topbar-h));
+    background: var(--menu-blanco);
+    z-index: 9999;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+}
+
+nav.menu.mobile-open {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    padding: 18px 16px 14px;
+    flex-shrink: 0;
+}
+
+.sidebar-logo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.sidebar-divider {
+    border: none;
+    border-top: 1px solid rgba(165, 133, 46, 0.35);
+    margin: 4px 16px;
+    flex-shrink: 0;
+}
+
+nav.menu > ul {
+    list-style: none;
+    margin: 0;
+    padding: 10px 12px;
+    flex: 1;
+}
+
+nav.menu ul li {
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+nav.menu > ul > li > a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    color: #4a4a4a;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+nav.menu > ul > li > a:hover,
+nav.menu > ul > li > a.active,
+nav.menu > ul > li.submenu.active > a {
+    background: rgba(105, 25, 50, 0.08);
+    color: var(--menu-primario);
+}
+
+/* Iconos */
+nav.menu .fas,
+nav.menu .fa {
+    color: var(--menu-dorado);
+    font-size: 0.85rem;
+    width: 16px;
+    text-align: center;
+}
+
+/* Flecha submenú */
+.submenu > a::after {
+    content: '▾';
+    font-size: 0.7rem;
+    margin-left: auto;
+    opacity: 0.6;
+    transition: transform 0.2s ease;
+    transform: rotate(0deg);
+}
+
+.submenu.active > a::after {
+    transform: rotate(180deg);
+}
+
+/* ==================== */
+/* ACORDEÓN SUBMENÚ       */
 /* ==================== */
 .submenu-list {
     display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 190px;
-    background: #320d1c;
-    border-top: 2px solid var(--menu-dorado);
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    z-index: 10001;
-    max-height: 420px;
+    position: static;
+    width: 100%;
+    min-width: 0;
+    max-height: none;
+    background: rgba(105, 25, 50, 0.03);
+    border-radius: 8px;
+    box-shadow: none;
     overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--menu-dorado) transparent;
+    margin-top: 2px;
     padding: 0.3rem 0;
     animation: dropDown 0.2s ease;
 }
@@ -168,15 +252,15 @@ nav.menu .fa {
 .submenu-list li {
     display: block !important;
     width: 100% !important;
+    margin-bottom: 0;
 }
 
 .submenu-list li a {
-    color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 0.8rem !important;
-    padding: 0.55rem 1.1rem !important;
+    color: #555 !important;
+    font-size: 0.78rem !important;
+    padding: 0.55rem 1.1rem 0.55rem 2.6rem !important;
     display: block !important;
     height: auto !important;
-    border-bottom: none !important;
     border-left: 3px solid transparent;
     border-radius: 0 !important;
     background: transparent !important;
@@ -186,17 +270,17 @@ nav.menu .fa {
 }
 
 .submenu-list li a:hover {
-    background: rgba(255, 255, 255, 0.07) !important;
+    background: rgba(105, 25, 50, 0.06) !important;
     border-left-color: var(--menu-dorado) !important;
-    color: #fff !important;
+    color: var(--menu-primario) !important;
 }
 
 /* Buscador de estados */
 .search-item {
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.8rem;
     position: sticky;
     top: 0;
-    background: #320d1c;
+    background: #fdfaf5;
     z-index: 10;
     border-bottom: 1px solid rgba(165, 133, 46, 0.2);
     margin-bottom: 0.2rem;
@@ -207,124 +291,128 @@ nav.menu .fa {
     padding: 6px 10px;
     border: 1px solid rgba(165, 133, 46, 0.35);
     border-radius: 5px;
-    background: rgba(0, 0, 0, 0.3);
-    color: white;
+    background: #fff;
+    color: #333;
     font-size: 0.78rem;
     outline: none;
     box-sizing: border-box;
 }
 
-.menu-search::placeholder { color: rgba(255,255,255,0.4); }
+.menu-search::placeholder { color: #999; }
 .menu-search:focus { border-color: var(--menu-dorado); }
 
-/* Botón regresar en el nav */
+/* Botón regresar (insertado por JS al inicio del sidebar) */
 .nav-back-link {
-    color: rgba(255, 255, 255, 0.85) !important;
-    border-right: 1px solid rgba(165, 133, 46, 0.3);
-    padding-right: 1.2rem !important;
-    gap: 6px;
+    color: var(--menu-primario) !important;
 }
 
 .nav-back-link:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    color: #fff !important;
-    border-bottom-color: var(--menu-dorado) !important;
-}
-
-.nav-back-link .fas {
-    color: var(--menu-dorado);
-    font-size: 0.75rem;
+    background: rgba(105, 25, 50, 0.08) !important;
 }
 
 /* Ocultar botón físico regresar (reemplazado por el nav) */
 .regresar-btn { display: none !important; }
 
-/* Animación dropdown */
+/* ==================== */
+/* USUARIO + FOOTER (sidebar) */
+/* ==================== */
+.sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    color: #555;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.sidebar-user .fas {
+    color: var(--menu-dorado);
+    font-size: 1rem;
+}
+
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 12px 10px;
+    padding: 8px 12px !important;
+    color: #555 !important;
+    font-size: 0.8rem !important;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-logout:hover {
+    background: rgba(220, 50, 50, 0.08) !important;
+    color: #c0392b !important;
+}
+
+.sidebar-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(to right, #6b1e3f, #320d1c);
+    border-top: 3px solid var(--menu-dorado);
+    flex-shrink: 0;
+}
+
+.sidebar-footer .fas {
+    color: var(--menu-dorado);
+    font-size: 1.5rem;
+}
+
+.sidebar-footer div {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.sidebar-footer strong {
+    color: #fff;
+    font-size: 0.68rem;
+    letter-spacing: 0.2px;
+}
+
+.sidebar-footer span {
+    color: var(--menu-dorado);
+    font-size: 0.62rem;
+}
+
+/* Animación acordeón */
 @keyframes dropDown {
     from { opacity: 0; transform: translateY(-6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Botón hamburguesa (solo visible en móvil) */
-.nav-hamburger {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 100%;
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    flex-shrink: 0;
+/* ==================== */
+/* DESPLAZAMIENTO GLOBAL  */
+/* ==================== */
+body {
+    padding-top: var(--menu-topbar-h) !important;
 }
 
-/* Responsive — colapsar la barra en un panel vertical con hamburguesa */
 @media (max-width: 768px) {
+    /* En movil el usuario/logout solo viven dentro del sidebar (ya visibles
+       al abrirlo); en la topbar angosta no caben junto al hamburguesa+marca. */
+    .topbar-user {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) {
     .nav-hamburger {
-        display: flex;
-    }
-
-    nav.menu > ul {
-        display: none;
-        flex-direction: column;
-        align-items: stretch;
-        position: fixed;
-        top: 46px;
-        left: 0;
-        width: 100%;
-        height: auto;
-        max-height: calc(100vh - 46px);
-        overflow-y: auto;
-        background: #320d1c;
-        padding: 0;
-    }
-
-    nav.menu.mobile-open > ul {
-        display: flex;
-    }
-
-    nav.menu ul li {
-        width: 100%;
-    }
-
-    /* En desktop el <li> es una fila (icono+texto), pero cuando ademas
-       contiene el <ul class="submenu-list"> (acordeon) hay que apilarlos
-       verticalmente en vez de ponerlos lado a lado. */
-    nav.menu ul li.submenu {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    nav.menu > ul > li > a {
-        width: 100%;
-        height: auto;
-        padding: 0.9rem 1.2rem;
-        border-bottom: 1px solid rgba(165, 133, 46, 0.15);
-    }
-
-    nav.menu ul li.nav-spacer {
         display: none;
     }
 
-    .nav-user {
-        width: 100%;
-        height: auto;
-        padding: 0.9rem 1.2rem;
-        border-left: none;
-        border-right: none;
-        border-bottom: 1px solid rgba(165, 133, 46, 0.15);
+    nav.menu {
+        transform: translateX(0);
     }
 
-    /* El submenú se acomoda en acordeón dentro de la columna, no como panel flotante */
-    .submenu-list {
-        position: static;
-        min-width: 0;
-        width: 100%;
-        max-height: none;
-        border-radius: 0;
-        box-shadow: none;
-        background: rgba(0, 0, 0, 0.25);
+    body {
+        padding-left: var(--menu-sidebar-w) !important;
     }
 }

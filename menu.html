@@ -1,8 +1,30 @@
-<!-- menu.html - BARRA DE NAVEGACIÓN SUPERIOR -->
-<nav class="menu">
+<!-- menu.html - BARRA SUPERIOR + SIDEBAR -->
+<div class="topbar">
     <button class="nav-hamburger" id="navHamburger" aria-label="Abrir menú" aria-expanded="false">
         <i class="fas fa-bars"></i>
     </button>
+    <a href="index.html" class="topbar-brand">
+        <i class="fas fa-shield-alt"></i>
+        <span>Control Operativo</span>
+    </a>
+    <div class="topbar-user">
+        <span class="nav-user">
+            <i class="fas fa-user-circle"></i>
+            <span class="nav-username">—</span>
+        </span>
+        <a href="#" class="logout-link"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </div>
+</div>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<nav class="menu">
+    <div class="sidebar-header">
+        <img class="sidebar-logo" src="imagenes/gobernacion.jpg" alt="Gobernación">
+    </div>
+
+    <hr class="sidebar-divider">
+
     <ul>
         <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
 
@@ -63,12 +85,21 @@
                 <li><a href="estados/zacatecas/zacatecasindex.html">Zacatecas</a></li>
             </ul>
         </li>
-
-        <li class="nav-spacer"></li>
-        <li class="nav-user">
-            <i class="fas fa-user-circle"></i>
-            <span class="nav-username">—</span>
-        </li>
-        <li><a href="#" class="logout-link"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
     </ul>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-user">
+        <i class="fas fa-user-circle"></i>
+        <span class="nav-username">—</span>
+    </div>
+    <a href="#" class="logout-link sidebar-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+
+    <div class="sidebar-footer">
+        <i class="fas fa-landmark"></i>
+        <div>
+            <strong>Instituto Nacional de Migración</strong>
+            <span>Dirección de Control Operativo</span>
+        </div>
+    </div>
 </nav>
