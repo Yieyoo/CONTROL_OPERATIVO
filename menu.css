@@ -60,52 +60,10 @@
     font-size: 1.05rem;
 }
 
-.topbar-user {
-    display: flex;
-    align-items: stretch;
-    margin-left: auto;
-}
-
-/* Usuario activo */
-.nav-user {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 0.8rem 0 1rem;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 0.78rem;
-    border-left: 1px solid rgba(165, 133, 46, 0.25);
-    height: 100%;
-    white-space: nowrap;
-}
-
-.nav-user .fas {
-    font-size: 1rem;
-    color: var(--menu-dorado);
-}
-
 .nav-username {
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--menu-primario);
     letter-spacing: 0.3px;
-}
-
-/* Cerrar Sesión (topbar) */
-.topbar .logout-link {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: rgba(255, 255, 255, 0.75) !important;
-    font-size: 0.8rem !important;
-    padding: 0 1rem !important;
-    text-decoration: none;
-    border-left: 1px solid rgba(165, 133, 46, 0.25);
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.topbar .logout-link:hover {
-    color: #fff !important;
-    background: rgba(220, 50, 50, 0.15) !important;
 }
 
 /* ==================== */
@@ -395,11 +353,4 @@ body {
     padding-top: var(--menu-topbar-h) !important;
 }
 
-@media (max-width: 768px) {
-    /* En movil el usuario/logout solo viven dentro del sidebar (ya visibles
-       al abrirlo); en la topbar angosta no caben junto al hamburguesa+marca. */
-    .topbar-user {
-        display: none;
-    }
-}
 
