@@ -350,16 +350,8 @@ class MenuLoader {
     static setupBackButton() {
         if (this.getDepth() === 0) return;
 
-        const ul = document.querySelector('nav.menu > ul');
-        if (ul) {
-            const li = document.createElement('li');
-            li.className = 'nav-back';
-            li.innerHTML = '<a href="#" class="nav-back-link"><i class="fas fa-arrow-left"></i> Regresar</a>';
-            ul.insertBefore(li, ul.firstChild);
-            li.querySelector('a').addEventListener('click', (e) => this.goBack(e));
-        }
-
         // En páginas internas, la marca de la topbar se convierte en el botón de regresar
+        // (ya no se duplica dentro del sidebar, con el de la topbar basta)
         const brand = document.getElementById('topbarBrand');
         if (brand) {
             brand.innerHTML = '<i class="fas fa-arrow-left"></i><span>Regresar</span>';
