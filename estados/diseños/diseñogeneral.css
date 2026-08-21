@@ -430,9 +430,16 @@
     .inst-logo-block { padding: 0 10px 0 0; }
     .inst-logo { height: 36px; }
     .inst-title-block { padding: 0; }
-    .instituto-info h1 { font-size: 0.76rem; white-space: normal; }
+    /* El nombre del estado es lo principal de esta pagina - va grande;
+       "INSTITUTO NACIONAL DE MIGRACION" queda como referencia chica. */
+    .instituto-info h1 { font-size: 0.62rem; white-space: normal; order: 2; }
     .inst-subtitle { display: none; }
-    .estado-badge { font-size: 0.58rem; padding: 2px 8px; letter-spacing: 2px; }
+    .estado-badge {
+      font-size: 1.5rem;
+      padding: 0;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
     .inst-date-block { padding-left: 0; width: 100%; }
     .instituto-info .fecha-actual { font-size: 0.73rem; }
 
