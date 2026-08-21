@@ -166,8 +166,8 @@ nav.menu .fa {
 }
 
 .submenu-list li {
-    display: block;
-    width: 100%;
+    display: block !important;
+    width: 100% !important;
 }
 
 .submenu-list li a {
