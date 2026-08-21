@@ -6,6 +6,13 @@
     <title>Organigrama</title>
     <link rel="icon" type="image/png" href="../../../imagenes/organigrama.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
+    <style>
+        /* El boton de alternar documento con top fijo (100px) tapaba el
+           titulo en celular, donde el titulo empieza mas abajo. */
+        @media (max-width: 768px) {
+            #toggle-doc-btn { top: 150px !important; }
+        }
+    </style>
     <script src="../../../js/auth.js" defer></script>   
     <script src="../../../js/sload-menu.js" defer></script>
 </head>

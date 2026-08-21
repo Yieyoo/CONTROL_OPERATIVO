@@ -339,7 +339,9 @@
   @media screen and (max-width: 768px) {
     /* Estilos generales */
     body {
-      padding: 10px;
+      /* padding-top >= altura de la barra fija (46px), si no el
+         encabezado institucional queda tapado detras de ella */
+      padding: 56px 10px 10px;
       overflow-x: hidden;
     }
     
@@ -416,7 +418,10 @@
     
     /* Header institucional responsive */
     .instituto-info {
-      padding: 14px 14px 14px 68px;
+      /* Sin reserva de espacio a la izquierda: esta pagina usa la barra
+         superior compartida (con su propio boton hamburguesa), no un
+         boton de menu flotante en la esquina. */
+      padding: 14px;
       min-height: auto;
       flex-wrap: wrap;
       gap: 8px;
