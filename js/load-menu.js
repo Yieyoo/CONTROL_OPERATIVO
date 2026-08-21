@@ -388,6 +388,15 @@ class MenuLoader {
 
     static closeMenu() {
         this.closeAllSubmenus();
+        const nav = document.querySelector('nav.menu');
+        const btn = document.getElementById('navHamburger');
+        const overlay = document.getElementById('menuOverlay');
+        if (nav) nav.classList.remove('mobile-open');
+        if (overlay) overlay.classList.remove('active');
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
     }
 
     static closeAllSubmenus() {
@@ -428,6 +437,13 @@ if (document.readyState === 'loading') {
 } else {
     MenuLoader.loadMenu();
 }
+
+// El sidebar siempre debe arrancar cerrado: cubre tanto la carga normal
+// como cuando el navegador restaura la página desde el bfcache (back/forward),
+// que de otro modo conservaría la clase mobile-open tal como quedó antes de navegar.
+window.addEventListener('pageshow', () => {
+    MenuLoader.closeMenu();
+});
 
 window.toggleMenu = function() {
     const menu = document.querySelector('.menu');
