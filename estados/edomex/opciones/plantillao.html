@@ -24,18 +24,13 @@
             z-index: 1000;
         }
 
-        /* Botones fijos: descargar + alternar documento */
+        /* Botones: descargar + alternar documento (en flujo normal, se desplazan con la pagina) */
         #doc-actions-fixed {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            z-index: 1000;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-            will-change: transform;
+            margin: 14px auto 0;
         }
 
         #download-doc-btn {
@@ -79,11 +74,6 @@
                 padding: 3px 6px;
             }
 
-            #doc-actions-fixed {
-                top: 152px;
-                right: 10px;
-                gap: 6px;
-            }
             #download-doc-btn {
                 width: 34px;
                 height: 34px;
@@ -92,7 +82,6 @@
                 padding: 8px 12px;
                 font-size: 12px;
             }
-            .pdf-container { margin-top: 52px !important; }
         }
     </style>
 </head>
@@ -104,17 +93,16 @@
     </div>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
 
-    <!-- Botones fijos: descargar + alternar documentos -->
+    <!-- Contenedor para el título personalizado -->
+    <div id="tituloContainer" class="titulo-personalizado">
+        Cargando título...
+    </div>
+
     <div id="doc-actions-fixed">
         <a id="download-doc-btn" href="#" download title="Descargar documento">
             <i class="fas fa-download"></i>
         </a>
         <button id="toggle-doc-btn">Mostrar Plantilla Eventual</button>
-    </div>
-
-    <!-- Contenedor para el título personalizado -->
-    <div id="tituloContainer" class="titulo-personalizado">
-        Cargando título...
     </div>
     
     <div class="loading" id="loading">
