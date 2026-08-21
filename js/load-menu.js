@@ -112,6 +112,7 @@ class MenuLoader {
         this.setupSubmenus();
         this.setupSearchFilter();
         this.setupLogout();
+        this.setupHamburger();
         this.enhanceDocumentPages();
         this.updateStateHeader();
         this.loadUsername();
@@ -295,6 +296,38 @@ class MenuLoader {
                     }
                 }, 100);
             });
+        });
+    }
+
+    static setupHamburger() {
+        const btn = document.getElementById('navHamburger');
+        const nav = document.querySelector('nav.menu');
+        if (!btn || !nav) return;
+
+        const closeMobileMenu = () => {
+            nav.classList.remove('mobile-open');
+            btn.setAttribute('aria-expanded', 'false');
+            btn.innerHTML = '<i class="fas fa-bars"></i>';
+        };
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = nav.classList.toggle('mobile-open');
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            btn.innerHTML = isOpen ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            if (!isOpen) this.closeAllSubmenus();
+        });
+
+        // Cerrar el panel móvil al navegar (pero no al abrir/cerrar un submenú)
+        document.querySelectorAll('.menu a').forEach(link => {
+            if (link.parentElement.classList.contains('submenu')) return;
+            link.addEventListener('click', closeMobileMenu);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (nav.classList.contains('mobile-open') && !e.target.closest('nav.menu')) {
+                closeMobileMenu();
+            }
         });
     }
 

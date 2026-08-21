@@ -245,10 +245,86 @@ nav.menu .fa {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive — ocultar texto, dejar solo iconos */
+/* Botón hamburguesa (solo visible en móvil) */
+.nav-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Responsive — colapsar la barra en un panel vertical con hamburguesa */
 @media (max-width: 768px) {
+    .nav-hamburger {
+        display: flex;
+    }
+
+    nav.menu > ul {
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        position: fixed;
+        top: 46px;
+        left: 0;
+        width: 100%;
+        height: auto;
+        max-height: calc(100vh - 46px);
+        overflow-y: auto;
+        background: #320d1c;
+        padding: 0;
+    }
+
+    nav.menu.mobile-open > ul {
+        display: flex;
+    }
+
+    nav.menu ul li {
+        width: 100%;
+    }
+
+    /* En desktop el <li> es una fila (icono+texto), pero cuando ademas
+       contiene el <ul class="submenu-list"> (acordeon) hay que apilarlos
+       verticalmente en vez de ponerlos lado a lado. */
+    nav.menu ul li.submenu {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     nav.menu > ul > li > a {
-        padding: 0 0.7rem;
-        font-size: 0.75rem;
+        width: 100%;
+        height: auto;
+        padding: 0.9rem 1.2rem;
+        border-bottom: 1px solid rgba(165, 133, 46, 0.15);
+    }
+
+    nav.menu ul li.nav-spacer {
+        display: none;
+    }
+
+    .nav-user {
+        width: 100%;
+        height: auto;
+        padding: 0.9rem 1.2rem;
+        border-left: none;
+        border-right: none;
+        border-bottom: 1px solid rgba(165, 133, 46, 0.15);
+    }
+
+    /* El submenú se acomoda en acordeón dentro de la columna, no como panel flotante */
+    .submenu-list {
+        position: static;
+        min-width: 0;
+        width: 100%;
+        max-height: none;
+        border-radius: 0;
+        box-shadow: none;
+        background: rgba(0, 0, 0, 0.25);
     }
 }
