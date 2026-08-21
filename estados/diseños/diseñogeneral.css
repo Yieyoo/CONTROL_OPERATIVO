@@ -339,9 +339,10 @@
   @media screen and (max-width: 768px) {
     /* Estilos generales */
     body {
-      /* padding-top >= altura de la barra fija (46px), si no el
-         encabezado institucional queda tapado detras de ella */
-      padding: 56px 10px 10px;
+      /* padding-top = altura exacta de la barra fija (46px, borde
+         incluido) - si es menor el encabezado queda tapado, si es mayor
+         se ve una franja del fondo entre la barra y la tarjeta blanca */
+      padding: 46px 10px 10px;
       overflow-x: hidden;
     }
     
@@ -452,6 +453,7 @@
     .inst-date-block {
       padding-left: 0;
       width: 100%;
+      justify-content: center;
       border-top: 1px solid rgba(165, 133, 46, 0.4);
       margin-top: 4px;
       padding-top: 10px;
