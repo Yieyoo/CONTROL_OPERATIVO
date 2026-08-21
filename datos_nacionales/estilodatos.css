@@ -295,9 +295,8 @@ header { display: none; }
     justify-content: center;
     text-align: center;
     padding: 1rem 2rem 0.8rem;
-    width: 100vw;
+    width: 100%;
     position: relative;
-    margin-left: calc(-50vw + 50%);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border-bottom: 3px solid #A5852E;
     gap: 2px;

@@ -68,7 +68,7 @@ class MenuLoader {
     }
 
     static cleanExistingMenu() {
-        document.querySelectorAll('.menu, .menu-overlay, .menu-toggle').forEach(el => el.remove());
+        document.querySelectorAll('.menu, .menu-overlay, .menu-toggle, .topbar').forEach(el => el.remove());
     }
 
     static enhanceDocumentPages() {
@@ -121,16 +121,16 @@ class MenuLoader {
     }
 
     static fixMenuLinks() {
-        const allLinks = document.querySelectorAll('.menu a[href]');
+        const allLinks = document.querySelectorAll('.topbar a[href], .menu a[href]');
         console.log(`🔗 Corrigiendo ${allLinks.length} enlaces del menú`);
 
         const depth = this.getDepth();
         const prefix = depth === 0 ? '' : '../'.repeat(depth);
 
-        // Corregir ruta del logo en el encabezado del menú
-        const menuLogo = document.querySelector('.menu-logo');
-        if (menuLogo && prefix) {
-            menuLogo.setAttribute('src', prefix + 'imagenes/inm logo.png');
+        // Corregir ruta del logo en el encabezado del sidebar
+        const sidebarLogo = document.querySelector('.sidebar-logo');
+        if (sidebarLogo && prefix) {
+            sidebarLogo.setAttribute('src', prefix + 'imagenes/gobernacion.jpg');
         }
 
         allLinks.forEach(link => {
@@ -215,7 +215,7 @@ class MenuLoader {
 
     static markActiveLink() {
         const currentURL = window.location.href.split('?')[0].split('#')[0];
-        document.querySelectorAll('.menu a[href]').forEach(link => {
+        document.querySelectorAll('.topbar a[href], .menu a[href]').forEach(link => {
             const linkURL = link.href.split('?')[0].split('#')[0];
             if (linkURL && linkURL === currentURL) {
                 link.classList.add('active');
@@ -302,10 +302,12 @@ class MenuLoader {
     static setupHamburger() {
         const btn = document.getElementById('navHamburger');
         const nav = document.querySelector('nav.menu');
+        const overlay = document.getElementById('menuOverlay');
         if (!btn || !nav) return;
 
         const closeMobileMenu = () => {
             nav.classList.remove('mobile-open');
+            if (overlay) overlay.classList.remove('active');
             btn.setAttribute('aria-expanded', 'false');
             btn.innerHTML = '<i class="fas fa-bars"></i>';
         };
@@ -313,10 +315,15 @@ class MenuLoader {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOpen = nav.classList.toggle('mobile-open');
+            if (overlay) overlay.classList.toggle('active', isOpen);
             btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             btn.innerHTML = isOpen ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             if (!isOpen) this.closeAllSubmenus();
         });
+
+        if (overlay) {
+            overlay.addEventListener('click', closeMobileMenu);
+        }
 
         // Cerrar el panel móvil al navegar (pero no al abrir/cerrar un submenú)
         document.querySelectorAll('.menu a').forEach(link => {
@@ -364,8 +371,9 @@ class MenuLoader {
     static loadUsername() {
         const username = localStorage.getItem('username');
         if (username) {
-            const el = document.querySelector('.nav-username');
-            if (el) el.textContent = username;
+            document.querySelectorAll('.nav-username').forEach(el => {
+                el.textContent = username;
+            });
         }
     }
 
