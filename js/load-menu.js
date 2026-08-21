@@ -338,25 +338,34 @@ class MenuLoader {
         });
     }
 
+    static goBack(e) {
+        e.preventDefault();
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = '/index.html';
+        }
+    }
+
     static setupBackButton() {
         if (this.getDepth() === 0) return;
 
         const ul = document.querySelector('nav.menu > ul');
-        if (!ul) return;
+        if (ul) {
+            const li = document.createElement('li');
+            li.className = 'nav-back';
+            li.innerHTML = '<a href="#" class="nav-back-link"><i class="fas fa-arrow-left"></i> Regresar</a>';
+            ul.insertBefore(li, ul.firstChild);
+            li.querySelector('a').addEventListener('click', (e) => this.goBack(e));
+        }
 
-        const li = document.createElement('li');
-        li.className = 'nav-back';
-        li.innerHTML = '<a href="#" class="nav-back-link"><i class="fas fa-arrow-left"></i> Regresar</a>';
-        ul.insertBefore(li, ul.firstChild);
-
-        li.querySelector('a').addEventListener('click', (e) => {
-            e.preventDefault();
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = '/index.html';
-            }
-        });
+        // En páginas internas, la marca de la topbar se convierte en el botón de regresar
+        const brand = document.getElementById('topbarBrand');
+        if (brand) {
+            brand.innerHTML = '<i class="fas fa-arrow-left"></i><span>Regresar</span>';
+            brand.href = '#';
+            brand.addEventListener('click', (e) => this.goBack(e));
+        }
 
         // Ocultar botones regresar físicos en el HTML
         document.querySelectorAll('.regresar-btn').forEach(btn => btn.style.display = 'none');
