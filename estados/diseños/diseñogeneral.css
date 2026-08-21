@@ -426,10 +426,19 @@
       flex-wrap: wrap;
       gap: 8px;
     }
+    /* Solo se muestra la separadora entre el logo y el nombre del estado;
+       la que va entre el nombre y la fecha se reemplaza por la linea
+       dorada horizontal de .inst-date-block, mas abajo. */
     .inst-sep { display: none; }
-    .inst-logo-block { padding: 0 10px 0 0; }
+    .inst-logo-block + .inst-sep {
+      display: block;
+      width: 1px;
+      height: 34px;
+      background: var(--color-secundario);
+    }
+    .inst-logo-block { padding: 0 12px 0 0; }
     .inst-logo { height: 36px; }
-    .inst-title-block { padding: 0; }
+    .inst-title-block { padding: 0 0 0 12px; }
     /* El nombre del estado es lo principal de esta pagina - va grande;
        "INSTITUTO NACIONAL DE MIGRACION" queda como referencia chica. */
     .instituto-info h1 { font-size: 0.62rem; white-space: normal; order: 2; }
@@ -440,7 +449,13 @@
       letter-spacing: 0.5px;
       line-height: 1.1;
     }
-    .inst-date-block { padding-left: 0; width: 100%; }
+    .inst-date-block {
+      padding-left: 0;
+      width: 100%;
+      border-top: 1px solid rgba(165, 133, 46, 0.4);
+      margin-top: 4px;
+      padding-top: 10px;
+    }
     .instituto-info .fecha-actual { font-size: 0.73rem; }
 
     /* Botón regresar */
