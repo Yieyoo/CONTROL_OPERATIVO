@@ -849,28 +849,46 @@ const uploadRawBuffer = (buffer, options) => {
 // orden fijo), porque distintas versiones del Excel nacional han traido
 // columnas de mas (ej. CURP) que corren todo lo que sigue.
 const REGISTRO_COLUMNAS = [
-  { header: 'NO.', key: 'no', pdfWidth: 28, pdfAlign: 'center' },
-  { header: 'STATUS', key: 'status', pdfWidth: 55, pdfAlign: 'center' },
-  { header: 'TIPO DE PLAZA', key: 'tipo_plaza', pdfWidth: 70, pdfAlign: 'center' },
-  { header: 'ADSCRIPCION', key: 'adscripcion', pdfWidth: 110, pdfAlign: 'left' },
-  { header: 'CODIGO-PLAZA NUEVO', key: 'codigo_plaza', pdfWidth: 90, pdfAlign: 'center' },
-  { header: 'NIVEL ACTUAL', key: 'nivel_actual', pdfWidth: 55, pdfAlign: 'center' },
-  { header: 'NUM EMP', key: 'num_emp', pdfWidth: 55, pdfAlign: 'center' },
-  { header: 'NOMBRE', key: 'nombre', pdfWidth: 160, pdfAlign: 'left' },
-  { header: 'CURP', key: 'curp', pdfWidth: 100, pdfAlign: 'center' },
-  { header: 'TIPO DE MOVIMIENTO', key: 'tipo_movimiento', pdfWidth: 75, pdfAlign: 'center' },
-  { header: 'FECHA DE ING. INM', key: 'fecha_ing_inm', pdfWidth: 62, pdfAlign: 'center' },
-  { header: 'FECHA DE ING A LA PLAZA', key: 'fecha_ing_plaza', pdfWidth: 62, pdfAlign: 'center' },
-  { header: 'VIG. DE INICIO MOV.', key: 'vig_inicio_mov', pdfWidth: 62, pdfAlign: 'center' },
-  { header: 'VIG. DE TERMINO MOV.', key: 'vig_termino_mov', pdfWidth: 62, pdfAlign: 'center' },
-  { header: 'PUESTO ESPECIFICO', key: 'puesto_especifico', pdfWidth: 220, pdfAlign: 'left' },
+  { header: 'NO.', key: 'no', pdfAlign: 'center' },
+  { header: 'STATUS', key: 'status', pdfAlign: 'center' },
+  { header: 'TIPO DE PLAZA', key: 'tipo_plaza', pdfAlign: 'center' },
+  { header: 'ADSCRIPCION', key: 'adscripcion', pdfAlign: 'left' },
+  { header: 'CODIGO-PLAZA NUEVO', key: 'codigo_plaza', pdfAlign: 'center' },
+  { header: 'NIVEL ACTUAL', key: 'nivel_actual', pdfAlign: 'center' },
+  { header: 'NUM EMP', key: 'num_emp', pdfAlign: 'center' },
+  { header: 'NOMBRE', key: 'nombre', pdfAlign: 'left' },
+  { header: 'CURP', key: 'curp', pdfAlign: 'center' },
+  { header: 'TIPO DE MOVIMIENTO', key: 'tipo_movimiento', pdfAlign: 'center' },
+  { header: 'FECHA DE ING. INM', key: 'fecha_ing_inm', pdfAlign: 'center' },
+  { header: 'FECHA DE ING A LA PLAZA', key: 'fecha_ing_plaza', pdfAlign: 'center' },
+  { header: 'VIG. DE INICIO MOV.', key: 'vig_inicio_mov', pdfAlign: 'center' },
+  { header: 'VIG. DE TERMINO MOV.', key: 'vig_termino_mov', pdfAlign: 'center' },
+  { header: 'PUESTO ESPECIFICO', key: 'puesto_especifico', pdfAlign: 'left' },
   // Datos sensibles: se ocultan (no se borran) en el .xlsx y se omiten
   // por completo de la vista previa en PDF.
-  { header: 'SUELDO BRUTO', key: 'sueldo_bruto', pdfWidth: 70, pdfAlign: 'right', sensible: true },
-  { header: 'SUELDO NETO', key: 'sueldo_neto', pdfWidth: 70, pdfAlign: 'right', sensible: true }
+  { header: 'SUELDO BRUTO', key: 'sueldo_bruto', pdfAlign: 'right', sensible: true },
+  { header: 'SUELDO NETO', key: 'sueldo_neto', pdfAlign: 'right', sensible: true }
 ];
 
+// Ancho de columna del PDF = ancho real de esa columna en el Excel fuente
+// (unidades de caracter de Excel) por esta escala, para que las
+// proporciones entre columnas sean las mismas que en el archivo original.
+const ESCALA_ANCHO_PDF = 4.4;
+const ANCHO_PDF_MINIMO = 24;
+
 const normalizarHeader = (valor) => String(valor || '').toUpperCase().replace(/\s+/g, ' ').trim();
+
+// Tipografia real de la plantilla (Montserrat, licencia OFL de Google
+// Fonts) para que el PDF use la misma fuente que el Excel en vez de una
+// generica - se cargan una sola vez al iniciar el servidor.
+let FUENTE_MONTSERRAT = null;
+let FUENTE_MONTSERRAT_BOLD = null;
+try {
+  FUENTE_MONTSERRAT = fs.readFileSync(path.join(__dirname, 'fonts', 'Montserrat-Regular.ttf'));
+  FUENTE_MONTSERRAT_BOLD = fs.readFileSync(path.join(__dirname, 'fonts', 'Montserrat-Bold.ttf'));
+} catch (e) {
+  console.error('No se pudieron cargar las fuentes Montserrat, se usara Helvetica:', e.message);
+}
 
 // ExcelJS no conserva bien el tamaño/recorte de imagenes embebidas al
 // releer y volver a guardar un .xlsx (las deja en 0x0, invisibles) - se
@@ -931,6 +949,11 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, 
   const chunks = [];
   doc.on('data', (c) => chunks.push(c));
 
+  if (FUENTE_MONTSERRAT) doc.registerFont('Montserrat', FUENTE_MONTSERRAT);
+  if (FUENTE_MONTSERRAT_BOLD) doc.registerFont('Montserrat-Bold', FUENTE_MONTSERRAT_BOLD);
+  const fRegular = FUENTE_MONTSERRAT ? 'Montserrat' : 'Helvetica';
+  const fBold = FUENTE_MONTSERRAT_BOLD ? 'Montserrat-Bold' : 'Helvetica-Bold';
+
   if (logo && logo.buffer) {
     try {
       // Mismo logo del membrete original; pdfkit calcula el alto solo,
@@ -939,17 +962,19 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, 
     } catch (e) { /* si el logo no se puede dibujar, se sigue sin el */ }
   }
 
-  doc.fontSize(11).font('Helvetica-Bold').text('INSTITUTO NACIONAL DE MIGRACION', margin, margin, { width: tableWidth, align: 'center' });
-  doc.fontSize(9).font('Helvetica').text('DIRECCION GENERAL DE ADMINISTRACION', { width: tableWidth, align: 'center' });
-  doc.text('DIRECCION DE ADMINISTRACION DE PERSONAL', { width: tableWidth, align: 'center' });
+  // El membrete institucional en el Excel original va alineado a la
+  // derecha (fuente Calibri, no redistribuible - se usa Helvetica).
+  doc.fontSize(11).font('Helvetica').text('INSTITUTO NACIONAL DE MIGRACION', margin, margin, { width: tableWidth, align: 'right' });
+  doc.fontSize(11).font('Helvetica').text('DIRECCION GENERAL DE ADMINISTRACION', { width: tableWidth, align: 'right' });
+  doc.text('DIRECCION DE ADMINISTRACION DE PERSONAL', { width: tableWidth, align: 'right' });
   doc.moveDown(0.5);
-  doc.fontSize(14).font('Helvetica-Bold').fillColor('#691932').text(`PLANTILLA OR ${nombreEstado}`, { width: tableWidth, align: 'center' });
-  doc.fontSize(10).font('Helvetica').fillColor('#000').text(`Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`, { width: tableWidth, align: 'center' });
+  doc.fontSize(17).font(fBold).fillColor('#691932').text(`PLANTILLA OR ${nombreEstado}`, { width: tableWidth, align: 'center' });
+  doc.fontSize(13).font(fRegular).fillColor('#000').text(`Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`, { width: tableWidth, align: 'center' });
 
   let y = margin + topBlockHeight;
   let x = margin;
 
-  doc.fontSize(6.5).font('Helvetica-Bold');
+  doc.fontSize(6.5).font(fBold);
   columnas.forEach(col => {
     doc.rect(x, y, col.width, headerRowHeight).fillAndStroke('#D4C19C', '#999');
     doc.fillColor('#56242A').text(col.label, x + 2, y + 4, { width: col.width - 4, height: headerRowHeight - 4, align: 'center' });
@@ -957,7 +982,7 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, 
   });
 
   y += headerRowHeight;
-  doc.font('Helvetica').fontSize(6.5);
+  doc.font(fRegular).fontSize(6.5);
 
   registros.forEach((registro, i) => {
     x = margin;
@@ -965,7 +990,7 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, 
     columnas.forEach(col => {
       doc.rect(x, y, col.width, rowHeight).fillAndStroke(bg, '#ccc');
       const texto = formatCeldaPdf(col.key, registro[col.key]);
-      doc.fillColor('#222').text(texto, x + 2, y + 5, {
+      doc.font(fRegular).fillColor('#222').text(texto, x + 2, y + 5, {
         width: col.width - 4,
         height: rowHeight - 4,
         align: col.align,
@@ -1044,7 +1069,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
         }
         const conocida = REGISTRO_COLUMNAS.find(r => r.header === headerNorm);
         columnasDetectadas.push(conocida ? { ...conocida, index: c } : {
-          header: headerNorm, key: `col_${c}`, pdfWidth: 80, pdfAlign: 'left', index: c
+          header: headerNorm, key: `col_${c}`, pdfAlign: 'left', index: c
         });
       }
 
@@ -1062,10 +1087,19 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
       // version de la plantilla (la celda esta fusionada hasta la Q).
       const anclaTitulo = !celdaVacia(hojaInspeccion.getCell('A5').value) ? 'A' : 'B';
 
-      // Columnas que se muestran en la vista previa PDF (todas menos las sensibles)
+      // Columnas que se muestran en la vista previa PDF (todas menos las
+      // sensibles), con el mismo ancho relativo que tienen en el Excel real.
       const columnasPdf = columnasDetectadas
         .filter(col => !col.sensible)
-        .map(col => ({ key: col.key, label: col.header, width: col.pdfWidth, align: col.pdfAlign }));
+        .map(col => {
+          const anchoExcel = hojaInspeccion.getColumn(col.index).width || 10;
+          return {
+            key: col.key,
+            label: col.header,
+            width: Math.max(ANCHO_PDF_MINIMO, Math.round(anchoExcel * ESCALA_ANCHO_PDF)),
+            align: col.pdfAlign
+          };
+        });
 
       // Logo del membrete original, para que la vista previa en PDF se
       // parezca al Excel real (mismo logo en todos los estados).
