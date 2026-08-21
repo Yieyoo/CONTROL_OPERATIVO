@@ -204,7 +204,7 @@
                                 <h3>${ultimo.filename || 'Plantilla de Personal'}</h3>
                                 <p>Actualizado: ${formatDate(ultimo.uploaded_at)}</p>
                                 <p>Tamaño: ${(ultimo.size / (1024*1024)).toFixed(2)} MB</p>
-                                <a href="${ultimo.download_url || ultimo.url}" class="download-btn" download>
+                                <a href="${ultimo.download_url || ultimo.url}" class="download-btn" download="${ultimo.filename || 'documento'}">
                                     Descargar Documento
                                 </a>
                             </div>

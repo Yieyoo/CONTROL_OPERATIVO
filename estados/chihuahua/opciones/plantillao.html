@@ -331,7 +331,7 @@
                         <p>Actualizado: ${formatDate(documento.uploaded_at)}</p>
                         <p>Tamaño: ${(documento.size / (1024*1024)).toFixed(2)} MB</p>
                         <p><em>${tipoTexto}</em></p>
-                        <a href="${documento.download_url || documento.url}" class="download-btn" download>
+                        <a href="${documento.download_url || documento.url}" class="download-btn" download="${documento.filename || 'documento'}">
                             Descargar Documento
                         </a>
                     </div>
