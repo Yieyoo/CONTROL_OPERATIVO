@@ -403,16 +403,3 @@ body {
     }
 }
 
-@media (min-width: 769px) {
-    .nav-hamburger {
-        display: none;
-    }
-
-    nav.menu {
-        transform: translateX(0);
-    }
-
-    body {
-        padding-left: var(--menu-sidebar-w) !important;
-    }
-}
