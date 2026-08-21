@@ -144,7 +144,7 @@ nav.menu .fa {
     position: absolute;
     top: 100%;
     left: 0;
-    min-width: 220px;
+    min-width: 190px;
     background: #320d1c;
     border-top: 2px solid var(--menu-dorado);
     border-radius: 0 0 10px 10px;
