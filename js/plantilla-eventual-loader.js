@@ -1,4 +1,4 @@
-// plantilla-eventual-loader.js - Plantilla de Personal con boton para alternar a la Plantilla Eventual.
+// plantilla-eventual-loader.js - Plantilla de Personal (PDF + Excel) con boton para alternar a la Plantilla Eventual.
 // Cada pagina define window.DOC_PAGE = { estado } y un <div id="documento-root">.
 // La logica es la misma que tenian las paginas individuales de cada estado.
 
@@ -171,6 +171,17 @@
                     if (ultimoArchivo.titulo_documento) {
                         return ultimoArchivo.titulo_documento;
                     }
+                }
+            }
+
+            // Título global configurado en Gestión de Archivos (solo en los estados que lo usan)
+            if ((window.DOC_PAGE || {}).usarTituloGlobal) {
+                const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
+                });
+                if (tituloResponse.ok) {
+                    const data = await tituloResponse.json();
+                    if (data.titulo) return data.titulo;
                 }
             }
         } catch (error) {
