@@ -6,6 +6,8 @@
     <title>ULTIMA VISITA DE SUPERVICION Y EVALUACIÓN</title>
     <link rel="icon" type="image/png" href="../../../imagenes/migracion.png">
     <link rel="stylesheet" href="../../diseños/diseñounafoto.css">
+    <script src="../../../js/auth.js" defer></script>
+    <script src="../../../js/load-menu.js" defer></script>
     <style>
         /* Estilos específicos para móviles iOS */
         @media only screen and (max-width: 768px) {
@@ -91,71 +93,9 @@
 <body>
     <script src="../../../config.js"></script>
     <h1 id="titulo-documento">ULTIMA VISITA DE SUPERVICION Y EVALUACIÓN</h1>        
-    <div class="menu-overlay"></div>
     <div class="loading" id="loading">
         <div class="spinner"></div>
     </div>
-
-    <header>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <nav class="menu">
-            <img src="../../../imagenes/gobernacion.jpg" class="logo-arriba-img" alt="Logo">
-            <ul>
-                <li><a href="../../../index.html">Inicio</a></li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Datos Nacionales</a>
-                    <ul class="submenu-list">
-                        <li><a href="../../../datos_nacionales/datosindex.html">Datos Nacionales</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/plantillad.html">Plantilla de Personal</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/tabulador.html">Tabulador</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/rubro.html">Gastos de Operación</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/estadofuerza.html">Analitico Estado Fuerza</a></li>
-                        <li><a href="../../../datos_nacionales/opcionesdatos/unidadcd.html">Unidades Caninas</a></li>
-                        <li><a href="../../../construccion.html">Inmuebles</a></li>
-                        <li><a href="../../../construccion.html">Padron Vehicular</a></li>
-                        <li><a href="../../../gestion/archivos.html">Gestion de Archvios</a></li>
-                    </ul>
-                </li>
-                <li class="submenu">
-                    <a href="javascript:void(0);" onclick="toggleSubmenu(event)">Información de ORs</a>
-                    <ul class="submenu-list">
-                        <li><a href="../../aguascalientes/aguascalientesindex.html">Aguascalientes</a></li>
-                        <li><a href="../baja_californiaindex.html">Baja California</a></li>
-                        <li><a href="../../baja_california_s/baja_california_surindex.html">Baja California Sur</a></li>
-                        <li><a href="../../campeche/campecheindex.html">Campeche</a></li>
-                        <li><a href="../../chiapas/chiapasindex.html">Chiapas</a></li>
-                        <li><a href="../../chihuahua/chihuahuaindex.html">Chihuahua</a></li>
-                        <li><a href="../../coahuila/coahuilaindex.html">Coahuila</a></li>
-                        <li><a href="../../colima/colimaindex.html">Colima</a></li>
-                        <li><a href="../../cdmx/cdmxindex.html">Ciudad de México</a></li>
-                        <li><a href="../../durango/durangoindex.html">Durango</a></li>
-                        <li><a href="../../guanajuato/guanajuatoindex.html">Guanajuato</a></li>
-                        <li><a href="../../guerrero/guerreroindex.html">Guerrero</a></li>
-                        <li><a href="../../hidalgo/hidalgoindex.html">Hidalgo</a></li>
-                        <li><a href="../../jalisco/jaliscoindex.html">Jalisco</a></li>
-                        <li><a href="../../edomex/edomexindex.html">Estado de México</a></li>
-                        <li><a href="../../michoacan/michoacanindex.html">Michoacán</a></li>
-                        <li><a href="../../morelos/morelosindex.html">Morelos</a></li>
-                        <li><a href="../../nayarit/nayaritindex.html">Nayarit</a></li>
-                        <li><a href="../../nuevo_leon/nuevo_leonindex.html">Nuevo León</a></li>
-                        <li><a href="../../oaxaca/oaxacaindex.html">Oaxaca</a></li>
-                        <li><a href="../../puebla/pueblaindex.html">Puebla</a></li>
-                        <li><a href="../../quererato/queretaroindex.html">Querétaro</a></li>
-                        <li><a href="../../quintanaroo/quintanarooindex.html">Quintana Roo</a></li>
-                        <li><a href="../../san_luis/san_luisindex.html">San Luis Potosí</a></li>
-                        <li><a href="../../sinaloa/sinaloaindex.html">Sinaloa</a></li>
-                        <li><a href="../../sonora/sonoraindex.html">Sonora</a></li>
-                        <li><a href="../../tabasco/tabascoindex.html">Tabasco</a></li>
-                        <li><a href="../../tamaulipas/tamaulipasindex.html">Tamaulipas</a></li>
-                        <li><a href="../../tlaxcala/tlaxcalaindex.html">Tlaxcala</a></li>
-                        <li><a href="../../veracruz/veracruzindex.html">Veracruz</a></li>
-                        <li><a href="../../yucatan/yucatanindex.html">Yucatán</a></li>
-                        <li><a href="../../zacatecas/zacatecasindex.html">Zacatecas</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </header>
 
     <div class="logo-container">
         <img src="../../../imagenes/inm logo.png" alt="Logo INM">
@@ -185,7 +125,7 @@
         <div id="mobile-error" class="error-message" style="display: none;"></div>
     </div>
 
-    <button class="regresar-btn" onclick="window.history.back()">Regresar</button>
+    <button class="regresar-btn" onclick="window.location.href='../baja_californiaindex.html'">Regresar</button>
 
 <script>
     // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
@@ -235,28 +175,6 @@
     function hideErrors() {
         document.getElementById('pdf-error').style.display = 'none';
         document.getElementById('mobile-error').style.display = 'none';
-    }
-
-    // Función para abrir/cerrar el menú
-    function toggleMenu() {
-        const menu = document.querySelector('.menu');
-        const overlay = document.querySelector('.menu-overlay');
-        menu.classList.toggle('active');
-        overlay.classList.toggle('active');
-    }
-
-    // Cerrar menú al hacer clic fuera
-    document.querySelector('.menu-overlay').addEventListener('click', toggleMenu);
-
-    // Función para submenús
-    function toggleSubmenu(event) {
-        event.preventDefault();
-        document.querySelectorAll('.submenu.active').forEach(sub => {
-            if (sub !== event.target.closest('.submenu')) {
-                sub.classList.remove('active');
-            }
-        });
-        event.target.closest('.submenu').classList.toggle('active');
     }
 
     // Formatear fecha legible
