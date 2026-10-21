@@ -2,3 +2,5 @@
 node_modules/
 *.log
 js/server copy.js
+# Plantillas de personal locales: no publicar
+documentos/*.xlsx
