@@ -1019,7 +1019,24 @@ const formatCeldaPdf = (key, valor) => {
   return String(valor);
 };
 
-function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, columnas, logo }) {
+// Tipos de plantilla nacional que se pueden procesar. Ambos usan el mismo
+// formato de Excel; solo cambian donde se guardan y el titulo.
+const TIPOS_PLANTILLA_NACIONAL = {
+  estructura: {
+    tipoDocumento: 'plantilla_personal_excel',
+    prefijoArchivo: 'plantilla',
+    titulo: 'PLANTILLA OR',
+    carpetaResumen: 'plantilla_personal_excel_datos'
+  },
+  eventual: {
+    tipoDocumento: 'plantilla_eventual_excel',
+    prefijoArchivo: 'plantilla_eventual',
+    titulo: 'PLANTILLA EVENTUAL OR',
+    carpetaResumen: 'plantilla_eventual_excel_datos'
+  }
+};
+
+function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, columnas, logo, titulo = 'PLANTILLA OR' }) {
   const margin = 30;
   const rowHeight = 20;
   const headerRowHeight = 28;
@@ -1051,7 +1068,7 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, 
   doc.fontSize(11).font('Helvetica').text('DIRECCION GENERAL DE ADMINISTRACION', { width: tableWidth, align: 'right' });
   doc.text('DIRECCION DE ADMINISTRACION DE PERSONAL', { width: tableWidth, align: 'right' });
   doc.moveDown(0.5);
-  doc.fontSize(17).font(fBold).fillColor('#691932').text(`PLANTILLA OR ${nombreEstado}`, { width: tableWidth, align: 'center' });
+  doc.fontSize(17).font(fBold).fillColor('#691932').text(`${titulo} ${nombreEstado}`, { width: tableWidth, align: 'center' });
   doc.fontSize(13).font(fRegular).fillColor('#000').text(`Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`, { width: tableWidth, align: 'center' });
 
   let y = margin + topBlockHeight;
@@ -1109,7 +1126,12 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
       const quincena = String(req.body.quincena || '');
       const mes = String(req.body.mes || '').toUpperCase().trim();
       const anio = String(req.body.anio || '');
+      const tipoPlantilla = String(req.body.tipo_plantilla || 'estructura');
+      const config = TIPOS_PLANTILLA_NACIONAL[tipoPlantilla];
 
+      if (!config) {
+        throw new AppError('Tipo de plantilla inválido (usa estructura o eventual)', 400, 'missing_fields');
+      }
       if (!['1', '2'].includes(quincena)) {
         throw new AppError('Quincena inválida (usa 1 o 2)', 400, 'missing_fields');
       }
@@ -1289,7 +1311,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             }
           }
 
-          hoja.getCell(`${anclaTitulo}5`).value = `PLANTILLA OR ${estadoInfo.nombre}`;
+          hoja.getCell(`${anclaTitulo}5`).value = `${config.titulo} ${estadoInfo.nombre}`;
           hoja.getCell(`${anclaTitulo}6`).value = `Vigencia ${quincenaTexto} Quincena ${mes} ${anio}`;
 
           try {
@@ -1313,8 +1335,8 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             console.error(`No se pudo reparar la imagen de la plantilla de ${slug}:`, errorImagen.message);
           }
 
-          const filenamePretty = `PLANTILLA OR ${estadoInfo.nombre} ${quincenaArchivo} QUINCENA ${mes} ${anio}.xlsx`;
-          const publicId = `${slug}/plantilla_personal_excel/plantilla_${anio}_${mesNum2}_q${quincena}`;
+          const filenamePretty = `${config.titulo} ${estadoInfo.nombre} ${quincenaArchivo} QUINCENA ${mes} ${anio}.xlsx`;
+          const publicId = `${slug}/${config.tipoDocumento}/${config.prefijoArchivo}_${anio}_${mesNum2}_q${quincena}`;
 
           let previewPdfUrl = null;
           try {
@@ -1324,7 +1346,8 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
               quincenaTexto,
               mes, anio,
               columnas: columnasPdf,
-              logo: logoPdf
+              logo: logoPdf,
+              titulo: config.titulo
             });
             const resultadoPdf = await uploadRawBuffer(bufferPdf, {
               public_id: `${publicId}_preview`,
@@ -1348,7 +1371,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
               original_filename: filenamePretty,
               uploaded_at: new Date().toISOString(),
               estado: slug,
-              tipo_documento: 'plantilla_personal_excel',
+              tipo_documento: config.tipoDocumento,
               quincena, mes, anio,
               ...(previewPdfUrl && { preview_pdf_url: previewPdfUrl })
             }
@@ -1356,7 +1379,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
 
           resultados.push({
             estado: slug,
-            tipo_documento: 'plantilla_personal_excel',
+            tipo_documento: config.tipoDocumento,
             filename: filenamePretty,
             url: resultadoCloudinary.secure_url,
             public_id: resultadoCloudinary.public_id,
@@ -1377,7 +1400,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
           quincena, mes, anio, procesado_en: procesadoEn,
           estados: estadosResumen
         }));
-        const publicIdJson = `datos-nacionales/plantilla_personal_excel_datos/datos_${anio}_${mesNum2}_q${quincena}`;
+        const publicIdJson = `datos-nacionales/${config.carpetaResumen}/datos_${anio}_${mesNum2}_q${quincena}`;
         const resultadoJson = await uploadRawBuffer(jsonBuffer, {
           public_id: publicIdJson,
           overwrite: true
@@ -1391,6 +1414,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
         status: 'success',
         data: {
           quincena, mes, anio,
+          tipo_plantilla: tipoPlantilla,
           procesado_en: procesadoEn,
           resultados,
           errores,

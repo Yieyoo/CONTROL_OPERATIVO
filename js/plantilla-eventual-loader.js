@@ -142,6 +142,7 @@
     const TIPO_DOCUMENTO = 'plantilla_personal'; // Documento principal
     const TIPO_DOCUMENTO_ALTERNATIVO = 'plantilla_eventual'; // Documento alternativo
     const TIPO_DOCUMENTO_EXCEL = 'plantilla_personal_excel';
+    const TIPO_DOCUMENTO_ALTERNATIVO_EXCEL = 'plantilla_eventual_excel'; // Generado desde el Excel nacional eventual
 
     // Variables para controlar documentos alternativos
     let documentoActual = 'principal'; // 'principal' o 'alternativo'
@@ -277,15 +278,18 @@
 
         try {
             if (documentoActual === 'principal') {
-                // Cargar documento alternativo (plantilla_eventual)
-                console.log(`Consultando documento alternativo: ${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`);
-                const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`, {
-                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
-                });
+                // Cargar documento alternativo: el más reciente entre el PDF eventual
+                // subido a mano y el Excel eventual generado desde el Excel nacional
+                const [pdfResponse, excelResponse] = await Promise.all([
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } }),
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO_EXCEL}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } })
+                ]);
 
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+                if (!pdfResponse.ok && !excelResponse.ok) throw new Error(`Error ${pdfResponse.status}: ${pdfResponse.statusText}`);
 
-                const result = await response.json();
+                const pdfData = pdfResponse.ok ? ((await pdfResponse.json()).data || []) : [];
+                const excelData = excelResponse.ok ? ((await excelResponse.json()).data || []) : [];
+                const result = { data: [...pdfData, ...excelData] };
 
                 if (result?.data && result.data.length > 0) {
                     const documentosAlternativos = result.data.sort((a, b) =>

@@ -93,6 +93,7 @@
                             <option value="plantilla_personal">Plantilla de Personal</option>
                             <option value="plantilla_personal_excel">Plantilla de Personal (Excel)</option>
                             <option value="plantilla_eventual">Plantilla Eventual</option>
+                            <option value="plantilla_eventual_excel">Plantilla Eventual (Excel)</option>
                             <option value="acuerdos_visita">Acuerdos de Visita</option>
                             <option value="visita_supervision">Última Visita de Supervisión</option>
                             
@@ -149,12 +150,17 @@
             <p class="plantilla-nacional-ayuda">
                 Sube el Excel nacional de personal (todas las Oficinas de Representación juntas) y el sistema
                 genera automáticamente un Excel independiente por cada estado detectado, conservando el formato
-                de la plantilla original.
+                de la plantilla original. Elige si es la plantilla de Estructura o la Eventual.
             </p>
             <form id="plantillaNacionalForm">
                 <input type="file" id="archivoNacional" name="archivoNacional" accept=".xlsx" required>
 
                 <div class="filters">
+                    <select id="tipoPlantillaSelect" required>
+                        <option value="estructura" selected>Plantilla de Estructura</option>
+                        <option value="eventual">Plantilla Eventual</option>
+                    </select>
+
                     <select id="quincenaSelect" required>
                         <option value="" disabled selected>Quincena</option>
                         <option value="1">1ra Quincena</option>
@@ -528,8 +534,8 @@
                 cargarTituloPersonalizado();
             }
 
-            // Plantilla de Personal (Excel) se genera desde el panel de abajo, no se sube manualmente aquí
-            const esPlantillaExcel = currentTipoDocumento === 'plantilla_personal_excel';
+            // Las plantillas en Excel (estructura y eventual) se generan desde el panel de abajo, no se suben manualmente aquí
+            const esPlantillaExcel = ['plantilla_personal_excel', 'plantilla_eventual_excel'].includes(currentTipoDocumento);
             plantillaExcelNota.style.display = esPlantillaExcel ? 'block' : 'none';
             fileInput.disabled = esPlantillaExcel;
             fileInput.required = !esPlantillaExcel;
@@ -612,6 +618,7 @@
                 const quincena = document.getElementById('quincenaSelect').value;
                 const mes = document.getElementById('mesSelect').value;
                 const anio = document.getElementById('anioInput').value;
+                const tipoPlantilla = document.getElementById('tipoPlantillaSelect').value;
                 const procesarBtn = document.getElementById('procesarPlantillaBtn');
                 const status = document.getElementById('plantillaNacionalStatus');
                 const resultados = document.getElementById('plantillaNacionalResultados');
@@ -631,6 +638,7 @@
                     formData.append('quincena', quincena);
                     formData.append('mes', mes);
                     formData.append('anio', anio);
+                    formData.append('tipo_plantilla', tipoPlantilla);
 
                     const response = await fetch(`${BACKEND_URL}/plantilla-nacional/procesar`, {
                         method: 'POST',
@@ -643,7 +651,8 @@
 
                     const { resultados: porEstado, errores } = respuesta.data;
 
-                    let html = '<h4>Plantillas generadas</h4><ul class="plantilla-nacional-lista">';
+                    const nombreTipo = tipoPlantilla === 'eventual' ? 'Plantilla Eventual' : 'Plantilla de Estructura';
+                    let html = `<h4>${nombreTipo}: plantillas generadas</h4><ul class="plantilla-nacional-lista">`;
                     porEstado.forEach(r => {
                         if (r.status === 'ok') {
                             html += `<li>✅ ${r.estado}: ${r.count} empleados — <a href="${r.url}" target="_blank">${r.filename}</a></li>`;
