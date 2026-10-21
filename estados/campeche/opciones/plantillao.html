@@ -1,235 +1,32 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PLANTILLA DE PERSONAL - Campeche</title>
+    <title>PLANTILLA DE PERSONAL</title>
     <link rel="icon" type="image/png" href="../../../imagenes/pasaporte.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
-    
+    <script src="../../../config.js"></script>
+    <script>window.DOC_PAGE = { estado: 'campeche', nombre: 'Campeche', tipo: 'plantilla_personal', titulo: 'PLANTILLA DE PERSONAL' };</script>
     <script src="../../../js/auth.js" defer></script>
     <script src="../../../js/load-menu.js" defer></script>
-    
-    <style>
-        /* Estilo para la fecha de actualización */
-        #fecha-subida {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 1000;
-        }
-
-        @media (max-width: 768px) {
-            #fecha-subida {
-                font-size: 10px;
-                padding: 3px 6px;
-            }
-        }
-    </style>
+    <script src="../../../js/plantilla-loader.js" defer></script>
 </head>
 <body>
-    <script src="../../../config.js"></script>
     <div class="header-lineas">
         <div class="linea-superior"></div>
         <div class="linea-inferior"></div>
     </div>
-    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE AQUÍ POR load-menu.js -->
+    <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE POR load-menu.js -->
 
     <!-- Contenedor para el título personalizado -->
     <div id="tituloContainer" class="titulo-personalizado">
         Cargando título...
     </div>
-    
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-    </div>
 
-    <div class="logo-container">
-        <img src="../../../imagenes/inm logo.png" alt="Logo INM">
-    </div>
-    
-    <div class="pdf-container">
-        <iframe 
-            id="pdf-viewer" 
-            class="pdf-embed"
-            frameborder="0"
-            title="Visualizador de PDF"
-        ></iframe>
-        <div id="pdf-error" class="error-message" style="display: none;"></div>
-    </div>
-
-    <div class="mobile-images">
-        <div id="mobile-error" class="error-message" style="display: none;"></div>
-    </div>
-
-    <div id="fecha-subida">
-        Actualizado: <span id="fecha-texto">Cargando...</span>
-    </div>
+    <!-- El contenido lo arma js/plantilla-loader.js -->
+    <div id="documento-root"></div>
 
     <button class="regresar-btn" onclick="window.location.href = '../campecheindex.html'">Regresar</button>
-
-    <script>
-        // Configuración
-        const BACKEND_URL = window.CONFIG.BACKEND_URL;
-        const API_TOKEN = window.CONFIG.getToken();
-        const ESTADO_FIJO = 'campeche';
-        const TIPO_DOCUMENTO = 'plantilla_personal';
-        const TIPO_DOCUMENTO_EXCEL = 'plantilla_personal_excel';
-
-        // Detectar iOS
-        function isIOS() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        }
-
-        // Función para obtener y cargar el título personalizado
-        async function cargarTituloPersonalizado() {
-            const tituloContainer = document.getElementById('tituloContainer');
-
-            try {
-                // 1. Obtener el archivo más reciente con título
-                const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
-                });
-
-                if (archivosResponse.ok) {
-                    const { data: archivos } = await archivosResponse.json();
-                    if (archivos.length > 0) {
-                        const ultimoArchivo = archivos.sort((a, b) => 
-                            new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                        )[0];
-
-                        if (ultimoArchivo.titulo_documento) {
-                            tituloContainer.textContent = ultimoArchivo.titulo_documento;
-                            return;
-                        }
-                    }
-                }
-
-                // 2. Obtener desde endpoint de títulos
-                const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
-                });
-
-                if (tituloResponse.ok) {
-                    const data = await tituloResponse.json();
-                    if (data.titulo) {
-                        tituloContainer.textContent = data.titulo;
-                        return;
-                    }
-                }
-
-                // 3. Título por defecto
-                tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
-
-            } catch (error) {
-                console.error('Error:', error);
-                tituloContainer.textContent = 'Plantilla de Personal - Aguascalientes';
-                tituloContainer.style.color = 'red';
-            }
-        }
-
-        // Mostrar/ocultar loading
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
-        }
-
-        // Mostrar mensaje de error
-        function showError(message, target = 'both') {
-            if (target === 'both' || target === 'pdf') {
-                const pdfError = document.getElementById('pdf-error');
-                pdfError.textContent = message;
-                pdfError.style.display = 'block';
-            }
-            if (target === 'both' || target === 'mobile') {
-                const mobileError = document.getElementById('mobile-error');
-                mobileError.textContent = message;
-                mobileError.style.display = 'block';
-            }
-        }
-
-        // Ocultar errores
-        function hideErrors() {
-            document.getElementById('pdf-error').style.display = 'none';
-            document.getElementById('mobile-error').style.display = 'none';
-        }
-
-        // Formatear fecha legible
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('es-MX', options);
-        }
-
-        // Cargar PDF de Plantilla de Personal de Aguascalientes
-        async function loadPlantillaPersonal() {
-            showLoading(true);
-            hideErrors();
-            const fechaElement = document.getElementById('fecha-texto');
-
-            try {
-                const [pdfResponse, excelResponse] = await Promise.all([
-                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } }),
-                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_EXCEL}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } })
-                ]);
-
-                const pdfData = pdfResponse.ok ? ((await pdfResponse.json()).data || []) : [];
-                const excelData = excelResponse.ok ? ((await excelResponse.json()).data || []) : [];
-                const todos = [...pdfData, ...excelData];
-
-                const pdfViewer = document.getElementById('pdf-viewer');
-                const mobileContainer = document.querySelector('.mobile-images');
-
-                if (todos.length > 0) {
-                    const ultimo = todos.sort((a, b) =>
-                        new Date(b.uploaded_at) - new Date(a.uploaded_at)
-                    )[0];
-                    const esPdf = ultimo.format === 'pdf';
-
-                    // Mostrar fecha de actualización
-                    fechaElement.textContent = formatDate(ultimo.uploaded_at);
-
-                    // PDF se muestra directo; Excel se previsualiza con el visor de Google Docs
-                    pdfViewer.src = esPdf ? ultimo.url : (ultimo.preview_pdf_url || ultimo.view_url);
-
-                    // Configuración para móviles
-                    if (!isIOS()) {
-                        mobileContainer.innerHTML = `
-                            <div class="file-info">
-                                <h3>${ultimo.filename || 'Plantilla de Personal'}</h3>
-                                <p>Actualizado: ${formatDate(ultimo.uploaded_at)}</p>
-                                <p>Tamaño: ${(ultimo.size / (1024*1024)).toFixed(2)} MB</p>
-                                <a href="${ultimo.download_url || ultimo.url}" class="download-btn" download="${ultimo.filename || 'documento'}">
-                                    Descargar Documento
-                                </a>
-                            </div>
-                        `;
-                    }
-                } else {
-                    showError('No se encontraron documentos de plantilla de personal para Aguascalientes', 'both');
-                    fechaElement.textContent = 'No disponible';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showError(`Error al cargar la plantilla: ${error.message}`, 'both');
-                fechaElement.textContent = 'Error al cargar';
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarTituloPersonalizado();
-            if (document.getElementById('pdf-viewer')) {
-                loadPlantillaPersonal();
-            }
-        });
-    </script>
 </body>
 </html>
-
