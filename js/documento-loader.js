@@ -46,6 +46,9 @@
     }
 
     function injectDOM(root) {
+        // El CSS (generaldoc.css) acomoda estos bloques como hijos directos del body
+        // (flex en columna); "contents" hace que el contenedor no altere ese layout.
+        root.style.display = 'contents';
         root.innerHTML = `
             <div class="loading" id="loading">
                 <div class="spinner"></div>
