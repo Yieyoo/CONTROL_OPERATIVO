@@ -123,7 +123,7 @@
 <script>
     // CONFIGURACIÓN - PLANTILLA DE PERSONAL
     const BACKEND_URL = window.CONFIG.BACKEND_URL;
-    const API_KEY = window.CONFIG.API_KEY;
+    const API_TOKEN = window.CONFIG.getToken();
     const ESTADO = 'datos-nacionales';
     const TIPO_DOCUMENTO = 'plantilla';
     const TITULO_DOCUMENTO = 'PLANTILLA ESTRUCTURA';
@@ -245,7 +245,7 @@
         try {
             console.log(`Consultando API para: ${ESTADO_FIJO}/${tipoDocumento}`);
             const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${tipoDocumento}`, {
-                headers: { 'x-api-key': API_KEY }
+                headers: { 'Authorization': 'Bearer ' + API_TOKEN }
             });
 
             if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);

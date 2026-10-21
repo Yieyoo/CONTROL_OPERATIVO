@@ -149,7 +149,7 @@
         // ================================================
         // Configuración
         const BACKEND_URL = window.CONFIG.BACKEND_URL;
-        const API_KEY = window.CONFIG.API_KEY;
+        const API_TOKEN = window.CONFIG.getToken();
         const ESTADO_FIJO = 'Hidalgo';
         const TIPO_DOCUMENTO = 'plantilla_personal'; // Documento principal
         const TIPO_DOCUMENTO_ALTERNATIVO = 'plantilla_eventual'; // Documento alternativo
@@ -170,7 +170,7 @@
         async function obtenerTituloPrincipal() {
             try {
                 const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'x-api-key': API_KEY }
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
                 });
 
                 if (response.ok) {
@@ -281,7 +281,7 @@
                     // Cargar documento alternativo (plantilla_eventual)
                     console.log(`Consultando documento alternativo: ${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`);
                     const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_ALTERNATIVO}`, {
-                        headers: { 'x-api-key': API_KEY }
+                        headers: { 'Authorization': 'Bearer ' + API_TOKEN }
                     });
 
                     if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -382,8 +382,8 @@
 
             try {
                 const [pdfResponse, excelResponse] = await Promise.all([
-                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, { headers: { 'x-api-key': API_KEY } }),
-                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_EXCEL}`, { headers: { 'x-api-key': API_KEY } })
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } }),
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_EXCEL}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } })
                 ]);
 
                 const pdfData = pdfResponse.ok ? ((await pdfResponse.json()).data || []) : [];

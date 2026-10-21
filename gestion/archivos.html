@@ -208,7 +208,7 @@
     <script>
         // Configuración global
         const BACKEND_URL = window.CONFIG.BACKEND_URL;
-        const API_KEY = window.CONFIG.API_KEY;
+        const API_TOKEN = window.CONFIG.getToken();
         let currentCarpeta = '';
         let currentTipoDocumento = '';
 
@@ -295,7 +295,7 @@
                 const url = `${BACKEND_URL}/archivos/${currentCarpeta}/${currentTipoDocumento}${cacheBuster}`;
                 
                 const response = await fetch(url, {
-                    headers: { 'x-api-key': API_KEY },
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN },
                     cache: 'no-store' // Evitar caché del navegador
                 });
                 
@@ -383,7 +383,7 @@
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
+                        'Authorization': 'Bearer ' + API_TOKEN
                     },
                     body: JSON.stringify({
                         public_id: publicId,
@@ -423,7 +423,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
+                        'Authorization': 'Bearer ' + API_TOKEN
                     },
                     body: JSON.stringify({
                         titulo: titulo
@@ -455,7 +455,7 @@
                 
                 // Luego verificar con el backend
                 const response = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                    headers: { 'x-api-key': API_KEY }
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
                 });
                 
                 if (response.ok) {
@@ -586,7 +586,7 @@
                     
                     const response = await fetch(`${BACKEND_URL}/upload`, {
                         method: 'POST',
-                        headers: { 'x-api-key': API_KEY },
+                        headers: { 'Authorization': 'Bearer ' + API_TOKEN },
                         body: formData
                     });
                     
@@ -634,7 +634,7 @@
 
                     const response = await fetch(`${BACKEND_URL}/plantilla-nacional/procesar`, {
                         method: 'POST',
-                        headers: { 'x-api-key': API_KEY },
+                        headers: { 'Authorization': 'Bearer ' + API_TOKEN },
                         body: formData
                     });
 
@@ -699,7 +699,7 @@
                 
                 // Luego consultar al backend
                 const response = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                    headers: { 'x-api-key': API_KEY }
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
                 });
                 
                 if (response.ok) {

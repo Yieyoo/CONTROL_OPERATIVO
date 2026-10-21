@@ -76,7 +76,7 @@
     <script>
         // Configuración
         const BACKEND_URL = window.CONFIG.BACKEND_URL;
-        const API_KEY = window.CONFIG.API_KEY;
+        const API_TOKEN = window.CONFIG.getToken();
         const ESTADO_FIJO = 'baja-california-sur';
         const TIPO_DOCUMENTO = 'plantilla_personal';
         const TIPO_DOCUMENTO_EXCEL = 'plantilla_personal_excel';
@@ -94,7 +94,7 @@
             try {
                 // 1. Obtener el archivo más reciente con título
                 const archivosResponse = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, {
-                    headers: { 'x-api-key': API_KEY }
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
                 });
 
                 if (archivosResponse.ok) {
@@ -113,7 +113,7 @@
 
                 // 2. Obtener desde endpoint de títulos
                 const tituloResponse = await fetch(`${BACKEND_URL}/obtener-titulo-global`, {
-                    headers: { 'x-api-key': API_KEY }
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
                 });
 
                 if (tituloResponse.ok) {
@@ -173,8 +173,8 @@
 
             try {
                 const [pdfResponse, excelResponse] = await Promise.all([
-                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, { headers: { 'x-api-key': API_KEY } }),
-                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_EXCEL}`, { headers: { 'x-api-key': API_KEY } })
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } }),
+                    fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOCUMENTO_EXCEL}`, { headers: { 'Authorization': 'Bearer ' + API_TOKEN } })
                 ]);
 
                 const pdfData = pdfResponse.ok ? ((await pdfResponse.json()).data || []) : [];

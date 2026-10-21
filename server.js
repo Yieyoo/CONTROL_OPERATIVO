@@ -11,6 +11,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const { promisify } = require('util');
 const zlib = require('zlib');
 const stream = require('stream');
@@ -213,34 +215,87 @@ app.use(require('compression')({
   filter: shouldCompress
 }));
 
+// Tokens de sesión firmados con HMAC (formato: payloadBase64url.firmaBase64url).
+// Se usan en lugar de cookies porque el frontend (GitHub Pages) y la API (Render)
+// viven en dominios distintos.
+const SESSION_DURATION_MS = 8 * 60 * 60 * 1000;
+
+const firmarToken = (payloadB64) =>
+  crypto.createHmac('sha256', process.env.SESSION_SECRET).update(payloadB64).digest('base64url');
+
+const crearToken = (username) => {
+  const payloadB64 = Buffer.from(JSON.stringify({
+    u: username,
+    exp: Date.now() + SESSION_DURATION_MS
+  })).toString('base64url');
+  return `${payloadB64}.${firmarToken(payloadB64)}`;
+};
+
+const verificarToken = (token) => {
+  if (!process.env.SESSION_SECRET || typeof token !== 'string') return null;
+  const [payloadB64, firma] = token.split('.');
+  if (!payloadB64 || !firma) return null;
+
+  const esperada = Buffer.from(firmarToken(payloadB64));
+  const recibida = Buffer.from(firma);
+  if (esperada.length !== recibida.length || !crypto.timingSafeEqual(esperada, recibida)) return null;
+
+  try {
+    const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
+    return payload.exp > Date.now() ? payload : null;
+  } catch {
+    return null;
+  }
+};
+
 // Middleware de autenticación
 const authenticate = (req, res, next) => {
-  const apiKey = req.headers['x-api-key'];
-  
-  if (!apiKey) {
+  const header = req.headers['authorization'] || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+
+  if (!token) {
     return res.status(401).json({
       status: 'error',
       error: 'unauthorized',
-      message: 'API Key no proporcionada',
-      code: 'MISSING_API_KEY',
+      message: 'Sesión no proporcionada',
+      code: 'MISSING_TOKEN',
       timestamp: new Date().toISOString(),
       path: req.path
     });
   }
 
-  if (apiKey !== process.env.API_KEY) {
-    console.warn(`Intento de acceso con API Key inválida desde IP: ${req.ip}`);
+  const payload = verificarToken(token);
+  if (!payload) {
+    console.warn(`Intento de acceso con sesión inválida o expirada desde IP: ${req.ip}`);
     return res.status(401).json({
       status: 'error',
       error: 'unauthorized',
-      message: 'API Key inválida',
-      code: 'INVALID_API_KEY',
+      message: 'Sesión inválida o expirada, vuelve a iniciar sesión',
+      code: 'INVALID_TOKEN',
       timestamp: new Date().toISOString()
     });
   }
-  
+
+  req.user = payload.u;
   next();
 };
+
+// Rate limiter estricto para login (5 intentos fallidos por 10 minutos)
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip,
+  handler: (req, res) => {
+    res.status(429).json({
+      status: 'error',
+      error: 'too_many_attempts',
+      message: 'Demasiados intentos fallidos. Espera 10 minutos e inténtalo de nuevo.'
+    });
+  }
+});
 
 // Manejo de errores
 class AppError extends Error {
@@ -353,6 +408,34 @@ function normalizarAdscripcion(valorCrudo) {
 
 // Rutas API
 const router = express.Router();
+
+// Login: valida contra LOGIN_USERNAME / LOGIN_PASSWORD_HASH (bcrypt) y entrega un token
+router.post('/login', loginLimiter, async (req, res) => {
+  const { username, password } = req.body || {};
+
+  if (!process.env.LOGIN_USERNAME || !process.env.LOGIN_PASSWORD_HASH || !process.env.SESSION_SECRET) {
+    console.error('❌ Faltan LOGIN_USERNAME, LOGIN_PASSWORD_HASH o SESSION_SECRET en las variables de entorno');
+    return res.status(500).json({ status: 'error', message: 'El inicio de sesión no está configurado en el servidor' });
+  }
+
+  if (typeof username !== 'string' || typeof password !== 'string' || !username || !password) {
+    return res.status(400).json({ status: 'error', message: 'Usuario y contraseña son requeridos' });
+  }
+
+  // Siempre se ejecuta bcrypt para no revelar por tiempo de respuesta si el usuario existe
+  const passwordOk = await bcrypt.compare(password, process.env.LOGIN_PASSWORD_HASH);
+  if (username !== process.env.LOGIN_USERNAME || !passwordOk) {
+    console.warn(`Login fallido para "${username}" desde IP: ${req.ip}`);
+    return res.status(401).json({ status: 'error', message: 'Usuario o contraseña incorrectos' });
+  }
+
+  res.json({
+    status: 'success',
+    token: crearToken(username),
+    username,
+    expiresIn: SESSION_DURATION_MS
+  });
+});
 
 // Ruta de salud
 router.get('/health', async (req, res) => {

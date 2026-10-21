@@ -3,7 +3,7 @@
 (function () {
     const ESTADO = window.FICHA_ESTADO || '';
     const BACKEND = window.CONFIG?.BACKEND_URL || '';
-    const KEY = window.CONFIG?.API_KEY || '';
+    const TOKEN = window.CONFIG?.getToken?.() || '';
     const IS_ADMIN = localStorage.getItem('authenticated') === 'true';
     const DEPTH = 3; // fichao.html is always at depth 3
     const PREFIX = '../'.repeat(DEPTH);
@@ -59,7 +59,7 @@
     async function loadFicha() {
         try {
             const res = await fetch(`${BACKEND}/ficha-datos/${ESTADO}`, {
-                headers: { 'x-api-key': KEY }
+                headers: { 'Authorization': 'Bearer ' + TOKEN }
             });
             const result = await res.json();
             currentData = result.data;
@@ -423,7 +423,7 @@
         try {
             const res = await fetch(`${BACKEND}/ficha-datos/${ESTADO}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': KEY },
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
                 body: JSON.stringify(data)
             });
             if (!res.ok) throw new Error('Error al guardar');

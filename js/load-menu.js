@@ -290,9 +290,8 @@ class MenuLoader {
 
                 setTimeout(() => {
                     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-                        localStorage.removeItem('authenticated');
-                        localStorage.removeItem('username');
-                        window.location.href = '/login.html';
+                        ['authenticated', 'username', 'loginTime', 'authToken'].forEach(k => localStorage.removeItem(k));
+                        window.location.href = '../'.repeat(MenuLoader.getDepth()) + 'login.html';
                     }
                 }, 100);
             });

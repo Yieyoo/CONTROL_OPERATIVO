@@ -310,7 +310,7 @@
             
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Verificando credenciales...</p>
+                <p id="loadingText">Verificando credenciales...</p>
             </div>
             
             <div class="error-message" id="errorMessage"></div>
@@ -328,6 +328,7 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
     <script>
         const elements = {
             form:     document.getElementById('loginForm'),
@@ -387,8 +388,14 @@
             this.textContent = isPass ? '🔒' : '👁️';
         });
 
-        // Envío del formulario → validación local + localStorage
-        elements.form.addEventListener('submit', function (e) {
+        function clearSession() {
+            ['authenticated', 'username', 'loginTime', 'authToken'].forEach(function (k) {
+                localStorage.removeItem(k);
+            });
+        }
+
+        // Envío del formulario → el servidor valida y entrega un token de sesión
+        elements.form.addEventListener('submit', async function (e) {
             e.preventDefault();
             hideMessages();
 
@@ -402,20 +409,44 @@
             }
 
             setLoading(true);
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = 'Verificando credenciales...';
+            // Render apaga el servidor cuando no se usa; el primer acceso puede tardar
+            const slowTimer = setTimeout(function () {
+                loadingText.textContent = 'Despertando el servidor, puede tardar hasta un minuto...';
+            }, 4000);
 
-            setTimeout(function () {
-                if (username === 'admin' && password === '***REMOVED***') {
+            try {
+                const res = await fetch(CONFIG.BACKEND_URL + '/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: password })
+                });
+                const data = await res.json().catch(function () { return {}; });
+
+                if (res.ok && data.token) {
+                    localStorage.setItem('authToken', data.token);
                     localStorage.setItem('authenticated', 'true');
-                    localStorage.setItem('username', username);
+                    localStorage.setItem('username', data.username || username);
                     localStorage.setItem('loginTime', Date.now().toString());
                     showSuccess('✅ Acceso correcto. Entrando al sistema...');
                     setTimeout(function () { window.location.replace('index.html'); }, 900);
-                } else {
-                    showError('❌ Usuario o contraseña incorrectos');
-                    shake();
-                    setLoading(false);
+                    return;
                 }
-            }, 600);
+
+                if (res.status === 429) {
+                    showLockout('⏳ ' + (data.message || 'Demasiados intentos. Espera unos minutos.'));
+                } else {
+                    showError('❌ ' + (data.message || 'Usuario o contraseña incorrectos'));
+                }
+                shake();
+            } catch (err) {
+                showError('❌ No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.');
+            } finally {
+                clearTimeout(slowTimer);
+                elements.password.value = '';
+                if (!localStorage.getItem('authToken')) setLoading(false);
+            }
         });
 
         // Al cargar: si ya está autenticado, redirigir directo
@@ -427,14 +458,13 @@
 
             const loginTime = parseInt(localStorage.getItem('loginTime'), 10);
             const sessionValid = localStorage.getItem('authenticated') === 'true' &&
+                localStorage.getItem('authToken') &&
                 loginTime && (Date.now() - loginTime) < 8 * 60 * 60 * 1000;
 
             if (sessionValid) {
                 window.location.replace('index.html');
             } else {
-                localStorage.removeItem('authenticated');
-                localStorage.removeItem('username');
-                localStorage.removeItem('loginTime');
+                clearSession();
             }
         });
 

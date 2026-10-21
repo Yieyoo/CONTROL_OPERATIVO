@@ -53,7 +53,7 @@
     <script>
         // Configuración - ESTOS SON LOS PARÁMETROS QUE DEBES CAMBIAR
         const BACKEND_URL = window.CONFIG.BACKEND_URL;
-        const API_KEY = window.CONFIG.API_KEY;
+        const API_TOKEN = window.CONFIG.getToken();
         const ESTADO = 'colima';
         const TIPO_DOCUMENTO = 'ubicaciones_sedes';
         const TITULO_DOCUMENTO = 'Ubicaciones de oficinas del INM en Colima';
@@ -118,7 +118,7 @@
             try {
                 console.log(`Consultando API para: ${ESTADO_FIJO}/${TIPO_DOC_FIJO}`);
                 const response = await fetch(`${BACKEND_URL}/archivos/${ESTADO_FIJO}/${TIPO_DOC_FIJO}`, {
-                    headers: { 'x-api-key': API_KEY }
+                    headers: { 'Authorization': 'Bearer ' + API_TOKEN }
                 });
 
                 if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);

@@ -112,6 +112,7 @@
     // Verificar autenticación via localStorage
     var loginTime = parseInt(localStorage.getItem('loginTime'), 10);
     var sessionValid = localStorage.getItem('authenticated') === 'true' &&
+        localStorage.getItem('authToken') &&
         loginTime && (Date.now() - loginTime) < 8 * 60 * 60 * 1000;
 
     if (sessionValid) {
@@ -125,6 +126,7 @@
         localStorage.removeItem('authenticated');
         localStorage.removeItem('username');
         localStorage.removeItem('loginTime');
+        localStorage.removeItem('authToken');
         window.location.replace('login.html');
     }
 
@@ -133,6 +135,7 @@
             localStorage.removeItem('authenticated');
             localStorage.removeItem('username');
             localStorage.removeItem('loginTime');
+            localStorage.removeItem('authToken');
             window.location.replace('login.html');
         }
     }
