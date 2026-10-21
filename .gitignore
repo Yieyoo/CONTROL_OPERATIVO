@@ -4,3 +4,7 @@ node_modules/
 js/server copy.js
 # Plantillas de personal locales: no publicar
 documentos/*.xlsx
+
+# Ya no se usan; se conservan solo en local
+documentacion/
+_respaldo_paginas_viejas/
