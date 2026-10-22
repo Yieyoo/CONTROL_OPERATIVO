@@ -6,11 +6,12 @@
     <title>Ficha Curricular</title>
     <link rel="icon" type="image/png" href="../../../imagenes/fichaicon.png">
     <link rel="stylesheet" href="../../diseños/generaldoc.css">
+    <link rel="stylesheet" href="../../diseños/ficha.css">
     <script src="../../../config.js"></script>
-    <script>window.DOC_PAGE = { estado: 'sonora', tipo: 'ficha_curricular', titulo: 'Ficha Curricular' };</script>
+    <script>window.FICHA_ESTADO = 'sonora';</script>
     <script src="../../../js/auth.js" defer></script>
     <script src="../../../js/load-menu.js" defer></script>
-    <script src="../../../js/documento-loader.js" defer></script>
+    <script src="../../../js/ficha-loader.js" defer></script>
 </head>
 <body>
     <div class="header-lineas">
@@ -19,10 +20,9 @@
     </div>
     <!-- EL MENÚ SE INSERTA AUTOMÁTICAMENTE POR load-menu.js -->
 
-    <h1 id="titulo-documento" class="titulo-personalizado">Ficha Curricular</h1>
+    <h1 class="titulo-personalizado">Ficha Curricular</h1>
 
-    <!-- El visor lo arma js/documento-loader.js -->
-    <div id="documento-root"></div>
+    <div id="ficha-root"></div>
 
     <button class="regresar-btn" onclick="window.location.href = '../sonoraindex.html'">Regresar</button>
 </body>

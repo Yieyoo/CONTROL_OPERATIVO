@@ -95,7 +95,7 @@
 
         const carreraHTML = (d.carrera_profesional || []).map(c => `
             <div class="ficha-carrera-item">
-                <span class="org">${c.org}</span> ${c.cargo}
+                ${c.org ? `<span class="org">${c.org}:</span> ` : ''}${c.cargo}
             </div>`).join('');
 
         const fotoPos = d.foto_position || '20% center';
