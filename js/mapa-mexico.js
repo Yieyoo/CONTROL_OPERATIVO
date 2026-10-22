@@ -59,6 +59,46 @@
 
     const fmt = n => Number(n || 0).toLocaleString('es-MX');
 
+    // ===== Titular de cada estado (sale de su Ficha Curricular) =====
+    const titulares = new Map(); // slug -> Promise<datos | null>
+
+    function obtenerTitular(slug) {
+        if (!titulares.has(slug)) {
+            titulares.set(slug, fetch(`${window.CONFIG.BACKEND_URL}/ficha-datos/${slug}`, {
+                headers: { 'Authorization': 'Bearer ' + window.CONFIG.getToken() }
+            })
+                .then(r => r.ok ? r.json() : null)
+                .then(j => (j && j.data && j.data.nombre) ? j.data : null)
+                .catch(() => null));
+        }
+        return titulares.get(slug);
+    }
+
+    function pintarTitular(caja, datos) {
+        caja.classList.remove('cargando');
+        if (!datos) {
+            caja.innerHTML = '<span class="sel-titular-nd">Sin ficha del titular</span>';
+            return;
+        }
+        caja.innerHTML = '';
+        const foto = document.createElement(datos.foto_url ? 'img' : 'span');
+        foto.className = 'sel-titular-foto';
+        if (datos.foto_url) {
+            foto.src = datos.foto_url;
+            foto.alt = datos.nombre;
+            foto.style.objectPosition = datos.foto_position || '50% 20%';
+        } else {
+            foto.innerHTML = '<i class="fas fa-user"></i>';
+        }
+        const texto = document.createElement('div');
+        const nombre = document.createElement('strong');
+        nombre.textContent = datos.nombre;
+        const cargo = document.createElement('span');
+        cargo.textContent = datos.cargo || 'Titular';
+        texto.append(nombre, cargo);
+        caja.append(foto, texto);
+    }
+
     function periodoTexto(datos) {
         if (!datos) return '';
         const q = datos.quincena === '1' ? '1ra' : '2da';
@@ -86,8 +126,8 @@
             <div class="sel-tipo" title="Vigencia: ${periodoTexto(datos)}">
                 <span class="sel-tipo-nombre">${etiqueta}</span>
                 <span class="sel-tipo-total">${fmt(c.total)}</span>
-                <span class="sel-chip activos">${fmt(c.activos)} activos</span>
-                <span class="sel-chip vacantes">${fmt(c.vacantes)} vacantes</span>
+                <span class="sel-chip activos">${fmt(c.activos)} ${c.activos === 1 ? 'activo' : 'activos'}</span>
+                <span class="sel-chip vacantes">${fmt(c.vacantes)} ${c.vacantes === 1 ? 'vacante' : 'vacantes'}</span>
             </div>`;
     }
 
@@ -337,6 +377,7 @@
                             <strong>${estado ? estado.nombre : 'Total nacional'}</strong>
                         </div>
                     </div>
+                    ${estado ? '<div class="sel-titular cargando"><span class="sel-titular-foto"></span><div><strong>&nbsp;</strong><span>&nbsp;</span></div></div>' : ''}
                     <div class="sel-resumen"></div>
                     <small class="sel-pista">${estado
                         ? 'Clic otra vez en el estado para abrir su página'
@@ -347,6 +388,15 @@
                     panel.querySelector('.sel-cabecera').appendChild(cerrar);
                 }
                 pintarResumen(panel.querySelector('.sel-resumen'), estado ? estado.slug : null);
+
+                if (estado) {
+                    const id = seleccionadoId;
+                    obtenerTitular(estado.slug).then(datos => {
+                        // Si mientras cargaba se eligió otro estado, no se pinta
+                        const caja = panel.querySelector('.sel-titular');
+                        if (caja && seleccionadoId === id) pintarTitular(caja, datos);
+                    });
+                }
             }
 
             pintarPanel();

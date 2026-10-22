@@ -415,6 +415,75 @@ main, footer {
   line-height: 1.25;
 }
 
+/* Titular de la oficina (de su Ficha Curricular) */
+.sel-titular {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #faf6f7;
+}
+
+.sel-titular-foto {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #A5852E;
+  background: #eadfe3;
+  display: grid;
+  place-items: center;
+  color: #b9a3ab;
+  font-size: 1.4rem;
+}
+
+.sel-titular > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sel-titular strong {
+  font-size: 0.9rem;
+  color: #222;
+  line-height: 1.25;
+}
+
+.sel-titular > div > span {
+  font-size: 0.74rem;
+  color: #777;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sel-titular-nd {
+  font-size: 0.78rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Mientras carga: renglones grises que parpadean */
+.sel-titular.cargando strong,
+.sel-titular.cargando > div > span {
+  border-radius: 4px;
+  background: #ece3e6;
+  animation: parpadeo 1.2s ease-in-out infinite;
+}
+
+.sel-titular.cargando strong { width: 140px; }
+.sel-titular.cargando > div > span { width: 100px; margin-top: 4px; }
+.sel-titular.cargando .sel-titular-foto { animation: parpadeo 1.2s ease-in-out infinite; }
+
+@keyframes parpadeo {
+  50% { opacity: 0.45; }
+}
+
 .sel-total {
   display: flex;
   align-items: baseline;
