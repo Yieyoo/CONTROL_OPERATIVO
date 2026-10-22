@@ -117,6 +117,7 @@
 
 /* Paginas de estado: barra y banda guinda se leen como un solo bloque (una sola linea dorada) */
 body.con-banda-estado .topbar {
+    background: linear-gradient(to right, #3d0c1c 0%, #5c1530 40%, #691932 75%, #7a2340 100%);
     border-bottom-color: transparent;
     box-shadow: none;
 }

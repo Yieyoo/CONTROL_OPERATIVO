@@ -544,13 +544,14 @@
 /* BANDA GUINDA CON SILUETA DEL ESTADO (js/estado-banda.js) */
 /* ==================== */
 .instituto-info.con-banda {
-  background: linear-gradient(115deg, #3d0c1c 0%, #5c1530 45%, #691932 75%, #7a2340 100%);
+  /* Mismo degradado que la barra superior en estas paginas (menu.css): se leen como un solo bloque */
+  background: linear-gradient(to right, #3d0c1c 0%, #5c1530 40%, #691932 75%, #7a2340 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   min-height: 118px;
   color: #fff;
   border-bottom: 3px solid #A5852E;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
 }
 
 /* Logo de Gobernacion en blanco sobre el guinda */
