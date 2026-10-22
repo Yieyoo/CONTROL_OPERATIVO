@@ -113,9 +113,6 @@
                 <p>Selecciona un estado en el mapa o búscalo en la lista</p>
             </div>
             <div class="mapa-cuerpo">
-                <div class="mapa-lienzo">
-                    <div id="map"></div>
-                </div>
                 <aside class="lista-estados">
                     <div class="lista-buscar">
                         <i class="fas fa-search"></i>
@@ -124,6 +121,10 @@
                     <ul id="listaEstados"></ul>
                     <p class="lista-vacia" id="listaVacia">Sin coincidencias</p>
                 </aside>
+                <div class="mapa-lienzo">
+                    <div id="map"></div>
+                </div>
+                <aside class="panel-resumen" id="panelResumen" aria-live="polite"></aside>
             </div>
         </section>
     </main>

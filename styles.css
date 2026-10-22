@@ -286,12 +286,17 @@ main, footer {
 
 .mapa-cuerpo {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 270px;
-  gap: 1.5rem;
-  align-items: start;
+  grid-template-columns: 190px minmax(0, 1fr) 280px;
+  grid-template-areas: "lista mapa panel";
+  gap: 1.25rem;
+  align-items: stretch;
 }
 
-.mapa-lienzo { min-width: 0; }
+.mapa-lienzo {
+  grid-area: mapa;
+  min-width: 0;
+  align-self: center;
+}
 
 .mapa-container #map {
   width: 100%;
@@ -371,49 +376,124 @@ main, footer {
   outline: none;
 }
 
-/* Tarjeta del estado seleccionado */
-.mapa-seleccion {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 10px 12px 10px 16px;
+/* Panel de resumen (derecha): total nacional o el estado seleccionado */
+.panel-resumen {
+  grid-area: panel;
+  align-self: start;
+  padding: 14px 16px 12px 18px;
   background: #fff;
+  border: 1px solid #eadfe3;
   border-left: 4px solid #A5852E;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  border-radius: 12px;
+  text-align: left;
+  transition: border-color 0.2s ease;
 }
 
-.mapa-seleccion.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+.panel-resumen.con-estado { border-left-color: #285c4d; }
+
+.sel-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.mapa-seleccion strong {
+.sel-etiqueta {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #A5852E;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sel-cabecera strong {
+  display: block;
   color: #691932;
-  font-size: 1rem;
+  font-size: 1.15rem;
+  line-height: 1.25;
 }
 
-.mapa-seleccion a {
-  padding: 6px 12px;
-  border-radius: 6px;
-  background: #691932;
-  color: #fff;
-  font-size: 0.82rem;
-  text-decoration: none;
+.sel-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 8px 0 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f7f1f3;
+}
+
+.sel-total span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #691932;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.sel-total strong {
+  font-size: 1.5rem;
+  color: #691932;
+  font-variant-numeric: tabular-nums;
+}
+
+.sel-tipo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 7px 2px;
+  border-bottom: 1px solid #f0e8eb;
+}
+
+.sel-tipo-nombre {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.sel-tipo-total {
+  justify-self: end;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #222;
+  font-variant-numeric: tabular-nums;
+}
+
+.sel-chip {
+  justify-self: start;
+  padding: 1px 8px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 600;
   white-space: nowrap;
-  transition: background 0.15s ease;
 }
 
-.mapa-seleccion a:hover { background: #285c4d; }
+.sel-chip.activos { background: #e3efe9; color: #285c4d; }
+.sel-chip.vacantes { justify-self: end; background: #f9ece3; color: #9a4b12; }
+
+.sel-tipo.sin-datos .sel-nd {
+  font-size: 0.78rem;
+  color: #999;
+  font-style: italic;
+}
+
+.sel-periodo,
+.sel-pista {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: #888;
+}
+
+.sel-pista { margin-top: 2px; }
+
+.sel-aviso {
+  margin: 8px 0 4px;
+  font-size: 0.82rem;
+  color: #777;
+}
 
 .mapa-seleccion-cerrar {
   border: none;
@@ -449,11 +529,14 @@ main, footer {
   color: #8a1c1c;
 }
 
-/* Lista de estados */
+/* Lista de estados (izquierda). height 0 + min-height 100%: toma el alto
+   del mapa en lugar de estirar la fila con sus 32 renglones */
 .lista-estados {
+  grid-area: lista;
   display: flex;
   flex-direction: column;
-  height: 520px;
+  height: 0;
+  min-height: 100%;
   background: #fff;
   border: 1px solid #eadfe3;
   border-radius: 12px;
@@ -462,14 +545,14 @@ main, footer {
 
 .lista-buscar {
   position: relative;
-  padding: 10px;
+  padding: 8px;
   border-bottom: 1px solid #eadfe3;
   background: #faf6f7;
 }
 
 .lista-buscar i {
   position: absolute;
-  left: 22px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
   color: #A5852E;
@@ -478,10 +561,10 @@ main, footer {
 
 .lista-buscar input {
   width: 100%;
-  padding: 9px 12px 9px 34px;
+  padding: 7px 10px 7px 28px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-family: inherit;
   outline: none;
   transition: var(--transicion);
@@ -496,14 +579,14 @@ main, footer {
   list-style: none;
   overflow-y: auto;
   flex: 1;
-  padding: 6px;
+  padding: 4px;
 }
 
 #listaEstados a {
   display: block;
-  padding: 7px 12px;
+  padding: 4px 10px;
   border-radius: 6px;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   color: #333;
   text-decoration: none;
   text-align: left;
@@ -581,8 +664,13 @@ main, footer {
 
   .portada .imagen-container img { max-height: 320px; }
 
-  .mapa-cuerpo { grid-template-columns: 1fr; }
-  .lista-estados { height: 320px; }
+  /* Tablet: mapa y resumen arriba, lista abajo */
+  .mapa-cuerpo {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-areas: "mapa panel" "lista lista";
+  }
+
+  .lista-estados { height: 240px; min-height: 0; }
 }
 
 @media (max-width: 640px) {
@@ -590,4 +678,10 @@ main, footer {
   .portada .texto-container h1 { font-size: 1.5rem; }
   .portada .imagen-container img { max-height: 240px; }
   .mapa-container { width: auto; margin: 1.5rem 12px 2rem; padding: 1.25rem 1rem; }
+
+  /* Celular: todo en una columna */
+  .mapa-cuerpo {
+    grid-template-columns: 1fr;
+    grid-template-areas: "mapa" "panel" "lista";
+  }
 }

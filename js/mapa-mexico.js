@@ -3,42 +3,118 @@
 // sin marca de agua). Cada estado se identifica con su código ISO (MXAGU, MXBCN...).
 (function () {
     const ESTADOS = {
-        MXAGU: { nombre: 'Aguascalientes', url: 'estados/aguascalientes/aguascalientesindex.html' },
-        MXBCN: { nombre: 'Baja California', url: 'estados/baja_california/baja_californiaindex.html' },
-        MXBCS: { nombre: 'Baja California Sur', url: 'estados/baja_california_s/baja_california_surindex.html' },
-        MXCAM: { nombre: 'Campeche', url: 'estados/campeche/campecheindex.html' },
-        MXCHP: { nombre: 'Chiapas', url: 'estados/chiapas/chiapasindex.html' },
-        MXCHH: { nombre: 'Chihuahua', url: 'estados/chihuahua/chihuahuaindex.html' },
-        MXCMX: { nombre: 'Ciudad de México', url: 'estados/cdmx/cdmxindex.html' },
-        MXCOA: { nombre: 'Coahuila', url: 'estados/coahuila/coahuilaindex.html' },
-        MXCOL: { nombre: 'Colima', url: 'estados/colima/colimaindex.html' },
-        MXDUR: { nombre: 'Durango', url: 'estados/durango/durangoindex.html' },
-        MXMEX: { nombre: 'Estado de México', url: 'estados/edomex/edomexindex.html' },
-        MXGUA: { nombre: 'Guanajuato', url: 'estados/guanajuato/guanajuatoindex.html' },
-        MXGRO: { nombre: 'Guerrero', url: 'estados/guerrero/guerreroindex.html' },
-        MXHID: { nombre: 'Hidalgo', url: 'estados/hidalgo/hidalgoindex.html' },
-        MXJAL: { nombre: 'Jalisco', url: 'estados/jalisco/jaliscoindex.html' },
-        MXMIC: { nombre: 'Michoacán', url: 'estados/michoacan/michoacanindex.html' },
-        MXMOR: { nombre: 'Morelos', url: 'estados/morelos/morelosindex.html' },
-        MXNAY: { nombre: 'Nayarit', url: 'estados/nayarit/nayaritindex.html' },
-        MXNLE: { nombre: 'Nuevo León', url: 'estados/nuevo_leon/nuevolindex.html' },
-        MXOAX: { nombre: 'Oaxaca', url: 'estados/oaxaca/oaxacaindex.html' },
-        MXPUE: { nombre: 'Puebla', url: 'estados/puebla/pueblaindex.html' },
-        MXQUE: { nombre: 'Querétaro', url: 'estados/queretaro/queretaroindex.html' },
-        MXROO: { nombre: 'Quintana Roo', url: 'estados/quintanaroo/quintanarooindex.html' },
-        MXSLP: { nombre: 'San Luis Potosí', url: 'estados/san_luis/san_luisindex.html' },
-        MXSIN: { nombre: 'Sinaloa', url: 'estados/sinaloa/sinaloaindex.html' },
-        MXSON: { nombre: 'Sonora', url: 'estados/sonora/sonoraindex.html' },
-        MXTAB: { nombre: 'Tabasco', url: 'estados/tabasco/tabascoindex.html' },
-        MXTAM: { nombre: 'Tamaulipas', url: 'estados/tamaulipas/tamaulipasindex.html' },
-        MXTLA: { nombre: 'Tlaxcala', url: 'estados/tlaxcala/tlaxcalaindex.html' },
-        MXVER: { nombre: 'Veracruz', url: 'estados/veracruz/veracruzindex.html' },
-        MXYUC: { nombre: 'Yucatán', url: 'estados/yucatan/yucatanindex.html' },
-        MXZAC: { nombre: 'Zacatecas', url: 'estados/zacatecas/zacatecasindex.html' }
+        MXAGU: { nombre: 'Aguascalientes', slug: 'aguascalientes', url: 'estados/aguascalientes/aguascalientesindex.html' },
+        MXBCN: { nombre: 'Baja California', slug: 'baja-california', url: 'estados/baja_california/baja_californiaindex.html' },
+        MXBCS: { nombre: 'Baja California Sur', slug: 'baja-california-sur', url: 'estados/baja_california_s/baja_california_surindex.html' },
+        MXCAM: { nombre: 'Campeche', slug: 'campeche', url: 'estados/campeche/campecheindex.html' },
+        MXCHP: { nombre: 'Chiapas', slug: 'chiapas', url: 'estados/chiapas/chiapasindex.html' },
+        MXCHH: { nombre: 'Chihuahua', slug: 'chihuahua', url: 'estados/chihuahua/chihuahuaindex.html' },
+        MXCMX: { nombre: 'Ciudad de México', slug: 'ciudad-de-mexico', url: 'estados/cdmx/cdmxindex.html' },
+        MXCOA: { nombre: 'Coahuila', slug: 'coahuila', url: 'estados/coahuila/coahuilaindex.html' },
+        MXCOL: { nombre: 'Colima', slug: 'colima', url: 'estados/colima/colimaindex.html' },
+        MXDUR: { nombre: 'Durango', slug: 'durango', url: 'estados/durango/durangoindex.html' },
+        MXMEX: { nombre: 'Estado de México', slug: 'estado-de-mexico', url: 'estados/edomex/edomexindex.html' },
+        MXGUA: { nombre: 'Guanajuato', slug: 'guanajuato', url: 'estados/guanajuato/guanajuatoindex.html' },
+        MXGRO: { nombre: 'Guerrero', slug: 'guerrero', url: 'estados/guerrero/guerreroindex.html' },
+        MXHID: { nombre: 'Hidalgo', slug: 'hidalgo', url: 'estados/hidalgo/hidalgoindex.html' },
+        MXJAL: { nombre: 'Jalisco', slug: 'jalisco', url: 'estados/jalisco/jaliscoindex.html' },
+        MXMIC: { nombre: 'Michoacán', slug: 'michoacan', url: 'estados/michoacan/michoacanindex.html' },
+        MXMOR: { nombre: 'Morelos', slug: 'morelos', url: 'estados/morelos/morelosindex.html' },
+        MXNAY: { nombre: 'Nayarit', slug: 'nayarit', url: 'estados/nayarit/nayaritindex.html' },
+        MXNLE: { nombre: 'Nuevo León', slug: 'nuevo-leon', url: 'estados/nuevo_leon/nuevolindex.html' },
+        MXOAX: { nombre: 'Oaxaca', slug: 'oaxaca', url: 'estados/oaxaca/oaxacaindex.html' },
+        MXPUE: { nombre: 'Puebla', slug: 'puebla', url: 'estados/puebla/pueblaindex.html' },
+        MXQUE: { nombre: 'Querétaro', slug: 'queretaro', url: 'estados/queretaro/queretaroindex.html' },
+        MXROO: { nombre: 'Quintana Roo', slug: 'quintana-roo', url: 'estados/quintanaroo/quintanarooindex.html' },
+        MXSLP: { nombre: 'San Luis Potosí', slug: 'san-luis-potosi', url: 'estados/san_luis/san_luisindex.html' },
+        MXSIN: { nombre: 'Sinaloa', slug: 'sinaloa', url: 'estados/sinaloa/sinaloaindex.html' },
+        MXSON: { nombre: 'Sonora', slug: 'sonora', url: 'estados/sonora/sonoraindex.html' },
+        MXTAB: { nombre: 'Tabasco', slug: 'tabasco', url: 'estados/tabasco/tabascoindex.html' },
+        MXTAM: { nombre: 'Tamaulipas', slug: 'tamaulipas', url: 'estados/tamaulipas/tamaulipasindex.html' },
+        MXTLA: { nombre: 'Tlaxcala', slug: 'tlaxcala', url: 'estados/tlaxcala/tlaxcalaindex.html' },
+        MXVER: { nombre: 'Veracruz', slug: 'veracruz', url: 'estados/veracruz/veracruzindex.html' },
+        MXYUC: { nombre: 'Yucatán', slug: 'yucatan', url: 'estados/yucatan/yucatanindex.html' },
+        MXZAC: { nombre: 'Zacatecas', slug: 'zacatecas', url: 'estados/zacatecas/zacatecasindex.html' }
     };
 
     const SVG_NS = 'http://www.w3.org/2000/svg';
     const quitarAcentos = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+    // ===== Resumen de plantilla (estructura + eventual) por estado =====
+    let resumen = null;
+    let resumenError = false;
+
+    const resumenListo = (async () => {
+        try {
+            const resp = await fetch(`${window.CONFIG.BACKEND_URL}/plantilla-resumen`, {
+                headers: { 'Authorization': 'Bearer ' + window.CONFIG.getToken() }
+            });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            resumen = (await resp.json()).data;
+        } catch (error) {
+            console.error('Error cargando el resumen de plantilla:', error);
+            resumenError = true;
+        }
+    })();
+
+    const fmt = n => Number(n || 0).toLocaleString('es-MX');
+
+    function periodoTexto(datos) {
+        if (!datos) return '';
+        const q = datos.quincena === '1' ? '1ra' : '2da';
+        return `${q} quincena ${String(datos.mes || '').toLowerCase()} ${datos.anio}`;
+    }
+
+    // Conteos de un estado, o de todo el país si slug es null
+    function conteo(datos, slug) {
+        const vacio = { total: 0, activos: 0, vacantes: 0 };
+        if (!datos) return vacio;
+        if (slug) return datos.estados[slug] || vacio;
+        return Object.values(datos.estados).reduce((s, c) => ({
+            total: s.total + c.total,
+            activos: s.activos + c.activos,
+            vacantes: s.vacantes + c.vacantes
+        }), vacio);
+    }
+
+    function filaTipo(etiqueta, datos, slug) {
+        if (!datos) {
+            return `<div class="sel-tipo sin-datos"><span class="sel-tipo-nombre">${etiqueta}</span><span class="sel-nd">Sin carga</span></div>`;
+        }
+        const c = conteo(datos, slug);
+        return `
+            <div class="sel-tipo" title="Vigencia: ${periodoTexto(datos)}">
+                <span class="sel-tipo-nombre">${etiqueta}</span>
+                <span class="sel-tipo-total">${fmt(c.total)}</span>
+                <span class="sel-chip activos">${fmt(c.activos)} activos</span>
+                <span class="sel-chip vacantes">${fmt(c.vacantes)} vacantes</span>
+            </div>`;
+    }
+
+    function pintarResumen(caja, slug) {
+        if (!resumen) {
+            caja.innerHTML = resumenError
+                ? '<p class="sel-aviso">No se pudo cargar la plantilla.</p>'
+                : '<p class="sel-aviso"><i class="fas fa-spinner fa-spin"></i> Cargando plantilla...</p>';
+            return;
+        }
+        const { estructura, eventual } = resumen;
+        if (!estructura && !eventual) {
+            caja.innerHTML = '<p class="sel-aviso">Aún no se ha cargado ninguna plantilla.</p>';
+            return;
+        }
+        const total = conteo(estructura, slug).total + conteo(eventual, slug).total;
+        const periodo = periodoTexto(estructura || eventual);
+
+        caja.innerHTML = `
+            <div class="sel-total">
+                <span>Plantilla actual</span>
+                <strong>${fmt(total)}</strong>
+            </div>
+            ${filaTipo('Estructura', estructura, slug)}
+            ${filaTipo('Eventual', eventual, slug)}
+            <small class="sel-periodo">Vigencia: ${periodo}</small>`;
+    }
 
     // Resalta un estado en el mapa y en la lista a la vez
     function resaltar(id, activo) {
@@ -210,7 +286,7 @@
         return b;
     }
 
-    async function cargarMapa(contenedor) {
+    async function cargarMapa(contenedor, panel) {
         const tooltip = document.createElement('div');
         tooltip.className = 'mapa-tooltip';
         contenedor.appendChild(tooltip);
@@ -228,31 +304,50 @@
 
             const zoom = crearZoom(svg, contenedor);
 
-            // Tarjeta del estado seleccionado
-            const tarjeta = document.createElement('div');
-            tarjeta.className = 'mapa-seleccion';
-            tarjeta.innerHTML = '<strong></strong><a href="#">Ver información <i class="fas fa-arrow-right"></i></a>';
-            const cerrar = crearBoton('fa-times', 'Quitar selección', () => deseleccionar());
-            cerrar.className = 'mapa-seleccion-cerrar';
-            tarjeta.appendChild(cerrar);
-            contenedor.appendChild(tarjeta);
-
             let seleccionado = null;
+            let seleccionadoId = null;
 
             function seleccionar(id, path) {
                 if (seleccionado) seleccionado.classList.remove('seleccionado');
                 seleccionado = path;
+                seleccionadoId = id;
                 path.classList.add('seleccionado');
-                tarjeta.querySelector('strong').textContent = ESTADOS[id].nombre;
-                tarjeta.querySelector('a').href = ESTADOS[id].url;
-                tarjeta.classList.add('visible');
+                pintarPanel();
                 zoom.enfocar(path);
             }
+
+            // Panel de la derecha: el estado seleccionado o, si no hay, el total nacional
+            function pintarPanel() {
+                if (!panel) return;
+                const estado = seleccionadoId ? ESTADOS[seleccionadoId] : null;
+                panel.classList.toggle('con-estado', !!estado);
+                panel.innerHTML = `
+                    <div class="sel-cabecera">
+                        <div>
+                            <span class="sel-etiqueta">${estado ? 'Oficina de Representación' : 'Resumen'}</span>
+                            <strong>${estado ? estado.nombre : 'Total nacional'}</strong>
+                        </div>
+                    </div>
+                    <div class="sel-resumen"></div>
+                    <small class="sel-pista">${estado
+                        ? 'Clic otra vez en el estado para abrir su página'
+                        : 'Selecciona un estado para ver su resumen'}</small>`;
+                if (estado) {
+                    const cerrar = crearBoton('fa-times', 'Quitar selección', () => deseleccionar());
+                    cerrar.className = 'mapa-seleccion-cerrar';
+                    panel.querySelector('.sel-cabecera').appendChild(cerrar);
+                }
+                pintarResumen(panel.querySelector('.sel-resumen'), estado ? estado.slug : null);
+            }
+
+            pintarPanel();
+            resumenListo.then(pintarPanel);
 
             function deseleccionar() {
                 if (seleccionado) seleccionado.classList.remove('seleccionado');
                 seleccionado = null;
-                tarjeta.classList.remove('visible');
+                seleccionadoId = null;
+                pintarPanel();
                 zoom.restablecer();
             }
 
@@ -353,7 +448,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const mapa = document.getElementById('map');
         const lista = document.getElementById('listaEstados');
-        if (mapa) cargarMapa(mapa);
+        if (mapa) cargarMapa(mapa, document.getElementById('panelResumen'));
         if (lista) armarLista(lista, document.getElementById('buscarEstado'), document.getElementById('listaVacia'));
     });
 })();

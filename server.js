@@ -1110,6 +1110,73 @@ function generarPdfPreview({ nombreEstado, registros, quincenaTexto, mes, anio, 
   });
 }
 
+// ========== RESUMEN DE PLANTILLA POR ESTADO (mapa de la portada) ==========
+// Cuenta total/activos/vacantes de cada estado a partir del JSON que guarda
+// /plantilla-nacional/procesar. Solo devuelve conteos, ningun dato personal.
+// Se cachea en memoria para no gastar el limite por hora del Admin API de Cloudinary.
+const RESUMEN_PLANTILLA_TTL = 10 * 60 * 1000;
+const resumenPlantillaCache = new Map(); // tipo -> { expira, datos }
+
+async function resumenPlantilla(tipo) {
+  const enCache = resumenPlantillaCache.get(tipo);
+  if (enCache && enCache.expira > Date.now()) return enCache.datos;
+
+  const https = require('https');
+  const config = TIPOS_PLANTILLA_NACIONAL[tipo];
+  const lista = await cloudinary.api.resources({
+    type: 'upload',
+    prefix: `datos-nacionales/${config.carpetaResumen}/`,
+    resource_type: 'raw',
+    max_results: 500
+  });
+
+  // El nombre (datos_AAAA_MM_qN) ordena por periodo: el mayor es la plantilla actual
+  const recurso = lista.resources.sort((a, b) => b.public_id.localeCompare(a.public_id))[0];
+  let datos = null;
+
+  if (recurso) {
+    const json = await new Promise((resolve, reject) => {
+      https.get(recurso.secure_url, (response) => {
+        let body = '';
+        response.on('data', chunk => body += chunk);
+        response.on('end', () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
+      }).on('error', reject);
+    });
+
+    const estados = {};
+    (json.estados || []).forEach(({ estado, registros }) => {
+      // Todo lo que no sea VACANTE cuenta como activo
+      const textoStatus = (v) => (v && Array.isArray(v.richText)) ? v.richText.map(t => t.text).join('') : v;
+      const vacantes = (registros || []).filter(r => normalizarHeader(textoStatus(r.status)) === 'VACANTE').length;
+      const total = (registros || []).length;
+      estados[estado] = { total, activos: total - vacantes, vacantes };
+    });
+
+    datos = {
+      quincena: json.quincena,
+      mes: json.mes,
+      anio: json.anio,
+      procesado_en: json.procesado_en,
+      estados
+    };
+  }
+
+  resumenPlantillaCache.set(tipo, { expira: Date.now() + RESUMEN_PLANTILLA_TTL, datos });
+  return datos;
+}
+
+router.get('/plantilla-resumen', authenticate, async (req, res, next) => {
+  try {
+    const [estructura, eventual] = await Promise.all([
+      resumenPlantilla('estructura').catch(e => { console.error('Resumen estructura:', e.message); return null; }),
+      resumenPlantilla('eventual').catch(e => { console.error('Resumen eventual:', e.message); return null; })
+    ]);
+    res.json({ status: 'success', data: { estructura, eventual } });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
   xlsxUpload(req, res, async (err) => {
     try {
@@ -1393,6 +1460,9 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
           resultados.push({ estado: slug, status: 'error', message: errorEstado.message });
         }
       }
+
+      // El resumen por estado del mapa debe reflejar esta carga de inmediato
+      resumenPlantillaCache.delete(tipoPlantilla);
 
       let resumenJson = null;
       try {
