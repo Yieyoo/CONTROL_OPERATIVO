@@ -85,30 +85,33 @@
             return;
         }
 
+        // Todo texto capturado se escapa: lo que se escriba en la ficha se muestra como texto, nunca como código
+        const e = v => escHtml(String(v ?? ''));
+
         const formacionHTML = (d.formacion || []).map(f =>
-            `<li>${f}</li>`).join('');
+            `<li>${e(f)}</li>`).join('');
 
         const trayHTML = (d.trayectoria || []).map(t => `
             <div class="ficha-tray-item">
-                <span class="periodo">${t.periodo}:</span> ${t.cargo}
+                <span class="periodo">${e(t.periodo)}:</span> ${e(t.cargo)}
             </div>`).join('');
 
         const carreraHTML = (d.carrera_profesional || []).map(c => `
             <div class="ficha-carrera-item">
-                ${c.org ? `<span class="org">${c.org}:</span> ` : ''}${c.cargo}
+                ${c.org ? `<span class="org">${e(c.org)}:</span> ` : ''}${e(c.cargo)}
             </div>`).join('');
 
         const fotoPos = d.foto_position || '20% center';
         const fotoTag = d.foto_url
-            ? `<img class="ficha-foto" src="${d.foto_url}" alt="Foto" style="object-position:${fotoPos}">`
+            ? `<img class="ficha-foto" src="${e(d.foto_url)}" alt="Foto" style="object-position:${e(fotoPos)}">`
             : `<span class="ficha-foto-placeholder">👤</span>`;
 
         area.innerHTML = `
             <div class="ficha-card">
                 <div class="ficha-izq">
-                    <div class="ficha-cargo">${d.cargo || ''}</div>
+                    <div class="ficha-cargo">${e(d.cargo)}</div>
                     <div class="ficha-foto-wrap">${fotoTag}</div>
-                    <div class="ficha-nombre">${d.nombre || ''}</div>
+                    <div class="ficha-nombre">${e(d.nombre)}</div>
 
                     ${(d.formacion?.length) ? `
                     <div class="ficha-sec-izq">
@@ -120,13 +123,13 @@
                         <h4>Información de Contacto</h4>
                         ${d.contacto?.personal ? `
                             <span class="ficha-contacto-label">☎ Personal:</span>
-                            <span class="ficha-contacto-val">${d.contacto.personal}</span>` : ''}
+                            <span class="ficha-contacto-val">${e(d.contacto.personal)}</span>` : ''}
                         ${d.contacto?.trabajo ? `
                             <span class="ficha-contacto-label">☎ Trabajo:</span>
-                            <span class="ficha-contacto-val">${d.contacto.trabajo}</span>` : ''}
+                            <span class="ficha-contacto-val">${e(d.contacto.trabajo)}</span>` : ''}
                         ${d.contacto?.institucional ? `
                             <span class="ficha-contacto-label">✉ Institucional:</span>
-                            <span class="ficha-contacto-val">${d.contacto.institucional}</span>` : ''}
+                            <span class="ficha-contacto-val">${e(d.contacto.institucional)}</span>` : ''}
                     </div>
                 </div>
 
@@ -137,15 +140,15 @@
 
                     <div class="ficha-sec-der">
                         <h3>Trayectoria INM</h3>
-                        ${d.anio_ingreso ? `<p class="ficha-anio">Año de ingreso al INM: ${d.anio_ingreso}</p>` : ''}
-                        ${d.or_nombre ? `<p class="ficha-or-nombre">${d.or_nombre}</p>` : ''}
+                        ${d.anio_ingreso ? `<p class="ficha-anio">Año de ingreso al INM: ${e(d.anio_ingreso)}</p>` : ''}
+                        ${d.or_nombre ? `<p class="ficha-or-nombre">${e(d.or_nombre)}</p>` : ''}
                         ${trayHTML}
                     </div>
 
                     ${(d.carrera_intro || d.carrera_profesional?.length) ? `
                     <div class="ficha-sec-der">
                         <h3>Carrera Profesional</h3>
-                        ${d.carrera_intro ? `<p class="ficha-carrera-intro">${d.carrera_intro}</p>` : ''}
+                        ${d.carrera_intro ? `<p class="ficha-carrera-intro">${e(d.carrera_intro)}</p>` : ''}
                         ${carreraHTML}
                     </div>` : ''}
                 </div>
@@ -157,7 +160,7 @@
         if (!wrap) return;
         if (d?.documento_url) {
             const nombre = d.documento_nombre || 'Documento';
-            wrap.innerHTML = `<a class="ficha-btn ficha-btn-descargar" href="${d.documento_url}" download="${nombre}" target="_blank">
+            wrap.innerHTML = `<a class="ficha-btn ficha-btn-descargar" href="${escHtml(d.documento_url)}" download="${escHtml(nombre)}" target="_blank" rel="noopener">
                 <i class="fas fa-download"></i> Descargar documento
             </a>`;
         } else {
@@ -178,11 +181,11 @@
                 <h3>Datos personales</h3>
                 <div class="ficha-field">
                     <label>Cargo / título (aparece en la columna izquierda)</label>
-                    <textarea id="f-cargo" rows="3">${d.cargo || ''}</textarea>
+                    <textarea id="f-cargo" rows="3">${escHtml(d.cargo || '')}</textarea>
                 </div>
                 <div class="ficha-field">
                     <label>Nombre completo</label>
-                    <input id="f-nombre" type="text" value="${d.nombre || ''}">
+                    <input id="f-nombre" type="text" value="${escHtml(d.nombre || '')}">
                 </div>
                 <div class="ficha-field">
                     <label>Foto</label>
@@ -210,15 +213,15 @@
                 <h3>Información de Contacto</h3>
                 <div class="ficha-field">
                     <label>Teléfono personal</label>
-                    <input id="f-tel-personal" type="text" value="${d.contacto?.personal || ''}">
+                    <input id="f-tel-personal" type="text" value="${escHtml(d.contacto?.personal || '')}">
                 </div>
                 <div class="ficha-field">
                     <label>Teléfono trabajo</label>
-                    <input id="f-tel-trabajo" type="text" value="${d.contacto?.trabajo || ''}">
+                    <input id="f-tel-trabajo" type="text" value="${escHtml(d.contacto?.trabajo || '')}">
                 </div>
                 <div class="ficha-field">
                     <label>Correo institucional</label>
-                    <input id="f-email" type="text" value="${d.contacto?.institucional || ''}">
+                    <input id="f-email" type="text" value="${escHtml(d.contacto?.institucional || '')}">
                 </div>
             </div>
 
@@ -227,11 +230,11 @@
                 <h3>Trayectoria INM</h3>
                 <div class="ficha-field">
                     <label>Año de ingreso al INM</label>
-                    <input id="f-anio" type="text" value="${d.anio_ingreso || ''}">
+                    <input id="f-anio" type="text" value="${escHtml(d.anio_ingreso || '')}">
                 </div>
                 <div class="ficha-field">
                     <label>Nombre de la OR (ej: Oficina de Representación en el Estado de X)</label>
-                    <input id="f-or" type="text" value="${d.or_nombre || ''}">
+                    <input id="f-or" type="text" value="${escHtml(d.or_nombre || '')}">
                 </div>
                 <label style="font-size:0.75rem;font-weight:600;color:#555;margin-bottom:6px;display:block">Historial de cargos</label>
                 <div id="f-tray-rows"></div>
@@ -243,7 +246,7 @@
                 <h3>Carrera Profesional <span style="font-weight:400;font-size:0.7rem;color:#888">(opcional)</span></h3>
                 <div class="ficha-field">
                     <label>Texto introductorio</label>
-                    <textarea id="f-carrera-intro" rows="2">${d.carrera_intro || ''}</textarea>
+                    <textarea id="f-carrera-intro" rows="2">${escHtml(d.carrera_intro || '')}</textarea>
                 </div>
                 <div id="f-carrera-rows"></div>
                 <button class="ficha-dyn-add" onclick="fichaAddRow('carrera')">+ Agregar puesto</button>
