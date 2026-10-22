@@ -473,6 +473,36 @@ router.get('/health', async (req, res) => {
   }
 });
 
+// ========== ENTREGA PRIVADA DE ARCHIVOS ==========
+// Todo se guarda en Cloudinary como 'authenticated': una liga solo abre si lleva la
+// firma que genera este servidor, y el servidor solo la da a quien tiene sesion.
+// Adivinar la ruta de un archivo ya no basta para descargarlo.
+const TIPO_ENTREGA = 'authenticated';
+
+function urlFirmada(publicId, resourceType = 'raw', opciones = {}) {
+  return cloudinary.url(publicId, {
+    type: TIPO_ENTREGA,
+    resource_type: resourceType,
+    sign_url: true,
+    secure: true,
+    ...opciones
+  });
+}
+
+// Firma una liga guardada antes (ej. foto_url o preview_pdf_url) a partir de su ruta
+function firmarLigaGuardada(url, resourceType) {
+  const m = /\/(image|raw|video)\/(?:upload|authenticated)\/(?:s--[^/]+--\/)?(?:v(\d+)\/)?(.+)$/.exec(url || '');
+  if (!m) return url || '';
+  const tipo = resourceType || m[1];
+  let publicId = m[3];
+  const opciones = m[2] ? { version: m[2] } : {};
+  if (tipo !== 'raw') {
+    const ext = /\.(\w+)$/.exec(publicId);
+    if (ext) { opciones.format = ext[1]; publicId = publicId.slice(0, -ext[0].length); }
+  }
+  return urlFirmada(publicId, tipo, opciones);
+}
+
 // Función para subir archivos
 const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null) => {
   if (!file) throw new AppError('No se ha subido ningún archivo', 400, 'missing_file');
@@ -486,8 +516,7 @@ const processUpload = async (file, estado, tipoDocumento, tituloDocumento = null
     resource_type: 'raw',
     folder: `${estado}/${tipoDocumento}`,
     format: 'pdf',
-    type: 'upload',
-    access_mode: 'public',
+    type: TIPO_ENTREGA,
     transformation: [{ quality: 'auto', fetch_format: 'auto' }],
     filename_override: originalName,
     unique_filename: false,
@@ -548,13 +577,13 @@ router.post('/upload', authenticate, (req, res, next) => {
       res.status(201).json({
         status: 'success',
         data: {
-          url: result.secure_url,
+          url: urlFirmada(result.public_id, result.resource_type, { version: result.version }),
           public_id: result.public_id,
           filename: result.original_filename,
           estado: estado,
           tipo_documento: tipoDocumento,
-          view_url: `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(result.secure_url)}`,
-          download_url: result.secure_url.replace('/upload/', '/upload/fl_attachment/'),
+          view_url: `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(urlFirmada(result.public_id, result.resource_type, { version: result.version }))}`,
+          download_url: urlFirmada(result.public_id, result.resource_type, { version: result.version, flags: 'attachment' }),
           uploaded_at: result.created_at,
           size: result.bytes,
           pages: result.pages,
@@ -584,7 +613,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
     }
 
     try {
-      await cloudinary.api.resource(public_id, { resource_type: 'raw' });
+      await cloudinary.api.resource(public_id, { resource_type: 'raw', type: TIPO_ENTREGA });
     } catch (error) {
       if (error.http_code === 404) {
         throw new AppError('Archivo no encontrado', 404, 'not_found');
@@ -594,6 +623,7 @@ router.delete('/delete', authenticate, async (req, res, next) => {
 
     const result = await cloudinary.uploader.destroy(public_id, {
       resource_type: 'raw',
+      type: TIPO_ENTREGA,
       invalidate: true
     });
 
@@ -625,7 +655,7 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
 
     // Agregar timestamp para evitar caché
     const result = await cloudinary.api.resources({
-      type: 'upload',
+      type: TIPO_ENTREGA,
       prefix: `${estado}/${tipoDocumento}/`,
       resource_type: 'raw',
       max_results: 500,
@@ -641,13 +671,13 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
       const originalName = resource.context?.custom?.original_filename ||
                          path.parse(resource.public_id).name + '.pdf';
       return {
-        url: `${resource.secure_url}?_=${Date.now()}`, // Cache busting
+        url: urlFirmada(resource.public_id, 'raw', { version: resource.version }), // la version evita cache viejo
         public_id: resource.public_id,
         filename: originalName,
         estado: estado,
         tipo_documento: tipoDocumento,
-        view_url: `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(resource.secure_url + '?_=' + Date.now())}`,
-        download_url: `${resource.secure_url.replace('/upload/', '/upload/fl_attachment/')}?_=${Date.now()}`,
+        view_url: `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(urlFirmada(resource.public_id, 'raw', { version: resource.version }))}`,
+        download_url: urlFirmada(resource.public_id, 'raw', { version: resource.version, flags: 'attachment' }),
         uploaded_at: resource.created_at,
         size: resource.bytes,
         // Cloudinary no siempre devuelve "format" al listar recursos raw -
@@ -662,7 +692,7 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
           titulo_documento: resource.context.custom.titulo_documento
         }),
         ...(resource.context?.custom?.preview_pdf_url && {
-          preview_pdf_url: resource.context.custom.preview_pdf_url
+          preview_pdf_url: firmarLigaGuardada(resource.context.custom.preview_pdf_url, 'raw')
         }),
         // Periodo elegido al procesar el Excel nacional (para armar el titulo)
         ...(resource.context?.custom?.mes && {
@@ -707,7 +737,7 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
     // Buscar todos los archivos de plantilla de personal para actualizar su metadata
     try {
       const recursos = await cloudinary.api.resources({
-        type: 'upload',
+        type: TIPO_ENTREGA,
         resource_type: 'raw',
         max_results: 500,
         context: true
@@ -721,7 +751,7 @@ router.post('/guardar-titulo-global', authenticate, async (req, res, next) => {
       await Promise.all(plantillas.map(async (resource) => {
         const originalName = resource.context?.custom?.original_filename || 'plantilla.pdf';
         await cloudinary.uploader.explicit(resource.public_id, {
-          type: 'upload',
+          type: TIPO_ENTREGA,
           resource_type: 'raw',
           context: `titulo_documento=${titulo}|original_filename=${originalName}`
         });
@@ -749,7 +779,7 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
     // Primero intenta obtener de Cloudinary (metadata del primer archivo de plantilla encontrado)
     try {
       const recursos = await cloudinary.api.resources({
-        type: 'upload',
+        type: TIPO_ENTREGA,
         resource_type: 'raw',
         max_results: 1,
         context: true,
@@ -789,7 +819,7 @@ router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
     // Helper to fetch latest Cloudinary raw resource in a folder
     async function latestRaw(prefix) {
       try {
-        const r = await cloudinary.api.resources({ type: 'upload', prefix, resource_type: 'raw', max_results: 1 });
+        const r = await cloudinary.api.resources({ type: TIPO_ENTREGA, prefix, resource_type: 'raw', max_results: 1 });
         return r.resources[0] || null;
       } catch (e) { return null; }
     }
@@ -802,7 +832,7 @@ router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
       const r = await latestRaw(`${estado}/ficha_datos/`);
       if (r) {
         fichaData = await new Promise((resolve, reject) => {
-          https.get(r.secure_url, (response) => {
+          https.get(urlFirmada(r.public_id, 'raw', { version: r.version }), (response) => {
             let body = '';
             response.on('data', chunk => body += chunk);
             response.on('end', () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
@@ -817,15 +847,19 @@ router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
     const docResource = await latestRaw(`${estado}/ficha_curricular/`);
     if (docResource) {
       const nombre = docResource.public_id.split('/').pop();
+      const docUrl = urlFirmada(docResource.public_id, 'raw', { version: docResource.version });
       if (fichaData) {
-        fichaData.documento_url = docResource.secure_url;
+        fichaData.documento_url = docUrl;
         fichaData.documento_nombre = nombre;
       } else {
-        fichaData = { documento_url: docResource.secure_url, documento_nombre: nombre };
+        fichaData = { documento_url: docUrl, documento_nombre: nombre };
       }
     }
 
-    res.json({ status: 'success', data: fichaData || null });
+    // La foto se guarda con su liga sin firma; se firma al entregarla
+    const salida = fichaData ? { ...fichaData } : null;
+    if (salida && salida.foto_url) salida.foto_url = firmarLigaGuardada(salida.foto_url, 'image');
+    res.json({ status: 'success', data: salida });
   } catch (error) {
     next(error);
   }
@@ -843,6 +877,7 @@ router.post('/ficha-datos/:estado', authenticate, async (req, res, next) => {
     if (fichaData.foto_base64) {
       const photoResult = await cloudinary.uploader.upload(fichaData.foto_base64, {
         resource_type: 'image',
+        type: TIPO_ENTREGA,
         public_id: `${estado}/ficha_foto/foto`,
         overwrite: true
       });
@@ -853,7 +888,7 @@ router.post('/ficha-datos/:estado', authenticate, async (req, res, next) => {
     const jsonBuffer = Buffer.from(JSON.stringify(fichaData));
     await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'raw', public_id: `${estado}/ficha_datos/datos`, overwrite: true },
+        { resource_type: 'raw', type: TIPO_ENTREGA, public_id: `${estado}/ficha_datos/datos`, overwrite: true },
         (error, result) => error ? reject(error) : resolve(result)
       );
       const { Readable } = require('stream');
@@ -865,7 +900,9 @@ router.post('/ficha-datos/:estado', authenticate, async (req, res, next) => {
 
     fichaCache[estado] = fichaData;
     fichaCacheHora[estado] = Date.now();
-    res.json({ status: 'success', data: fichaData });
+    const salida = { ...fichaData };
+    if (salida.foto_url) salida.foto_url = firmarLigaGuardada(salida.foto_url, 'image');
+    res.json({ status: 'success', data: salida });
   } catch (error) {
     next(error);
   }
@@ -887,7 +924,7 @@ router.post('/ficha-documento/:estado', authenticate, docUpload.single('document
 
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'raw', public_id: `${estado}/ficha_documento/doc.${ext}`, overwrite: true },
+        { resource_type: 'raw', type: TIPO_ENTREGA, public_id: `${estado}/ficha_documento/doc.${ext}`, overwrite: true },
         (error, result) => error ? reject(error) : resolve(result)
       );
       const { Readable } = require('stream');
@@ -897,12 +934,13 @@ router.post('/ficha-documento/:estado', authenticate, docUpload.single('document
       readable.pipe(uploadStream);
     });
 
+    const docUrl = urlFirmada(result.public_id, 'raw', { version: result.version });
     if (fichaCache[estado]) {
-      fichaCache[estado].documento_url = result.secure_url;
+      fichaCache[estado].documento_url = docUrl;
       fichaCache[estado].documento_nombre = nombre;
     }
 
-    res.json({ status: 'success', url: result.secure_url, nombre });
+    res.json({ status: 'success', url: docUrl, nombre });
   } catch (error) { next(error); }
 });
 
@@ -929,7 +967,7 @@ const xlsxUpload = multer({
 const uploadRawBuffer = (buffer, options) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
-      { resource_type: 'raw', ...options },
+      { resource_type: 'raw', type: TIPO_ENTREGA, ...options },
       (error, result) => error ? reject(error) : resolve(result)
     );
     const { Readable } = require('stream');
@@ -1137,7 +1175,7 @@ async function resumenPlantilla(tipo) {
   const https = require('https');
   const config = TIPOS_PLANTILLA_NACIONAL[tipo];
   const lista = await cloudinary.api.resources({
-    type: 'upload',
+    type: TIPO_ENTREGA,
     prefix: `datos-nacionales/${config.carpetaResumen}/`,
     resource_type: 'raw',
     max_results: 500
@@ -1149,7 +1187,7 @@ async function resumenPlantilla(tipo) {
 
   if (recurso) {
     const json = await new Promise((resolve, reject) => {
-      https.get(recurso.secure_url, (response) => {
+      https.get(urlFirmada(recurso.public_id, 'raw', { version: recurso.version }), (response) => {
         let body = '';
         response.on('data', chunk => body += chunk);
         response.on('end', () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
@@ -1464,14 +1502,19 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
             estado: slug,
             tipo_documento: config.tipoDocumento,
             filename: filenamePretty,
-            url: resultadoCloudinary.secure_url,
+            url: urlFirmada(resultadoCloudinary.public_id, 'raw', { version: resultadoCloudinary.version }),
             public_id: resultadoCloudinary.public_id,
-            preview_pdf_url: previewPdfUrl,
+            preview_pdf_url: previewPdfUrl && firmarLigaGuardada(previewPdfUrl, 'raw'),
             count: filas.length,
             status: 'ok'
           });
 
-          estadosResumen.push({ estado: slug, registros });
+          // El resumen guarda los registros sin CURP ni sueldos (no se necesitan para los conteos)
+          const clavesSensibles = new Set(['curp', ...columnasDetectadas.filter(col => col.sensible).map(col => col.key)]);
+          estadosResumen.push({
+            estado: slug,
+            registros: registros.map(r => Object.fromEntries(Object.entries(r).filter(([k]) => !clavesSensibles.has(k))))
+          });
         } catch (errorEstado) {
           resultados.push({ estado: slug, status: 'error', message: errorEstado.message });
         }
@@ -1491,7 +1534,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
           public_id: publicIdJson,
           overwrite: true
         });
-        resumenJson = { public_id: resultadoJson.public_id, url: resultadoJson.secure_url };
+        resumenJson = { public_id: resultadoJson.public_id };
       } catch (errorJson) {
         console.error('Error al guardar el resumen JSON de plantilla nacional:', errorJson.message);
       }
