@@ -602,6 +602,12 @@ main, footer {
   outline: none;
 }
 
+#listaEstados a.seleccionado {
+  background: #285c4d;
+  color: #fff;
+  font-weight: 600;
+}
+
 .lista-vacia {
   display: none;
   padding: 14px;

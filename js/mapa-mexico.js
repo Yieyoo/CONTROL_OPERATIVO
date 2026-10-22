@@ -120,6 +120,10 @@
             <small class="sel-periodo">Vigencia: ${periodo}</small>`;
     }
 
+    // Lo define el mapa al cargar: selecciona un estado (zoom + resumen) o, si ya
+    // estaba seleccionado, abre su página. La lista lo usa para comportarse igual.
+    let elegirEstado = null;
+
     // Resalta un estado en el mapa y en la lista a la vez
     function resaltar(id, activo) {
         document.querySelectorAll(`[data-estado="${id}"]`).forEach(el => el.classList.toggle('activo', activo));
@@ -307,11 +311,16 @@
             let seleccionado = null;
             let seleccionadoId = null;
 
+            // Marca el estado elegido en el mapa y en la lista
+            function marcar(id) {
+                document.querySelectorAll('[data-estado].seleccionado').forEach(el => el.classList.remove('seleccionado'));
+                if (id) document.querySelectorAll(`[data-estado="${id}"]`).forEach(el => el.classList.add('seleccionado'));
+            }
+
             function seleccionar(id, path) {
-                if (seleccionado) seleccionado.classList.remove('seleccionado');
                 seleccionado = path;
                 seleccionadoId = id;
-                path.classList.add('seleccionado');
+                marcar(id);
                 pintarPanel();
                 zoom.enfocar(path);
             }
@@ -344,7 +353,7 @@
             resumenListo.then(pintarPanel);
 
             function deseleccionar() {
-                if (seleccionado) seleccionado.classList.remove('seleccionado');
+                marcar(null);
                 seleccionado = null;
                 seleccionadoId = null;
                 pintarPanel();
@@ -391,16 +400,28 @@
                 path.addEventListener('focus', () => resaltar(id, true));
                 path.addEventListener('blur', () => resaltar(id, false));
                 // Primer clic: acerca y centra el estado. Segundo clic sobre el mismo: abre su página
-                path.addEventListener('click', () => {
-                    if (seleccionado === path) window.location.href = estado.url;
-                    else seleccionar(id, path);
-                });
+                path.addEventListener('click', () => elegirEstado(id));
                 path.addEventListener('keydown', e => {
                     if (e.key === 'Enter') window.location.href = estado.url;
                 });
 
                 svg.appendChild(path);
             });
+
+            elegirEstado = id => {
+                const path = svg.querySelector(`path[data-estado="${id}"]`);
+                if (!path) return;
+                if (seleccionado === path) {
+                    window.location.href = ESTADOS[id].url;
+                    return;
+                }
+                seleccionar(id, path);
+                // En celular la lista queda debajo del mapa: se sube para que se vea el zoom
+                const r = contenedor.getBoundingClientRect();
+                if (r.top < 0 || r.bottom > window.innerHeight) {
+                    contenedor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            };
         } catch (error) {
             console.error('Error cargando el mapa:', error);
             const aviso = document.createElement('p');
@@ -422,6 +443,13 @@
                 a.dataset.busqueda = quitarAcentos(ESTADOS[id].nombre);
                 a.addEventListener('mouseenter', () => resaltar(id, true));
                 a.addEventListener('mouseleave', () => resaltar(id, false));
+                // Igual que en el mapa: primer clic acerca el estado, el segundo abre su página.
+                // Ctrl/Shift/rueda siguen abriendo la liga normal (otra pestaña).
+                a.addEventListener('click', e => {
+                    if (!elegirEstado || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+                    e.preventDefault();
+                    elegirEstado(id);
+                });
                 li.appendChild(a);
                 lista.appendChild(li);
             });
@@ -437,11 +465,11 @@
             vacia.style.display = visibles ? 'none' : 'block';
         });
 
-        // Enter abre el primer resultado
+        // Enter elige el primer resultado (otro Enter abre su página)
         buscar.addEventListener('keydown', e => {
             if (e.key !== 'Enter') return;
             const primero = [...lista.querySelectorAll('a')].find(a => a.parentNode.style.display !== 'none');
-            if (primero) window.location.href = primero.href;
+            if (primero) primero.click();
         });
     }
 
