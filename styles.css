@@ -309,6 +309,7 @@ main, footer {
   display: block;
   width: 100%;
   height: auto;
+  transform-origin: 0 0;
   touch-action: pan-y;
   user-select: none;
 }
@@ -323,9 +324,9 @@ main, footer {
 .mapa-estado {
   fill: #691932;
   stroke: #fff;
-  stroke-width: 1;
+  /* --trazo = 1/zoom: las fronteras no engordan al acercar */
+  stroke-width: calc(1.4 * var(--trazo, 1));
   stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
   cursor: pointer;
   outline: none;
   transition: fill 0.2s ease;
@@ -339,7 +340,7 @@ main, footer {
 .mapa-estado.seleccionado {
   fill: #285c4d;
   stroke: #A5852E;
-  stroke-width: 2.5;
+  stroke-width: calc(3.5 * var(--trazo, 1));
 }
 
 /* Botones de zoom */

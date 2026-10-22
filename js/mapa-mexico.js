@@ -121,14 +121,17 @@
         document.querySelectorAll(`[data-estado="${id}"]`).forEach(el => el.classList.toggle('activo', activo));
     }
 
-    // ===== Zoom: se mueve el viewBox del SVG =====
+    // ===== Zoom =====
+    // El SVG se mueve con transform de CSS (lo hace la tarjeta gráfica, sin redibujar
+    // los estados en cada cuadro). Al terminar el movimiento se redibuja una vez, nítido.
     const ANCHO = 1000, ALTO = 630;
     const ZOOM_MAX = 12;
+    const DURACION = 450;
 
     function crearZoom(svg, contenedor) {
-        let vista = { x: 0, y: 0, w: ANCHO, h: ALTO };
-        let objetivo = vista;   // a dónde va la animación en curso
-        let animacion = null;
+        let vista = { x: 0, y: 0, w: ANCHO, h: ALTO };   // parte del mapa visible (unidades del SVG)
+        let reposo = null;
+        const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // Mantiene la proporción y no deja que el mapa se salga del recuadro
         function ajustar(v) {
@@ -139,40 +142,35 @@
             return { x, y, w, h };
         }
 
-        function aplicar(v) {
-            vista = v;
-            svg.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
-            contenedor.classList.toggle('con-zoom', v.w < ANCHO - 0.5);
+        // Cuando el mapa deja de moverse: se quita la capa de la tarjeta gráfica para que
+        // el navegador lo redibuje nítido, y el grosor de las fronteras se ajusta al zoom
+        function enReposo() {
+            svg.style.willChange = 'auto';
+            svg.style.setProperty('--trazo', (vista.w / ANCHO).toFixed(4));
         }
 
-        const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function aplicar(v, duracion) {
+            vista = v;
+            const s = ANCHO / v.w;
+            clearTimeout(reposo);
+            svg.style.willChange = 'transform';
+            svg.style.transition = duracion && !sinMovimiento
+                ? `transform ${duracion}ms cubic-bezier(0.22, 0.61, 0.36, 1)`
+                : 'none';
+            svg.style.transform =
+                `translate(${-v.x / ANCHO * 100 * s}%, ${-v.y / ALTO * 100 * s}%) scale(${s})`;
+            contenedor.classList.toggle('con-zoom', v.w < ANCHO - 0.5);
+            reposo = setTimeout(enReposo, (sinMovimiento ? 0 : duracion || 0) + 150);
+        }
 
-        function ir(destino, animar = true) {
-            destino = ajustar(destino);
-            objetivo = destino;
-            cancelAnimationFrame(animacion);
-            if (!animar || sinMovimiento) return aplicar(destino);
-
-            const inicio = { ...vista };
-            const t0 = performance.now();
-            const DURACION = 450;
-            const paso = () => {
-                const t = Math.min(1, Math.max(0, (performance.now() - t0) / DURACION));
-                const e = 1 - Math.pow(1 - t, 3);
-                aplicar({
-                    x: inicio.x + (destino.x - inicio.x) * e,
-                    y: inicio.y + (destino.y - inicio.y) * e,
-                    w: inicio.w + (destino.w - inicio.w) * e,
-                    h: inicio.h + (destino.h - inicio.h) * e
-                });
-                if (t < 1) animacion = requestAnimationFrame(paso);
-            };
-            animacion = requestAnimationFrame(paso);
+        function ir(destino, duracion = DURACION) {
+            aplicar(ajustar(destino), duracion);
         }
 
         // Convierte coordenadas de pantalla a coordenadas del mapa
+        // (se mide el contenedor: el SVG está escalado y su rectángulo no sirve)
         function aMapa(clientX, clientY) {
-            const r = svg.getBoundingClientRect();
+            const r = contenedor.getBoundingClientRect();
             return {
                 x: vista.x + (clientX - r.left) / r.width * vista.w,
                 y: vista.y + (clientY - r.top) / r.height * vista.h
@@ -180,19 +178,17 @@
         }
 
         // Acerca o aleja dejando fijo el punto (px, py) del mapa
-        function zoomEn(factor, px, py, animar = true) {
+        function zoomEn(factor, px, py, duracion = DURACION) {
             const w = vista.w / factor, h = vista.h / factor;
             ir({
                 x: px - (px - vista.x) / factor,
                 y: py - (py - vista.y) / factor,
                 w, h
-            }, animar);
+            }, duracion);
         }
 
-        // Parte del destino de la animación en curso para que clics seguidos se acumulen
         function zoomCentro(factor) {
-            const v = objetivo, w = v.w / factor, h = v.h / factor;
-            ir({ x: v.x + (v.w - w) / 2, y: v.y + (v.h - h) / 2, w, h });
+            zoomEn(factor, vista.x + vista.w / 2, vista.y + vista.h / 2);
         }
 
         function enfocar(path) {
@@ -214,7 +210,7 @@
             if (alejando && vista.w >= ANCHO - 0.5) return;
             e.preventDefault();
             const p = aMapa(e.clientX, e.clientY);
-            zoomEn(alejando ? 1 / 1.25 : 1.25, p.x, p.y, false);
+            zoomEn(alejando ? 1 / 1.25 : 1.25, p.x, p.y, 160);
         }, { passive: false });
 
         // Arrastrar para mover y pellizcar para acercar (mouse y touch)
@@ -238,7 +234,7 @@
         svg.addEventListener('pointermove', e => {
             if (!punteros.has(e.pointerId)) return;
             punteros.set(e.pointerId, { x: e.clientX, y: e.clientY });
-            const r = svg.getBoundingClientRect();
+            const r = contenedor.getBoundingClientRect();
 
             if (pellizco && punteros.size === 2) {
                 const [a, b] = [...punteros.values()];
@@ -248,7 +244,7 @@
                 const px = v.x + (cx - r.left) / r.width * v.w;
                 const py = v.y + (cy - r.top) / r.height * v.h;
                 const w = v.w / factor, h = v.h / factor;
-                ir({ x: px - (px - v.x) / factor, y: py - (py - v.y) / factor, w, h }, false);
+                ir({ x: px - (px - v.x) / factor, y: py - (py - v.y) / factor, w, h }, 0);
                 seMovio = true;
             } else if (arrastre && vista.w < ANCHO - 0.5) {
                 const dx = e.clientX - arrastre.x, dy = e.clientY - arrastre.y;
@@ -256,7 +252,7 @@
                 if (!seMovio) svg.setPointerCapture(e.pointerId);
                 seMovio = true;
                 const v = arrastre.vista;
-                ir({ x: v.x - dx / r.width * v.w, y: v.y - dy / r.height * v.h, w: v.w, h: v.h }, false);
+                ir({ x: v.x - dx / r.width * v.w, y: v.y - dy / r.height * v.h, w: v.w, h: v.h }, 0);
             }
         });
 
