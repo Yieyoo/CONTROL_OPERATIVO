@@ -8,3 +8,6 @@ documentos/*.xlsx
 # Ya no se usan; se conservan solo en local
 documentacion/
 _respaldo_paginas_viejas/
+
+# Semblanzas (datos personales): solo en local
+documentos/*SEMBLANZAS*/

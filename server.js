@@ -776,6 +776,10 @@ router.get('/obtener-titulo-global', authenticate, async (req, res, next) => {
 
 // ========== FICHA CURRICULAR DATA ==========
 const fichaCache = {};
+// Hora en que se leyo cada ficha: pasado este tiempo se vuelve a pedir a Cloudinary,
+// para que un cambio hecho fuera del formulario (ej. carga masiva) aparezca sin reiniciar
+const fichaCacheHora = {};
+const FICHA_CACHE_TTL = 10 * 60 * 1000;
 
 router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
   try {
@@ -791,7 +795,8 @@ router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
     }
 
     // Use cache for ficha JSON
-    let fichaData = fichaCache[estado] || null;
+    const vigente = (fichaCacheHora[estado] || 0) > Date.now() - FICHA_CACHE_TTL;
+    let fichaData = vigente ? (fichaCache[estado] || null) : null;
 
     if (!fichaData) {
       const r = await latestRaw(`${estado}/ficha_datos/`);
@@ -804,6 +809,7 @@ router.get('/ficha-datos/:estado', authenticate, async (req, res, next) => {
           }).on('error', reject);
         });
         fichaCache[estado] = fichaData;
+        fichaCacheHora[estado] = Date.now();
       }
     }
 
@@ -858,6 +864,7 @@ router.post('/ficha-datos/:estado', authenticate, async (req, res, next) => {
     });
 
     fichaCache[estado] = fichaData;
+    fichaCacheHora[estado] = Date.now();
     res.json({ status: 'success', data: fichaData });
   } catch (error) {
     next(error);
