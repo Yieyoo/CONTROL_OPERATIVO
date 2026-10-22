@@ -132,6 +132,10 @@ class MenuLoader {
         if (sidebarLogo && prefix) {
             sidebarLogo.setAttribute('src', prefix + 'imagenes/gobernacion.jpg');
         }
+        const sello = document.querySelector('.topbar-sello');
+        if (sello && prefix) {
+            sello.setAttribute('src', prefix + 'imagenes/sello.png');
+        }
 
         allLinks.forEach(link => {
             const originalHref = link.getAttribute('href');

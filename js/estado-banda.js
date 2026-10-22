@@ -20,6 +20,7 @@
         const banda = document.querySelector('.instituto-info');
         if (!banda) return;
         banda.classList.add('con-banda');
+        document.body.classList.add('con-banda-estado');
         if (!id) return;
 
         try {

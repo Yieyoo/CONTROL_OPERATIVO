@@ -60,6 +60,67 @@
     font-size: 1.05rem;
 }
 
+/* Sello del sitio (rostro de la portada) */
+.topbar-sello {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--menu-dorado);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Usuario y salir, a la derecha */
+.topbar-usuario {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-right: 10px;
+}
+
+.topbar-usuario-nombre {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.8rem;
+    padding: 0 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+}
+
+.topbar-usuario-nombre .fas { color: var(--menu-dorado); font-size: 1rem; }
+.topbar .nav-username { color: inherit; font-weight: 600; }
+
+.topbar-salir {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.topbar-salir:hover { background: rgba(255, 255, 255, 0.12); }
+.topbar-salir .fas { color: var(--menu-dorado); }
+
+/* En celular solo queda el boton de salir, sin texto */
+@media (max-width: 640px) {
+    .topbar-usuario-nombre { display: none; }
+    .topbar-salir span { display: none; }
+}
+
+/* Paginas de estado: barra y banda guinda se leen como un solo bloque (una sola linea dorada) */
+body.con-banda-estado .topbar {
+    border-bottom-color: transparent;
+    box-shadow: none;
+}
+
 .nav-username {
     font-weight: 600;
     color: var(--menu-primario);

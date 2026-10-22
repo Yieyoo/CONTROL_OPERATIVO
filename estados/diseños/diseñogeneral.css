@@ -593,6 +593,8 @@
   .con-banda > *:not(.banda-silueta) { position: relative; z-index: 1; }
   .con-banda .inst-logo-block + .inst-sep { background: rgba(255, 255, 255, 0.35); }
   .con-banda .estado-badge { font-size: 1.5rem; letter-spacing: 1.5px; }
+  .con-banda .inst-logo { height: 36px; }
+  .con-banda .inst-logo-block + .inst-sep { height: 34px; }
   .con-banda .inst-date-block { border-top-color: rgba(217, 185, 92, 0.4); }
   /* En celular la silueta va de marca de agua detras del texto */
   .banda-silueta {
