@@ -299,14 +299,48 @@ main, footer {
 }
 
 #map svg {
-  max-width: 100%;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
-#map text {
-  font-family: 'Arial', sans-serif;
-  font-size: 10px;
-  fill: #fff;
+.mapa-estado {
+  fill: #691932;
+  stroke: #fff;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  cursor: pointer;
+  outline: none;
+  transition: fill 0.2s ease;
+}
+
+.mapa-estado.activo,
+.mapa-estado:focus-visible {
+  fill: #285c4d;
+}
+
+.mapa-tooltip {
+  position: absolute;
+  z-index: 5;
   pointer-events: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #1f1f1f;
+  color: #fff;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 12px));
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.mapa-tooltip.visible { opacity: 1; }
+
+.mapa-aviso {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #8a1c1c;
 }
 
 /* Lista de estados */
@@ -371,6 +405,7 @@ main, footer {
 }
 
 #listaEstados a:hover,
+#listaEstados a.activo,
 #listaEstados a:focus-visible {
   background: #691932;
   color: #fff;

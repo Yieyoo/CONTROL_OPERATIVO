@@ -115,7 +115,6 @@
             <div class="mapa-cuerpo">
                 <div class="mapa-lienzo">
                     <div id="map"></div>
-                    <p id="mapa-error" style="color: red; display: none;"></p>
                 </div>
                 <aside class="lista-estados">
                     <div class="lista-buscar">
@@ -130,8 +129,7 @@
     </main>
 
     <!-- Scripts -->
-    <script src="mapa/html5countrymapv4.5/mapdata.js"></script>
-    <script src="mapa/html5countrymapv4.5/countrymap.js"></script>
+    <script src="js/mapa-mexico.js"></script>
 
    <script>
     // Verificar autenticación via localStorage
@@ -172,17 +170,6 @@
         day: 'numeric'
     });
 
-    // Verificación de carga del mapa
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-            if (typeof simplemaps_countrymap === 'undefined') {
-                document.getElementById('mapa-error').textContent = 
-                    'Error: No se cargó countrymap.js. Verifica la ruta.';
-                document.getElementById('mapa-error').style.display = 'block';
-            }
-        }, 1000);
-    });
-
     // Efectos visuales
     document.addEventListener('DOMContentLoaded', function() {
         // Efecto de carga inicial
@@ -201,57 +188,6 @@
         
         const mapas = document.querySelectorAll('.mapa-container');
         mapas.forEach(mapa => observer.observe(mapa));
-    });
-
-    // Lista de estados (sale de mapdata.js para no repetir nombres ni rutas)
-    document.addEventListener('DOMContentLoaded', function() {
-        var lista = document.getElementById('listaEstados');
-        var vacia = document.getElementById('listaVacia');
-        var buscar = document.getElementById('buscarEstado');
-        if (typeof simplemaps_countrymap_mapdata === 'undefined') return;
-
-        var datos = simplemaps_countrymap_mapdata.state_specific;
-        var quitarAcentos = function(t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); };
-
-        Object.keys(datos)
-            .filter(function(id) { return datos[id].url; })
-            .sort(function(a, b) { return datos[a].name.localeCompare(datos[b].name, 'es'); })
-            .forEach(function(id) {
-                var li = document.createElement('li');
-                var a = document.createElement('a');
-                a.href = datos[id].url;
-                a.textContent = datos[id].name;
-                a.dataset.busqueda = quitarAcentos(datos[id].name);
-                // Al pasar por la lista se resalta el estado en el mapa
-                a.addEventListener('mouseenter', function() {
-                    if (window.simplemaps_countrymap && simplemaps_countrymap.popup) simplemaps_countrymap.popup('state', id);
-                });
-                a.addEventListener('mouseleave', function() {
-                    if (window.simplemaps_countrymap && simplemaps_countrymap.popup_hide) simplemaps_countrymap.popup_hide();
-                });
-                li.appendChild(a);
-                lista.appendChild(li);
-            });
-
-        buscar.addEventListener('input', function() {
-            var q = quitarAcentos(buscar.value.trim());
-            var visibles = 0;
-            lista.querySelectorAll('a').forEach(function(a) {
-                var ok = a.dataset.busqueda.indexOf(q) !== -1;
-                a.parentNode.style.display = ok ? '' : 'none';
-                if (ok) visibles++;
-            });
-            vacia.style.display = visibles ? 'none' : 'block';
-        });
-
-        // Enter abre el primer resultado
-        buscar.addEventListener('keydown', function(e) {
-            if (e.key !== 'Enter') return;
-            var primero = Array.prototype.find.call(lista.querySelectorAll('a'), function(a) {
-                return a.parentNode.style.display !== 'none';
-            });
-            if (primero) window.location.href = primero.href;
-        });
     });
 
 </script>
