@@ -104,7 +104,11 @@
             return;
         }
         const total = conteo(estructura, slug).total + conteo(eventual, slug).total;
-        const periodo = periodoTexto(estructura || eventual);
+        // Si estructura y eventual son de quincenas distintas, se muestran las dos
+        const pe = periodoTexto(estructura), pv = periodoTexto(eventual);
+        const periodo = (pe && pv && pe !== pv)
+            ? `estructura ${pe} · eventual ${pv}`
+            : (pe || pv);
 
         caja.innerHTML = `
             <div class="sel-total">

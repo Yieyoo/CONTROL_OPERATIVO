@@ -663,6 +663,12 @@ router.get('/archivos/:estado/:tipoDocumento', authenticate, async (req, res, ne
         }),
         ...(resource.context?.custom?.preview_pdf_url && {
           preview_pdf_url: resource.context.custom.preview_pdf_url
+        }),
+        // Periodo elegido al procesar el Excel nacional (para armar el titulo)
+        ...(resource.context?.custom?.mes && {
+          quincena: resource.context.custom.quincena,
+          mes: resource.context.custom.mes,
+          anio: resource.context.custom.anio
         })
       };
     });
@@ -1253,6 +1259,7 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
       const COL_ADSCRIPCION = colAdscripcion.index;
       const COL_NOMBRE = colNombre.index;
       const COL_NUMERO = (columnasDetectadas.find(c => c.key === 'no') || {}).index || 1;
+      const COL_STATUS = (columnasDetectadas.find(c => c.key === 'status') || {}).index || null;
       const ULTIMA_COLUMNA = columnasDetectadas[columnasDetectadas.length - 1].index;
 
       // El titulo/vigencia puede estar anclado en A5/A6 o B5/B6 segun la
@@ -1306,7 +1313,9 @@ router.post('/plantilla-nacional/procesar', authenticate, (req, res, next) => {
           errores.push({ row: r, valor_adscripcion: String(adscripcionValor ?? ''), motivo: 'adscripcion_no_reconocida' });
           continue;
         }
-        if (celdaVacia(nombreValor)) {
+        // Una plaza VACANTE puede venir sin nombre; solo es error si esta ocupada
+        const esVacante = COL_STATUS && normalizarHeader(fila.getCell(COL_STATUS).value) === 'VACANTE';
+        if (celdaVacia(nombreValor) && !esVacante) {
           errores.push({ row: r, valor_adscripcion: String(adscripcionValor ?? ''), motivo: 'nombre_vacio' });
           continue;
         }

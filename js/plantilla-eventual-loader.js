@@ -148,6 +148,7 @@
     let documentoActual = 'principal'; // 'principal' o 'alternativo'
     let documentosDisponibles = [];
     let tituloPrincipalCompleto = ''; // Almacena el título completo del documento principal
+    let documentoMostrado = null; // Documento que se está viendo (para el periodo del título)
 
     // Detectar iOS
     function isIOS() {
@@ -193,9 +194,25 @@
         return 'Plantilla de Personal - ' + NOMBRE_ESTADO + ' - Estructura';
     }
 
+    // Periodo del documento generado desde el Excel nacional, ej. "1ra Quincena Agosto 2026"
+    function periodoDocumento(documento) {
+        if (!documento || !documento.mes || !documento.anio) return '';
+        const quincena = String(documento.quincena) === '1' ? '1ra' : '2da';
+        const mes = documento.mes.charAt(0) + documento.mes.slice(1).toLowerCase();
+        return `${quincena} Quincena ${mes} ${documento.anio}`;
+    }
+
     // Función para actualizar el título en la página
     function actualizarTituloPagina(tipoDocumento = 'principal') {
         const tituloContainer = document.getElementById('tituloContainer');
+
+        // Si lo que se muestra salió del Excel nacional, el título lleva el periodo que se eligió al subirlo
+        const periodo = periodoDocumento(documentoMostrado);
+        if (periodo && tituloContainer) {
+            const tipoTexto = tipoDocumento === 'principal' ? 'Estructura' : 'Eventual';
+            tituloContainer.textContent = `Plantilla de Personal - ${NOMBRE_ESTADO} - ${tipoTexto} - ${periodo}`;
+            return;
+        }
 
         if (!tituloPrincipalCompleto) return;
 
@@ -346,6 +363,8 @@
             console.error('Elementos del DOM no encontrados');
             return;
         }
+
+        documentoMostrado = documento;
 
         // Actualizar fecha
         fechaElement.textContent = formatDate(documento.uploaded_at);
