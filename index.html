@@ -69,13 +69,7 @@
         <p>Por favor espera</p>
     </div> 
 
-    <header>
-        
-        <!-- Contenido del header sin el menú -->
-        <div class="logo-container">
-            <img src="imagenes/unnamed.png" alt="Gobernación" class="logo" id="logo-gobernacion">
-        </div>
-    </header>
+    <header></header>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main>
@@ -85,22 +79,53 @@
                 <img src="imagenes/MujerBandera.png" alt="Imagen representativa">
             </div>
             <div class="texto-container">
+                <img src="imagenes/unnamed.png" alt="Gobernación" class="logo-gobernacion" id="logo-gobernacion">
+                <span class="portada-etiqueta">Información de Control Operativo</span>
                 <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
-                <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
-                <h3>Dirección de Control Operativo</h3>
+                <p class="portada-dg">Dirección General de Coordinación de Oficinas de Representación</p>
+                <p class="portada-direccion">Dirección de Control Operativo</p>
                 <div class="linea"></div>
-                <h2>Información de Control Operativo</h2>
-                <div class="fecha-actual" id="fechaActual"></div>
+                <div class="fecha-actual"><i class="fas fa-calendar-alt"></i> <span id="fechaActual"></span></div>
+
+                <!-- Accesos directos -->
+                <nav class="accesos" aria-label="Accesos directos">
+                    <a class="acceso" href="datos_nacionales/datosindex.html">
+                        <i class="fas fa-database"></i>
+                        <span><strong>Datos Nacionales</strong><small>Concentrado de todo el país</small></span>
+                    </a>
+                    <a class="acceso" href="#mapa">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span><strong>Oficinas de Representación</strong><small>Consulta por estado</small></span>
+                    </a>
+                    <a class="acceso" href="gestion/archivos.html">
+                        <i class="fas fa-folder-open"></i>
+                        <span><strong>Gestión de Archivos</strong><small>Carga y consulta de documentos</small></span>
+                    </a>
+                </nav>
             </div>
         </section>
-        <div class="contra-header"></div>     
-       
-        
+        <div class="contra-header"></div>
+
         <!-- SECCIÓN MAPA -->
-        <section class="mapa-container">
-            <h2 class="titulo-mapa">Mapa Interactivo de México</h2>
-            <div id="map"></div>
-            <p id="mapa-error" style="color: red; display: none;"></p>
+        <section class="mapa-container" id="mapa">
+            <div class="mapa-encabezado">
+                <h2 class="titulo-mapa">Oficinas de Representación</h2>
+                <p>Selecciona un estado en el mapa o búscalo en la lista</p>
+            </div>
+            <div class="mapa-cuerpo">
+                <div class="mapa-lienzo">
+                    <div id="map"></div>
+                    <p id="mapa-error" style="color: red; display: none;"></p>
+                </div>
+                <aside class="lista-estados">
+                    <div class="lista-buscar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="buscarEstado" placeholder="Buscar estado..." autocomplete="off">
+                    </div>
+                    <ul id="listaEstados"></ul>
+                    <p class="lista-vacia" id="listaVacia">Sin coincidencias</p>
+                </aside>
+            </div>
         </section>
     </main>
 
@@ -141,7 +166,7 @@
     }
 
     // Mostrar fecha actual
-    document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
+    document.getElementById("fechaActual").textContent = new Date().toLocaleDateString('es-MX', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -176,6 +201,57 @@
         
         const mapas = document.querySelectorAll('.mapa-container');
         mapas.forEach(mapa => observer.observe(mapa));
+    });
+
+    // Lista de estados (sale de mapdata.js para no repetir nombres ni rutas)
+    document.addEventListener('DOMContentLoaded', function() {
+        var lista = document.getElementById('listaEstados');
+        var vacia = document.getElementById('listaVacia');
+        var buscar = document.getElementById('buscarEstado');
+        if (typeof simplemaps_countrymap_mapdata === 'undefined') return;
+
+        var datos = simplemaps_countrymap_mapdata.state_specific;
+        var quitarAcentos = function(t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); };
+
+        Object.keys(datos)
+            .filter(function(id) { return datos[id].url; })
+            .sort(function(a, b) { return datos[a].name.localeCompare(datos[b].name, 'es'); })
+            .forEach(function(id) {
+                var li = document.createElement('li');
+                var a = document.createElement('a');
+                a.href = datos[id].url;
+                a.textContent = datos[id].name;
+                a.dataset.busqueda = quitarAcentos(datos[id].name);
+                // Al pasar por la lista se resalta el estado en el mapa
+                a.addEventListener('mouseenter', function() {
+                    if (window.simplemaps_countrymap && simplemaps_countrymap.popup) simplemaps_countrymap.popup('state', id);
+                });
+                a.addEventListener('mouseleave', function() {
+                    if (window.simplemaps_countrymap && simplemaps_countrymap.popup_hide) simplemaps_countrymap.popup_hide();
+                });
+                li.appendChild(a);
+                lista.appendChild(li);
+            });
+
+        buscar.addEventListener('input', function() {
+            var q = quitarAcentos(buscar.value.trim());
+            var visibles = 0;
+            lista.querySelectorAll('a').forEach(function(a) {
+                var ok = a.dataset.busqueda.indexOf(q) !== -1;
+                a.parentNode.style.display = ok ? '' : 'none';
+                if (ok) visibles++;
+            });
+            vacia.style.display = visibles ? 'none' : 'block';
+        });
+
+        // Enter abre el primer resultado
+        buscar.addEventListener('keydown', function(e) {
+            if (e.key !== 'Enter') return;
+            var primero = Array.prototype.find.call(lista.querySelectorAll('a'), function(a) {
+                return a.parentNode.style.display !== 'none';
+            });
+            if (primero) window.location.href = primero.href;
+        });
     });
 
 </script>
