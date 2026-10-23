@@ -1,0 +1,192 @@
+/* ==================== */
+/* VISOR DE DOCUMENTOS (js/visor-shell.js)                          */
+/* Banda del estado + barra de informacion + PDF en un marco.       */
+/* Se aplica solo cuando el body tiene la clase .con-visor.          */
+/* ==================== */
+
+/* Lo que reemplaza el armazon */
+body.con-visor .titulo-personalizado,
+body.con-visor .doc-fecha,
+body.con-visor #doc-actions-fixed,
+body.con-visor #fecha-subida,
+body.con-visor .regresar-btn { display: none !important; }
+
+body.con-visor { padding-top: 46px; }
+
+/* ===== Banda del estado (mismo degradado que la barra superior) ===== */
+.vb-banda {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-height: 104px;
+    padding: 0 48px 0 80px;
+    background: linear-gradient(to right, #3d0c1c 0%, #5c1530 40%, #691932 75%, #7a2340 100%);
+    border-bottom: 3px solid #A5852E;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.vb-logo { height: 54px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; padding-right: 26px; }
+
+.vb-sep { width: 1px; height: 60px; background: rgba(255, 255, 255, 0.22); flex-shrink: 0; }
+
+.vb-titulo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 26px;
+    text-align: left;
+}
+
+.vb-estado {
+    font-size: clamp(1.4rem, 2vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+.vb-seccion {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #d9b95c;
+}
+
+.vb-inm { font-size: 0.72rem; color: rgba(255, 255, 255, 0.7); }
+
+.vb-silueta {
+    flex-shrink: 0;
+    height: 80px;
+    width: 110px;
+    margin: 0 26px 0 12px;
+    overflow: visible;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+.vb-silueta path {
+    fill: rgba(217, 185, 92, 0.16);
+    stroke: #d9b95c;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.vb-fecha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 26px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.88);
+    white-space: nowrap;
+}
+
+.vb-fecha .fas { color: #d9b95c; }
+
+/* ===== Barra de informacion del documento ===== */
+.vb-barra {
+    width: calc(100% - 32px);
+    max-width: 76rem;
+    margin: 22px auto 16px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    text-align: left;
+}
+
+.vb-tabs { display: inline-flex; background: #f3eef0; border-radius: 8px; padding: 4px; gap: 4px; }
+
+.vb-tabs button {
+    border: 0;
+    background: transparent;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #691932;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.vb-tabs button.activa { background: #691932; color: #fff; box-shadow: 0 2px 6px rgba(105, 25, 50, 0.3); }
+.vb-tabs button:not(.activa):hover:not(:disabled) { background: #eadfe3; }
+.vb-tabs button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.vb-meta { color: #666; font-size: 0.86rem; }
+.vb-meta b { color: #691932; }
+
+.vb-acciones { margin-left: auto; display: flex; gap: 8px; }
+
+.vb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid #d8c9ce;
+    background: #fff;
+    color: #691932;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.vb-btn:hover { background: #faf6f7; border-color: #691932; }
+.vb-btn.prim { background: #A5852E; border-color: #A5852E; color: #fff; }
+.vb-btn.prim:hover { background: #8a6a24; border-color: #8a6a24; }
+
+/* ===== Marco del PDF ===== */
+body.con-visor .pdf-container {
+    width: calc(100% - 32px);
+    max-width: 76rem;
+    margin: 0 auto 30px;
+    border-radius: 10px;
+    border: none;
+    background: #525659;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.15);
+}
+
+body.con-visor .pdf-embed,
+body.con-visor .pdf-container iframe {
+    height: calc(100vh - 290px);
+    min-height: 520px;
+}
+
+body.con-visor .pdf-container:fullscreen .pdf-embed { height: 100vh; }
+
+/* ===== Celular ===== */
+@media (max-width: 768px) {
+    .vb-banda { padding: 14px 16px; min-height: 0; flex-wrap: wrap; gap: 8px; }
+    .vb-logo { height: 34px; padding-right: 12px; }
+    .vb-sep { height: 34px; }
+    .vb-sep.vb-sep-fecha { display: none; }
+    .vb-titulo { padding-left: 12px; position: relative; z-index: 1; }
+    .vb-estado { font-size: 1.35rem; letter-spacing: 1.5px; }
+    .vb-inm { display: none; }
+    .vb-fecha { width: 100%; justify-content: center; padding: 8px 0 0; border-top: 1px solid rgba(217, 185, 92, 0.4); font-size: 0.75rem; position: relative; z-index: 1; }
+    .vb-silueta { position: absolute; top: 50%; right: -6px; translate: 0 -50%; width: 130px; height: 130px; margin: 0; opacity: 0.35; filter: none; }
+
+    .vb-barra { gap: 10px; }
+    .vb-tabs { width: 100%; }
+    .vb-tabs button { flex: 1; }
+    .vb-acciones { margin-left: 0; width: 100%; }
+    .vb-acciones .vb-btn { flex: 1; justify-content: center; }
+    .vb-btn-pc { display: none !important; }
+}

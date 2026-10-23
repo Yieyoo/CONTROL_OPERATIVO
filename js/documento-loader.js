@@ -71,6 +71,9 @@
             <div class="mobile-images">
                 <div id="mobile-error" class="error-message" style="display: none;"></div>
             </div>
+            <!-- Los lee js/visor-shell.js para su boton "Descargar" y la fecha de la barra -->
+            <a id="download-doc-btn" href="#" hidden></a>
+            <span id="fecha-texto" hidden>Cargando...</span>
         `;
     }
 
@@ -100,6 +103,8 @@
             const filename = latest.filename || `${TIPO}.pdf`;
 
             document.getElementById('pdf-viewer').src = latest.url;
+            document.getElementById('download-doc-btn').href = latest.download_url || latest.url;
+            document.getElementById('fecha-texto').textContent = formatDate(latest.uploaded_at);
 
             if (isIOS()) {
                 const iosLink = document.getElementById('ios-pdf-link');

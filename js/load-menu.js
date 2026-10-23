@@ -134,7 +134,7 @@ class MenuLoader {
         }
         const sello = document.querySelector('.topbar-sello');
         if (sello && prefix) {
-            sello.setAttribute('src', prefix + 'imagenes/sello.png');
+            sello.setAttribute('src', prefix + 'imagenes/aguila.png');
         }
 
         allLinks.forEach(link => {

@@ -60,13 +60,13 @@
     font-size: 1.05rem;
 }
 
-/* Sello del sitio (rostro de la portada) */
+/* Escudo nacional (circulo del aguila del logo de Gobernacion), en blanco */
 .topbar-sello {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid var(--menu-dorado);
-    object-fit: cover;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.95;
     flex-shrink: 0;
 }
 
