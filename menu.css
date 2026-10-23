@@ -215,10 +215,18 @@ nav.menu > ul > li > a {
 }
 
 nav.menu > ul > li > a:hover,
-nav.menu > ul > li > a.active,
 nav.menu > ul > li.submenu.active > a {
+    background: rgba(105, 25, 50, 0.06);
+    color: var(--menu-primario);
+}
+
+/* Pagina actual: la opcion (o el grupo que la contiene) va marcada con una franja dorada */
+nav.menu > ul > li > a.active,
+nav.menu > ul > li.submenu.contiene-actual > a {
     background: rgba(105, 25, 50, 0.08);
     color: var(--menu-primario);
+    font-weight: 700;
+    box-shadow: inset 3px 0 0 var(--menu-dorado);
 }
 
 /* Iconos */
@@ -293,6 +301,14 @@ nav.menu .fa {
     background: rgba(105, 25, 50, 0.06) !important;
     border-left-color: var(--menu-dorado) !important;
     color: var(--menu-primario) !important;
+}
+
+/* Opcion actual dentro de un submenu */
+.submenu-list li a.active {
+    background: rgba(105, 25, 50, 0.08) !important;
+    border-left-color: var(--menu-dorado) !important;
+    color: var(--menu-primario) !important;
+    font-weight: 700;
 }
 
 /* Buscador de estados */
@@ -415,4 +431,9 @@ body {
     padding-top: var(--menu-topbar-h) !important;
 }
 
-
+/* Usuario y cerrar sesion ya estan en la barra superior: en el menu solo se muestran en celular */
+@media (min-width: 641px) {
+    nav.menu .sidebar-user,
+    nav.menu .sidebar-logout,
+    nav.menu .sidebar-user + .sidebar-logout { display: none; }
+}

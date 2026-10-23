@@ -219,11 +219,20 @@ class MenuLoader {
 
     static markActiveLink() {
         const currentURL = window.location.href.split('?')[0].split('#')[0];
+        // Carpeta del estado si la pagina es de un estado (su inicio o cualquiera de sus documentos)
+        const carpetaActual = (/\/estados\/([^/]+)\//.exec(decodeURIComponent(window.location.pathname)) || [])[1];
+
         document.querySelectorAll('.topbar a[href], .menu a[href]').forEach(link => {
+            // Los encabezados de submenu (href="#") no son paginas: antes contaban como "esta pagina"
+            if (link.getAttribute('href') === '#') return;
             const linkURL = link.href.split('?')[0].split('#')[0];
-            if (linkURL && linkURL === currentURL) {
-                link.classList.add('active');
-            }
+            const carpetaLink = (/\/estados\/([^/]+)\//.exec(decodeURIComponent(link.pathname)) || [])[1];
+            const esActual = linkURL === currentURL || (carpetaActual && carpetaLink === carpetaActual);
+            if (!esActual) return;
+            link.classList.add('active');
+            // El grupo que contiene la pagina actual tambien se marca (sin abrirlo)
+            const grupo = link.closest('.submenu');
+            if (grupo) grupo.classList.add('contiene-actual');
         });
     }
 
