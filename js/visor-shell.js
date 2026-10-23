@@ -26,7 +26,8 @@
         organigrama: 'Organigrama',
         vehiculos: 'Vehículos',
         unidad_canina: 'Unidad Canina',
-        ubicaciones_sedes: 'Ubicación de las Oficinas'
+        ubicaciones_sedes: 'Ubicación de las Oficinas',
+        ficha_curricular: 'Ficha Curricular'
     };
 
     // Documentos con dos versiones: la pestaña 2 equivale al boton "alternar" del visor
@@ -38,7 +39,8 @@
     const SVG_NS = 'http://www.w3.org/2000/svg';
     const carpeta = (/\/estados\/([^/]+)\//.exec(decodeURIComponent(location.pathname)) || [])[1];
     const estado = ESTADOS[carpeta];
-    const pagina = window.DOC_PAGE || {};
+    // La ficha curricular no usa DOC_PAGE: solo lleva la banda (no tiene PDF ni barra)
+    const pagina = window.DOC_PAGE || (window.FICHA_ESTADO ? { tipo: 'ficha_curricular' } : {});
     const seccion = SECCIONES[pagina.tipo] || pagina.titulo || '';
 
     function crearBanda() {
@@ -160,7 +162,13 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         // Corre despues del visor (este script se carga al final), cuando ya existe su contenido
-        if (!document.getElementById('pdf-viewer')) return;
+        if (!document.getElementById('pdf-viewer')) {
+            if (!document.getElementById('ficha-root')) return;
+            document.body.classList.add('con-visor', 'con-banda-estado');
+            const ancla = document.querySelector('.titulo-personalizado') || document.body.firstChild;
+            ancla.parentNode.insertBefore(crearBanda(), ancla);
+            return;
+        }
         document.body.classList.add('con-visor', 'con-banda-estado');
 
         const banda = crearBanda();

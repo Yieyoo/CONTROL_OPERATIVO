@@ -405,3 +405,132 @@ header { display: none; }
 .btn-13, .btn-14               { background-color: #1a3e72 !important; }
 
 .regresar-btn { display: none !important; }
+/* ==================== */
+/* BANDA GUINDA CON SILUETA DE MEXICO (mismo estilo que los estados) */
+/* ==================== */
+body { overflow-x: hidden; }
+
+.dn-banda {
+  align-self: stretch;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  min-height: 118px;
+  padding: 0 48px 0 80px;
+  background: linear-gradient(to right, #3d0c1c 0%, #5c1530 40%, #691932 75%, #7a2340 100%);
+  border-bottom: 3px solid #A5852E;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.dn-logo { height: 62px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; padding-right: 26px; }
+.dn-sep { width: 1px; height: 68px; background: rgba(255, 255, 255, 0.22); flex-shrink: 0; }
+
+.dn-titulo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding-left: 26px; text-align: left; }
+.dn-nombre { font-size: clamp(1.6rem, 2.4vw, 2.2rem); font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; line-height: 1.1; }
+.dn-sub { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #d9b95c; }
+.dn-inm { font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); }
+
+.dn-silueta {
+  flex-shrink: 0;
+  height: 92px;
+  width: 150px;
+  margin: 0 28px 0 12px;
+  overflow: visible;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+.dn-silueta path {
+  fill: rgba(217, 185, 92, 0.16);
+  stroke: #d9b95c;
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.dn-fecha { display: flex; align-items: center; gap: 12px; padding-left: 26px; font-size: 1rem; color: rgba(255, 255, 255, 0.88); white-space: nowrap; }
+.dn-fecha .fas { color: #d9b95c; }
+
+/* Barra superior con el mismo degradado (un solo encabezado) */
+.topbar { background: linear-gradient(to right, #3d0c1c 0%, #5c1530 40%, #691932 75%, #7a2340 100%) !important; border-bottom-color: transparent !important; box-shadow: none !important; }
+
+/* ===== Botones sobrios (mismos colores) ===== */
+.opciones-container { background: transparent !important; box-shadow: none !important; }
+
+.opciones-grid button {
+  position: relative;
+  overflow: hidden;
+  min-height: 50px;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.4px;
+  padding: 12px 22px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-transform: none;
+  transition: translate 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.3s ease, transform 0.3s ease !important;
+}
+
+.opciones-grid button i {
+  flex-shrink: 0;
+  width: 1.4em;
+  text-align: center;
+  box-sizing: content-box;
+  padding-right: 14px;
+  border-right: 1px solid rgba(255, 255, 255, 0.35);
+  line-height: 1.6;
+}
+
+.opciones-grid button::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: #A5852E;
+  scale: 0 1;
+  transition: scale 0.25s ease;
+}
+
+.opciones-grid button:hover { translate: 0 -2px; filter: brightness(0.93); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18) !important; }
+.opciones-grid button:hover::after { scale: 1 1; }
+
+@media (max-width: 768px) {
+  .dn-banda { padding: 14px 16px; min-height: 0; flex-wrap: wrap; gap: 8px; }
+  .dn-logo { height: 36px; padding-right: 12px; }
+  .dn-sep { height: 34px; }
+  .dn-sep-fecha { display: none; }
+  .dn-titulo { padding-left: 12px; position: relative; z-index: 1; }
+  .dn-nombre { font-size: 1.4rem; letter-spacing: 1.5px; }
+  .dn-inm { display: none; }
+  .dn-fecha { width: 100%; justify-content: center; padding: 8px 0 0; border-top: 1px solid rgba(217, 185, 92, 0.4); font-size: 0.75rem; position: relative; z-index: 1; }
+  .dn-silueta { position: absolute; top: 50%; right: -10px; translate: 0 -50%; width: 170px; height: 120px; margin: 0; opacity: 0.35; filter: none; }
+  .opciones-grid button { justify-content: flex-start; }
+}
+
+/* Banda de orilla a orilla y botones con mas espacio (como en los estados) */
+body { padding-left: 0 !important; padding-right: 0 !important; padding-top: 46px !important; }
+.dn-banda { width: 100%; }
+.contenedor-principal {
+  width: calc(100% - 32px) !important;
+  max-width: 64rem !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-top: 28px !important;
+}
+.opciones-grid button { white-space: nowrap; }
+@media (max-width: 768px) {
+  .fila { flex-direction: column; }
+  .opciones-grid button { white-space: normal; }
+}
+.opciones-container { max-width: none !important; width: 100% !important; }
+.opciones-grid button { white-space: normal !important; line-height: 1.25; }

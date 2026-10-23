@@ -9,7 +9,7 @@
     <meta http-equiv="Expires" content="0">
     <title>Datos Nacionales - Control Operativo</title>
     <link rel="icon" type="image/png" sizes="48x48" href="../imagenes/mapa.png">
-    <link rel="stylesheet" href="estilodatos.css">
+    <link rel="stylesheet" href="estilodatos.css?v=20261022i">
     <script src="../js/auth.js" defer></script>
     <script src="../js/load-menu.js" defer></script>
 </head>
@@ -21,21 +21,19 @@
         </div>
     </header>
 
-    <!-- Información del instituto -->
-    <section class="instituto-info">
-        <h1>INSTITUTO NACIONAL DE MIGRACIÓN</h1>
-        <h2>Dirección General de Coordinación de Oficinas de Representación</h2>
-        <h3>Dirección de Control Operativo</h3>
-        <div class="fecha-actual" id="fechaActual"></div>
-        <button class="regresar-btn" onclick="window.location.href='../index.html'">
-            <i class="fas fa-arrow-left"></i> Regresar
-        </button>
+    <!-- Encabezado: banda guinda con la silueta de Mexico (mismo estilo que los estados) -->
+    <section class="dn-banda">
+        <img class="dn-logo" src="../imagenes/unnamed.png" alt="Gobernación">
+        <div class="dn-sep"></div>
+        <div class="dn-titulo">
+            <span class="dn-nombre">Datos Nacionales</span>
+            <span class="dn-sub">Dirección de Control Operativo</span>
+            <span class="dn-inm">Instituto Nacional de Migración</span>
+        </div>
+        <svg class="dn-silueta" id="dnSilueta" viewBox="0 0 1000 630" aria-hidden="true"></svg>
+        <div class="dn-sep dn-sep-fecha"></div>
+        <div class="dn-fecha"><i class="fas fa-calendar-alt"></i><span id="fechaActual"></span></div>
     </section>
-
-    <!-- Agregamos el nombre del estado aquí -->
-    <div class="estado-info">
-        <h4>Datos Nacionales</h4>
-    </div>
 
     <!-- Contenedor solo para las opciones -->
     <div class="contenedor-principal">
@@ -95,6 +93,18 @@
     </div>
 
     <script>
+        // Silueta de todo el pais (los 32 estados del mapa de la portada)
+        fetch('../imagenes/mx.svg').then(r => r.ok ? r.text() : '').then(txt => {
+            if (!txt) return;
+            const origen = new DOMParser().parseFromString(txt, 'image/svg+xml');
+            const destino = document.getElementById('dnSilueta');
+            origen.querySelectorAll('#features path').forEach(p => {
+                const nuevo = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                nuevo.setAttribute('d', p.getAttribute('d'));
+                destino.appendChild(nuevo);
+            });
+        }).catch(() => {});
+
         // Mostrar la fecha actual
         document.getElementById("fechaActual").innerHTML = new Date().toLocaleDateString('es-MX', {
             year: 'numeric',
